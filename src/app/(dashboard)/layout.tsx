@@ -1,11 +1,44 @@
+'use client';
+
+import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { MessageSquare, GitMerge, Settings, LayoutDashboard, Bot } from 'lucide-react';
+import UserMenu from '@/components/UserMenu';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [status, router]);
+
+  if (status === 'loading') {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'unauthenticated') {
+    return null;
+  }
+
+  const tenant = (session?.user as any)?.tenant;
+
   return (
     <div className="flex h-screen bg-slate-50">
       {/* Sidebar */}
@@ -38,15 +71,15 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center px-6 justify-end">
-          <div className="flex items-center gap-3">
-            <div className="text-sm text-right">
-              <p className="font-medium text-slate-700">Admin User</p>
-              <p className="text-xs text-slate-500">demo-tenant-1234</p>
-            </div>
-            <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold">
-              A
-            </div>
-          </div>
+          {session?.user && (
+            <UserMenu 
+              user={{
+                email: session.user.email || '',
+                name: session.user.name || null,
+              }}
+              tenant={tenant}
+            />
+          )}
         </header>
         
         {/* Page Content */}

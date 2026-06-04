@@ -6,9 +6,9 @@ import { ChatWindow } from '@/modules/widget/ChatWindow';
 
 function WidgetUIRenderer() {
   const searchParams = useSearchParams();
-  const tenantId = searchParams.get('tenantId') || 'demo-tenant-1234';
-  const color = searchParams.get('color') || '#2563eb';
-  const name = searchParams.get('name') || 'Support Bot';
+  const tenantId = searchParams?.get('tenantId') || 'demo-tenant-1234';
+  const color = searchParams?.get('color') || '#2563eb';
+  const name = searchParams?.get('name') || 'Support Bot';
 
   return (
     <div className="h-screen w-screen overflow-hidden">

@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Save, FileText, Link as LinkIcon, Settings, Globe, HelpCircle, Plus, Trash2, ArrowLeft, Send, Bot, User, RotateCcw, GitMerge, List, MessageSquare, LayoutList, FormInput, ExternalLink, Cpu, ChevronRight, Code } from 'lucide-react';
 import Link from 'next/link';
@@ -97,6 +99,7 @@ export default function AgentBuilderPage() {
   const [activeTab, setActiveTab] = useState('faq');
   const [agentConfig, setAgentConfig] = useState({
     name: 'Sales Assistant',
+    description: 'A helpful sales assistant for customer support',
     agentId: 'sales_bot_01',
     llmProvider: 'gemini',
     systemPrompt: 'You are a helpful sales assistant.',
@@ -245,6 +248,98 @@ export default function AgentBuilderPage() {
 
   // --- Training Simulation ---
   const [isTraining, setIsTraining] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedFlows, setSavedFlows] = useState<any[]>([]);
+  const [isLoadingFlows, setIsLoadingFlows] = useState(false);
+  const [showFlowMenu, setShowFlowMenu] = useState(false);
+
+  useEffect(() => {
+    // Load saved flows on mount
+    const loadFlows = async () => {
+      try {
+        const response = await fetch('/api/agent/flows');
+        if (response.ok) {
+          const data = await response.json();
+          setSavedFlows(data.flows || []);
+        }
+      } catch (error) {
+        console.error('Error loading flows:', error);
+      }
+    };
+    loadFlows();
+  }, []);
+
+  const handleLoadFlow = async (flowId: string) => {
+    setIsLoadingFlows(true);
+    try {
+      const response = await fetch(`/api/flows?id=${flowId}`);
+      if (response.ok) {
+        const flow = await response.json();
+        
+        // Update agent config
+        setAgentConfig(flow.config || {});
+        
+        // Update intents from flow intents
+        if (flow.intents && flow.intents.length > 0) {
+          setIntents(flow.intents.map((intent: any) => ({
+            id: intent.id,
+            name: intent.name,
+            trainingPhrases: intent.trainingPhrases,
+            answerType: intent.responseType,
+            answer: intent.response,
+            options: intent.options || '',
+            cardTitle: '',
+            customPayload: intent.metadata?.customPayload || ''
+          })));
+        }
+        
+        // Update flow visualization from metadata
+        if (flow.metadata?.nodes && flow.metadata?.edges) {
+          setNodes(flow.metadata.nodes);
+          setEdges(flow.metadata.edges);
+        }
+        
+        setShowFlowMenu(false);
+        alert(`Loaded flow: ${flow.name}`);
+      }
+    } catch (error) {
+      console.error('Error loading flow:', error);
+      alert('Failed to load flow');
+    } finally {
+      setIsLoadingFlows(false);
+    }
+  };
+
+  const handleSaveFlow = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/flows', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: agentConfig.name || 'Untitled Agent',
+          description: agentConfig.description || '',
+          config: agentConfig,
+          intents: intents,
+          nodes: nodes,
+          edges: edges
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save flow');
+      }
+
+      const data = await response.json();
+      alert('Flow saved successfully!');
+    } catch (error) {
+      console.error('Error saving flow:', error);
+      alert('Failed to save flow. Check console for details.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleTrainAgent = () => {
     setIsTraining(true);
     setTimeout(() => {
@@ -295,6 +390,29 @@ export default function AgentBuilderPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <div className="relative">
+            <button
+              onClick={() => setShowFlowMenu(!showFlowMenu)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm bg-slate-100 text-slate-700 hover:bg-slate-200"
+            >
+              <FileText size={16} /> {savedFlows.length > 0 ? `Load Flow (${savedFlows.length})` : 'Load Flow'}
+            </button>
+            {showFlowMenu && savedFlows.length > 0 && (
+              <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                {savedFlows.map((flow) => (
+                  <button
+                    key={flow.id}
+                    onClick={() => handleLoadFlow(flow.id)}
+                    disabled={isLoadingFlows}
+                    className="w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  >
+                    <div className="font-medium text-sm text-slate-900">{flow.name}</div>
+                    <div className="text-xs text-slate-500 mt-1">{flow.intents?.length || 0} intents</div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <button
             onClick={handleTrainAgent}
             disabled={isTraining}
@@ -304,8 +422,13 @@ export default function AgentBuilderPage() {
             <Cpu size={16} className={isTraining ? 'animate-pulse' : ''} />
             {isTraining ? 'Training in progress...' : 'Train Agent'}
           </button>
-          <button className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-sm">
-            <Save size={16} /> Save Changes
+          <button
+            onClick={handleSaveFlow}
+            disabled={isSaving}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all shadow-sm ${isSaving ? 'bg-slate-100 text-slate-600 cursor-wait' : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+          >
+            <Save size={16} className={isSaving ? 'animate-pulse' : ''} /> {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>

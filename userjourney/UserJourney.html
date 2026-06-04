@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CEO SUITE Chatbot UI/UX POC - City First</title>
+<link rel="stylesheet" href="UserJourney.css" />
+</head>
+<body>
+<div class="demo-shell">
+  <div class="chat-widget">
+    <div class="chat-header">
+      <div class="logo" aria-label="Claire profile photo"></div>
+      <div class="header-copy">
+        <div class="header-title">Claire from CEO SUITE</div>
+        <div class="header-sub">Workspace consultant • Online now</div>
+      </div>
+      <button class="header-action" type="button" onclick="restart()" aria-label="Restart chat">↻</button>
+    </div>
+    <div class="chat-body" id="chat" aria-live="polite"></div>
+    <div class="chat-input">
+      <input id="freeText" placeholder="Type your question..." />
+      <button type="button" onclick="askAI()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script src="UserJourney.js"></script>
+</body>
+</html>

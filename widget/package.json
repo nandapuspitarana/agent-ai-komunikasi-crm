@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "lucide-react": "^1.14.0",
-    "preact": "^10.29.1"
+    "preact": "^10.29.1",
+    "socket.io-client": "^4.7.2"
   }
 }

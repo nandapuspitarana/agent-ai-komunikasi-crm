@@ -1,23 +1,44 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Zap, ArrowRight, Mail, Lock } from 'lucide-react';
+import { Zap, ArrowRight, Mail, Lock, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login delay
-    setTimeout(() => {
-      // In a real app, you'd set auth cookies/tokens here
-      // For now, redirect to the inbox dashboard
-      router.push('/inbox');
-    }, 800);
+    setError('');
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Email atau password salah');
+        setIsLoading(false);
+      } else {
+        // Redirect ke halaman yang sesuai dengan role
+        router.push('/inbox');
+        router.refresh();
+      }
+    } catch (err) {
+      setError('Terjadi kesalahan. Silakan coba lagi.');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -39,6 +60,13 @@ export default function LoginPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-10 px-4 shadow-xl shadow-slate-200/50 sm:rounded-3xl sm:px-10 border border-slate-100">
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
+          
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700">
@@ -54,7 +82,7 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  defaultValue="demo@zetacrm.com"
+                  defaultValue=""
                   className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all"
                 />
               </div>
@@ -74,7 +102,7 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  defaultValue="password"
+                  defaultValue=""
                   className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all"
                 />
               </div>
@@ -94,9 +122,9 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
 

@@ -1,7 +1,9 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useState } from 'react';
-import { Bot, Plus, Search, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { Bot, Plus, Search, MoreVertical, Edit2, Trash2, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AgentsListPage() {
@@ -11,22 +13,42 @@ export default function AgentsListPage() {
     { id: 'internal_hr_01', name: 'HR Assistant', provider: 'Local', status: 'Active', knowledge: '1 Doc, 3 URLs' },
   ]);
 
+  const [showChatbot, setShowChatbot] = useState(false);
+
   return (
     <div className="min-h-full bg-slate-50 p-6 font-sans text-slate-800">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
               <Bot className="text-blue-600" /> AI Agents
             </h1>
-            <p className="text-slate-500 mt-1">Manage and monitor all your AI agents in one place.</p>
+            <p className="text-slate-500 mt-1">Manage and monitor your agents, or launch the User Journey Chatbot directly.</p>
           </div>
-          <Link href="/agent/builder" className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
-            <Plus size={18} /> Create New Agent
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button
+              onClick={() => setShowChatbot(!showChatbot)}
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-all shadow-md hover:shadow-lg"
+            >
+              <MessageSquare size={18} /> User Journey Chatbot
+            </button>
+            <Link href="/agent/builder" className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
+              <Plus size={18} /> Create New Agent
+            </Link>
+          </div>
         </div>
+
+        {/* Chatbot Section */}
+        {showChatbot && (
+          <div className="flex justify-center">
+            <div className="w-full max-w-xl bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Chatbot Preview</h3>
+              <p className="text-slate-600">Chatbot preview will be implemented here</p>
+            </div>
+          </div>
+        )}
 
         {/* Search & Filter */}
         <div className="flex gap-4">
@@ -80,21 +102,16 @@ export default function AgentsListPage() {
                       <button className="p-1.5 text-slate-400 hover:text-red-600 transition-colors">
                         <Trash2 size={16} />
                       </button>
+                      <button className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors">
+                        <MoreVertical size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
-              {agents.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
-                    No agents found. Create one to get started!
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   );

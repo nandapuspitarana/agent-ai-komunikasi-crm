@@ -4,6 +4,77 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  AGENT
+  BUSINESS_PARTNER
+}
+
+enum AuditAction {
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  USER_LOGIN
+  USER_LOGOUT
+  PASSWORD_CHANGED
+  PASSWORD_RESET_REQUESTED
+  PASSWORD_RESET_COMPLETED
+  ROLE_CHANGED
+  STATUS_CHANGED
+}
+
+model User {
+  id                String              @id @default(uuid())
+  email             String              @unique
+  password          String
+  name              String
+  role              UserRole            @default(AGENT)
+  tenantId          String?
+  tenant            Tenant?             @relation(fields: [tenantId], references: [id])
+  isActive          Boolean             @default(true)
+  lastLoginAt       DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  auditLogs         AuditLog[]          @relation("AuditLogUser")
+  performedAudits   AuditLog[]          @relation("AuditLogPerformedBy")
+  passwordResetTokens PasswordResetToken[]
+}
+
+model AuditLog {
+  id            String      @id @default(uuid())
+  action        AuditAction
+  userId        String?
+  user          User?       @relation("AuditLogUser", fields: [userId], references: [id])
+  performedById String?
+  performedBy   User?       @relation("AuditLogPerformedBy", fields: [performedById], references: [id])
+  entityType    String      // "User", "Tenant", etc.
+  entityId      String?
+  changes       Json?       // Store old and new values
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime    @default(now())
+  
+  @@index([userId])
+  @@index([performedById])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  
+  @@index([token])
+  @@index([userId])
 }
 
 model Tenant {
@@ -12,6 +83,7 @@ model Tenant {
   subscription String        @default("free")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  users        User[]
   integrations Integration[]
   flows        Flow[]
   chatSessions ChatSession[]
@@ -31,10 +103,30 @@ model Flow {
   tenantId  String
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
   name      String
-  nodes     Json
-  edges     Json
+  description String?
+  config    Json     @default("{}")
+  metadata  Json     @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  intents   Intent[]
+
+  @@index([tenantId])
+}
+
+model Intent {
+  id               String   @id @default(uuid())
+  flowId           String
+  flow             Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  name             String
+  trainingPhrases  String[]
+  responseType     String   // "text", "options", "form", "card"
+  response         String
+  options          String?
+  metadata         Json     @default("{}")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([flowId])
 }
 
 model ChatSession {

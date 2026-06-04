@@ -49,6 +49,82 @@ Ensure you have the following installed:
    npm install
    ```
 
+3. **Setup environment variables**:
+   Copy `.env.example` to `.env` and update the values:
+   ```bash
+   DATABASE_URL="postgresql://user:pass@localhost:5444/crm?schema=public"
+   REDIS_URL="redis://localhost:5448"
+   AES_ENCRYPTION_KEY="your-32-character-encryption-key"
+   
+   # NextAuth Configuration
+   AUTH_SECRET="your-secret-key-change-this-in-production-min-32-chars"
+   NEXTAUTH_URL="http://localhost:3101"
+   ```
+
+4. **Setup database**:
+   ```bash
+   # Push schema to database
+   npm run db:push
+   
+   # Seed database with test users
+   npm run db:seed
+   ```
+
+5. **Start development server**:
+   ```bash
+   npm run dev
+   ```
+
+6. **Access the application**:
+   Open [http://localhost:3101](http://localhost:3101) in your browser.
+
+---
+
+## 🔐 Authentication
+
+The application uses **NextAuth.js v5** with credential-based authentication and role-based access control (RBAC).
+
+### User Roles
+
+- **SUPER_ADMIN**: Full system access, not tied to any tenant
+- **AGENT**: Customer support agent, tied to a specific tenant
+- **BUSINESS_PARTNER**: Business partner with limited access, tied to a specific tenant
+
+### Test Accounts
+
+After running `npm run db:seed`, you can login with:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | admin@zetacrm.com | password123 |
+| Agent | agent@zetacrm.com | password123 |
+| Business Partner | partner@zetacrm.com | password123 |
+
+### Protected Routes
+
+The following routes require authentication:
+- `/inbox` - Inbox dashboard
+- `/dashboard` - Main dashboard  
+- `/agent` - Agent configuration
+- `/settings` - Settings page
+
+For more details, see [Authentication Documentation](./docs/authentication.md).
+
+---
+
+## 📦 Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm start            # Start production server
+npm run lint         # Run ESLint
+
+npm run db:push      # Push Prisma schema to database
+npm run db:seed      # Seed database with test data
+npm run db:reset     # Reset database and seed
+```
+
 3. **Configure Environment Variables**:
    Copy the example environment file and update your credentials:
    ```bash

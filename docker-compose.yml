@@ -15,7 +15,7 @@ services:
     image: redis:7-alpine
     container_name: crm-redis
     ports:
-      - "6380:6379"
+      - "5448:6379"
 
 volumes:
   postgres_data:

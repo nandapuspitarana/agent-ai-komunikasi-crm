@@ -1,34 +1,38 @@
+import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
 
-export function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
-  
-  // Basic tenant detection logic
-  // In a real SaaS, this would come from a subdomain, custom domain, or session
-  const tenantId = request.headers.get('x-tenant-id') || request.cookies.get('tenant_id')?.value;
+export default auth((req) => {
+  const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
 
-  // Protect dashboard routes
-  if (url.pathname.startsWith('/inbox') || url.pathname.startsWith('/flow-builder') || url.pathname.startsWith('/settings')) {
-    if (!tenantId) {
-      // For now, if no tenant is found, we might want to redirect to a generic login or error
-      // But for development, we'll allow it or set a default
-      console.warn('No tenant_id found in request to', url.pathname);
-    }
+  const isAuthPage = nextUrl.pathname.startsWith('/login');
+  const isProtectedRoute = 
+    nextUrl.pathname.startsWith('/inbox') ||
+    nextUrl.pathname.startsWith('/dashboard') ||
+    nextUrl.pathname.startsWith('/agent') ||
+    nextUrl.pathname.startsWith('/settings');
+
+  // Redirect logged-in users away from login page
+  if (isAuthPage && isLoggedIn) {
+    return NextResponse.redirect(new URL('/inbox', nextUrl));
   }
 
-  const response = NextResponse.next();
-  
+  // Redirect unauthenticated users to login page
+  if (isProtectedRoute && !isLoggedIn) {
+    return NextResponse.redirect(new URL('/login', nextUrl));
+  }
+
   // Inject tenant context into headers for downstream use
-  if (tenantId) {
-    response.headers.set('x-tenant-id', tenantId);
+  const response = NextResponse.next();
+  if (req.auth?.user?.tenantId) {
+    response.headers.set('x-tenant-id', req.auth.user.tenantId);
   }
 
   return response;
-}
+});
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|widget.js).*)',
   ],
 };
