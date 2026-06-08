@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Widget Preview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .widget-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .logs {
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CRM Widget Preview & Testing</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="tenantId">Tenant ID:</label>
+                <input type="text" id="tenantId" value="demo-tenant-1234" placeholder="Enter tenant ID">
+            </div>
+            <div class="control-group">
+                <label for="visitorName">Visitor Name (Random):</label>
+                <input type="text" id="visitorName" placeholder="Leave empty for random name">
+                <button type="button" id="generateName">Generate Random Name</button>
+            </div>
+            <div class="control-group">
+                <label for="widgetUrl">Widget URL:</label>
+                <input type="text" id="widgetUrl" value="http://localhost:3101/widget-ui" placeholder="Widget URL">
+            </div>
+            <div class="control-group">
+                <button type="button" id="loadWidget">Load Widget</button>
+                <button type="button" id="unloadWidget" style="background-color: #dc3545;">Unload Widget</button>
+            </div>
+        </div>
+        
+        <div class="status" id="connectionStatus">Status: Not loaded</div>
+        
+        <div class="widget-container">
+            <iframe id="widgetFrame" src="" style="width: 380px; height: 600px; border: 1px solid #ccc; border-radius: 8px; display: none;"></iframe>
+        </div>
+        
+        <div class="control-group">
+            <label>Logs:</label>
+            <div class="logs" id="logs"></div>
+        </div>
+    </div>
+
+    <script>
+        let widgetScript = null;
+        let widgetInitialized = false;
+        
+        // Utility functions
+        function log(message) {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        function setStatus(status, isConnected = null) {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.textContent = `Status: ${status}`;
+            statusDiv.className = 'status';
+            if (isConnected !== null) {
+                statusDiv.classList.add(isConnected ? 'connected' : 'disconnected');
+            }
+        }
+        
+        // Generate random visitor name
+        function generateRandomName() {
+            const firstNames = ['Alex', 'Sam', 'Taylor', 'Jordan', 'Casey', 'Riley', 'Quinn', 'Avery', 'Peyton', 'Reese'];
+            const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
+            const first = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const last = lastNames[Math.floor(Math.random() * lastNames.length)];
+            return `${first} ${last}`;
+        }
+        
+        // Event listeners
+        document.getElementById('generateName').addEventListener('click', () => {
+            document.getElementById('visitorName').value = generateRandomName();
+        });
+        
+        document.getElementById('loadWidget').addEventListener('click', () => {
+            const tenantId = document.getElementById('tenantId').value.trim();
+            const visitorName = document.getElementById('visitorName').value.trim() || generateRandomName();
+            const widgetUrl = document.getElementById('widgetUrl').value.trim() || 'http://localhost:3101/widget-ui';
+            
+            if (!tenantId) {
+                alert('Please enter a Tenant ID');
+                return;
+            }
+            
+            if (widgetInitialized) {
+                log('Widget already loaded. Unloading first...');
+                unloadWidget();
+            }
+            
+            log(`Loading widget for tenant: ${tenantId}, visitor: ${visitorName}`);
+            
+            // Load widget in iframe
+            const iframe = document.getElementById('widgetFrame');
+            iframe.src = `${widgetUrl}?tenantId=${encodeURIComponent(tenantId)}&name=${encodeURIComponent(visitorName)}&random=${Date.now()}`;
+            iframe.style.display = 'block';
+            
+            iframe.onload = () => {
+                log('Widget iframe loaded successfully');
+                setStatus('Widget loaded', true);
+            };
+            
+            iframe.onerror = () => {
+                log('Error loading widget iframe');
+                setStatus('Error loading widget', false);
+            };
+            
+            widgetInitialized = true;
+            setStatus('Loading widget...');
+        });
+        
+        document.getElementById('unloadWidget').addEventListener('click', () => {
+            unloadWidget();
+        });
+        
+        function unloadWidget() {
+            const iframe = document.getElementById('widgetFrame');
+            iframe.src = '';
+            iframe.style.display = 'none';
+            
+            widgetInitialized = false;
+            log('Widget unloaded');
+            setStatus('Widget unloaded');
+        }
+        
+        // Listen for widget events (if widget communicates via custom events)
+        window.addEventListener('widgetConnected', (e) => {
+            log('Widget connected to server');
+            setStatus('Widget connected', true);
+        });
+        
+        window.addEventListener('widgetDisconnected', (e) => {
+            log('Widget disconnected from server');
+            setStatus('Widget disconnected', false);
+        });
+        
+        // Initialize with random name
+        document.getElementById('visitorName').value = generateRandomName();
+        
+        log('Preview page loaded. Configure settings and click "Load Widget" to test.');
+    </script>
+</body>
+</html>

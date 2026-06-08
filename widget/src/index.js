@@ -1,50 +1,108 @@
 import { h, render } from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
-import { io } from 'socket.io-client';
+import SocketManager from './socket';
 
 const Widget = () => {
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
+  const [tenantId, setTenantId] = useState(null);
 
   // Initialize Socket.io connection on component mount
   useEffect(() => {
     const initializeSocket = async () => {
       try {
         // Get widget config from server
-        const configRes = await fetch('/api/widget/config', {
+        const configRes = await fetch('/api/widget/init', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ source: window.location.origin })
         });
         const config = await configRes.json();
+        
+        if (!config.status === 'success') {
+          throw new Error('Failed to get widget config');
+        }
+
         setSessionId(config.sessionId);
+        setTenantId(config.tenantId);
 
-        // Connect to Socket.io server
-        const socket = io(window.location.origin, {
-          query: { sessionId: config.sessionId, tenantId: config.tenantId }
-        });
+        // Initialize Socket.io using SocketManager
+        const socketManager = new SocketManager(
+          window.location.origin,
+          config.tenantId,
+          config.sessionId
+        );
 
-        socket.on('connect', () => {
+        // Setup event listeners
+        socketManager.on('connected', (data) => {
           setIsConnected(true);
           console.log('Widget connected to server');
+          setMessages(prev => [...prev, { 
+            text: 'Connected to support team', 
+            sender: 'system', 
+            timestamp: new Date() 
+          }]);
         });
 
-        socket.on('disconnect', () => {
+        socketManager.on('disconnected', (data) => {
           setIsConnected(false);
           console.log('Widget disconnected from server');
         });
 
-        socket.on('message', (data) => {
-          setMessages(prev => [...prev, { text: data.message, sender: 'agent', timestamp: new Date() }]);
+        socketManager.on('message', (data) => {
+          setMessages(prev => [...prev, { 
+            text: data.message, 
+            sender: 'agent', 
+            timestamp: new Date() 
+          }]);
         });
 
-        socket.on('agent_typing', (data) => {
-          setMessages(prev => [...prev, { text: 'Agent is typing...', sender: 'system', isTyping: true }]);
+        socketManager.on('agent_typing', (data) => {
+          setMessages(prev => [...prev, { 
+            text: 'Agent is typing...', 
+            sender: 'system', 
+            isTyping: true 
+          }]);
         });
 
-        socketRef.current = socket;
+        socketManager.on('agent_typing_stop', (data) => {
+          setMessages(prev => prev.filter(msg => !msg.isTyping));
+        });
+
+        socketManager.on('flow_event', (data) => {
+          if (data.type === 'message') {
+            setMessages(prev => [...prev, { 
+              text: data.content, 
+              sender: 'bot', 
+              timestamp: new Date() 
+            }]);
+          }
+        });
+
+        socketManager.on('connection_error', (data) => {
+          console.error('Connection error:', data.error);
+          setMessages(prev => [...prev, { 
+            text: 'Connection error. Please try again.', 
+            sender: 'system', 
+            timestamp: new Date() 
+          }]);
+        });
+
+        // Connect to server
+        await socketManager.connect();
+        socketRef.current = socketManager;
       } catch (error) {
         console.error('Failed to initialize widget:', error);
+        setMessages(prev => [...prev, { 
+          text: 'Failed to connect. Please refresh the page.', 
+          sender: 'system', 
+          timestamp: new Date() 
+        }]);
       }
     };
 
@@ -64,18 +122,25 @@ const Widget = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || !isConnected || !socketRef.current) return;
 
     const userMessage = { text: inputValue, sender: 'user', timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
 
-    // Send message via Socket.io
-    if (socketRef.current) {
-      socketRef.current.emit('send_message', {
-        message: inputValue,
-        sessionId: sessionId
+    try {
+      // Send message via SocketManager
+      await socketRef.current.sendMessage({
+        text: inputValue,
+        type: 'user_message'
       });
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setMessages(prev => [...prev, { 
+        text: 'Failed to send message. Please try again.', 
+        sender: 'system', 
+        timestamp: new Date() 
+      }]);
     }
 
     setInputValue('');

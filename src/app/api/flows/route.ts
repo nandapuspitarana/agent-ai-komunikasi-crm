@@ -92,15 +92,37 @@ export async function POST(request: NextRequest) {
     }
 
     if (id) {
-      // Update existing flow
-      const flow = await prisma.flow.update({
+      // Update existing flow and its intents in a transaction
+      const [updatedFlow] = await prisma.$transaction([
+        prisma.flow.update({
+          where: { id },
+          data: {
+            name,
+            description,
+            config: config || {},
+            metadata: { nodes, edges } as any
+          }
+        }),
+        prisma.intent.deleteMany({
+          where: { flowId: id }
+        }),
+        ...(intents && intents.length > 0 ? intents.map((intent: any) => 
+          prisma.intent.create({
+            data: {
+              flowId: id,
+              name: intent.name,
+              trainingPhrases: intent.trainingPhrases || [],
+              responseType: intent.answerType || 'text',
+              response: intent.answer || '',
+              options: intent.options,
+              metadata: { customPayload: intent.customPayload } as any
+            }
+          })
+        ) : [])
+      ]);
+
+      const flow = await prisma.flow.findUnique({
         where: { id },
-        data: {
-          name,
-          description,
-          config: config || {},
-          metadata: { nodes, edges } as any
-        },
         include: { intents: true }
       });
 

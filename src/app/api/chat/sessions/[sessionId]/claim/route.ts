@@ -1,0 +1,78 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/auth';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ sessionId: string }> }
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || !session?.user?.tenantId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const sessionId = (await params).sessionId;
+    const tenantId = session.user.tenantId;
+
+    // Check if session exists and belongs to the agent's tenant
+    const chatSession = await prisma.chatSession.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!chatSession || chatSession.tenantId !== tenantId) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
+
+    // Update session status to 'agent' and assign agent id
+    const updatedSession = await prisma.chatSession.update({
+      where: { id: sessionId },
+      data: {
+        status: 'agent',
+        assignedAgentId: session.user.id,
+      },
+    });
+
+    // Create system message about agent joining
+    await prisma.message.create({
+      data: {
+        sessionId,
+        senderType: 'system',
+        content: `Agen ${session.user.name || 'kami'} bergabung ke percakapan.`,
+      },
+    });
+
+    // Emit Socket.io event to notify widget
+    const io = (global as any).socketIO;
+    if (io) {
+      // Emit to widget session room
+      io.to(`session:${sessionId}`).emit('agent_joined', {
+        agentId: session.user.id,
+        agentName: session.user.name || 'Agent',
+      });
+      io.to(`widget:${sessionId}`).emit('agent_joined', {
+        agentId: session.user.id,
+        agentName: session.user.name || 'Agent',
+      });
+
+      // Emit to all agent dashboards in tenant to update session status
+      io.to(`inbox:${tenantId}`).emit('session_updated', {
+        sessionId,
+        status: 'agent',
+        assignedAgentId: session.user.id,
+        agentName: session.user.name || 'Agent',
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      status: 'agent',
+      assignedAgentId: session.user.id,
+    });
+  } catch (error) {
+    console.error('Error claiming chat session:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

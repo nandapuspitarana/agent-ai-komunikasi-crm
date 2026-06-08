@@ -1,0 +1,152 @@
+{
+  "version": "1.0",
+  "type": "agent_flow",
+  "data": {
+    "name": "CEO SUITE User Journey",
+    "description": "Guided chat flow from UserJourney.js covering services, cities, and pricing.",
+    "config": {
+      "name": "Claire",
+      "description": "CEO SUITE Virtual Assistant",
+      "agentId": "ceo_suite_bot_01",
+      "llmProvider": "gemini",
+      "systemPrompt": "You are Claire from CEO SUITE. You help users navigate workspace solutions including Private Office, Coworking, Virtual Office, and Meeting Rooms across Asia. Be professional and helpful. If the user asks something outside the options, answer briefly based on CEO SUITE context and guide them back to the options.",
+      "humanPrompt": "{input}",
+      "language": "en",
+      "speakingStyle": "professional",
+      "responseLength": "short",
+      "welcomeMessage": "Hello, I’m Claire from CEO SUITE. What are you looking for today?",
+      "defaultFeedback": "Was this helpful?"
+    },
+    "metadata": {},
+    "intents": [
+      {
+        "name": "Start / Main Menu",
+        "trainingPhrases": ["hi", "hello", "start", "menu", "start again", "what services do you offer", "help"],
+        "responseType": "options",
+        "response": "Hello, I’m Claire from CEO SUITE. What are you looking for today?",
+        "options": "Help me choose, Private Office, Day Office, Dedicated Workstation, Coworking, Virtual Office, Meeting Room",
+        "metadata": {}
+      },
+      {
+        "name": "Help me choose",
+        "trainingPhrases": ["Help me choose", "I don't know what I need", "Guide me", "Recommend a service"],
+        "responseType": "options",
+        "response": "Sure. Which need sounds closest?",
+        "options": "Space for my team, A regular desk, Occasional workspace, Business address, Meeting room, Private office for a day",
+        "metadata": {}
+      },
+      {
+        "name": "Need: Space for my team",
+        "trainingPhrases": ["Space for my team", "I need an office for my team", "Team workspace"],
+        "responseType": "options",
+        "response": "I recommend Private Office. Best for teams that need a private, ready-to-use office with flexible terms.\n\nWhich city are you interested in?",
+        "options": "Bangkok, Beijing, Hangzhou, Hanoi, Ho Chi Minh City, Hong Kong, Jakarta, Kuala Lumpur, Manila, Seoul, Shanghai, Singapore",
+        "metadata": {}
+      },
+      {
+        "name": "Need: A regular desk",
+        "trainingPhrases": ["A regular desk", "I need a desk", "Dedicated desk"],
+        "responseType": "options",
+        "response": "I recommend Dedicated Workstation. Best for individuals or small teams who want a regular desk without taking a full office.\n\nWhich city are you interested in?",
+        "options": "Bangkok, Beijing, Hangzhou, Hanoi, Ho Chi Minh City, Hong Kong, Jakarta, Kuala Lumpur, Manila, Seoul, Shanghai, Singapore",
+        "metadata": {}
+      },
+      {
+        "name": "Need: Occasional workspace",
+        "trainingPhrases": ["Occasional workspace", "Flexible desk", "Drop in desk"],
+        "responseType": "options",
+        "response": "I recommend Coworking. Best for flexible access, short visits, or occasional workdays in the city.\n\nWhich city are you interested in?",
+        "options": "Bangkok, Beijing, Hangzhou, Hanoi, Ho Chi Minh City, Hong Kong, Jakarta, Kuala Lumpur, Manila, Seoul, Shanghai, Singapore",
+        "metadata": {}
+      },
+      {
+        "name": "Need: Business address",
+        "trainingPhrases": ["Business address", "Mailing address", "Virtual office needs"],
+        "responseType": "options",
+        "response": "I recommend Virtual Office. Best for a business address, mail handling, and local presence without a physical desk.\n\nWhich city are you interested in?",
+        "options": "Bangkok, Beijing, Hangzhou, Hanoi, Ho Chi Minh City, Hong Kong, Jakarta, Kuala Lumpur, Manila, Seoul, Shanghai, Singapore",
+        "metadata": {}
+      },
+      {
+        "name": "Direct: Private Office",
+        "trainingPhrases": ["Private Office", "I want a private office"],
+        "responseType": "options",
+        "response": "Private Office\nBest for teams that need a private, ready-to-use office with flexible terms.\n\nWhich city are you interested in?",
+        "options": "Bangkok, Beijing, Hangzhou, Hanoi, Ho Chi Minh City, Hong Kong, Jakarta, Kuala Lumpur, Manila, Seoul, Shanghai, Singapore",
+        "metadata": {}
+      },
+      {
+        "name": "Direct: Coworking",
+        "trainingPhrases": ["Coworking", "I want coworking space"],
+        "responseType": "options",
+        "response": "Coworking\nBest for flexible access, short visits, or occasional workdays in the city.\n\nWhich city are you interested in?",
+        "options": "Bangkok, Beijing, Hangzhou, Hanoi, Ho Chi Minh City, Hong Kong, Jakarta, Kuala Lumpur, Manila, Seoul, Shanghai, Singapore",
+        "metadata": {}
+      },
+      {
+        "name": "City: Jakarta",
+        "trainingPhrases": ["Jakarta", "In Jakarta", "Jakarta options"],
+        "responseType": "options",
+        "response": "Please choose a centre, or select “Not sure yet” and I can help narrow it down.",
+        "options": "Sahid Sudirman Center, AXA Tower, Indonesia Stock Exchange, One Pacific Place, Not sure yet",
+        "metadata": {}
+      },
+      {
+        "name": "City: Singapore",
+        "trainingPhrases": ["Singapore", "In Singapore"],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Centennial Tower</div><div class='price-option'><div class='price'>SGD 75</div><div class='small'>Coworking / day</div></div><div class='price-option'><div class='price'>SGD 799</div><div class='small'>Dedicated Workstation / desk / month</div></div><div class='price-option'><div class='price'>Starting from SGD 800</div><div class='small'>Private Office / person / month</div></div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question before submitting your details.</div>",
+        "options": "Request quotation, Book a tour, I have other questions, Start again",
+        "metadata": {}
+      },
+      {
+        "name": "City: Bangkok",
+        "trainingPhrases": ["Bangkok", "In Bangkok"],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Athenee Tower</div><div class='price-option'><div class='price'>THB 500</div><div class='small'>Coworking / person / day</div></div><div class='price-option'><div class='price'>THB 4,500</div><div class='small'>Dedicated Workstation / desk / month</div></div><div class='price-option'><div class='price'>Starting from THB 6,500</div><div class='small'>Private Office / person / month</div></div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question before submitting your details.</div>",
+        "options": "Request quotation, Book a tour, I have other questions, Start again",
+        "metadata": {}
+      },
+      {
+        "name": "Jakarta: Not sure yet",
+        "trainingPhrases": ["Not sure yet", "Help me choose centre", "Recommend centre"],
+        "responseType": "options",
+        "response": "No problem. A few quick questions can help narrow the centre choices. Which sounds closest?",
+        "options": "Sudirman / SCBD, Kuningan, Show all centres",
+        "metadata": {}
+      },
+      {
+        "name": "Jakarta: Sudirman / SCBD",
+        "trainingPhrases": ["Sudirman / SCBD", "Sudirman", "SCBD"],
+        "responseType": "options",
+        "response": "Thanks. Here are the Sudirman / SCBD centre options for Jakarta.",
+        "options": "Sahid Sudirman Center, Indonesia Stock Exchange, One Pacific Place",
+        "metadata": {}
+      },
+      {
+        "name": "Centre: Sahid Sudirman Center",
+        "trainingPhrases": ["Sahid Sudirman Center", "Sahid"],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Sahid Sudirman Center (Jakarta)</div><div class='price-option'><div class='price'>IDR 150,000</div><div class='small'>Coworking / person / day</div></div><div class='price-option'><div class='price'>IDR 1,900,000</div><div class='small'>Dedicated Workstation / desk / month</div></div><div class='price-option'><div class='price'>Starting from IDR 2,500,000</div><div class='small'>Private Office / person / month</div></div><div class='price-option'><div class='price'>IDR 250,000</div><div class='small'>Virtual Office / month (billed annually)</div></div><div class='price-option'><div class='price'>IDR 200,000</div><div class='small'>Meeting Room / hour</div></div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
+        "options": "Request quotation, Book a tour, I have other questions, Start again",
+        "metadata": {}
+      },
+      {
+        "name": "Action: Request Quotation",
+        "trainingPhrases": ["Request quotation", "I want a quote", "Get quotation"],
+        "responseType": "form",
+        "response": "Our team will review availability and follow up with quotation details. Please provide your Name, Email, Contact Number, Team size, and Move-in date.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Your name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Your email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Your phone number' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='e.g. 5' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn'>Request Quotation</button></div>",
+        "options": "",
+        "metadata": {}
+      },
+      {
+        "name": "Action: Book a tour",
+        "trainingPhrases": ["Book a tour", "I want to visit", "Schedule a tour"],
+        "responseType": "form",
+        "response": "Please let us know your preferred Date and Time for the tour, along with your Name and Email.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Your name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Your email' class='form-card_input'/><button type='button' class='submit-btn'>Schedule Tour</button></div>",
+        "options": "",
+        "metadata": {}
+      }
+    ]
+  }
+}

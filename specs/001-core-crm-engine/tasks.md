@@ -36,7 +36,7 @@
 - [x] T009 [P] [US1] Create core `widget.js` script injecting Shadow DOM in `widget/src/index.js`
 - [x] T010 [P] [US1] Implement Tenancy Handshake endpoint `/api/widget/init` in `src/app/api/widget/init/route.ts`
 - [x] T011 [US1] Build Omni-Inbox UI Dashboard for Agents to receive widget messages in `src/app/(dashboard)/inbox/page.tsx`
-- [ ] T012 [US1] Integrate Socket.io client in widget to send/receive messages to Omni-Inbox in `widget/src/socket.js`
+- [x] T012 [US1] Integrate Socket.io client in widget to send/receive messages to Omni-Inbox in `widget/src/socket.js`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -49,9 +49,9 @@
 ### Implementation for User Story 2
 
 - [x] T013 [P] [US2] Integrate React Flow into Admin Dashboard in `src/app/(dashboard)/flow-builder/page.tsx`
-- [ ] T014 [US2] Create Node Architecture (Message, Input, Condition) components in `src/components/flow-nodes/`
-- [ ] T015 [US2] Implement Flow Interpreter backend engine to read JSON flows in `src/modules/flow-builder/interpreter.ts`
-- [ ] T016 [US2] Build Variable System saving user context to Redis in `src/modules/flow-builder/variables.ts`
+- [x] T014 [US2] Create Node Architecture (Message, Input, Condition) components in `src/components/flow-nodes/`
+- [x] T015 [US2] Implement Flow Interpreter backend engine to read JSON flows in `src/modules/flow-builder/interpreter.ts`
+- [x] T016 [US2] Build Variable System saving user context to Redis in `src/modules/flow-builder/variables.ts`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -63,11 +63,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T017 [P] [US3] Implement Google Sheets OAuth2 and append/read logic in `src/modules/integrations/google-sheets.ts`
-- [ ] T018 [P] [US3] Create WhatsApp Cloud API webhook handler in `src/app/api/webhooks/whatsapp/route.ts`
-- [ ] T019 [US3] Build Message Router directing WhatsApp payload to Flow Engine in `src/modules/chat-engine/router.ts`
-- [ ] T020 [US3] Add Integration Node to React Flow Builder in `src/components/flow-nodes/IntegrationNode.tsx`
-- [ ] T021 [US3] Implement Usage Tracking middleware for SaaS limits in `src/middleware/usage.ts`
+- [x] T017 [P] [US3] Implement Google Sheets OAuth2 and append/read logic in `src/modules/integrations/google-sheets.ts`
+- [x] T018 [P] [US3] Create WhatsApp Cloud API webhook handler in `src/app/api/webhooks/whatsapp/route.ts`
+- [x] T019 [US3] Build Message Router directing WhatsApp payload to Flow Engine in `src/modules/chat-engine/router.ts`
+- [x] T020 [US3] Add Integration Node to React Flow Builder in `src/components/flow-nodes/IntegrationNode.tsx`
+- [x] T021 [US3] Implement Usage Tracking middleware for SaaS limits in `src/middleware/usage.ts`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -79,17 +79,27 @@
 
 ### Implementation for User Story 4
 
-- [ ] T022 [P] [US4] Implement Fallback Logic executing on timeout to route to Human Agent in `src/modules/flow-builder/fallback.ts`
-- [ ] T023 [P] [US4] Create Canned Responses feature in Omni-Inbox UI in `src/components/inbox/CannedResponses.tsx`
-- [ ] T024 [US4] Build Tenant Settings UI for widget branding customization in `src/app/(dashboard)/settings/page.tsx`
+- [x] T022 [P] [US4] Implement Fallback Logic executing on timeout to route to Human Agent in `src/modules/flow-builder/fallback.ts`
+- [x] T023 [P] [US4] Create Canned Responses feature in Omni-Inbox UI in `src/components/inbox/CannedResponses.tsx`
+- [x] T024 [US4] Build Tenant Settings UI for widget branding customization in `src/app/(dashboard)/settings/page.tsx`
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T025 [P] Optimization: Minify `widget.js` and configure build pipeline for CDN distribution in `widget/webpack.config.js`
-- [ ] T026 [P] Documentation: Create Copy-Paste Snippet installation guide in `docs/installation.md`
-- [ ] T027 Final Security Audit: Run integration validation on auth and API modules.
+- [x] T025 [P] Optimization: Minify `widget.js` and configure build pipeline for CDN distribution in `widget/webpack.config.js`
+- [x] T026 [P] Documentation: Create Copy-Paste Snippet installation guide in `docs/installation.md`
+- [x] T027 Final Security Audit: Run integration validation on auth and API modules → `docs/SECURITY_AUDIT.md`
+
+## Phase 8: AI Agent Integration & UI Polish (Priority: P1)
+
+**Purpose**: Connect Python AI Agent Proxy, fix UI constraints, and ensure robust inbox operations.
+
+- [x] T028 [P] Remove Flow Test Panel to prevent Redis errors in dev environments without Redis.
+- [x] T029 [P] Fix Agent Builder UI: Expand React Flow canvas to full width (`w-full` instead of `max-w-5xl`).
+- [x] T030 [P] Verify Inbox visibility: `GET /api/chat/sessions` correctly returns active sessions for `SUPER_ADMIN` role (empty `whereClause` = no filter).
+- [x] T031 [P] Integrate Python AI Agent Proxy: `src/lib/ai-agent.ts` calls `AGENT_PROXY_URL/api/v1/chat` with 15s timeout and graceful offline fallback. `.env` updated to separate `LOCAL_LLM_URL` (GPU engine) from `AGENT_PROXY_URL` (proxy).
+- [x] T032 [P] Clean up debug logs in `src/app/api/chat/sessions/route.ts` and `src/lib/socket.ts`.
 
 ## Dependencies & Execution Order
 

@@ -33,7 +33,8 @@ model User {
   name              String
   role              UserRole            @default(AGENT)
   tenantId          String?
-  tenant            Tenant?             @relation(fields: [tenantId], references: [id])
+  tenant            Tenant?             @relation("TenantUsers", fields: [tenantId], references: [id])
+  tenantHandoffs    Tenant[]            @relation("TenantHandoffAgent")
   isActive          Boolean             @default(true)
   lastLoginAt       DateTime?
   createdAt         DateTime            @default(now())
@@ -81,12 +82,24 @@ model Tenant {
   id           String        @id @default(uuid())
   name         String
   subscription String        @default("free")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  users        User[]
-  integrations Integration[]
-  flows        Flow[]
-  chatSessions ChatSession[]
+  aiEnabled    Boolean       @default(true)
+  aiSystemPrompt String?
+  handoffAgentId String?
+  handoffAgent   User?         @relation("TenantHandoffAgent", fields: [handoffAgentId], references: [id])
+  activeFlowId   String?
+  activeFlow     Flow?         @relation("TenantActiveFlow", fields: [activeFlowId], references: [id])
+  
+  // Appearance Configuration
+  themeBrandColor      String?       @default("#801517")
+  themeUserBubbleColor String?       @default("#801517")
+  themeBotBubbleColor  String?       @default("#ffffff")
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  users          User[]        @relation("TenantUsers")
+  integrations   Integration[]
+  flows          Flow[]        @relation("TenantFlows")
+  chatSessions   ChatSession[]
 }
 
 model Integration {
@@ -101,7 +114,8 @@ model Integration {
 model Flow {
   id        String   @id @default(uuid())
   tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenant    Tenant   @relation("TenantFlows", fields: [tenantId], references: [id])
+  activeForTenants Tenant[] @relation("TenantActiveFlow")
   name      String
   description String?
   config    Json     @default("{}")
@@ -109,6 +123,7 @@ model Flow {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   intents   Intent[]
+  knowledgeDocs KnowledgeDocument[]
 
   @@index([tenantId])
 }
@@ -130,15 +145,18 @@ model Intent {
 }
 
 model ChatSession {
-  id        String    @id @default(uuid())
-  tenantId  String
-  tenant    Tenant    @relation(fields: [tenantId], references: [id])
-  contactId String
-  channel   String
-  status    String    @default("bot")
-  rating    Int?      // Rating from 1 to 5 given by user at the end
-  createdAt DateTime  @default(now())
-  messages  Message[]
+  id               String    @id @default(uuid())
+  tenantId         String
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  contactId        String
+  channel          String
+  status           String    @default("bot")
+  rating           Int?      // Rating from 1 to 5 given by user at the end
+  handoffRequested Boolean   @default(false)
+  assignedAgentId  String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+  messages         Message[]
 }
 
 model Message {
@@ -149,3 +167,26 @@ model Message {
   content    String
   createdAt  DateTime    @default(now())
 }
+
+model KnowledgeDocument {
+  id          String   @id @default(uuid())
+  flowId      String
+  flow        Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  tenantId    String
+  metaName    String
+  description String?
+  category    String?
+  tags        String[]
+  filename    String
+  fileType    String
+  status      String   @default("pending") // pending, ready, failed
+  chunkCount  Int      @default(0)
+  proxyDocId  String?  // ID from Python proxy/Supabase vector store
+  errorMsg    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([flowId])
+  @@index([tenantId])
+}
+

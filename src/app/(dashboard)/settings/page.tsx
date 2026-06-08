@@ -45,9 +45,14 @@ export default function SettingsPage() {
     confirmPassword: '',
   });
 
+  // Tenant settings state
+  const [tenant, setTenant] = useState<any>(null);
+  const [tenantLoading, setTenantLoading] = useState(false);
+  const [tenantSaveLoading, setTenantSaveLoading] = useState(false);
+
   // Fetch users
   useEffect(() => {
-    if (activeTab === 'users') {
+    if (activeTab === 'users' || activeTab === 'tenant') {
       fetchUsers();
     }
   }, [activeTab]);
@@ -58,6 +63,59 @@ export default function SettingsPage() {
       fetchAuditLogs();
     }
   }, [activeTab]);
+
+  // Fetch tenant settings
+  useEffect(() => {
+    if (activeTab === 'tenant') {
+      fetchTenantSettings();
+    }
+  }, [activeTab]);
+
+  const fetchTenantSettings = async () => {
+    setTenantLoading(true);
+    try {
+      const res = await fetch('/api/tenant');
+      if (res.ok) {
+        const data = await res.json();
+        setTenant(data.tenant);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tenant:', error);
+    } finally {
+      setTenantLoading(false);
+    }
+  };
+
+  const handleTenantSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tenant) return;
+    setTenantSaveLoading(true);
+    try {
+      const res = await fetch('/api/tenant', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: tenant.name,
+          aiSystemPrompt: tenant.aiSystemPrompt,
+          handoffAgentId: tenant.handoffAgentId,
+          activeFlowId: tenant.activeFlowId,
+          themeBrandColor: tenant.themeBrandColor,
+          themeUserBubbleColor: tenant.themeUserBubbleColor,
+          themeBotBubbleColor: tenant.themeBotBubbleColor,
+        }),
+      });
+      if (res.ok) {
+        alert('Tenant settings saved successfully!');
+      } else {
+        alert('Failed to save settings');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error saving tenant settings');
+    } finally {
+      setTenantSaveLoading(false);
+    }
+  };
 
   const fetchUsers = async () => {
     setUsersLoading(true);
@@ -420,67 +478,168 @@ export default function SettingsPage() {
           <div className="p-8">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Tenant Settings</h2>
 
-            <form className="max-w-2xl space-y-6">
-              {/* Tenant Name */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Tenant Name
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Demo Tenant"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
+            {tenantLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+                <p className="text-slate-600 mt-3">Loading tenant settings...</p>
               </div>
-
-              {/* Website */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Website URL
-                </label>
-                <input
-                  type="url"
-                  defaultValue="https://example.com"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
+            ) : !tenant ? (
+              <div className="text-center py-8 text-slate-500">
+                <p>No tenant configuration found</p>
               </div>
-
-              {/* Widget Color */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Widget Primary Color
-                </label>
-                <div className="flex items-center gap-4">
+            ) : (
+              <form onSubmit={handleTenantSave} className="max-w-2xl space-y-6">
+                {/* Tenant Name */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Tenant Name
+                  </label>
                   <input
-                    type="color"
-                    defaultValue="#3b82f6"
-                    className="h-10 w-16 rounded-lg cursor-pointer border border-slate-300"
+                    type="text"
+                    value={tenant.name || ''}
+                    onChange={(e) => setTenant({ ...tenant, name: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   />
-                  <code className="text-sm text-slate-600">#3b82f6</code>
                 </div>
-              </div>
 
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  defaultValue="Our customer support chatbot"
-                  rows={4}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
+                <div className="pt-6 border-t border-slate-200">
+                  <h3 className="text-lg font-bold text-slate-800 mb-4">Global AI Rules</h3>
+                  
+                  {/* Active AI Agent */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Active AI Agent (Flow)
+                    </label>
+                    <p className="text-xs text-slate-500 mb-2">
+                      Pilih Agent AI (Flow) mana yang akan membalas pesan masuk dari pengguna.
+                    </p>
+                    <select
+                      value={tenant.activeFlowId || ''}
+                      onChange={(e) => setTenant({ ...tenant, activeFlowId: e.target.value || null })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                    >
+                      <option value="">-- Gunakan pengaturan global (Default) --</option>
+                      {tenant?.flows?.map((flow: any) => (
+                        <option key={flow.id} value={flow.id}>
+                          {flow.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Submit */}
-              <button
-                type="submit"
-                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Save size={18} />
-                Save Settings
-              </button>
-            </form>
+                  {/* AI System Prompt */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Global AI System Prompt
+                    </label>
+                    <p className="text-xs text-slate-500 mb-2">
+                      Instruksi global untuk AI yang berlaku untuk semua agent di tenant ini.
+                    </p>
+                    <textarea
+                      value={tenant.aiSystemPrompt || ''}
+                      onChange={(e) => setTenant({ ...tenant, aiSystemPrompt: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-mono text-sm"
+                      placeholder="You are a helpful assistant..."
+                    />
+                  </div>
+
+                  {/* Handoff Agent */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Default Handoff Agent (Human Queue)
+                    </label>
+                    <p className="text-xs text-slate-500 mb-2">
+                      Siapa yang akan ditugaskan (atau nama siapa yang akan disebut oleh AI) ketika pengguna meminta bantuan manusia?
+                    </p>
+                    <select
+                      value={tenant.handoffAgentId || ''}
+                      onChange={(e) => setTenant({ ...tenant, handoffAgentId: e.target.value || null })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                    >
+                      <option value="">-- No specific agent (Queue) --</option>
+                      {users.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.name || user.email} ({user.role})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-slate-200">
+                  <h3 className="text-lg font-bold text-slate-800 mb-4">Widget Appearance</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Brand Color</label>
+                      <p className="text-xs text-slate-500 mb-2">Warna utama untuk Header dan Tombol.</p>
+                      <div className="flex gap-2">
+                        <input 
+                          type="color" 
+                          value={tenant.themeBrandColor || '#801517'}
+                          onChange={(e) => setTenant({...tenant, themeBrandColor: e.target.value})}
+                          className="w-10 h-10 p-1 border border-slate-300 rounded cursor-pointer shrink-0 bg-white"
+                        />
+                        <input 
+                          type="text" 
+                          value={tenant.themeBrandColor || '#801517'}
+                          onChange={(e) => setTenant({...tenant, themeBrandColor: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none font-mono text-sm uppercase bg-white"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">User Bubble</label>
+                      <p className="text-xs text-slate-500 mb-2">Warna balon chat untuk Pengguna.</p>
+                      <div className="flex gap-2">
+                        <input 
+                          type="color" 
+                          value={tenant.themeUserBubbleColor || '#801517'}
+                          onChange={(e) => setTenant({...tenant, themeUserBubbleColor: e.target.value})}
+                          className="w-10 h-10 p-1 border border-slate-300 rounded cursor-pointer shrink-0 bg-white"
+                        />
+                        <input 
+                          type="text" 
+                          value={tenant.themeUserBubbleColor || '#801517'}
+                          onChange={(e) => setTenant({...tenant, themeUserBubbleColor: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none font-mono text-sm uppercase bg-white"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Bot Bubble</label>
+                      <p className="text-xs text-slate-500 mb-2">Warna balon chat untuk AI.</p>
+                      <div className="flex gap-2">
+                        <input 
+                          type="color" 
+                          value={tenant.themeBotBubbleColor || '#ffffff'}
+                          onChange={(e) => setTenant({...tenant, themeBotBubbleColor: e.target.value})}
+                          className="w-10 h-10 p-1 border border-slate-300 rounded cursor-pointer shrink-0 bg-white"
+                        />
+                        <input 
+                          type="text" 
+                          value={tenant.themeBotBubbleColor || '#ffffff'}
+                          onChange={(e) => setTenant({...tenant, themeBotBubbleColor: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none font-mono text-sm uppercase bg-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit */}
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={tenantSaveLoading}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    <Save size={18} />
+                    {tenantSaveLoading ? 'Saving...' : 'Save Settings'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
       </div>

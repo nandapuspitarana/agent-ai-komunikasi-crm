@@ -3,10 +3,14 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Save, FileText, Link as LinkIcon, Settings, Globe, HelpCircle, Plus, Trash2, ArrowLeft, Send, Bot, User, RotateCcw, GitMerge, List, MessageSquare, LayoutList, FormInput, ExternalLink, Cpu, ChevronRight, Code } from 'lucide-react';
+import { Save, FileText, Link as LinkIcon, Settings, Globe, HelpCircle, Plus, Trash2, ArrowLeft, Send, Bot, User, RotateCcw, GitMerge, List, MessageSquare, LayoutList, FormInput, ExternalLink, Cpu, ChevronRight, Code, Download } from 'lucide-react';
 import Link from 'next/link';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, BackgroundVariant, addEdge, Handle, Position, applyNodeChanges, NodeChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { MessageNode } from '@/components/flow-nodes/MessageNode';
+import { InputNode } from '@/components/flow-nodes/InputNode';
+import { ConditionNode } from '@/components/flow-nodes/ConditionNode';
+import AgentKnowledgeTab from '@/components/AgentKnowledgeTab';
 
 // --- Custom Nodes for React Flow ---
 const QuestionNode = ({ data }: { data: any }) => {
@@ -93,10 +97,24 @@ const AnswerNode = ({ data }: { data: any }) => {
     </div>
   );
 };
-// -----------------------------------
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-export default function AgentBuilderPage() {
+const nodeTypes = {
+  message: MessageNode,
+  input: InputNode,
+  condition: ConditionNode,
+  question: QuestionNode,
+  answer: AnswerNode,
+};
+
+function AgentBuilderContent() {
+  const searchParams = useSearchParams();
+  const flowIdParam = searchParams.get('id');
+
   const [activeTab, setActiveTab] = useState('faq');
+  const [currentFlowId, setCurrentFlowId] = useState<string | null>(flowIdParam);
+
   const [agentConfig, setAgentConfig] = useState({
     name: 'Sales Assistant',
     description: 'A helpful sales assistant for customer support',
@@ -108,49 +126,32 @@ export default function AgentBuilderPage() {
     speakingStyle: 'professional',
     responseLength: 'medium',
     welcomeMessage: 'Halo! Ada yang bisa saya bantu hari ini?',
+    welcomeMessageType: 'text',
+    welcomeMessageOptions: '',
+    defaultResponse: 'Maaf, saya belum mengerti pertanyaan Anda. Silakan pilih menu di bawah ini:',
+    defaultResponseType: 'options',
+    defaultResponseOptions: 'Help me choose, Bicara dengan Agen',
     defaultFeedback: 'Apakah jawaban ini membantu?',
-    urls: ['']
+    urls: [''],
+    themeBrandColor: '#801517',
+    themeBotBubbleColor: '#ffffff',
+    themeUserBubbleColor: '#801517'
   });
 
   // --- Unified Intent State ---
   const [faqView, setFaqView] = useState<'list' | 'flow'>('list');
   const [activeIntentId, setActiveIntentId] = useState<string | null>(null); // For detailed edit view
 
-  const [intents, setIntents] = useState([
-    {
-      id: '1',
-      name: 'Intent: Sapaan Awal',
-      trainingPhrases: ['Halo', 'Hai', 'Permisi', 'Mulai percakapan'],
-      answerType: 'options',
-      answer: 'Halo! Silakan pilih layanan yang Anda butuhkan:',
-      options: 'Komplain, Cek Status, Promo',
-      cardTitle: '',
-      customPayload: ''
-    },
-    {
-      id: '2',
-      name: 'Intent: Komplain Produk',
-      trainingPhrases: ['Saya ingin komplain', 'Barang rusak', 'Pesanan tidak sesuai', 'Kecewa'],
-      answerType: 'form',
-      answer: 'Mohon maaf atas ketidaknyamanan Anda. Silakan isi form keluhan berikut.',
-      options: '',
-      cardTitle: '',
-      customPayload: '{"action": "trigger_complaint_form"}'
-    },
-    {
-      id: '3',
-      name: 'Intent: Cek Status',
-      trainingPhrases: ['Cek status order', 'Pesanan saya sampai mana?', 'Lacak resi'],
-      answerType: 'text',
-      answer: 'Baik, silakan ketikkan Nomor Resi Anda.',
-      options: '',
-      cardTitle: '',
-      customPayload: ''
-    },
-  ]);
+  const [intents, setIntents] = useState<any[]>([]);
 
   // --- Flow State derived from Intents ---
-  const nodeTypes = useMemo(() => ({ question: QuestionNode, answer: AnswerNode }), []);
+  const nodeTypes = useMemo(() => ({ 
+    question: QuestionNode, 
+    answer: AnswerNode,
+    message: MessageNode,
+    input: InputNode,
+    condition: ConditionNode
+  }), []);
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
 
@@ -175,7 +176,7 @@ export default function AgentBuilderPage() {
         data: {
           label: intent.answer,
           answerType: intent.answerType,
-          options: intent.options.split(',').map(s => s.trim()).filter(Boolean),
+          options: typeof intent.options === 'string' ? intent.options.split(',').map((s: string) => s.trim()).filter(Boolean) : intent.options,
           cardTitle: intent.cardTitle,
           customPayload: intent.customPayload
         },
@@ -252,45 +253,76 @@ export default function AgentBuilderPage() {
   const [savedFlows, setSavedFlows] = useState<any[]>([]);
   const [isLoadingFlows, setIsLoadingFlows] = useState(false);
   const [showFlowMenu, setShowFlowMenu] = useState(false);
+  const [tenantConfig, setTenantConfig] = useState<any>({});
 
   useEffect(() => {
-    // Load saved flows on mount
-    const loadFlows = async () => {
+    // Load saved flows and tenant config on mount
+    const loadData = async () => {
       try {
-        const response = await fetch('/api/agent/flows');
-        if (response.ok) {
-          const data = await response.json();
-          setSavedFlows(data.flows || []);
+        const [flowsRes, tenantRes] = await Promise.all([
+          fetch('/api/flows'),
+          fetch('/api/tenant')
+        ]);
+        
+        if (flowsRes.ok) {
+          const data = await flowsRes.json();
+          setSavedFlows(data || []);
+        }
+        
+        if (tenantRes.ok) {
+          const data = await tenantRes.json();
+          if (data.tenant) {
+            setTenantConfig(data.tenant);
+          }
         }
       } catch (error) {
-        console.error('Error loading flows:', error);
+        console.error('Error loading data:', error);
       }
     };
-    loadFlows();
-  }, []);
+    loadData();
 
-  const handleLoadFlow = async (flowId: string) => {
+    if (currentFlowId) {
+      handleLoadFlow(currentFlowId, true);
+    }
+  }, [currentFlowId]);
+
+  const handleLoadFlow = async (flowId: string, isInitialLoad: boolean = false) => {
     setIsLoadingFlows(true);
     try {
-      const response = await fetch(`/api/flows?id=${flowId}`);
+      const response = await fetch(`/api/flows/${flowId}`);
       if (response.ok) {
         const flow = await response.json();
         
-        // Update agent config
-        setAgentConfig(flow.config || {});
-        
-        // Update intents from flow intents
-        if (flow.intents && flow.intents.length > 0) {
-          setIntents(flow.intents.map((intent: any) => ({
-            id: intent.id,
-            name: intent.name,
-            trainingPhrases: intent.trainingPhrases,
-            answerType: intent.responseType,
-            answer: intent.response,
-            options: intent.options || '',
-            cardTitle: '',
-            customPayload: intent.metadata?.customPayload || ''
+        setAgentConfig(flow.config || {
+          name: flow.name,
+          description: flow.description || '',
+          agentId: 'sales_bot_01',
+          llmProvider: 'gemini',
+          systemPrompt: 'You are a helpful sales assistant.',
+          humanPrompt: 'User says: {input}',
+          language: 'id',
+          speakingStyle: 'professional',
+          responseLength: 'medium',
+          welcomeMessage: 'Halo! Ada yang bisa saya bantu hari ini?',
+          welcomeMessageType: 'text',
+          welcomeMessageOptions: '',
+          defaultFeedback: 'Apakah jawaban ini membantu?',
+          urls: ['']
+        });
+
+        // Map database fields to UI fields
+        if (flow.intents && Array.isArray(flow.intents)) {
+          setIntents(flow.intents.map((i: any) => ({
+            id: i.id,
+            name: i.name,
+            trainingPhrases: i.trainingPhrases || [],
+            answerType: i.responseType || 'text',
+            answer: i.response || '',
+            options: i.options || '',
+            customPayload: i.metadata?.customPayload || ''
           })));
+        } else {
+          setIntents([]);
         }
         
         // Update flow visualization from metadata
@@ -299,12 +331,15 @@ export default function AgentBuilderPage() {
           setEdges(flow.metadata.edges);
         }
         
+        setCurrentFlowId(flow.id);
         setShowFlowMenu(false);
-        alert(`Loaded flow: ${flow.name}`);
+        if (!isInitialLoad) {
+          alert(`Loaded flow: ${flow.name}`);
+        }
       }
     } catch (error) {
       console.error('Error loading flow:', error);
-      alert('Failed to load flow');
+      if (!isInitialLoad) alert('Failed to load flow');
     } finally {
       setIsLoadingFlows(false);
     }
@@ -313,17 +348,21 @@ export default function AgentBuilderPage() {
   const handleSaveFlow = async () => {
     setIsSaving(true);
     try {
+      const payload: any = {
+        name: agentConfig.name || 'Untitled Agent',
+        description: agentConfig.description || '',
+        config: agentConfig,
+        intents: intents,
+        metadata: { nodes, edges }
+      };
+      if (currentFlowId) {
+        payload.id = currentFlowId;
+      }
+
       const response = await fetch('/api/flows', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: agentConfig.name || 'Untitled Agent',
-          description: agentConfig.description || '',
-          config: agentConfig,
-          intents: intents,
-          nodes: nodes,
-          edges: edges
-        })
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -331,6 +370,26 @@ export default function AgentBuilderPage() {
       }
 
       const data = await response.json();
+      if ((data.status === 'created' || data.status === 'updated') && data.flow?.id) {
+        setCurrentFlowId(data.flow.id);
+        
+        if (data.flow.intents) {
+          setIntents(data.flow.intents.map((i: any) => ({
+            id: i.id,
+            name: i.name,
+            trainingPhrases: i.trainingPhrases || [],
+            answerType: i.responseType || 'text',
+            answer: i.response || '',
+            options: i.options || '',
+            customPayload: i.metadata?.customPayload || ''
+          })));
+        }
+
+        if (!currentFlowId) {
+          window.history.replaceState(null, '', `/agent/builder?id=${data.flow.id}`);
+        }
+      }
+      
       alert('Flow saved successfully!');
     } catch (error) {
       console.error('Error saving flow:', error);
@@ -348,29 +407,104 @@ export default function AgentBuilderPage() {
     }, 2000);
   };
 
+  const handleExport = () => {
+    if (!currentFlowId) {
+      alert('Please save the Agent first before exporting.');
+      return;
+    }
+    // Redirect to the download route
+    window.location.href = `/api/agent/flow/${currentFlowId}/export`;
+  };
+
   // --- Chat Simulation ---
-  const [chatMessages, setChatMessages] = useState<{ role: 'assistant' | 'user', text: string }[]>([
-    { role: 'assistant', text: agentConfig.welcomeMessage }
+  const [previewSessionId, setPreviewSessionId] = useState<string>('');
+  
+  useEffect(() => {
+    // Generate a valid UUID for the python backend on mount
+    setPreviewSessionId(crypto.randomUUID());
+  }, []);
+
+  const [chatMessages, setChatMessages] = useState<{ role: 'assistant' | 'user', text: string, type?: string, options?: string }[]>([
+    { role: 'assistant', text: agentConfig.welcomeMessage, type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
+  useEffect(() => {
+    if (chatMessages.length <= 1) {
+      setChatMessages([
+        { role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }
+      ]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agentConfig.welcomeMessage, agentConfig.welcomeMessageType, agentConfig.welcomeMessageOptions]);
 
-    const newMessages = [...chatMessages, { role: 'user' as const, text: chatInput }];
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim() || !currentFlowId) return;
+
+    const userInput = chatInput;
+    const newMessages = [...chatMessages, { role: 'user' as const, text: userInput }];
     setChatMessages(newMessages);
     setChatInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
+    // 1. Native Intent Matching against Unsaved Local State
+    const lowerMsg = userInput.toLowerCase().trim();
+    let matchedIntent = null;
+    
+    if (intents && intents.length > 0) {
+      for (const intent of intents) {
+        if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
+        if (intent.trainingPhrases.some((phrase: string) => lowerMsg === phrase.toLowerCase().trim() || lowerMsg.includes(phrase.toLowerCase().trim()))) {
+          matchedIntent = intent;
+          break;
+        }
+      }
+    }
+
+    // 2. Call API to get response (and optionally paraphrase matched intents)
+    try {
+      if (!currentFlowId) throw new Error('Agent not saved yet. Please save agent to test AI fallback.');
+      
+      const res = await fetch('/api/agent/test-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          flowId: currentFlowId,
+          message: userInput,
+          sessionId: previewSessionId,
+          matchedIntent: matchedIntent ? {
+            name: matchedIntent.name,
+            response: matchedIntent.answer || matchedIntent.response || '',
+            type: matchedIntent.answerType || matchedIntent.responseType || 'text',
+            options: matchedIntent.options
+          } : null
+        })
+      });
+
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to get response');
+      }
+
       setChatMessages([...newMessages, {
         role: 'assistant',
-        text: `[Matched Intent]\nStyle: ${agentConfig.speakingStyle}`
+        text: data.reply,
+        type: data.type,
+        options: data.options
       }]);
+    } catch (error: any) {
+      setChatMessages([...newMessages, {
+        role: 'assistant',
+        text: agentConfig.defaultResponse || `Maaf, sistem AI belum dapat membalas karena: ${error.message}. Pastikan pertanyaan Anda sesuai dengan daftar Intent/QnA yang ada.`,
+        type: agentConfig.defaultResponseType || 'text',
+        options: agentConfig.defaultResponseOptions || ''
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const activeIntentData = intents.find(i => i.id === activeIntentId);
@@ -390,6 +524,13 @@ export default function AgentBuilderPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg text-sm font-medium transition-colors border border-slate-200"
+            title="Download Agent Configuration"
+          >
+            <Download size={16} /> <span className="hidden sm:inline">Export JSON</span>
+          </button>
           <div className="relative">
             <button
               onClick={() => setShowFlowMenu(!showFlowMenu)}
@@ -443,7 +584,7 @@ export default function AgentBuilderPage() {
               <Settings size={18} className={activeTab === 'settings' ? 'text-blue-600' : 'text-slate-400'} /> Setting Agent
             </button>
             <button onClick={() => { setActiveTab('knowledge'); setActiveIntentId(null); }} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'knowledge' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}>
-              <Globe size={18} className={activeTab === 'knowledge' ? 'text-blue-600' : 'text-slate-400'} /> Sumber Knowledge
+              <Globe size={18} className={activeTab === 'knowledge' ? 'text-blue-600' : 'text-slate-400'} /> Base Knowledge
             </button>
             <button onClick={() => setActiveTab('faq')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'faq' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}>
               <HelpCircle size={18} className={activeTab === 'faq' ? 'text-blue-600' : 'text-slate-400'} /> Intents & QnA
@@ -453,7 +594,7 @@ export default function AgentBuilderPage() {
 
         {/* Middle Column: Tab Content */}
         <div className="flex-1 overflow-y-auto p-8 relative bg-slate-50">
-          <div className="max-w-5xl mx-auto h-full flex flex-col">
+          <div className="w-full h-full flex flex-col">
 
             {/* TAB: SETTING AGENT */}
             {activeTab === 'settings' && (
@@ -461,13 +602,65 @@ export default function AgentBuilderPage() {
                 <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                   <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 border-b border-slate-100 pb-2">Basic Info</h2>
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Agent Name</label>
-                      <input type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={agentConfig.name} onChange={e => setAgentConfig({ ...agentConfig, name: e.target.value })} />
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Agent Name</label>
+                    <input 
+                      type="text" 
+                      value={agentConfig.name}
+                      onChange={(e) => setAgentConfig({...agentConfig, name: e.target.value})}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                    <textarea 
+                      value={agentConfig.description || ''}
+                      onChange={(e) => setAgentConfig({...agentConfig, description: e.target.value})}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100">
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 pb-2 border-b border-slate-100">AI Prompt Configuration</h2>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          System Prompt
+                        </label>
+                        <p className="text-xs text-slate-500 mb-2">Instruksi inti untuk AI. Berikan konteks persona, tugas, atau aturan khusus di sini. (Contoh: sertakan tag `[HANDOFF_REQUESTED]` jika pengguna ingin bicara dengan agen manusia).</p>
+                        <textarea 
+                          value={agentConfig.systemPrompt || ''}
+                          onChange={(e) => setAgentConfig({...agentConfig, systemPrompt: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm bg-slate-50"
+                          rows={6}
+                          placeholder="You are a helpful sales assistant..."
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Human Prompt
+                        </label>
+                        <p className="text-xs text-slate-500 mb-2">Format pesan dari pengguna. Gunakan {'{input}'} untuk merepresentasikan pesan asli pengguna.</p>
+                        <input 
+                          type="text" 
+                          value={agentConfig.humanPrompt || ''}
+                          onChange={(e) => setAgentConfig({...agentConfig, humanPrompt: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm bg-slate-50"
+                          placeholder="User says: {input}"
+                        />
+                      </div>
                     </div>
+                  </div>
                   </div>
                 </section>
               </div>
+            )}
+
+            {/* TAB: KNOWLEDGE BASE */}
+            {activeTab === 'knowledge' && (
+              <AgentKnowledgeTab flowId={currentFlowId} />
             )}
 
             {/* TAB: FAQ / INTENTS */}
@@ -621,7 +814,101 @@ export default function AgentBuilderPage() {
 
                     {faqView === 'list' ? (
                       <div className="space-y-3 overflow-y-auto w-full">
-                        <div className="flex justify-end mb-2">
+                        {/* WELCOME MESSAGE / SAPAAN (NEW PLACEMENT) */}
+                        <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-6">
+                          <div className="flex items-center gap-2 mb-3">
+                            <MessageSquare size={18} className="text-blue-600" />
+                            <h3 className="font-semibold text-slate-800">Welcome Message / Sapaan</h3>
+                          </div>
+                          <p className="text-xs text-slate-500 mb-4">Pesan pertama yang akan dikirim AI saat pengguna membuka chat.</p>
+                          
+                          <div className="space-y-4">
+                            <div>
+                              <textarea 
+                                value={agentConfig.welcomeMessage || ''}
+                                onChange={(e) => setAgentConfig({...agentConfig, welcomeMessage: e.target.value})}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                rows={2}
+                                placeholder="Halo! Ada yang bisa saya bantu hari ini?"
+                              />
+                            </div>
+                            <div className="flex gap-4">
+                              <div className="w-1/3">
+                                <label className="block text-xs font-medium text-slate-700 mb-1">Message Type</label>
+                                <select 
+                                  value={agentConfig.welcomeMessageType || 'text'}
+                                  onChange={(e) => setAgentConfig({...agentConfig, welcomeMessageType: e.target.value})}
+                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                >
+                                  <option value="text">Text Only</option>
+                                  <option value="options">Text with Options (Buttons)</option>
+                                  <option value="form">Form (Lead Capture)</option>
+                                </select>
+                              </div>
+                              {agentConfig.welcomeMessageType === 'options' && (
+                                <div className="flex-1">
+                                  <label className="block text-xs font-medium text-slate-700 mb-1">Options (comma separated)</label>
+                                  <input 
+                                    type="text" 
+                                    value={agentConfig.welcomeMessageOptions || ''}
+                                    onChange={(e) => setAgentConfig({...agentConfig, welcomeMessageOptions: e.target.value})}
+                                    placeholder="e.g. Help me choose, Pricing, Book a tour"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* DEFAULT RESPONSE (NEW PLACEMENT) */}
+                        <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-5 mb-6">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Bot size={18} className="text-orange-600" />
+                            <h3 className="font-semibold text-slate-800">Default Fallback Response</h3>
+                          </div>
+                          <p className="text-xs text-slate-500 mb-4">Pesan yang akan dikirim AI jika pengguna mengetik sesuatu yang tidak dimengerti (tidak cocok dengan Intent/QnA manapun).</p>
+                          
+                          <div className="space-y-4">
+                            <div>
+                              <textarea 
+                                value={agentConfig.defaultResponse || ''}
+                                onChange={(e) => setAgentConfig({...agentConfig, defaultResponse: e.target.value})}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                                rows={2}
+                                placeholder="Maaf, saya belum mengerti pertanyaan Anda..."
+                              />
+                            </div>
+                            <div className="flex gap-4">
+                              <div className="w-1/3">
+                                <label className="block text-xs font-medium text-slate-700 mb-1">Message Type</label>
+                                <select 
+                                  value={agentConfig.defaultResponseType || 'text'}
+                                  onChange={(e) => setAgentConfig({...agentConfig, defaultResponseType: e.target.value})}
+                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
+                                >
+                                  <option value="text">Text Only</option>
+                                  <option value="options">Text with Options (Buttons)</option>
+                                  <option value="form">Form (Lead Capture)</option>
+                                </select>
+                              </div>
+                              {agentConfig.defaultResponseType === 'options' && (
+                                <div className="flex-1">
+                                  <label className="block text-xs font-medium text-slate-700 mb-1">Options (comma separated)</label>
+                                  <input 
+                                    type="text" 
+                                    value={agentConfig.defaultResponseOptions || ''}
+                                    onChange={(e) => setAgentConfig({...agentConfig, defaultResponseOptions: e.target.value})}
+                                    placeholder="e.g. Kembali ke Menu Utama, Bicara dengan Agen"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3 mb-2">
                           <button onClick={addIntent} className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">
                             <Plus size={16} /> Add Intent
                           </button>
@@ -669,53 +956,105 @@ export default function AgentBuilderPage() {
         </div>
 
         {/* Right Column: Chat Preview Panel */}
-        <div className="w-[360px] bg-white border-l border-slate-200 flex-shrink-0 flex flex-col shadow-[-4px_0_15px_-5px_rgba(0,0,0,0.05)] z-10">
-          <div className="p-4 bg-slate-900 text-white flex justify-between items-center flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-inner">
-                <Bot size={16} className="text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm leading-tight">{agentConfig.name || 'AI Assistant'}</h3>
-                <p className="text-[11px] text-blue-200 flex items-center gap-1 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> Live Preview
-                </p>
+        <div className="w-[360px] bg-white border-l border-slate-200 flex-shrink-0 flex flex-col shadow-[-4px_0_15px_-5px_rgba(0,0,0,0.05)] z-10 overflow-hidden flex-col">
+          <div className="flex-1 overflow-y-auto space-y-4">
+            {/* Test Panel removed to avoid Redis errors in environments without Redis */}
+
+            {/* Chat Preview */}
+            <div className="px-4 pb-4">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Chat Preview</h3>
+              <div className="bg-slate-900 text-white rounded-lg overflow-hidden flex flex-col h-[400px]">
+                <div className="p-3 flex justify-between items-center flex-shrink-0" style={{ backgroundColor: tenantConfig.themeBrandColor || '#801517' }}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/30">
+                      <Bot size={18} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-xs leading-tight text-white">{tenantConfig.name || 'Your Brand'}</h3>
+                      <p className="text-[10px] text-white/80 flex items-center gap-1 mt-0.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> Online now
+                      </p>
+                    </div>
+                  </div>
+                  <button onClick={() => {
+                    setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }]);
+                    setPreviewSessionId(crypto.randomUUID());
+                  }} className="p-1.5 text-white/80 hover:text-white hover:bg-black/20 rounded transition-colors" title="Restart chat">
+                    <RotateCcw size={14} />
+                  </button>
+                </div>
+                <div className="flex-1 p-3 overflow-y-auto bg-slate-50 space-y-3">
+                  {chatMessages.map((msg, idx) => (
+                    <div key={idx} className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                      <div className={`flex gap-2 w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        {msg.role === 'assistant' && (
+                          <div className="w-6 h-6 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-5 border border-blue-200">
+                            <Bot size={12} className="text-blue-600" />
+                          </div>
+                        )}
+                        <div className={`flex flex-col max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                          {msg.role === 'assistant' && (
+                            <span className="text-[10px] text-slate-500 font-medium ml-1 mb-0.5">{agentConfig.name || 'AI Assistant'}</span>
+                          )}
+                          <div 
+                            className={`rounded-lg p-2.5 text-[12px] shadow-sm leading-relaxed ${msg.role === 'user' ? 'text-white rounded-br-none' : 'border border-slate-200 text-slate-800 rounded-bl-none'}`}
+                            style={{
+                              backgroundColor: msg.role === 'user' ? (tenantConfig.themeUserBubbleColor || '#801517') : (tenantConfig.themeBotBubbleColor || '#ffffff'),
+                              '--theme-brand': tenantConfig.themeBrandColor || '#801517'
+                            } as React.CSSProperties}
+                          >
+                            {msg.role === 'assistant' ? (
+                              <div 
+                                dangerouslySetInnerHTML={{ __html: msg.text }} 
+                                className="whitespace-pre-wrap [&>b]:font-bold [&>strong]:font-bold [&>i]:italic [&_.notice]:bg-yellow-50 [&_.notice]:p-1.5 [&_.notice]:rounded [&_.notice]:border [&_.notice]:border-yellow-200 [&_.notice]:text-yellow-800 [&_.notice]:my-1.5 [&_.notice]:text-[11px] [&_.card]:bg-white [&_.card]:border [&_.card]:border-slate-200 [&_.card]:rounded-xl [&_.card]:p-3 [&_.card]:my-2 [&_.card-title]:text-[var(--theme-brand)] [&_.card-title]:font-bold [&_.card-title]:mb-2 [&_.price-option]:border-t [&_.price-option]:border-slate-100 [&_.price-option]:pt-2 [&_.price-option]:mt-2 [&_.price-option:nth-child(2)]:border-0 [&_.price-option:nth-child(2)]:pt-0 [&_.price-option:nth-child(2)]:mt-0 [&_.price]:font-bold [&_.price]:text-[15px] [&_.price]:text-slate-800 [&_.price]:leading-tight [&_.small]:text-[11px] [&_.small]:text-slate-500 [&_.small]:leading-tight [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:my-1 [&_.cta-note]:mt-3 [&_.cta-note]:pt-2 [&_.cta-note]:border-t [&_.cta-note]:border-slate-100 [&_.cta-note]:text-[11px] [&_.cta-note]:text-slate-500 [&_.cta-note]:italic [&_.form-card]:bg-white [&_.form-card]:border [&_.form-card]:border-slate-200 [&_.form-card]:rounded-xl [&_.form-card]:p-3 [&_.form-card]:my-2 [&_.form-card_label]:block [&_.form-card_label]:text-[11px] [&_.form-card_label]:text-slate-700 [&_.form-card_label]:font-bold [&_.form-card_label]:mb-1 [&_.form-card_label]:mt-2 [&_.form-card_input]:w-full [&_.form-card_input]:border [&_.form-card_input]:border-slate-200 [&_.form-card_input]:rounded-lg [&_.form-card_input]:px-2.5 [&_.form-card_input]:py-2 [&_.form-card_input]:text-[11px] [&_.form-card_input]:outline-none [&_.form-card_input]:font-sans [&_.form-grid]:grid [&_.form-grid]:grid-cols-2 [&_.form-grid]:gap-2 [&_.submit-btn]:w-full [&_.submit-btn]:bg-[var(--theme-brand)] [&_.submit-btn]:text-white [&_.submit-btn]:rounded-xl [&_.submit-btn]:py-2 [&_.submit-btn]:font-bold [&_.submit-btn]:mt-3 [&_.submit-btn]:text-[11px]"
+                              />
+                            ) : (
+                              <div className="whitespace-pre-wrap">{msg.text}</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {msg.role === 'assistant' && msg.type === 'options' && msg.options && (
+                        <div className="pl-7 flex flex-wrap gap-1 mt-1">
+                          {msg.options.split(',').map((opt, i) => (
+                            <button key={i} onClick={() => setChatInput(opt.trim())} className="px-2 py-1 bg-white border border-blue-200 text-blue-600 text-[10px] rounded-full hover:bg-blue-50 transition-colors text-left">
+                              {opt.trim()}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {isTyping && (
+                    <div className="flex gap-2 justify-start">
+                      <div className="w-5 h-5 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-0.5"><Bot size={10} className="text-blue-600" /></div>
+                      <div className="bg-white border border-slate-200 rounded-lg rounded-bl-none px-2 py-2 shadow-sm flex gap-1 items-center h-8">
+                        <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"></span>
+                        <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                        <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="p-2 bg-slate-800 border-t border-slate-700 flex-shrink-0">
+                  <form onSubmit={handleSendMessage} className="relative flex items-center">
+                    <input type="text" placeholder="Test..." className="w-full pl-3 pr-8 py-2 bg-slate-700 border border-slate-600 rounded-full text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500" value={chatInput} onChange={(e) => setChatInput(e.target.value)} />
+                    <button type="submit" disabled={!chatInput.trim() || isTyping} className="absolute right-1 p-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50"><Send size={12} /></button>
+                  </form>
+                </div>
               </div>
             </div>
-            <button onClick={() => setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage }])} className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors">
-              <RotateCcw size={16} />
-            </button>
-          </div>
-          <div className="flex-1 p-4 overflow-y-auto bg-slate-100/50 space-y-4">
-            {chatMessages.map((msg, idx) => (
-              <div key={idx} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {msg.role === 'assistant' && (
-                  <div className="w-6 h-6 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-1"><Bot size={12} className="text-blue-600" /></div>
-                )}
-                <div className={`max-w-[85%] rounded-2xl p-3 text-[13px] shadow-sm leading-relaxed ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'}`}>
-                  {msg.text}
-                </div>
-              </div>
-            ))}
-            {isTyping && (
-              <div className="flex gap-2 justify-start">
-                <div className="w-6 h-6 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-1"><Bot size={12} className="text-blue-600" /></div>
-                <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-none px-3 py-4 shadow-sm flex gap-1 items-center h-10">
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="p-3 bg-white border-t border-slate-200 flex-shrink-0">
-            <form onSubmit={handleSendMessage} className="relative flex items-center">
-              <input type="text" placeholder="Test your agent..." className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" value={chatInput} onChange={(e) => setChatInput(e.target.value)} />
-              <button type="submit" disabled={!chatInput.trim() || isTyping} className="absolute right-1.5 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50"><Send size={14} /></button>
-            </form>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AgentBuilderPage() {
+  return (
+    <Suspense fallback={<div className="h-full flex items-center justify-center">Loading agent builder...</div>}>
+      <AgentBuilderContent />
+    </Suspense>
   );
 }
