@@ -2,55 +2,74 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   BarChart, Users, Star, MessageSquareText, 
   ArrowUpRight, ArrowDownRight, Clock, 
   CheckCircle2, AlertCircle, Medal, Bot, Zap,
   Settings, UploadCloud, Link as LinkIcon, Plus,
-  TrendingUp, Lightbulb
+  TrendingUp, Lightbulb, Loader2
 } from 'lucide-react';
 
 export default function DashboardOverview() {
   const [activeTab, setActiveTab] = useState<'overview' | 'rating' | 'ai-agent' | 'insight'>('overview');
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const [dashboardData, setDashboardData] = useState<{
+    stats: { totalChats: number, resolvedChats: number, pendingChats: number, inProgressChats: number },
+    csat: { average: string, totalReviews: number, distribution: { stars: number, percentage: number }[] },
+    recentRatings: any[]
+  } | null>(null);
 
-  // Overview Data
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/dashboard/stats');
+        if (res.ok) {
+          const data = await res.json();
+          setDashboardData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  // Overview Data (Real data where available)
   const overviewStats = [
-    { name: 'Total New Users', value: '342', change: '+12%', isPositive: true, icon: Users },
-    { name: 'Total Old Users', value: '1,205', change: '+2.4%', isPositive: true, icon: Users },
-    { name: 'Open Chats', value: '45', change: '-5%', isPositive: true, icon: MessageSquareText },
-    { name: 'Resolved Chats', value: '892', change: '+18%', isPositive: true, icon: CheckCircle2 },
-    { name: 'Avg. Response Time', value: '45s', change: '-10s', isPositive: true, icon: Clock },
-    { name: 'Avg. Resolution Time', value: '4m 12s', change: '-45s', isPositive: true, icon: BarChart },
-    { name: 'Avg. Waiting Time', value: '1m 30s', change: '+15s', isPositive: false, icon: Clock },
+    { name: 'Total Chats', value: dashboardData?.stats.totalChats || 0, change: '+12%', isPositive: true, icon: MessageSquareText },
+    { name: 'Resolved Chats', value: dashboardData?.stats.resolvedChats || 0, change: '+18%', isPositive: true, icon: CheckCircle2 },
+    { name: 'In Progress Chats', value: dashboardData?.stats.inProgressChats || 0, change: '+5%', isPositive: true, icon: Users },
+    { name: 'Pending Chats', value: dashboardData?.stats.pendingChats || 0, change: '-2%', isPositive: true, icon: Clock },
+    { name: 'Avg. CSAT Score', value: dashboardData?.csat.average || '0.0', change: '+0.2', isPositive: true, icon: Star },
+    { name: 'Total Reviews', value: dashboardData?.csat.totalReviews || 0, change: '+10%', isPositive: true, icon: Star },
   ];
 
   // Pie Chart Data
   const chatStatus = {
-    resolved: { count: 892, color: 'bg-green-500' },
-    pending: { count: 45, color: 'bg-amber-500' },
-    inProgress: { count: 120, color: 'bg-blue-500' }
+    resolved: { count: dashboardData?.stats.resolvedChats || 0, color: 'bg-green-500' },
+    pending: { count: dashboardData?.stats.pendingChats || 0, color: 'bg-amber-500' },
+    inProgress: { count: dashboardData?.stats.inProgressChats || 0, color: 'bg-blue-500' }
   };
-  const totalChats = chatStatus.resolved.count + chatStatus.pending.count + chatStatus.inProgress.count;
+  const totalChats = (dashboardData?.stats.totalChats || 0) > 0 ? dashboardData!.stats.totalChats : 1; // Prevent division by zero
 
   // Rating Data
-  const csatOverview = {
-    average: '4.8',
-    totalReviews: 450,
+  const csatOverview = dashboardData?.csat || {
+    average: '0.0',
+    totalReviews: 0,
     distribution: [
-      { stars: 5, percentage: 80 },
-      { stars: 4, percentage: 12 },
-      { stars: 3, percentage: 5 },
-      { stars: 2, percentage: 2 },
-      { stars: 1, percentage: 1 },
+      { stars: 5, percentage: 0 },
+      { stars: 4, percentage: 0 },
+      { stars: 3, percentage: 0 },
+      { stars: 2, percentage: 0 },
+      { stars: 1, percentage: 0 },
     ]
   };
 
-  const recentRatings = [
-    { id: 1, user: 'John Doe', rating: 5, comment: 'Very helpful agent!', time: '10 mins ago', channel: 'widget' },
-    { id: 2, user: 'Anonymous', rating: 4, comment: 'Fast response.', time: '25 mins ago', channel: 'whatsapp' },
-    { id: 3, user: 'Sarah Smith', rating: 5, comment: 'Resolved my issue instantly.', time: '1 hour ago', channel: 'widget' },
-  ];
+  const recentRatings = dashboardData?.recentRatings || [];
 
   const agentLeaderboard = [
     { id: 1, name: 'Agent Sarah', score: '4.9', resolved: 145, avatar: 'S' },
@@ -128,7 +147,13 @@ export default function DashboardOverview() {
       {/* OVERVIEW TAB */}
       {activeTab === 'overview' && (
         <div className="space-y-6 animate-in fade-in duration-300">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64 text-slate-400">
+              <Loader2 className="animate-spin w-8 h-8 mr-3 text-blue-500" /> Memuat data statistik...
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {overviewStats.map((stat) => {
               const Icon = stat.icon;
               return (
@@ -182,13 +207,21 @@ export default function DashboardOverview() {
               </div>
             </div>
           </div>
+          </>
+          )}
         </div>
       )}
 
       {/* RATING TAB */}
       {activeTab === 'rating' && (
         <div className="space-y-6 animate-in fade-in duration-300">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64 text-slate-400">
+              <Loader2 className="animate-spin w-8 h-8 mr-3 text-blue-500" /> Memuat data rating...
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-1 flex flex-col">
               <h2 className="text-lg font-bold text-slate-900 mb-6">CSAT Overview</h2>
               <div className="flex items-center gap-4 mb-8">
@@ -250,7 +283,7 @@ export default function DashboardOverview() {
               <button className="text-sm font-medium text-blue-600 hover:text-blue-700">View all</button>
             </div>
             <div className="divide-y divide-slate-100">
-              {recentRatings.map((rating) => (
+              {recentRatings.length > 0 ? recentRatings.map((rating) => (
                 <div key={rating.id} className="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors">
                   <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold shrink-0">
                     {rating.user.charAt(0)}
@@ -269,9 +302,13 @@ export default function DashboardOverview() {
                     <p className="text-sm text-slate-600">{rating.comment}</p>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="p-6 text-center text-slate-500">Belum ada review.</div>
+              )}
             </div>
           </div>
+          </>
+          )}
         </div>
       )}
 

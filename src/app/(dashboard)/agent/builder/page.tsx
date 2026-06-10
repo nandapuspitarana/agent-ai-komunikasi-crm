@@ -12,6 +12,7 @@ import { InputNode } from '@/components/flow-nodes/InputNode';
 import DOMPurify from 'dompurify';
 import { ConditionNode } from '@/components/flow-nodes/ConditionNode';
 import AgentKnowledgeTab from '@/components/AgentKnowledgeTab';
+import ImageUpload from '@/components/ImageUpload';
 
 // --- Custom Nodes for React Flow ---
 const QuestionNode = ({ data }: { data: any }) => {
@@ -136,7 +137,8 @@ function AgentBuilderContent() {
     urls: [''],
     themeBrandColor: '#801517',
     themeBotBubbleColor: '#ffffff',
-    themeUserBubbleColor: '#801517'
+    themeUserBubbleColor: '#801517',
+    botAvatarUrl: ''
   });
 
   // --- Unified Intent State ---
@@ -309,7 +311,8 @@ function AgentBuilderContent() {
           welcomeMessageType: 'text',
           welcomeMessageOptions: '',
           defaultFeedback: 'Apakah jawaban ini membantu?',
-          urls: ['']
+          urls: [''],
+          botAvatarUrl: ''
         });
 
         // Map database fields to UI fields
@@ -633,6 +636,16 @@ function AgentBuilderContent() {
                       rows={2}
                     />
                   </div>
+                  
+                  <div className="pt-4 border-t border-slate-100">
+                    <ImageUpload 
+                      currentImage={agentConfig.botAvatarUrl} 
+                      onUpload={(url) => setAgentConfig({ ...agentConfig, botAvatarUrl: url })} 
+                      aspectRatio={1} 
+                      maxSize={2} 
+                      label="Bot Avatar"
+                    />
+                  </div>
 
                   <div className="pt-4 border-t border-slate-100">
                     <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 pb-2 border-b border-slate-100">AI Prompt Configuration</h2>
@@ -664,6 +677,46 @@ function AgentBuilderContent() {
                           placeholder="User says: {input}"
                         />
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 mt-6">
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 pb-2 border-b border-slate-100">Fallback / Default Response</h2>
+                    <p className="text-xs text-slate-500 mb-4">Balasan yang digunakan jika sistem gagal menjawab, atau bisa digunakan untuk merutekan percakapan ke agen manusia (tambahkan <code>[HANDOFF_REQUESTED]</code>).</p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Fallback Message</label>
+                        <textarea 
+                          value={agentConfig.defaultResponse || ''}
+                          onChange={(e) => setAgentConfig({...agentConfig, defaultResponse: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          rows={3}
+                          placeholder="Maaf, saya tidak mengerti. Saya teruskan ke agen kami ya. [HANDOFF_REQUESTED]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Response Type</label>
+                        <select 
+                          value={agentConfig.defaultResponseType || 'text'}
+                          onChange={(e) => setAgentConfig({...agentConfig, defaultResponseType: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        >
+                          <option value="text">Text Only</option>
+                          <option value="options">Options / Buttons</option>
+                        </select>
+                      </div>
+                      {agentConfig.defaultResponseType === 'options' && (
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Options (Comma separated)</label>
+                          <input 
+                            type="text" 
+                            value={agentConfig.defaultResponseOptions || ''}
+                            onChange={(e) => setAgentConfig({...agentConfig, defaultResponseOptions: e.target.value})}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="e.g. Bicara dengan Agen, Menu Utama"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                   </div>

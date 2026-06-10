@@ -25,13 +25,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
     }
 
+    const flowConfig = tenant.flows[0]?.config as any;
+
     return NextResponse.json({
       status: 'success',
       config: {
         name: tenant.name,
         primaryColor: tenant.themeBrandColor || '#2563eb', // Use tenant color
         logo: tenant.themeBrandLogo || null,
-        botAvatarUrl: tenant.botAvatarUrl || null,
+        botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
         initialFlow: tenant.flows[0] || null
       }
     });

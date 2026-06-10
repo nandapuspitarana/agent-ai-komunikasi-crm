@@ -17,6 +17,8 @@ interface Chat {
   messages: Array<{ id: string; text: string; sender: string; timestamp: string }>;
   preview: string;
   time: string;
+  assignedAgentId?: string;
+  assignedAgentName?: string | null;
 }
 
 export default function InboxPage() {
@@ -26,6 +28,7 @@ export default function InboxPage() {
   const [messageInput, setMessageInput] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [showCannedResponses, setShowCannedResponses] = useState(false);
+  const [agents, setAgents] = useState<{id: string, name: string}[]>([]);
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -44,13 +47,29 @@ export default function InboxPage() {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch chat sessions:', error);
+        console.error('Error fetching sessions:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
+    const fetchAgents = async () => {
+      try {
+        const res = await fetch('/api/users?limit=100');
+        if (res.ok) {
+          const data = await res.json();
+          // Filter agents or show all users who can handle chats
+          setAgents(data.users || []);
+        }
+      } catch (error) {
+        console.error('Error fetching agents:', error);
+      }
+    };
+
     fetchSessions();
+    if ((session.user as any).role === 'SUPER_ADMIN' || (session.user as any).role === 'BUSINESS_PARTNER') {
+      fetchAgents();
+    }
   }, [session]);
 
   // Join the selected chat session room to receive realtime messages for it
@@ -250,19 +269,20 @@ export default function InboxPage() {
   }, [selectedChat, chats]);
 
   // Function to manually claim a conversation
-  const handleClaimChat = async (sessionId: string) => {
+  const handleClaimChat = async (chatId: string) => {
     try {
-      const res = await fetch(`/api/chat/sessions/${sessionId}/claim`, {
-        method: 'POST',
+      const res = await fetch(`/api/chat/sessions/${chatId}/claim`, {
+        method: 'POST'
       });
       if (res.ok) {
-        const data = await res.json();
-        // Update local state immediately
+        // Optimistic UI update
         setChats(prev => prev.map(chat => {
-          if (chat.id === sessionId) {
-            return {
-              ...chat,
-              status: 'agent',
+          if (chat.id === chatId) {
+            return { 
+              ...chat, 
+              status: 'agent', 
+              assignedAgentId: (session?.user as any)?.id, 
+              assignedAgentName: session?.user?.name,
               messages: [...(chat.messages || []), {
                 id: Date.now().toString() + Math.random(),
                 text: `✅ Anda mengambil alih percakapan.`,
@@ -278,6 +298,75 @@ export default function InboxPage() {
       }
     } catch (error) {
       console.error('Error claiming chat:', error);
+    }
+  };
+
+  const handleReassignChat = async (chatId: string, newAgentId: string) => {
+    try {
+      const res = await fetch(`/api/chat/sessions/${chatId}/reassign`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assignedAgentId: newAgentId })
+      });
+      if (res.ok) {
+        const newAgentName = agents.find(a => a.id === newAgentId)?.name || 'Unknown Agent';
+        setChats(prev => prev.map(chat => {
+          if (chat.id === chatId) {
+            return { 
+              ...chat, 
+              assignedAgentId: newAgentId, 
+              assignedAgentName: newAgentName,
+              messages: [...(chat.messages || []), {
+                id: Date.now().toString() + Math.random(),
+                text: `🔄 Percakapan ditransfer ke ${newAgentName}.`,
+                sender: 'system',
+                timestamp: new Date().toISOString()
+              }]
+            };
+          }
+          return chat;
+        }));
+        // Notify others
+        if (socketRef.current) {
+          socketRef.current.emit('agent_joined', { sessionId: chatId });
+        }
+      } else {
+        const err = await res.json();
+        alert('Gagal mentransfer percakapan: ' + err.error);
+      }
+    } catch (error) {
+      console.error('Error reassigning chat:', error);
+    }
+  };
+
+  const handleCloseChat = async (sessionId: string) => {
+    if (!confirm('Apakah Anda yakin ingin menutup percakapan ini dan mengirimkan permintaan review ke pengunjung?')) return;
+    
+    try {
+      const res = await fetch(`/api/chat/sessions/${sessionId}/close`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        setChats(prev => prev.map(chat => {
+          if (chat.id === sessionId) {
+            return {
+              ...chat,
+              status: 'closed',
+              messages: [...(chat.messages || []), {
+                id: Date.now().toString() + Math.random(),
+                text: `Percakapan telah ditutup oleh agen. Meminta review dari pengguna...`,
+                sender: 'system',
+                timestamp: new Date().toISOString()
+              }]
+            };
+          }
+          return chat;
+        }));
+      } else {
+        console.error('Failed to close session');
+      }
+    } catch (error) {
+      console.error('Error closing chat:', error);
     }
   };
 
@@ -388,6 +477,11 @@ export default function InboxPage() {
                       👤 Ditangani
                     </span>
                   )}
+                  {chat.status === 'closed' && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-semibold">
+                      ✓ Selesai
+                    </span>
+                  )}
                 </div>
               </div>
             ))
@@ -408,15 +502,34 @@ export default function InboxPage() {
                   <h3 className="font-semibold text-slate-800">
                     {chats.find(c => c.id === selectedChat)?.contactId}
                   </h3>
-                  <p className="text-xs text-slate-500 flex items-center mt-0.5">
-                    <span className={`w-2 h-2 rounded-full mr-1.5 ${chats.find(c => c.id === selectedChat)?.status === 'queue' ? 'bg-amber-400' : 'bg-green-500'}`}></span>
-                    {chats.find(c => c.id === selectedChat)?.status === 'queue' ? 'Menunggu Agen' : 'Aktif'}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-xs text-slate-500 flex items-center mt-0.5">
+                      <span className={`w-2 h-2 rounded-full mr-1.5 ${chats.find(c => c.id === selectedChat)?.status === 'queue' ? 'bg-amber-400' : 'bg-green-500'}`}></span>
+                      {chats.find(c => c.id === selectedChat)?.status === 'queue' ? 'Menunggu Agen' : 'Aktif'}
+                    </p>
+                    {chats.find(c => c.id === selectedChat)?.status === 'agent' && chats.find(c => c.id === selectedChat)?.assignedAgentName && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                        Ditangani oleh: <span className="font-medium text-slate-800">{chats.find(c => c.id === selectedChat)?.assignedAgentName}</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex items-center gap-2">
+                {((session?.user as any)?.role === 'SUPER_ADMIN' || (session?.user as any)?.role === 'BUSINESS_PARTNER') && chats.find(c => c.id === selectedChat)?.status === 'agent' && (
+                  <select
+                    className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs rounded-lg outline-none cursor-pointer"
+                    value={chats.find(c => c.id === selectedChat)?.assignedAgentId || ''}
+                    onChange={(e) => handleReassignChat(selectedChat, e.target.value)}
+                  >
+                    <option value="" disabled>Transfer ke...</option>
+                    {agents.map(agent => (
+                      <option key={agent.id} value={agent.id}>{agent.name}</option>
+                    ))}
+                  </select>
+                )}
                 {chats.find(c => c.id === selectedChat)?.status === 'queue' && (
                   <button
                     onClick={() => handleClaimChat(selectedChat)}
@@ -431,6 +544,14 @@ export default function InboxPage() {
                     className="px-3.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center"
                   >
                     Intervensi AI (Ambil)
+                  </button>
+                )}
+                {(chats.find(c => c.id === selectedChat)?.status === 'agent' || chats.find(c => c.id === selectedChat)?.status === 'queue') && (
+                  <button
+                    onClick={() => handleCloseChat(selectedChat)}
+                    className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center border border-slate-300"
+                  >
+                    Tutup Percakapan
                   </button>
                 )}
               </div>
@@ -485,44 +606,51 @@ export default function InboxPage() {
               )}
               <div ref={messagesEndRef} />
             </div>
- 
-            <div className="p-4 bg-white border-t border-slate-200">
-              <div className="flex items-center bg-slate-100 rounded-full pr-2 pl-4 py-1 mb-2">
-                <input 
-                  type="text" 
-                  placeholder="Ketik pesan atau / untuk template balasan..." 
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  className="flex-1 bg-transparent border-none focus:ring-0 text-sm outline-none"
-                />
-                <button 
-                  onClick={() => setShowCannedResponses(!showCannedResponses)}
-                  className="p-2 text-slate-500 hover:text-blue-600 transition-colors mr-1"
-                  title="Canned Responses"
-                >
-                  <PanelRight size={18} />
-                </button>
-                <button 
-                  onClick={handleSendMessage}
-                  className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-                >
-                  <Send size={16} className="ml-0.5" />
-                </button>
-              </div>
-              {showCannedResponses && session?.user && (
-                <div className="border-t border-slate-200 pt-2">
-                  <CannedResponses 
-                    tenantId={(session.user as any).tenantId}
-                    agentId={(session.user as any).id}
-                    onSelect={(response) => {
-                      setMessageInput(prev => prev + (prev ? ' ' : '') + response.content);
-                      setShowCannedResponses(false);
-                    }}
+            
+            {/* Input form - only show if status is not closed */}
+            {chats.find(c => c.id === selectedChat)?.status !== 'closed' ? (
+              <div className="p-4 bg-white border-t border-slate-200">
+                <div className="flex items-center bg-slate-100 rounded-full pr-2 pl-4 py-1 mb-2">
+                  <input 
+                    type="text" 
+                    placeholder="Ketik pesan atau / untuk template balasan..." 
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    className="flex-1 bg-transparent border-none focus:ring-0 text-sm outline-none"
                   />
+                  <button 
+                    onClick={() => setShowCannedResponses(!showCannedResponses)}
+                    className="p-2 text-slate-500 hover:text-blue-600 transition-colors mr-1"
+                    title="Canned Responses"
+                  >
+                    <PanelRight size={18} />
+                  </button>
+                  <button 
+                    onClick={handleSendMessage}
+                    className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                  >
+                    <Send size={16} className="ml-0.5" />
+                  </button>
                 </div>
-              )}
-            </div>
+                {showCannedResponses && session?.user && (
+                  <div className="border-t border-slate-200 pt-2">
+                    <CannedResponses 
+                      tenantId={(session.user as any).tenantId}
+                      agentId={(session.user as any).id}
+                      onSelect={(response) => {
+                        setMessageInput(prev => prev + (prev ? ' ' : '') + response.content);
+                        setShowCannedResponses(false);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-4 bg-slate-100 border-t border-slate-200 text-center text-slate-500 text-sm">
+                Percakapan ini telah ditutup.
+              </div>
+            )}
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center flex-col text-slate-400">

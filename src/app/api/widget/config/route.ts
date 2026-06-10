@@ -19,7 +19,10 @@ export async function GET(request: Request) {
   }
 
   // Integrasi dengan Prisma untuk mengambil data asli
-  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } })
+  const tenant = await prisma.tenant.findUnique({ 
+    where: { id: tenantId },
+    include: { activeFlow: true }
+  });
   
   if (!tenant) {
     return NextResponse.json(
@@ -28,13 +31,15 @@ export async function GET(request: Request) {
     );
   }
 
+  const flowConfig = tenant.activeFlow?.config as any;
+
   const settings = {
     tenantId,
     primaryColor: tenant.themeBrandColor || '#2563eb',
     welcomeMessage: 'Hi there! How can we help you today?',
     logoUrl: tenant.themeBrandLogo || 'https://via.placeholder.com/40',
     botName: tenant.name || 'CRM Support Bot',
-    botAvatarUrl: tenant.botAvatarUrl || null
+    botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null
   };
 
   return NextResponse.json(settings, {

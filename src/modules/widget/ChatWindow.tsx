@@ -36,6 +36,10 @@ export function ChatWindow({
   const [isSending, setIsSending] = useState(false);
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('bot');
   const [serverSessionId, setServerSessionId] = useState<string | null>(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
@@ -115,6 +119,13 @@ export function ChatWindow({
     // Balasan dari human agent
     socket.on('agent_message', (data: { message: string, avatar?: string }) => {
       addMessage(data.message, 'agent', data.avatar);
+    });
+
+    // Session closed
+    socket.on('session_closed', () => {
+      setSessionStatus('closed' as any);
+      setShowReviewForm(true);
+      addMessage('Percakapan telah ditutup oleh agen.', 'system');
     });
 
     return () => {
@@ -211,6 +222,26 @@ export function ChatWindow({
     sendMessage('Saya ingin bicara dengan agen manusia');
   };
 
+  const submitReview = async () => {
+    if (!serverSessionId || rating === 0) return;
+    setIsSending(true);
+    try {
+      const res = await fetch(`/api/chat/sessions/${serverSessionId}/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating, review: reviewText }),
+      });
+      if (res.ok) {
+        setReviewSubmitted(true);
+        setShowReviewForm(false);
+      }
+    } catch (error) {
+      console.error('Error submitting review', error);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     sendMessage(inputValue);
@@ -222,6 +253,7 @@ export function ChatWindow({
       case 'bot': return isConnected ? 'Online · AI Aktif' : 'Menghubungkan...';
       case 'queue': return '⏳ Menunggu Agen';
       case 'agent': return '👤 Terhubung ke Agen';
+      case 'closed' as any: return '✓ Percakapan Selesai';
       case 'connecting': return 'Menghubungkan...';
     }
   };
@@ -231,6 +263,7 @@ export function ChatWindow({
       case 'bot': return isConnected ? 'bg-green-400' : 'bg-red-400';
       case 'queue': return 'bg-yellow-400';
       case 'agent': return 'bg-emerald-400';
+      case 'closed' as any: return 'bg-slate-400';
       default: return 'bg-slate-400';
     }
   };
@@ -354,35 +387,77 @@ export function ChatWindow({
         </div>
       )}
 
-      {/* Input Form Area */}
+      {/* Input Form Area or Review Form */}
       <div className="p-3 bg-white border-t border-slate-100 shadow-[0_-4px_15px_rgba(0,0,0,0.02)]">
-        <form onSubmit={handleSend} className="flex items-center gap-2 relative">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={
-              sessionStatus === 'queue' 
-                ? 'Menunggu agen bergabung...' 
-                : sessionStatus === 'agent'
-                ? 'Tulis pesan ke agen...'
-                : 'Tulis pesan Anda...'
-            }
-            className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full px-5 py-3 text-sm outline-none transition-all placeholder-slate-400"
-            style={{ '--tw-ring-color': widgetConfig.primaryColor } as React.CSSProperties}
-          />
-          <button 
-            type="submit"
-            disabled={!inputValue.trim() || isSending}
-            className="absolute right-1.5 p-2 rounded-full text-white flex-shrink-0 transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-md"
-            style={{ backgroundColor: widgetConfig.primaryColor }}
-          >
-            <Send size={16} className="ml-0.5" />
-          </button>
-        </form>
+        {showReviewForm && !reviewSubmitted ? (
+          <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-4 p-2">
+            <p className="text-center text-sm font-semibold text-slate-700">Bagaimana layanan kami?</p>
+            <div className="flex justify-center gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className={`p-1 transition-transform hover:scale-110 ${rating >= star ? 'text-amber-400' : 'text-slate-200'}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill={rating >= star ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </button>
+              ))}
+            </div>
+            <textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              placeholder="Tulis pendapat Anda (opsional)..."
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-300 resize-none h-16"
+            />
+            <button
+              onClick={submitReview}
+              disabled={rating === 0 || isSending}
+              className="w-full py-2 rounded-xl text-white text-sm font-semibold disabled:opacity-50 transition-all"
+              style={{ backgroundColor: widgetConfig.primaryColor }}
+            >
+              Kirim Penilaian
+            </button>
+          </div>
+        ) : reviewSubmitted ? (
+          <div className="py-4 text-center">
+            <div className="w-10 h-10 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <p className="text-sm font-medium text-slate-700">Terima kasih atas penilaian Anda!</p>
+          </div>
+        ) : (sessionStatus as any) === 'closed' ? (
+          <div className="py-3 text-center">
+            <p className="text-sm text-slate-500">Percakapan telah berakhir.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSend} className="flex items-center gap-2 relative">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder={
+                sessionStatus === 'queue' 
+                  ? 'Menunggu agen bergabung...' 
+                  : sessionStatus === 'agent'
+                  ? 'Tulis pesan ke agen...'
+                  : 'Tulis pesan Anda...'
+              }
+              className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full px-5 py-3 text-sm outline-none transition-all placeholder-slate-400"
+              style={{ '--tw-ring-color': widgetConfig.primaryColor } as React.CSSProperties}
+            />
+            <button 
+              type="submit"
+              disabled={!inputValue.trim() || isSending}
+              className="absolute right-1.5 p-2 rounded-full text-white flex-shrink-0 transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-md"
+              style={{ backgroundColor: widgetConfig.primaryColor }}
+            >
+              <Send size={16} className="ml-0.5" />
+            </button>
+          </form>
+        )}
         <div className="text-center mt-2">
           <p className="text-[10px] text-slate-400 font-medium tracking-wide">
-            {sessionStatus === 'bot' ? '🤖 Dijawab oleh AI' : sessionStatus === 'agent' ? '👤 Agen Aktif' : '⏳ Menunggu Agen'}
+            {sessionStatus === 'bot' ? '🤖 Dijawab oleh AI' : sessionStatus === 'agent' ? '👤 Agen Aktif' : sessionStatus === 'queue' ? '⏳ Menunggu Agen' : '✓ Selesai'}
           </p>
         </div>
       </div>

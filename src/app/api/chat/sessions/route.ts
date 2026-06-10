@@ -37,6 +37,14 @@ export async function GET(req: NextRequest) {
       }
     });
 
+    // Fetch user names for assigned agents
+    const assignedAgentIds = chatSessions.map(s => s.assignedAgentId).filter(Boolean) as string[];
+    const agents = await prisma.user.findMany({
+      where: { id: { in: assignedAgentIds } },
+      select: { id: true, name: true }
+    });
+    const agentMap = new Map(agents.map(a => [a.id, a.name]));
+
     // Format the response for the frontend
     const formattedSessions = chatSessions.map(session => {
       const lastMessage = session.messages[session.messages.length - 1];
@@ -45,6 +53,8 @@ export async function GET(req: NextRequest) {
         contactId: session.contactId,
         channel: session.channel,
         status: session.status,
+        assignedAgentId: session.assignedAgentId,
+        assignedAgentName: session.assignedAgentId ? agentMap.get(session.assignedAgentId) || 'Unknown Agent' : null,
         createdAt: session.createdAt,
         messages: session.messages.map(msg => ({
           id: msg.id,

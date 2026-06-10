@@ -263,8 +263,7 @@ export async function POST(req: NextRequest) {
         aiReplyRaw = aiResponse.reply || 'Maaf, saya tidak bisa menjawab saat ini.';
       } catch (aiError) {
         console.error('[Widget Message] AI Engine error:', aiError);
-        aiReplyRaw =
-          'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami.  [HANDOFF_REQUESTED]';
+        aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami.  [HANDOFF_REQUESTED]';
       }
     }
 
