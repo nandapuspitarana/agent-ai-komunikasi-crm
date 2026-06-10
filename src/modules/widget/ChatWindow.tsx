@@ -8,6 +8,7 @@ interface ChatWindowProps {
   tenantId: string;
   primaryColor?: string;
   botName?: string;
+  botLogo?: string | null;
 }
 
 type MessageSender = 'user' | 'bot' | 'agent' | 'system';
@@ -16,6 +17,7 @@ interface ChatMessage {
   id: number | string;
   text: string;
   sender: MessageSender;
+  avatar?: string;
 }
 
 type SessionStatus = 'bot' | 'agent' | 'queue' | 'connecting';
@@ -23,7 +25,8 @@ type SessionStatus = 'bot' | 'agent' | 'queue' | 'connecting';
 export function ChatWindow({ 
   tenantId: propTenantId, 
   primaryColor = '#2563eb', 
-  botName = 'Support Bot' 
+  botName = 'Support Bot',
+  botLogo = null,
 }: ChatWindowProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: 1, text: 'Hi! Ada yang bisa saya bantu hari ini? 😊', sender: 'bot' }
@@ -46,12 +49,35 @@ export function ChatWindow({
   
   const tenantId = getTenantId();
 
-  const addMessage = useCallback((text: string, sender: MessageSender) => {
-    setMessages(prev => [...prev, { id: Date.now() + Math.random(), text, sender }]);
+  const addMessage = useCallback((text: string, sender: MessageSender, avatar?: string) => {
+    setMessages(prev => [...prev, { id: Date.now() + Math.random(), text, sender, avatar }]);
   }, []);
 
-  // Initialize Socket.io connection
+  const [widgetConfig, setWidgetConfig] = useState({
+    name: botName,
+    primaryColor: primaryColor,
+    logo: botLogo,
+    botAvatarUrl: null as string | null
+  });
+
+  // Initialize Socket.io connection and fetch config
   useEffect(() => {
+    // Fetch widget config
+    fetch(`/api/widget/config?tenantId=${tenantId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) {
+          setWidgetConfig(prev => ({
+            ...prev,
+            name: data.botName || prev.name,
+            primaryColor: data.primaryColor || prev.primaryColor,
+            logo: data.logoUrl || prev.logo,
+            botAvatarUrl: data.botAvatarUrl || null
+          }));
+        }
+      })
+      .catch(err => console.error('Error fetching widget config:', err));
+
     const socket = io(window.location.origin, {
       path: '/api/socket',
       query: {
@@ -87,8 +113,8 @@ export function ChatWindow({
     });
 
     // Balasan dari human agent
-    socket.on('agent_message', (data: { message: string }) => {
-      addMessage(data.message, 'agent');
+    socket.on('agent_message', (data: { message: string, avatar?: string }) => {
+      addMessage(data.message, 'agent', data.avatar);
     });
 
     return () => {
@@ -214,15 +240,19 @@ export function ChatWindow({
       {/* Top Header */}
       <div 
         className="flex items-center justify-between p-4 shadow-sm z-10"
-        style={{ backgroundColor: primaryColor, color: 'white' }}
+        style={{ backgroundColor: widgetConfig.primaryColor, color: 'white' }}
       >
         <div className="flex items-center">
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-3 shadow-inner">
-            {sessionStatus === 'agent' ? <UserCheck size={22} /> : <Bot size={22} />}
+          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-3 shadow-inner overflow-hidden">
+            {widgetConfig.logo ? (
+              <img src={widgetConfig.logo} alt="Logo" className="w-full h-full object-cover" />
+            ) : (
+              sessionStatus === 'agent' ? <UserCheck size={22} /> : <Bot size={22} />
+            )}
           </div>
           <div>
             <h2 className="font-semibold text-base leading-tight">
-              {sessionStatus === 'agent' ? 'Human Agent' : botName}
+              {sessionStatus === 'agent' ? 'Human Agent' : widgetConfig.name}
             </h2>
             <p className="text-xs opacity-90 flex items-center mt-0.5">
               <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${getStatusColor()}`}></span>
@@ -259,11 +289,18 @@ export function ChatWindow({
               className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
             >
               {!isUser && (
-                <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center mr-2 mt-1 flex-shrink-0">
-                  {msg.sender === 'agent' 
-                    ? <User size={14} className="text-emerald-600" />
-                    : <Bot size={14} className="text-slate-500" />
-                  }
+                <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center mr-2 mt-1 flex-shrink-0 overflow-hidden">
+                  {widgetConfig.botAvatarUrl && msg.sender === 'bot' ? (
+                    <img src={widgetConfig.botAvatarUrl} alt="Bot" className="w-full h-full object-cover" />
+                  ) : widgetConfig.logo && msg.sender === 'bot' ? (
+                    <img src={widgetConfig.logo} alt="Bot" className="w-full h-full object-cover" />
+                  ) : msg.avatar && msg.sender === 'agent' ? (
+                    <img src={msg.avatar} alt="Agent" className="w-full h-full object-cover" />
+                  ) : msg.sender === 'agent' ? (
+                    <User size={14} className="text-emerald-600" />
+                  ) : (
+                    <Bot size={14} className="text-slate-500" />
+                  )}
                 </div>
               )}
               
@@ -273,7 +310,7 @@ export function ChatWindow({
                     ? 'text-white rounded-br-sm' 
                     : 'bg-white border border-slate-100 rounded-bl-sm'
                 }`}
-                style={isUser ? { backgroundColor: primaryColor } : {}}
+                style={isUser ? { backgroundColor: widgetConfig.primaryColor } : {}}
               >
                 {isUser ? (
                   <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
@@ -332,13 +369,13 @@ export function ChatWindow({
                 : 'Tulis pesan Anda...'
             }
             className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full px-5 py-3 text-sm outline-none transition-all placeholder-slate-400"
-            style={{ '--tw-ring-color': primaryColor } as React.CSSProperties}
+            style={{ '--tw-ring-color': widgetConfig.primaryColor } as React.CSSProperties}
           />
           <button 
             type="submit"
             disabled={!inputValue.trim() || isSending}
             className="absolute right-1.5 p-2 rounded-full text-white flex-shrink-0 transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-md"
-            style={{ backgroundColor: primaryColor }}
+            style={{ backgroundColor: widgetConfig.primaryColor }}
           >
             <Send size={16} className="ml-0.5" />
           </button>

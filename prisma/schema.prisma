@@ -39,6 +39,7 @@ model User {
   email             String              @unique
   password          String
   name              String
+  avatarUrl         String?             @db.Text
   role              UserRole            @default(AGENT)
   tenantId          String?
   tenant            Tenant?             @relation("TenantUsers", fields: [tenantId], references: [id])
@@ -101,6 +102,8 @@ model Tenant {
   themeBrandColor      String?       @default("#801517")
   themeUserBubbleColor String?       @default("#801517")
   themeBotBubbleColor  String?       @default("#ffffff")
+  themeBrandLogo       String?       @db.Text
+  botAvatarUrl         String?       @db.Text
   
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt

@@ -19,6 +19,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import ImageUpload from '@/components/ImageUpload';
 
 type TabType = 'account' | 'users' | 'audit-logs' | 'tenant';
 
@@ -124,6 +125,8 @@ export default function SettingsPage() {
           themeBrandColor: tenant.themeBrandColor,
           themeUserBubbleColor: tenant.themeUserBubbleColor,
           themeBotBubbleColor: tenant.themeBotBubbleColor,
+          themeBrandLogo: tenant.themeBrandLogo,
+          botAvatarUrl: tenant.botAvatarUrl,
         }),
       });
       if (res.ok) {
@@ -167,6 +170,7 @@ export default function SettingsPage() {
           email: editingUser.email,
           role: editingUser.role,
           isActive: editingUser.isActive,
+          avatarUrl: editingUser.avatarUrl,
         }),
       });
 
@@ -200,6 +204,7 @@ export default function SettingsPage() {
           tenantId: newUser.tenantId === 'NEW' ? undefined : (newUser.tenantId || undefined),
           newTenantName: newUser.tenantId === 'NEW' ? newTenantName : undefined,
           isActive: true,
+          avatarUrl: (newUser as any).avatarUrl,
         }),
       });
 
@@ -545,6 +550,17 @@ export default function SettingsPage() {
                         <p className="text-xs text-slate-500 mt-1">Only Super Admin can change roles.</p>
                       )}
                     </div>
+                    
+                    <div className="pt-2">
+                      <ImageUpload
+                        label="Profile Avatar"
+                        description="Upload a profile picture for the agent (square ratio)."
+                        currentImage={editingUser.avatarUrl}
+                        onImageCropped={(base64) => setEditingUser({ ...editingUser, avatarUrl: base64 })}
+                        targetSize={200}
+                        maxFileSize={2}
+                      />
+                    </div>
                     <div className="flex items-center gap-2 pt-2">
                       <input
                         type="checkbox"
@@ -808,6 +824,18 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="pt-6 border-t border-slate-200">
+                  <h3 className="text-lg font-bold text-slate-800 mb-4">Brand Logo</h3>
+                  <ImageUpload
+                    label="Widget Brand Logo"
+                    description="Upload your company logo. It will be cropped to a square and displayed in the widget header."
+                    currentImage={tenant.themeBrandLogo}
+                    onImageCropped={(base64) => setTenant({ ...tenant, themeBrandLogo: base64 })}
+                    targetSize={256}
+                    maxFileSize={2}
+                  />
+                </div>
+
+                <div className="pt-6 border-t border-slate-200">
                   <h3 className="text-lg font-bold text-slate-800 mb-4">Global AI Rules</h3>
                   
                   {/* Active AI Agent */}
@@ -846,6 +874,21 @@ export default function SettingsPage() {
                       rows={4}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-mono text-sm"
                       placeholder="You are a helpful assistant..."
+                    />
+                  </div>
+
+                  {/* Bot Avatar */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Bot Avatar
+                    </label>
+                    <ImageUpload
+                      label="AI Bot Profile Picture"
+                      description="Upload an avatar image for your AI Agent. This will replace the default Bot icon in the widget chat."
+                      currentImage={tenant.botAvatarUrl}
+                      onImageCropped={(base64) => setTenant({ ...tenant, botAvatarUrl: base64 })}
+                      targetSize={200}
+                      maxFileSize={2}
                     />
                   </div>
 

@@ -18,19 +18,26 @@ export async function GET(request: Request) {
     );
   }
 
-  // TODO: Integrasi dengan Prisma untuk mengambil data asli
-  // const settings = await prisma.tenantSettings.findUnique({ where: { tenantId } })
+  // Integrasi dengan Prisma untuk mengambil data asli
+  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } })
   
-  // Data Mock untuk kebutuhan uji coba
-  const mockSettings = {
+  if (!tenant) {
+    return NextResponse.json(
+      { error: 'Tenant not found' },
+      { status: 404, headers: { 'Access-Control-Allow-Origin': '*' } }
+    );
+  }
+
+  const settings = {
     tenantId,
-    primaryColor: '#2563eb', // Warna biru khas Tailwind
+    primaryColor: tenant.themeBrandColor || '#2563eb',
     welcomeMessage: 'Hi there! How can we help you today?',
-    logoUrl: 'https://via.placeholder.com/40',
-    botName: 'CRM Support Bot'
+    logoUrl: tenant.themeBrandLogo || 'https://via.placeholder.com/40',
+    botName: tenant.name || 'CRM Support Bot',
+    botAvatarUrl: tenant.botAvatarUrl || null
   };
 
-  return NextResponse.json(mockSettings, {
+  return NextResponse.json(settings, {
     status: 200,
     headers: {
       'Access-Control-Allow-Origin': '*', // Mengizinkan cross-domain

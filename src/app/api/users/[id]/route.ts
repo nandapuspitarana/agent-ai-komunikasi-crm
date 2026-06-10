@@ -97,7 +97,7 @@ export async function PUT(
     const userId = (await params).id;
 
     const body = await request.json();
-    const { name, email, role, tenantId, isActive } = body;
+    const { name, email, role, tenantId, isActive, avatarUrl } = body;
 
     // Get existing user
     const existingUser = await prisma.user.findUnique({
@@ -141,6 +141,7 @@ export async function PUT(
 
     if (name) updateData.name = name;
     if (email) updateData.email = email;
+    if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
 
     // Only Super Admin can change role and tenantId
     // Business Partner can only change isActive status of their agents

@@ -82,18 +82,26 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      // Get agent avatar
+      const agentUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { avatarUrl: true }
+      });
+
       // Emit agent message
       io.to(`session:${sessionId}`).emit('agent_message', {
         sessionId,
         message: content,
         senderType: 'agent',
-        timestamp: newMessage.createdAt.toISOString()
+        timestamp: newMessage.createdAt.toISOString(),
+        avatar: agentUser?.avatarUrl || null
       });
       io.to(`widget:${sessionId}`).emit('agent_message', {
         sessionId,
         message: content,
         senderType: 'agent',
-        timestamp: newMessage.createdAt.toISOString()
+        timestamp: newMessage.createdAt.toISOString(),
+        avatar: agentUser?.avatarUrl || null
       });
     }
 

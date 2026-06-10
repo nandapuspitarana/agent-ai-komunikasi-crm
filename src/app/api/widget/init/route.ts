@@ -29,7 +29,9 @@ export async function POST(request: Request) {
       status: 'success',
       config: {
         name: tenant.name,
-        primaryColor: '#2563eb', // Mocked for now
+        primaryColor: tenant.themeBrandColor || '#2563eb', // Use tenant color
+        logo: tenant.themeBrandLogo || null,
+        botAvatarUrl: tenant.botAvatarUrl || null,
         initialFlow: tenant.flows[0] || null
       }
     });

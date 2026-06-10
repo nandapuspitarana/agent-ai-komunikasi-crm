@@ -49,7 +49,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, aiSystemPrompt, handoffAgentId, activeFlowId, themeBrandColor, themeUserBubbleColor, themeBotBubbleColor } = body;
+    const { name, aiSystemPrompt, handoffAgentId, activeFlowId, themeBrandColor, themeUserBubbleColor, themeBotBubbleColor, themeBrandLogo, botAvatarUrl } = body;
 
     const updatedTenant = await prisma.tenant.update({
       where: { id: session.user.tenantId },
@@ -61,6 +61,8 @@ export async function PUT(req: NextRequest) {
         themeBrandColor,
         themeUserBubbleColor,
         themeBotBubbleColor,
+        themeBrandLogo,
+        botAvatarUrl,
       },
     });
 
