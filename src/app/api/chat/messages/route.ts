@@ -29,6 +29,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
+    // Verify assigned agent
+    if (chatSession.status === 'agent' && chatSession.assignedAgentId && chatSession.assignedAgentId !== session.user.id) {
+      return NextResponse.json({ error: 'Forbidden. This chat is handled by another agent.' }, { status: 403 });
+    }
+
     // Save agent message to database
     const newMessage = await prisma.message.create({
       data: {

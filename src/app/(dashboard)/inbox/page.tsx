@@ -607,9 +607,29 @@ export default function InboxPage() {
               <div ref={messagesEndRef} />
             </div>
             
-            {/* Input form - only show if status is not closed */}
-            {chats.find(c => c.id === selectedChat)?.status !== 'closed' ? (
-              <div className="p-4 bg-white border-t border-slate-200">
+            {/* Input form - only show if status is not closed and assigned to current user */}
+            {(() => {
+              const chat = chats.find(c => c.id === selectedChat);
+              if (!chat) return null;
+              if (chat.status === 'closed') {
+                return (
+                  <div className="p-4 bg-slate-100 border-t border-slate-200 text-center text-slate-500 text-sm">
+                    Percakapan ini telah ditutup.
+                  </div>
+                );
+              }
+              
+              const currentUserId = (session?.user as any)?.id;
+              if (chat.status === 'agent' && chat.assignedAgentId && chat.assignedAgentId !== currentUserId) {
+                return (
+                  <div className="p-4 bg-slate-50 border-t border-slate-200 text-center text-slate-500 text-sm">
+                    Percakapan ini sedang ditangani oleh <span className="font-semibold text-slate-700">{chat.assignedAgentName || 'agen lain'}</span>. Anda hanya dapat memantau percakapan.
+                  </div>
+                );
+              }
+
+              return (
+                <div className="p-4 bg-white border-t border-slate-200">
                 <div className="flex items-center bg-slate-100 rounded-full pr-2 pl-4 py-1 mb-2">
                   <input 
                     type="text" 
@@ -646,11 +666,8 @@ export default function InboxPage() {
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="p-4 bg-slate-100 border-t border-slate-200 text-center text-slate-500 text-sm">
-                Percakapan ini telah ditutup.
-              </div>
-            )}
+            );
+          })()}
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center flex-col text-slate-400">
