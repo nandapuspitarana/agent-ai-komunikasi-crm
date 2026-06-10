@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/auth';
+import { logDocumentDeleted } from '@/lib/audit-logger';
 
 export async function DELETE(
   req: NextRequest,
@@ -12,6 +14,7 @@ export async function DELETE(
   }
   
   try {
+    const session = await auth();
     const response = await fetch(`${proxyUrl}/api/v1/documents/${documentId}`, {
       method: 'DELETE',
     });
@@ -24,6 +27,11 @@ export async function DELETE(
     }
 
     const data = await response.json();
+    
+    if (session?.user?.id) {
+      await logDocumentDeleted(session.user.id, { id: documentId });
+    }
+    
     return NextResponse.json(data);
   } catch (error) {
     console.error('[API/Agent/Documents/Delete] Error deleting document:', error);

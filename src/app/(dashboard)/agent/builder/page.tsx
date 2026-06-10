@@ -9,6 +9,7 @@ import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState,
 import '@xyflow/react/dist/style.css';
 import { MessageNode } from '@/components/flow-nodes/MessageNode';
 import { InputNode } from '@/components/flow-nodes/InputNode';
+import DOMPurify from 'dompurify';
 import { ConditionNode } from '@/components/flow-nodes/ConditionNode';
 import AgentKnowledgeTab from '@/components/AgentKnowledgeTab';
 
@@ -143,6 +144,7 @@ function AgentBuilderContent() {
   const [activeIntentId, setActiveIntentId] = useState<string | null>(null); // For detailed edit view
 
   const [intents, setIntents] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // --- Flow State derived from Intents ---
   const nodeTypes = useMemo(() => ({ 
@@ -454,12 +456,23 @@ function AgentBuilderContent() {
     let matchedIntent = null;
     
     if (intents && intents.length > 0) {
+      let maxMatchLength = 0;
       for (const intent of intents) {
         if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
-        if (intent.trainingPhrases.some((phrase: string) => lowerMsg === phrase.toLowerCase().trim() || lowerMsg.includes(phrase.toLowerCase().trim()))) {
-          matchedIntent = intent;
-          break;
+        for (const phrase of intent.trainingPhrases) {
+          const lowerPhrase = phrase.toLowerCase().trim();
+          if (lowerMsg === lowerPhrase) {
+            matchedIntent = intent;
+            maxMatchLength = Infinity;
+            break;
+          } else if (lowerMsg.includes(lowerPhrase)) {
+            if (lowerPhrase.length > maxMatchLength) {
+              maxMatchLength = lowerPhrase.length;
+              matchedIntent = intent;
+            }
+          }
         }
+        if (maxMatchLength === Infinity) break;
       }
     }
 
@@ -774,6 +787,70 @@ function AgentBuilderContent() {
                               />
                             </div>
                           )}
+                          {activeIntentData?.answerType === 'form' && (
+                            <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-4">
+                              <label className="block text-xs font-semibold text-blue-800 uppercase tracking-wider mb-2">Form Builder Generator</label>
+                              <p className="text-xs text-blue-600 mb-3">Define fields separated by commas. Example: <code className="bg-white px-1 py-0.5 rounded">Name:text:req, Email:email:req, Phone:tel:req</code></p>
+                              <input
+                                type="text"
+                                className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-white mb-3"
+                                placeholder="Name:text:req, Email:email:req, Phone:tel:req"
+                                id="formBuilderInput"
+                              />
+                              <label className="block text-xs font-semibold text-blue-800 uppercase tracking-wider mb-2">Webhook POST URL (Optional)</label>
+                              <input
+                                type="text"
+                                className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-white mb-3"
+                                placeholder="http://localhost:5678/webhook/..."
+                                id="formBuilderWebhook"
+                              />
+                              <button 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  const input = (document.getElementById('formBuilderInput') as HTMLInputElement).value;
+                                  const webhookUrl = (document.getElementById('formBuilderWebhook') as HTMLInputElement).value.trim();
+                                  if (!input) return;
+                                  
+                                  let onSubmitCode = "event.preventDefault();";
+                                  if (webhookUrl) {
+                                    onSubmitCode += ` var btn=this.querySelector('button'); if(btn){btn.disabled=true;btn.textContent='Sending...';} var fd=new FormData(this); var d=Object.fromEntries(fd); fetch('${webhookUrl}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(()=>{alert('Data berhasil dikirim!'); this.reset(); if(btn){btn.disabled=false;btn.textContent='Submit';}}).catch(e=>{console.error(e); alert('Gagal mengirim data'); if(btn){btn.disabled=false;btn.textContent='Submit';}});`;
+                                  }
+                                  
+                                  const fields = input.split(',').map(s => s.trim()).filter(Boolean);
+                                  let html = `<form class='form-card' onsubmit="${onSubmitCode}">`;
+                                  
+                                  fields.forEach(f => {
+                                    const parts = f.split(':');
+                                    const label = parts[0] || 'Field';
+                                    const type = parts[1] || 'text';
+                                    const req = parts[2] && parts[2].startsWith('req') ? 'required' : '';
+                                    const nameAttr = label.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+                                    
+                                    html += `<label class='form-card_label'>${label} ${req ? '<span class="required">*</span>' : ''}</label>`;
+                                    
+                                    if (type === 'tel' || type === 'phone') {
+                                      html += `<input type='tel' name='${nameAttr}' placeholder='e.g. 6512345678' class='form-card_input' pattern='[0-9]+' title='Please enter only numbers' oninput='this.value = this.value.replace(/[^0-9]/g, \"\")' ${req}/>`;
+                                    } else if (type === 'textarea') {
+                                      html += `<textarea name='${nameAttr}' placeholder='Enter ${label}' class='form-card_input' ${req}></textarea>`;
+                                    } else {
+                                      html += `<input type='${type}' name='${nameAttr}' placeholder='Enter ${label}' class='form-card_input' ${req}/>`;
+                                    }
+                                  });
+                                  
+                                  html += `<button type='submit' class='submit-btn'>Submit</button></form>`;
+                                  
+                                  const currentMsg = activeIntentData?.answer || '';
+                                  const msgPrefix = currentMsg.includes('<form') ? currentMsg.split('<form')[0] : (currentMsg ? currentMsg + '<br/>' : 'Silakan lengkapi form berikut:');
+                                  
+                                  updateActiveIntent('answer', msgPrefix + html);
+                                  alert('Form HTML with Webhook integration generated into Message Content!');
+                                }}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors"
+                              >
+                                Generate Form HTML
+                              </button>
+                            </div>
+                          )}
                         </div>
 
                         {/* Custom Payload */}
@@ -814,6 +891,55 @@ function AgentBuilderContent() {
 
                     {faqView === 'list' ? (
                       <div className="space-y-3 overflow-y-auto w-full">
+                        {/* AI PERSONA (NEW SETTINGS) */}
+                        <div className="bg-purple-50/50 border border-purple-100 rounded-xl p-5 mb-6">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Bot size={18} className="text-purple-600" />
+                            <h3 className="font-semibold text-slate-800">AI Persona & Kebutuhan Usaha</h3>
+                          </div>
+                          <p className="text-xs text-slate-500 mb-4">Atur bagaimana agen AI Anda berbicara dan memahami konteks bisnis Anda.</p>
+                          
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <label className="block text-xs font-medium text-slate-700 mb-1">Bahasa Utama</label>
+                              <select 
+                                value={agentConfig.language || 'Bahasa Indonesia'}
+                                onChange={(e) => setAgentConfig({...agentConfig, language: e.target.value})}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm"
+                              >
+                                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                                <option value="English">English</option>
+                                <option value="Bahasa Indonesia campur English (Jaksel)">Bahasa Campur (Jaksel)</option>
+                                <option value="Jawa">Jawa</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-slate-700 mb-1">Gaya Bicara</label>
+                              <select 
+                                value={agentConfig.speakingStyle || 'ramah dan profesional'}
+                                onChange={(e) => setAgentConfig({...agentConfig, speakingStyle: e.target.value})}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm"
+                              >
+                                <option value="ramah dan profesional">Ramah & Profesional</option>
+                                <option value="sangat santai dan asik layaknya teman">Santai & Asik</option>
+                                <option value="sangat formal dan baku">Formal & Baku</option>
+                                <option value="penuh antusiasme dan ceria">Antusias & Ceria</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-slate-700 mb-1">Kebutuhan Usaha / Konteks (Opsional)</label>
+                            <textarea 
+                              value={agentConfig.businessNeeds || ''}
+                              onChange={(e) => setAgentConfig({...agentConfig, businessNeeds: e.target.value})}
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                              rows={3}
+                              placeholder="Contoh: Kami adalah klinik kecantikan yang fokus pada perawatan anti-aging. Berikan saran dengan nada meyakinkan."
+                            />
+                            <p className="text-[10px] text-slate-400 mt-1">Ini akan ditambahkan sebagai konteks utama saat AI membalas pesan.</p>
+                          </div>
+                        </div>
+
                         {/* WELCOME MESSAGE / SAPAAN (NEW PLACEMENT) */}
                         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-6">
                           <div className="flex items-center gap-2 mb-3">
@@ -908,13 +1034,32 @@ function AgentBuilderContent() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-end gap-3 mb-2">
-                          <button onClick={addIntent} className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                          <div className="relative flex-1">
+                            <input 
+                              type="text" 
+                              placeholder="Search intents by name, phrase, or response..." 
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-white"
+                            />
+                            <div className="absolute left-3 top-2.5 text-slate-400">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            </div>
+                          </div>
+                          <button onClick={addIntent} className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors shrink-0">
                             <Plus size={16} /> Add Intent
                           </button>
                         </div>
 
-                        {intents.map((intent) => (
+                        {intents
+                          .filter(intent => 
+                            !searchQuery || 
+                            intent.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            intent.trainingPhrases?.some((p: string) => p.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                            intent.answer?.toLowerCase().includes(searchQuery.toLowerCase())
+                          )
+                          .map((intent) => (
                           <div
                             key={intent.id}
                             onClick={() => setActiveIntentId(intent.id)}
@@ -1005,7 +1150,7 @@ function AgentBuilderContent() {
                           >
                             {msg.role === 'assistant' ? (
                               <div 
-                                dangerouslySetInnerHTML={{ __html: msg.text }} 
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.text, { ADD_ATTR: ['pattern', 'title', 'oninput', 'onsubmit', 'placeholder', 'onclick'] }) }} 
                                 className="whitespace-pre-wrap [&>b]:font-bold [&>strong]:font-bold [&>i]:italic [&_.notice]:bg-yellow-50 [&_.notice]:p-1.5 [&_.notice]:rounded [&_.notice]:border [&_.notice]:border-yellow-200 [&_.notice]:text-yellow-800 [&_.notice]:my-1.5 [&_.notice]:text-[11px] [&_.card]:bg-white [&_.card]:border [&_.card]:border-slate-200 [&_.card]:rounded-xl [&_.card]:p-3 [&_.card]:my-2 [&_.card-title]:text-[var(--theme-brand)] [&_.card-title]:font-bold [&_.card-title]:mb-2 [&_.price-option]:border-t [&_.price-option]:border-slate-100 [&_.price-option]:pt-2 [&_.price-option]:mt-2 [&_.price-option:nth-child(2)]:border-0 [&_.price-option:nth-child(2)]:pt-0 [&_.price-option:nth-child(2)]:mt-0 [&_.price]:font-bold [&_.price]:text-[15px] [&_.price]:text-slate-800 [&_.price]:leading-tight [&_.small]:text-[11px] [&_.small]:text-slate-500 [&_.small]:leading-tight [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:my-1 [&_.cta-note]:mt-3 [&_.cta-note]:pt-2 [&_.cta-note]:border-t [&_.cta-note]:border-slate-100 [&_.cta-note]:text-[11px] [&_.cta-note]:text-slate-500 [&_.cta-note]:italic [&_.form-card]:bg-white [&_.form-card]:border [&_.form-card]:border-slate-200 [&_.form-card]:rounded-xl [&_.form-card]:p-3 [&_.form-card]:my-2 [&_.form-card_label]:block [&_.form-card_label]:text-[11px] [&_.form-card_label]:text-slate-700 [&_.form-card_label]:font-bold [&_.form-card_label]:mb-1 [&_.form-card_label]:mt-2 [&_.form-card_input]:w-full [&_.form-card_input]:border [&_.form-card_input]:border-slate-200 [&_.form-card_input]:rounded-lg [&_.form-card_input]:px-2.5 [&_.form-card_input]:py-2 [&_.form-card_input]:text-[11px] [&_.form-card_input]:outline-none [&_.form-card_input]:font-sans [&_.form-grid]:grid [&_.form-grid]:grid-cols-2 [&_.form-grid]:gap-2 [&_.submit-btn]:w-full [&_.submit-btn]:bg-[var(--theme-brand)] [&_.submit-btn]:text-white [&_.submit-btn]:rounded-xl [&_.submit-btn]:py-2 [&_.submit-btn]:font-bold [&_.submit-btn]:mt-3 [&_.submit-btn]:text-[11px]"
                               />
                             ) : (

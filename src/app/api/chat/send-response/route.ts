@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { VariableManager } from '@/modules/flow-builder/variables';
 import { PrismaClient } from '@prisma/client';
+import { logChatMessageSent } from '@/lib/audit-logger';
 
 const prisma = new PrismaClient();
 
@@ -51,6 +52,8 @@ export async function POST(req: NextRequest) {
     // Emit message via Socket.io to widget
     // Note: This will be handled by the Socket.io server
     // The widget is listening on the 'message' event for responses
+
+    await logChatMessageSent(session.user.id, sessionId, message);
 
     return NextResponse.json({
       success: true,

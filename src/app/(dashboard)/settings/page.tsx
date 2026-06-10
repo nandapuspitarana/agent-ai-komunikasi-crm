@@ -34,6 +34,8 @@ export default function SettingsPage() {
   // Users state
   const [users, setUsers] = useState<any[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
+  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [isUpdatingUser, setIsUpdatingUser] = useState(false);
 
   // Audit logs state
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -129,6 +131,37 @@ export default function SettingsPage() {
       console.error('Failed to fetch users:', error);
     } finally {
       setUsersLoading(false);
+    }
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setIsUpdatingUser(true);
+    try {
+      const res = await fetch(`/api/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editingUser.name,
+          email: editingUser.email,
+          role: editingUser.role,
+          isActive: editingUser.isActive,
+        }),
+      });
+
+      if (res.ok) {
+        setEditingUser(null);
+        fetchUsers();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to update user');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error updating user');
+    } finally {
+      setIsUpdatingUser(false);
     }
   };
 
@@ -390,7 +423,10 @@ export default function SettingsPage() {
                           {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}
                         </td>
                         <td className="px-4 py-3 text-right flex items-center justify-end gap-2">
-                          <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                          <button 
+                            onClick={() => setEditingUser(user)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          >
                             <Edit2 size={16} />
                           </button>
                           <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
@@ -406,6 +442,80 @@ export default function SettingsPage() {
 
             {!usersLoading && users.length > 0 && (
               <p className="text-xs text-slate-500 mt-4">Showing {users.length} of {users.length} users</p>
+            )}
+
+            {/* Edit User Modal */}
+            {editingUser && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+                <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
+                  <h3 className="text-lg font-bold mb-4 text-slate-900">Edit User</h3>
+                  <form onSubmit={handleUpdateUser} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                      <input
+                        type="text"
+                        value={editingUser.name || ''}
+                        onChange={(e) => setEditingUser({...editingUser, name: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                      <input
+                        type="email"
+                        value={editingUser.email || ''}
+                        onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Role (Hak Akses)</label>
+                      <select
+                        value={editingUser.role || ''}
+                        onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                        disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
+                      >
+                        <option value="SUPER_ADMIN">Super Admin</option>
+                        <option value="AGENT">Agent</option>
+                        <option value="BUSINESS_PARTNER">Business Partner</option>
+                      </select>
+                      {(session?.user as any)?.role !== 'SUPER_ADMIN' && (
+                        <p className="text-xs text-slate-500 mt-1">Only Super Admin can change roles.</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 pt-2">
+                      <input
+                        type="checkbox"
+                        id="isActive"
+                        checked={editingUser.isActive || false}
+                        onChange={(e) => setEditingUser({...editingUser, isActive: e.target.checked})}
+                        disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                      <label htmlFor="isActive" className="text-sm font-medium text-slate-700">Active Status</label>
+                    </div>
+                    <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
+                      <button
+                        type="button"
+                        onClick={() => setEditingUser(null)}
+                        className="px-4 py-2 text-slate-700 font-medium hover:bg-slate-100 rounded-lg transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isUpdatingUser}
+                        className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {isUpdatingUser ? 'Saving...' : 'Save Changes'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             )}
           </div>
         )}
@@ -436,6 +546,14 @@ export default function SettingsPage() {
                     'USER_DELETED': { bg: 'bg-red-50', text: 'text-red-900', dot: 'bg-red-600' },
                     'ROLE_CHANGED': { bg: 'bg-purple-50', text: 'text-purple-900', dot: 'bg-purple-600' },
                     'STATUS_CHANGED': { bg: 'bg-orange-50', text: 'text-orange-900', dot: 'bg-orange-600' },
+                    'DOCUMENT_UPLOADED': { bg: 'bg-emerald-50', text: 'text-emerald-900', dot: 'bg-emerald-600' },
+                    'DOCUMENT_DELETED': { bg: 'bg-red-50', text: 'text-red-900', dot: 'bg-red-600' },
+                    'AI_AGENT_CREATED': { bg: 'bg-indigo-50', text: 'text-indigo-900', dot: 'bg-indigo-600' },
+                    'AI_AGENT_UPDATED': { bg: 'bg-blue-50', text: 'text-blue-900', dot: 'bg-blue-600' },
+                    'AI_AGENT_DELETED': { bg: 'bg-red-50', text: 'text-red-900', dot: 'bg-red-600' },
+                    'DATA_IMPORTED': { bg: 'bg-teal-50', text: 'text-teal-900', dot: 'bg-teal-600' },
+                    'DATA_EXPORTED': { bg: 'bg-cyan-50', text: 'text-cyan-900', dot: 'bg-cyan-600' },
+                    'CHAT_MESSAGE_SENT': { bg: 'bg-fuchsia-50', text: 'text-fuchsia-900', dot: 'bg-fuchsia-600' },
                   };
 
                   const color = actionColors[log.action] || { bg: 'bg-slate-50', text: 'text-slate-900', dot: 'bg-slate-600' };

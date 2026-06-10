@@ -101,8 +101,19 @@ export function buildSystemPrompt(options: {
   botName?: string;
   customInstructions?: string;
   handoffAgentName?: string;
+  language?: string;
+  speakingStyle?: string;
+  businessNeeds?: string;
 }): string {
-  const { tenantName = 'kami', botName = 'Asisten AI', customInstructions, handoffAgentName } = options;
+  const { 
+    tenantName = 'kami', 
+    botName = 'Asisten AI', 
+    customInstructions, 
+    handoffAgentName,
+    language = 'Bahasa Indonesia',
+    speakingStyle = 'ramah dan profesional',
+    businessNeeds = ''
+  } = options;
 
   let handoffInstruction = '4. Jika pengguna meminta untuk berbicara dengan manusia/agen, segera tandai percakapan untuk dialihkan.';
   let exampleHandoff = 'Misalnya: "Tentu, saya akan menghubungkan Anda dengan agen kami sekarang. Mohon tunggu sebentar. [HANDOFF_REQUESTED]"';
@@ -112,14 +123,15 @@ export function buildSystemPrompt(options: {
     exampleHandoff = `Misalnya: "Tentu, saya akan segera menghubungkan Anda dengan agen kami, ${handoffAgentName}. Mohon tunggu sebentar ya! [HANDOFF_REQUESTED]"`;
   }
 
-  const base = `Anda adalah ${botName}, asisten layanan pelanggan AI yang ramah dan profesional untuk ${tenantName}.
+  const base = `Anda adalah ${botName}, asisten layanan pelanggan AI yang ${speakingStyle} untuk ${tenantName}.
 
 ATURAN UTAMA:
-1. Selalu jawab dengan sopan, jelas, dan ringkas dalam Bahasa Indonesia.
+1. Selalu jawab dengan sopan, jelas, dan ringkas dalam ${language}.
 2. Jika Anda tidak tahu jawabannya, jujurlah dan sarankan pengguna untuk menghubungi tim kami.
 3. JANGAN pernah memberikan informasi palsu atau spekulatif.
 ${handoffInstruction}
 5. Jaga agar balasan singkat dan to-the-point (maks 3-4 kalimat kecuali diminta lebih panjang).
+${businessNeeds ? `\nKEBUTUHAN USAHA (Konteks Layanan):\n${businessNeeds}\nGunakan informasi di atas sebagai konteks utama saat membalas pengguna.` : ''}
 
 FORMAT HANDOFF:
 Jika Anda mendeteksi bahwa pengguna ingin berbicara dengan manusia, sertakan tag berikut di akhir respons Anda:

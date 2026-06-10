@@ -4,8 +4,8 @@
  * The local endpoint must accept a JSON payload and return a JSON `{ reply: string, ... }`.
  */
 
-const AGENT_PROXY_URL = process.env.AGENT_PROXY_URL || 'http://localhost:8000';
-const LOCAL_LLM_URL = process.env.LOCAL_LLM_URL || ''; // e.g. http://localhost:7860/api/predict
+const AGENT_PROXY_URL = (process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8000').replace('localhost', '127.0.0.1');
+const LOCAL_LLM_URL = (process.env.LOCAL_LLM_URL || '').replace('localhost', '127.0.0.1');
 const LOCAL_LLM_TYPE = process.env.LOCAL_LLM_TYPE || 'generic';
 
 export interface AgentChatRequest {
@@ -20,6 +20,7 @@ export interface AgentChatRequest {
     bytes_b64: string;
     metadata?: Record<string, any>;
   }>;
+  document_ids?: string[];
 }
 
 export interface AgentChatResponse {
@@ -96,7 +97,7 @@ export async function chatWithAgent(request: AgentChatRequest): Promise<AgentCha
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
-      signal: AbortSignal.timeout(15000), // 15s timeout
+      signal: AbortSignal.timeout(120000), // 120s timeout
     });
 
     if (!response.ok) {

@@ -24,17 +24,35 @@ export async function POST(req: NextRequest) {
     // 1. Native Intent Matching (Rule-based Fallback if not provided by client)
     if (!matchedIntent && flow.intents && flow.intents.length > 0) {
       const lowerMsg = message.toLowerCase().trim();
+      let bestMatch = null;
+      let maxMatchLength = 0;
+      
       for (const intent of flow.intents) {
         if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
-        if (intent.trainingPhrases.some((phrase: string) => lowerMsg === phrase.toLowerCase().trim() || lowerMsg.includes(phrase.toLowerCase().trim()))) {
-          matchedIntent = {
-            name: intent.name,
-            response: intent.response,
-            type: intent.responseType,
-            options: intent.options
-          };
-          break;
+        
+        for (const phrase of intent.trainingPhrases) {
+          const lowerPhrase = phrase.toLowerCase().trim();
+          if (lowerMsg === lowerPhrase) {
+            bestMatch = intent;
+            maxMatchLength = Infinity;
+            break;
+          } else if (lowerMsg.includes(lowerPhrase)) {
+            if (lowerPhrase.length > maxMatchLength) {
+              maxMatchLength = lowerPhrase.length;
+              bestMatch = intent;
+            }
+          }
         }
+        if (maxMatchLength === Infinity) break;
+      }
+      
+      if (bestMatch) {
+        matchedIntent = {
+          name: bestMatch.name,
+          response: bestMatch.response,
+          type: bestMatch.responseType,
+          options: bestMatch.options
+        };
       }
     }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { PrismaClient } from '@prisma/client';
 import { canAccessAdminPanel } from '@/lib/auth-utils';
+import { logAIAgentCreated, logAIAgentUpdated, logAIAgentDeleted } from '@/lib/audit-logger';
 
 const prisma = new PrismaClient();
 
@@ -126,6 +127,10 @@ export async function POST(request: NextRequest) {
         include: { intents: true }
       });
 
+      if (session?.user?.id) {
+        await logAIAgentUpdated(session.user.id, { id }, flow);
+      }
+
       return NextResponse.json({ status: 'updated', flow });
     } else {
       // Create new flow
@@ -164,6 +169,10 @@ export async function POST(request: NextRequest) {
         include: { intents: true }
       });
 
+      if (session?.user?.id) {
+        await logAIAgentCreated(session.user.id, flowWithIntents);
+      }
+
       return NextResponse.json({ status: 'created', flow: flowWithIntents }, { status: 201 });
     }
   } catch (error) {
@@ -200,6 +209,10 @@ export async function DELETE(request: NextRequest) {
     await prisma.flow.delete({
       where: { id: flowId }
     });
+
+    if (session?.user?.id) {
+      await logAIAgentDeleted(session.user.id, flow);
+    }
 
     return NextResponse.json({ status: 'deleted', message: 'Flow deleted successfully' });
   } catch (error) {

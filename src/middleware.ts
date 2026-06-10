@@ -10,6 +10,7 @@ export default auth((req) => {
     nextUrl.pathname.startsWith('/inbox') ||
     nextUrl.pathname.startsWith('/dashboard') ||
     nextUrl.pathname.startsWith('/agent') ||
+    nextUrl.pathname.startsWith('/integration') ||
     nextUrl.pathname.startsWith('/settings');
 
   // Redirect logged-in users away from login page

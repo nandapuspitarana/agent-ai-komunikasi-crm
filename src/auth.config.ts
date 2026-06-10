@@ -13,15 +13,17 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
+      const isAuthPage = nextUrl.pathname.startsWith('/login');
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard') || 
                            nextUrl.pathname.startsWith('/inbox') ||
                            nextUrl.pathname.startsWith('/agent') ||
+                           nextUrl.pathname.startsWith('/integration') ||
                            nextUrl.pathname.startsWith('/settings');
       
       if (isOnDashboard) {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page
-      } else if (isLoggedIn) {
+      } else if (isAuthPage && isLoggedIn) {
         return Response.redirect(new URL('/inbox', nextUrl));
       }
       return true;

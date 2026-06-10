@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
+import { logDataImported } from '@/lib/audit-logger';
 
 const prisma = new PrismaClient();
 
@@ -69,6 +70,9 @@ export async function POST(req: NextRequest) {
 
       return flow;
     });
+
+    // Log the import action
+    await logDataImported(session.user.id, 'Flow', { name: newFlow.name, id: newFlow.id });
 
     return NextResponse.json({ success: true, flow: newFlow });
   } catch (error: any) {

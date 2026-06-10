@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
+import { logDataExported } from '@/lib/audit-logger';
 
 const prisma = new PrismaClient();
 
@@ -80,6 +81,9 @@ export async function GET(
         })(),
       },
     };
+
+    // Log the export action
+    await logDataExported(session.user.id, 'Flow', flow.id);
 
     // Return as a downloadable JSON file
     return new NextResponse(JSON.stringify(exportData, null, 2), {

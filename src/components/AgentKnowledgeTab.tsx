@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   FileText, Upload, Trash2, RefreshCw, AlertCircle, CheckCircle,
   X, FileSpreadsheet, File, Tag, AlertTriangle,
-  Wifi, WifiOff, Plus, Clock, Search
+  Wifi, WifiOff, Plus, Clock, Search, Library
 } from 'lucide-react';
 
 type DocType = 'pdf' | 'docs' | 'excel' | 'csv' | 'txt' | 'all';
@@ -41,7 +41,12 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal
+  // Library Modal
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [tenantDocs, setTenantDocs] = useState<any[]>([]);
+  const [linking, setLinking] = useState(false);
+
+  // Upload Modal
   const [showModal, setShowModal] = useState(false);
   const [activeUploadTab, setActiveUploadTab] = useState<DocType>('pdf');
   const [metaName, setMetaName] = useState('');
@@ -61,6 +66,38 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
       setError('Gagal memuat dokumen.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTenantDocs = async () => {
+    try {
+      const res = await fetch('/api/agent/documents/tenant');
+      const data = await res.json();
+      setTenantDocs(data.documents || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLinkDocument = async (sourceDocumentId: string) => {
+    if (!flowId) return;
+    setLinking(true);
+    try {
+      const res = await fetch('/api/agent/documents/link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceDocumentId, flowId })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Gagal menautkan dokumen');
+      }
+      setShowLibrary(false);
+      fetchDocuments();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLinking(false);
     }
   };
 
@@ -179,6 +216,12 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
           <div className="flex gap-2">
             <button onClick={fetchDocuments} className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            </button>
+            <button
+              onClick={() => { fetchTenantDocs(); setShowLibrary(true); }}
+              className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 shadow-sm"
+            >
+              <Library size={16} /> Pilih dari Library
             </button>
             <button
               onClick={() => setShowModal(true)}
@@ -327,6 +370,61 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Library Modal */}
+      {showLibrary && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div className="flex justify-between items-center px-5 py-4 border-b border-slate-100">
+              <div>
+                <h3 className="font-bold text-slate-800">Library Dokumen</h3>
+                <p className="text-xs text-slate-500">Pilih dokumen yang sudah pernah diunggah sebelumnya</p>
+              </div>
+              <button onClick={() => setShowLibrary(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+            </div>
+
+            <div className="overflow-y-auto flex-1 p-5 bg-slate-50/50">
+              {tenantDocs.length === 0 ? (
+                <div className="text-center py-10">
+                  <Library size={32} className="mx-auto text-slate-300 mb-3" />
+                  <p className="text-slate-500 text-sm">Belum ada dokumen di Library.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {tenantDocs.map(doc => {
+                    const isAlreadyAdded = documents.some(d => d.proxyDocId === doc.proxyDocId);
+                    return (
+                      <div key={doc.id} className={`p-4 rounded-xl border flex flex-col justify-between ${isAlreadyAdded ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-sm'}`}>
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="mt-1">{getFileIcon(doc.filename)}</div>
+                          <div>
+                            <h4 className="font-semibold text-slate-800 text-sm line-clamp-1">{doc.metaName}</h4>
+                            <p className="text-xs text-slate-500 line-clamp-1">{doc.filename}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
+                          <span className="text-xs font-medium text-slate-500">{doc.chunkCount} chunks</span>
+                          <button
+                            onClick={() => handleLinkDocument(doc.id)}
+                            disabled={isAlreadyAdded || linking}
+                            className={`px-3 py-1 text-xs font-semibold rounded-lg ${isAlreadyAdded ? 'bg-slate-200 text-slate-500' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                          >
+                            {isAlreadyAdded ? 'Sudah Ditambahkan' : linking ? 'Menautkan...' : 'Pilih Dokumen'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 border-t border-slate-100 flex justify-end">
+              <button onClick={() => setShowLibrary(false)} className="px-4 py-2 text-sm bg-slate-100 text-slate-600 rounded-lg font-medium">Tutup</button>
+            </div>
           </div>
         </div>
       )}

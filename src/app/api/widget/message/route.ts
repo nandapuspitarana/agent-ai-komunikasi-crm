@@ -46,7 +46,11 @@ export async function POST(req: NextRequest) {
         handoffAgent: {
           select: { name: true }
         },
-        activeFlow: true
+        activeFlow: {
+          include: {
+            intents: true
+          }
+        }
       }
     });
 
@@ -183,6 +187,9 @@ export async function POST(req: NextRequest) {
       botName: tenant.activeFlow?.name || 'Asisten AI',
       customInstructions: finalCustomInstructions.trim() || undefined,
       handoffAgentName: tenant.handoffAgent?.name,
+      language: flowConfig.language,
+      speakingStyle: flowConfig.speakingStyle,
+      businessNeeds: flowConfig.businessNeeds,
     });
 
     let formattedMessage = message;
@@ -190,24 +197,75 @@ export async function POST(req: NextRequest) {
       formattedMessage = flowHumanPromptTemplate.replace('{input}', message);
     }
 
-    // Step 3: Call AI Engine
+    // Step 2: Check QnA (Intents)
+    let qnaMatch = null;
+    
+    // 2a. Check DB Intents first
+    if (tenant.activeFlow && tenant.activeFlow.intents) {
+      const userMsgLower = message.toLowerCase().trim();
+      let maxMatchLength = 0;
+      
+      for (const intent of tenant.activeFlow.intents) {
+        if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
+        
+        for (const phrase of intent.trainingPhrases) {
+          const lowerPhrase = phrase.toLowerCase().trim();
+          if (userMsgLower === lowerPhrase) {
+            qnaMatch = intent;
+            maxMatchLength = Infinity;
+            break;
+          } else if (userMsgLower.includes(lowerPhrase)) {
+            if (lowerPhrase.length > maxMatchLength) {
+              maxMatchLength = lowerPhrase.length;
+              qnaMatch = intent;
+            }
+          }
+        }
+        if (maxMatchLength === Infinity) break;
+      }
+    }
+
+
     let aiReplyRaw = '';
     let handoffOccurred = false;
 
-    try {
-      const aiResponse = await chatWithAgent({
-        message: formattedMessage, // Send the formatted message if human prompt exists
-        session_id: currentSessionId,
-        user_id: chatSession.contactId,
-        tenant_id: tenantId,
-        system_prompt: systemPrompt,
-      });
+    if (qnaMatch) {
+      aiReplyRaw = qnaMatch.response;
+      // Add HTML options if present
+      if (qnaMatch.options) {
+        const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
+        if (opts.length > 0) {
+          aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+        }
+      }
+    } else {
+      // Fetch document IDs associated with the active flow for RAG isolation
+      let documentIds: string[] = [];
+      if (tenant.activeFlowId) {
+        const docs = await prisma.knowledgeDocument.findMany({
+          where: { flowId: tenant.activeFlowId, status: 'ready' },
+          select: { proxyDocId: true }
+        });
+        documentIds = docs.map(d => d.proxyDocId).filter((id): id is string => id !== null);
+      }
 
-      aiReplyRaw = aiResponse.reply || 'Maaf, saya tidak bisa menjawab saat ini.';
-    } catch (aiError) {
-      console.error('[Widget Message] AI Engine error:', aiError);
-      aiReplyRaw =
-        'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami.  [HANDOFF_REQUESTED]';
+      // Step 3: Call AI Engine
+      try {
+        const aiResponse = await chatWithAgent({
+          message: formattedMessage, // Send the formatted message if human prompt exists
+          session_id: currentSessionId,
+          user_id: chatSession.contactId,
+          tenant_id: tenantId,
+          system_prompt: systemPrompt,
+          document_ids: documentIds,
+        });
+
+        aiReplyRaw = aiResponse.reply || 'Maaf, saya tidak bisa menjawab saat ini.';
+      } catch (aiError) {
+        console.error('[Widget Message] AI Engine error:', aiError);
+        aiReplyRaw =
+          'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami.  [HANDOFF_REQUESTED]';
+      }
     }
 
     // Step 4: Parse AI response for handoff flag
