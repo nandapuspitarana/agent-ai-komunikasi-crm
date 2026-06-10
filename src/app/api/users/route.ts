@@ -21,8 +21,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Only Super Admin can view all users
-    if (!canAccessAdminPanel(session.user.role)) {
+    if (session.user.role !== 'SUPER_ADMIN' && session.user.role !== 'BUSINESS_PARTNER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -35,6 +34,10 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     const where: any = {};
+
+    if (session.user.role === 'BUSINESS_PARTNER') {
+      where.tenantId = session.user.tenantId;
+    }
 
     if (search) {
       where.OR = [
@@ -64,6 +67,14 @@ export async function GET(request: NextRequest) {
             select: {
               id: true,
               name: true,
+              _count: {
+                select: {
+                  users: {
+                    where: { role: 'AGENT' }
+                  },
+                  flows: true
+                }
+              }
             },
           },
         },
@@ -98,12 +109,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!canAccessAdminPanel(session.user.role)) {
+    if (session.user.role !== 'SUPER_ADMIN' && session.user.role !== 'BUSINESS_PARTNER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { email, password, name, role, tenantId, isActive } = body;
+    const { email, password, name, role, tenantId, isActive, newTenantName } = body;
 
     // Validation
     if (!email || !password || !name || !role) {
@@ -111,6 +122,10 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    if (session.user.role === 'BUSINESS_PARTNER' && role !== 'AGENT') {
+      return NextResponse.json({ error: 'Business Partners can only create Agents' }, { status: 403 });
     }
 
     // Check if user already exists
@@ -128,6 +143,18 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Determine tenantId
+    let finalTenantId = tenantId || null;
+    if (session.user.role === 'BUSINESS_PARTNER') {
+      finalTenantId = session.user.tenantId;
+    } else if (session.user.role === 'SUPER_ADMIN' && role === 'BUSINESS_PARTNER' && !tenantId) {
+      const tenantName = newTenantName || `Bisnis milik ${name}`;
+      const newTenant = await prisma.tenant.create({
+        data: { name: tenantName }
+      });
+      finalTenantId = newTenant.id;
+    }
+
     // Create user
     const user = await prisma.user.create({
       data: {
@@ -135,7 +162,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         name,
         role,
-        tenantId: tenantId || null,
+        tenantId: finalTenantId,
         isActive: isActive !== undefined ? isActive : true,
       },
       select: {
@@ -153,7 +180,7 @@ export async function POST(request: NextRequest) {
     await logUserCreated(
       user.id,
       session.user.id,
-      { email, name, role, tenantId, isActive },
+      { email, name, role, tenantId: finalTenantId, isActive },
       request.headers.get('x-forwarded-for') || undefined,
       request.headers.get('user-agent') || undefined
     );

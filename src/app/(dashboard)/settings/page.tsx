@@ -36,6 +36,11 @@ export default function SettingsPage() {
   const [usersLoading, setUsersLoading] = useState(false);
   const [editingUser, setEditingUser] = useState<any | null>(null);
   const [isUpdatingUser, setIsUpdatingUser] = useState(false);
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'AGENT', tenantId: '' });
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [tenantsList, setTenantsList] = useState<any[]>([]);
+  const [newTenantName, setNewTenantName] = useState('');
 
   // Audit logs state
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -52,12 +57,27 @@ export default function SettingsPage() {
   const [tenantLoading, setTenantLoading] = useState(false);
   const [tenantSaveLoading, setTenantSaveLoading] = useState(false);
 
-  // Fetch users
+  // Fetch users & tenants
   useEffect(() => {
     if (activeTab === 'users' || activeTab === 'tenant') {
       fetchUsers();
+      if ((session?.user as any)?.role === 'SUPER_ADMIN') {
+        fetchTenantsList();
+      }
     }
-  }, [activeTab]);
+  }, [activeTab, session]);
+
+  const fetchTenantsList = async () => {
+    try {
+      const res = await fetch('/api/tenants');
+      if (res.ok) {
+        const data = await res.json();
+        setTenantsList(data.tenants || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tenants:', error);
+    }
+  };
 
   // Fetch audit logs
   useEffect(() => {
@@ -162,6 +182,42 @@ export default function SettingsPage() {
       alert('Error updating user');
     } finally {
       setIsUpdatingUser(false);
+    }
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsCreatingUser(true);
+    try {
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newUser.name,
+          email: newUser.email,
+          password: newUser.password,
+          role: newUser.role,
+          tenantId: newUser.tenantId === 'NEW' ? undefined : (newUser.tenantId || undefined),
+          newTenantName: newUser.tenantId === 'NEW' ? newTenantName : undefined,
+          isActive: true,
+        }),
+      });
+
+      if (res.ok) {
+        setIsAddingUser(false);
+        setNewUser({ name: '', email: '', password: '', role: 'AGENT', tenantId: '' });
+        setNewTenantName('');
+        fetchUsers();
+        if ((session?.user as any)?.role === 'SUPER_ADMIN') fetchTenantsList();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to create user');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error creating user');
+    } finally {
+      setIsCreatingUser(false);
     }
   };
 
@@ -370,7 +426,10 @@ export default function SettingsPage() {
           <div className="p-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-slate-900">User Management</h2>
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={() => setIsAddingUser(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
                 <Plus size={18} />
                 Add User
               </button>
@@ -497,6 +556,32 @@ export default function SettingsPage() {
                       />
                       <label htmlFor="isActive" className="text-sm font-medium text-slate-700">Active Status</label>
                     </div>
+                    {editingUser.tenant && (
+                      <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mt-4">
+                        <p className="text-sm font-bold text-slate-800 mb-2">Tenant Details (Sisi Admin)</p>
+                        <div className="space-y-2">
+                          <p className="text-xs text-slate-600">
+                            <span className="font-medium">Tenant ID:</span>{' '}
+                            <code className="bg-slate-200 px-1 rounded ml-1">{editingUser.tenantId}</code>
+                          </p>
+                          <p className="text-xs text-slate-600">
+                            <span className="font-medium">Tenant Name:</span> {editingUser.tenant.name}
+                          </p>
+                        </div>
+                        
+                        <div className="mt-4 grid grid-cols-2 gap-3">
+                          <div className="bg-white p-3 rounded border border-slate-200 text-center">
+                            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Human Agents</p>
+                            <p className="font-bold text-xl text-blue-600">{editingUser.tenant._count?.users || 0}</p>
+                          </div>
+                          <div className="bg-white p-3 rounded border border-slate-200 text-center">
+                            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">AI Flows</p>
+                            <p className="font-bold text-xl text-purple-600">{editingUser.tenant._count?.flows || 0}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
                       <button
                         type="button"
@@ -511,6 +596,108 @@ export default function SettingsPage() {
                         className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
                         {isUpdatingUser ? 'Saving...' : 'Save Changes'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Add User Modal */}
+            {isAddingUser && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+                <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
+                  <h3 className="text-lg font-bold mb-4 text-slate-900">Add New User</h3>
+                  <form onSubmit={handleCreateUser} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                      <input
+                        type="text"
+                        value={newUser.name}
+                        onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                      <input
+                        type="email"
+                        value={newUser.email}
+                        onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                      <input
+                        type="password"
+                        value={newUser.password}
+                        onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Role (Hak Akses)</label>
+                      <select
+                        value={newUser.role}
+                        onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                        disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
+                      >
+                        {(session?.user as any)?.role === 'SUPER_ADMIN' && <option value="SUPER_ADMIN">Super Admin</option>}
+                        <option value="AGENT">Agent</option>
+                        <option value="BUSINESS_PARTNER">Business Partner</option>
+                      </select>
+                    </div>
+                    {(session?.user as any)?.role === 'SUPER_ADMIN' && (
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Bisnis Owner / Tenant</label>
+                        <select
+                          value={newUser.tenantId}
+                          onChange={(e) => setNewUser({...newUser, tenantId: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                        >
+                          <option value="">-- Kosongkan (Bukan Agent Spesifik) --</option>
+                          {tenantsList.map((t) => (
+                            <option key={t.id} value={t.id}>{t.name} (ID: {t.id.substring(0, 8)}...)</option>
+                          ))}
+                          {newUser.role === 'BUSINESS_PARTNER' && (
+                            <option value="NEW">-- Buat Bisnis Baru (Otomatis) --</option>
+                          )}
+                        </select>
+                      </div>
+                    )}
+                    {newUser.tenantId === 'NEW' && (session?.user as any)?.role === 'SUPER_ADMIN' && (
+                      <div className="pl-4 border-l-2 border-blue-500">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Nama Bisnis Baru</label>
+                        <input
+                          type="text"
+                          value={newTenantName}
+                          onChange={(e) => setNewTenantName(e.target.value)}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50"
+                          placeholder={`Misal: Bisnis milik ${newUser.name || 'User'}`}
+                          required={newUser.tenantId === 'NEW'}
+                        />
+                      </div>
+                    )}
+                    <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingUser(false)}
+                        className="px-4 py-2 text-slate-700 font-medium hover:bg-slate-100 rounded-lg transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isCreatingUser}
+                        className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {isCreatingUser ? 'Creating...' : 'Create User'}
                       </button>
                     </div>
                   </form>

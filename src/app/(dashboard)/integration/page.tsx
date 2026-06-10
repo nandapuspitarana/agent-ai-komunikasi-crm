@@ -2,13 +2,14 @@
 
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
-import { Code, LayoutTemplate, Copy, CheckCircle2 } from 'lucide-react';
+import { Code, LayoutTemplate, Copy, CheckCircle2, Key } from 'lucide-react';
 
 export default function IntegrationPage() {
   const { data: session } = useSession();
-  const tenantId = (session?.user as any)?.tenant?.id || 'YOUR_TENANT_ID';
+  const tenantId = (session?.user as any)?.tenantId || 'YOUR_TENANT_ID';
   const [copiedScript, setCopiedScript] = useState(false);
   const [copiedWP, setCopiedWP] = useState(false);
+  const [copiedTenantId, setCopiedTenantId] = useState(false);
 
   const htmlScript = `<!-- Start of SaaS CRM Widget -->
 <script>
@@ -61,6 +62,12 @@ function saas_crm_agent_inject_script() {
     }
   };
 
+  const copyTenantId = () => {
+    navigator.clipboard.writeText(tenantId);
+    setCopiedTenantId(true);
+    setTimeout(() => setCopiedTenantId(false), 2000);
+  };
+
   return (
     <div className="p-8 max-w-5xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="mb-8">
@@ -69,6 +76,32 @@ function saas_crm_agent_inject_script() {
       </div>
 
       <div className="grid grid-cols-1 gap-8">
+        {/* Tenant ID Section */}
+        <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="border-b border-slate-100 bg-slate-50 p-4 flex items-center gap-3">
+            <Key className="text-amber-500" size={20} />
+            <h2 className="font-semibold text-slate-700">Your Tenant ID</h2>
+          </div>
+          <div className="p-6">
+            <p className="text-sm text-slate-600 mb-4">
+              This is your unique Tenant ID. You may need it for API integrations, webhooks, or configuring your AI Agent proxy.
+            </p>
+            <div className="flex items-center gap-3">
+              <code className="px-4 py-2 bg-slate-100 rounded-md border border-slate-200 text-slate-800 font-mono text-sm select-all">
+                {tenantId}
+              </code>
+              <button
+                onClick={copyTenantId}
+                className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded transition-colors flex items-center gap-2"
+                title="Copy Tenant ID"
+              >
+                {copiedTenantId ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
+                <span className="text-sm font-medium">{copiedTenantId ? 'Copied!' : 'Copy'}</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* HTML Integration */}
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
           <div className="border-b border-slate-100 bg-slate-50 p-4 flex items-center gap-3">

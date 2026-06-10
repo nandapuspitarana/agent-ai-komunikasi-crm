@@ -27,14 +27,6 @@ export async function GET(
 
     const userId = (await params).id;
 
-    // Users can view their own profile, Super Admin can view all
-    if (
-      session.user.id !== userId &&
-      !canAccessAdminPanel(session.user.role)
-    ) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -58,6 +50,20 @@ export async function GET(
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Check access
+    let isAllowed = false;
+    if (session.user.role === 'SUPER_ADMIN') {
+      isAllowed = true;
+    } else if (session.user.id === userId) {
+      isAllowed = true;
+    } else if (session.user.role === 'BUSINESS_PARTNER' && user.tenantId === session.user.tenantId) {
+      isAllowed = true;
+    }
+
+    if (!isAllowed) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Get audit logs (only for Super Admin or own profile)
@@ -90,14 +96,6 @@ export async function PUT(
 
     const userId = (await params).id;
 
-    // Users can update their own profile, Super Admin can update all
-    if (
-      session.user.id !== userId &&
-      !canAccessAdminPanel(session.user.role)
-    ) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
     const body = await request.json();
     const { name, email, role, tenantId, isActive } = body;
 
@@ -108,6 +106,20 @@ export async function PUT(
 
     if (!existingUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Check access
+    let isAllowed = false;
+    if (session.user.role === 'SUPER_ADMIN') {
+      isAllowed = true;
+    } else if (session.user.id === userId) {
+      isAllowed = true;
+    } else if (session.user.role === 'BUSINESS_PARTNER' && existingUser.tenantId === session.user.tenantId) {
+      isAllowed = true;
+    }
+
+    if (!isAllowed) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Check if email is being changed and already exists
@@ -130,11 +142,14 @@ export async function PUT(
     if (name) updateData.name = name;
     if (email) updateData.email = email;
 
-    // Only Super Admin can change role and status
-    if (canAccessAdminPanel(session.user.role)) {
+    // Only Super Admin can change role and tenantId
+    // Business Partner can only change isActive status of their agents
+    if (session.user.role === 'SUPER_ADMIN') {
       if (role !== undefined) updateData.role = role;
       if (isActive !== undefined) updateData.isActive = isActive;
       if (tenantId !== undefined) updateData.tenantId = tenantId;
+    } else if (session.user.role === 'BUSINESS_PARTNER') {
+      if (isActive !== undefined) updateData.isActive = isActive;
     }
 
     // Update user
@@ -220,11 +235,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Only Super Admin can delete users
-    if (!canAccessAdminPanel(session.user.role)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
     const userId = (await params).id;
 
     // Prevent self-deletion
@@ -242,6 +252,18 @@ export async function DELETE(
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Check access
+    let isAllowed = false;
+    if (session.user.role === 'SUPER_ADMIN') {
+      isAllowed = true;
+    } else if (session.user.role === 'BUSINESS_PARTNER' && user.tenantId === session.user.tenantId) {
+      isAllowed = true;
+    }
+
+    if (!isAllowed) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Delete user
