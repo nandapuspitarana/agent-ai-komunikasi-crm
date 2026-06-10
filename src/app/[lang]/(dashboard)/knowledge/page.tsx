@@ -24,7 +24,7 @@ const UPLOAD_TABS: UploadTab[] = [
     label: 'PDF',
     accept: '.pdf',
     icon: <FileText size={20} />,
-    description: 'Dokumen PDF, laporan, manual, kebijakan',
+    description: 'PDF documents, reports, manuals, policies',
     color: 'text-red-600 bg-red-50 border-red-200',
   },
   {
@@ -32,7 +32,7 @@ const UPLOAD_TABS: UploadTab[] = [
     label: 'Word / Docs',
     accept: '.docx,.doc',
     icon: <File size={20} />,
-    description: 'Dokumen Word (.docx, .doc)',
+    description: 'Word documents (.docx, .doc)',
     color: 'text-blue-600 bg-blue-50 border-blue-200',
   },
   {
@@ -40,7 +40,7 @@ const UPLOAD_TABS: UploadTab[] = [
     label: 'Excel',
     accept: '.xlsx,.xls',
     icon: <FileSpreadsheet size={20} />,
-    description: 'Spreadsheet Excel (.xlsx, .xls)',
+    description: 'Excel spreadsheets (.xlsx, .xls)',
     color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
   },
   {
@@ -48,15 +48,15 @@ const UPLOAD_TABS: UploadTab[] = [
     label: 'CSV',
     accept: '.csv',
     icon: <FileSpreadsheet size={20} />,
-    description: 'Data tabular dalam format CSV',
+    description: 'Tabular data in CSV format',
     color: 'text-orange-600 bg-orange-50 border-orange-200',
   },
   {
     id: 'txt',
-    label: 'Teks',
+    label: 'Text',
     accept: '.txt,.md',
     icon: <FileText size={20} />,
-    description: 'File teks biasa (.txt, .md)',
+    description: 'Plain text files (.txt, .md)',
     color: 'text-slate-600 bg-slate-50 border-slate-200',
   },
 ];
@@ -121,7 +121,7 @@ export default function KnowledgeBasePage() {
       setProxyStatus(data.proxyStatus || 'ok');
       if (data.error) setError(data.error);
     } catch (err: any) {
-      setError('Gagal terhubung ke server. Coba refresh halaman ini.');
+      setError('Failed to connect to the server. Try refreshing this page.');
       setProxyStatus('error');
     } finally {
       setLoading(false);
@@ -167,7 +167,7 @@ export default function KnowledgeBasePage() {
     e.preventDefault();
     if (!selectedFile) return;
     if (!metaName.trim()) {
-      setError('Meta Name wajib diisi');
+      setError('Meta Name is required');
       return;
     }
 
@@ -189,13 +189,13 @@ export default function KnowledgeBasePage() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Gagal mengupload dokumen');
+        throw new Error(data.error || 'Failed to upload document');
       }
 
       closeModal();
       await fetchDocuments();
     } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan saat upload dokumen');
+      setError(err.message || 'An error occurred while uploading the document');
     } finally {
       setUploading(false);
     }
@@ -215,14 +215,14 @@ export default function KnowledgeBasePage() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Hapus dokumen "${name}"? Seluruh pengetahuan yang dipelajari dari dokumen ini akan dihapus dari AI.`)) return;
+    if (!confirm(`Delete document "${name}"? All knowledge learned from this document will be removed from the AI.`)) return;
     setError(null);
     try {
       const res = await fetch(`/api/agent/documents/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Gagal menghapus dokumen');
+      if (!res.ok) throw new Error('Failed to delete document');
       await fetchDocuments();
     } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan saat menghapus dokumen');
+      setError(err.message || 'An error occurred while deleting the document');
     }
   };
 
@@ -273,7 +273,7 @@ export default function KnowledgeBasePage() {
               </span>
             ) : null}
           </div>
-          <p className="text-slate-500 mt-1 text-sm">Upload dokumen untuk digunakan AI saat menjawab pertanyaan pelanggan</p>
+          <p className="text-slate-500 mt-1 text-sm">Upload documents for the AI to use when answering customer questions</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -288,7 +288,7 @@ export default function KnowledgeBasePage() {
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90 transition-opacity shadow-sm text-sm"
           >
             <Upload size={16} />
-            Upload Dokumen
+            Upload Document
           </button>
         </div>
       </div>
@@ -302,7 +302,7 @@ export default function KnowledgeBasePage() {
             </div>
             <div>
               <div className="text-2xl font-bold text-slate-900">{documents.length}</div>
-              <div className="text-xs text-slate-500">Total Dokumen</div>
+              <div className="text-xs text-slate-500">Total Documents</div>
             </div>
           </div>
           <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-3">
@@ -311,7 +311,7 @@ export default function KnowledgeBasePage() {
             </div>
             <div>
               <div className="text-2xl font-bold text-slate-900">{statusCounts.ready}</div>
-              <div className="text-xs text-slate-500">Siap Digunakan</div>
+              <div className="text-xs text-slate-500">Ready to Use</div>
             </div>
           </div>
           <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-3">
@@ -334,7 +334,7 @@ export default function KnowledgeBasePage() {
           {proxyStatus === 'offline' ? <WifiOff size={20} className="mt-0.5 flex-shrink-0" /> : <AlertTriangle size={20} className="mt-0.5 flex-shrink-0" />}
           <div>
             <p className="font-semibold text-sm">
-              {proxyStatus === 'offline' ? 'AI Engine Tidak Aktif' : 'Terjadi Kesalahan'}
+              {proxyStatus === 'offline' ? 'AI Engine is Offline' : 'An Error Occurred'}
             </p>
             <p className="text-sm mt-0.5">{error}</p>
             {proxyStatus === 'offline' && (
@@ -352,7 +352,7 @@ export default function KnowledgeBasePage() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Cari nama atau tags..."
+            placeholder="Search name or tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
@@ -369,7 +369,7 @@ export default function KnowledgeBasePage() {
                   : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              {type === 'all' ? 'Semua' : type.toUpperCase()}
+              {type === 'all' ? 'All' : type.toUpperCase()}
             </button>
           ))}
         </div>
@@ -380,45 +380,45 @@ export default function KnowledgeBasePage() {
         {loading ? (
           <div className="text-center py-16">
             <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-4" />
-            <p className="text-slate-500 text-sm">Memuat dokumen...</p>
+            <p className="text-slate-500 text-sm">Loading documents...</p>
           </div>
         ) : documents.length === 0 ? (
           <div className="text-center py-16 px-6">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <FileText size={32} className="text-blue-500" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Belum ada dokumen</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">No documents yet</h3>
             <p className="text-slate-500 text-sm mb-6 max-w-md mx-auto">
-              Upload dokumen PDF, Word, Excel, CSV, atau TXT untuk mengajarkan AI tentang bisnis Anda.
-              AI akan menggunakan dokumen ini untuk menjawab pertanyaan pelanggan dengan akurat.
+              Upload PDF, Word, Excel, CSV, or TXT documents to teach the AI about your business.
+              The AI will use these documents to answer customer questions accurately.
             </p>
             {proxyStatus === 'offline' ? (
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
-                <WifiOff size={16} /> Nyalakan AI Engine terlebih dahulu
+                <WifiOff size={16} /> Turn on the AI Engine first
               </div>
             ) : (
               <button
                 onClick={() => setShowModal(true)}
                 className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90 text-sm shadow-sm"
               >
-                Upload Dokumen Pertama
+                Upload First Document
               </button>
             )}
           </div>
         ) : filteredDocuments.length === 0 ? (
           <div className="text-center py-12 text-slate-400 text-sm">
-            Tidak ada dokumen yang cocok dengan filter "{searchQuery || filterType}"
+            No documents match the filter "{searchQuery || filterType}"
           </div>
         ) : (
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Dokumen</th>
+                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Document</th>
                 <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Tags</th>
                 <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Status</th>
                 <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-center">Chunks</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Tanggal</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-right">Aksi</th>
+                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Date</th>
+                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -466,15 +466,15 @@ export default function KnowledgeBasePage() {
                   <td className="px-5 py-4">
                     {doc.status === 'ready' ? (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                        <CheckCircle size={12} /> Siap
+                        <CheckCircle size={12} /> Ready
                       </span>
                     ) : doc.status === 'failed' ? (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700" title={doc.error_message}>
-                        <AlertCircle size={12} /> Gagal
+                        <AlertCircle size={12} /> Failed
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                        <Clock size={12} className="animate-pulse" /> Proses
+                        <Clock size={12} className="animate-pulse" /> Processing
                       </span>
                     )}
                   </td>
@@ -490,7 +490,7 @@ export default function KnowledgeBasePage() {
                     <button
                       onClick={() => handleDelete(doc.id, doc.metadata?.name || doc.filename)}
                       className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Hapus dokumen"
+                      title="Delete document"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -509,8 +509,8 @@ export default function KnowledgeBasePage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">Upload ke Base Knowledge</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Pilih tipe file dan isi metadata dokumen</p>
+                <h3 className="text-lg font-bold text-slate-900">Upload to Base Knowledge</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Select file type and fill in document metadata</p>
               </div>
               <button onClick={closeModal} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400">
                 <X size={20} />
@@ -584,9 +584,9 @@ export default function KnowledgeBasePage() {
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2 ${currentTab.color}`}>
                       {currentTab.icon}
                     </div>
-                    <p className="text-sm font-medium text-slate-700">Klik untuk pilih file {currentTab.label}</p>
+                    <p className="text-sm font-medium text-slate-700">Click to select {currentTab.label} file</p>
                     <p className="text-xs text-slate-400 mt-1">{currentTab.description}</p>
-                    <p className="text-xs text-slate-400">Maks. 10MB | Format: {currentTab.accept}</p>
+                    <p className="text-xs text-slate-400">Max 10MB | Format: {currentTab.accept}</p>
                   </>
                 )}
               </div>
@@ -594,50 +594,50 @@ export default function KnowledgeBasePage() {
               {/* Meta Name */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Nama Dokumen <span className="text-red-500">*</span>
+                  Document Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={metaName}
                   onChange={(e) => setMetaName(e.target.value)}
-                  placeholder="e.g. Kebijakan Cuti Karyawan 2026"
+                  placeholder="e.g. Employee Leave Policy 2026"
                   className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   required
                 />
-                <p className="text-xs text-slate-400 mt-1">Nama yang dikenali AI saat menjawab pertanyaan</p>
+                <p className="text-xs text-slate-400 mt-1">The name recognized by the AI when answering questions</p>
               </div>
 
               {/* Category */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Kategori
+                  Category
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
                 >
-                  <option value="">-- Pilih kategori --</option>
-                  <option value="HR">HR / Sumber Daya Manusia</option>
-                  <option value="Product">Produk & Layanan</option>
-                  <option value="Finance">Keuangan</option>
-                  <option value="Legal">Legal & Kepatuhan</option>
-                  <option value="Technical">Teknis / IT</option>
-                  <option value="SOP">SOP & Prosedur</option>
+                  <option value="">-- Select category --</option>
+                  <option value="HR">HR / Human Resources</option>
+                  <option value="Product">Products & Services</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Legal">Legal & Compliance</option>
+                  <option value="Technical">Technical / IT</option>
+                  <option value="SOP">SOP & Procedures</option>
                   <option value="FAQ">FAQ</option>
-                  <option value="Other">Lainnya</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
               {/* Description */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Deskripsi Singkat
+                  Short Description
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Jelaskan isi dokumen ini secara singkat..."
+                  placeholder="Briefly describe the contents of this document..."
                   rows={2}
                   className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
                 />
@@ -654,7 +654,7 @@ export default function KnowledgeBasePage() {
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagKeyDown}
-                    placeholder="Tambah tag, tekan Enter"
+                    placeholder="Add tag, press Enter"
                     className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   />
                   <button
@@ -677,7 +677,7 @@ export default function KnowledgeBasePage() {
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-slate-400 mt-1">Tag membantu AI memilih dokumen yang tepat untuk pertanyaan spesifik</p>
+                <p className="text-xs text-slate-400 mt-1">Tags help the AI select the right documents for specific questions</p>
               </div>
 
               {/* Footer */}
@@ -688,7 +688,7 @@ export default function KnowledgeBasePage() {
                   className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
                   disabled={uploading}
                 >
-                  Batal
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -696,9 +696,9 @@ export default function KnowledgeBasePage() {
                   className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-2 shadow-sm"
                 >
                   {uploading ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Memproses...</>
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
                   ) : (
-                    <><Upload size={16} /> Upload & Proses</>
+                    <><Upload size={16} /> Upload & Process</>
                   )}
                 </button>
               </div>

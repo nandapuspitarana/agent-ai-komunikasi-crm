@@ -6,6 +6,7 @@ import {
   X, FileSpreadsheet, File, Tag, AlertTriangle,
   Wifi, WifiOff, Plus, Clock, Search, Library
 } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 type DocType = 'pdf' | 'docs' | 'excel' | 'csv' | 'txt' | 'all';
 
@@ -36,6 +37,7 @@ function getFileIcon(filename: string) {
 }
 
 export default function AgentKnowledgeTab({ flowId }: { flowId: string | null }) {
+  const { t } = useTranslation();
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -195,8 +197,8 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
         <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 text-blue-500">
           <Globe size={32} />
         </div>
-        <h2 className="text-xl font-bold text-slate-800 mb-2">Simpan Agent Terlebih Dahulu</h2>
-        <p className="text-slate-500">Anda harus menyimpan agent ini terlebih dahulu (klik tombol "Save Changes" di atas) sebelum dapat mengupload dokumen ke Base Knowledge.</p>
+        <h2 className="text-xl font-bold text-slate-800 mb-2">{t('agentBuilder', 'saveAgentFirst')}</h2>
+        <p className="text-slate-500">{t('agentBuilder', 'saveAgentFirstDesc')}</p>
       </div>
     );
   }
@@ -210,8 +212,8 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-base font-bold text-slate-800">Knowledge Base</h2>
-            <p className="text-sm text-slate-500">Dokumen referensi khusus untuk agent ini.</p>
+            <h2 className="text-base font-bold text-slate-800">{t('agentBuilder', 'knowledgeBase')}</h2>
+            <p className="text-sm text-slate-500">{t('agentBuilder', 'knowledgeBaseDesc')}</p>
           </div>
           <div className="flex gap-2">
             <button onClick={fetchDocuments} className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
@@ -221,13 +223,13 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
               onClick={() => { fetchTenantDocs(); setShowLibrary(true); }}
               className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 shadow-sm"
             >
-              <Library size={16} /> Pilih dari Library
+              <Library size={16} /> {t('agentBuilder', 'chooseFromLibrary')}
             </button>
             <button
               onClick={() => setShowModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm"
             >
-              <Upload size={16} /> Upload Dokumen
+              <Upload size={16} /> {t('agentBuilder', 'uploadDocument')}
             </button>
           </div>
         </div>
@@ -245,16 +247,16 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
           ) : documents.length === 0 ? (
             <div className="text-center py-16 px-4">
               <FileText size={32} className="mx-auto text-slate-300 mb-3" />
-              <p className="text-slate-500 text-sm">Belum ada dokumen untuk agent ini.</p>
+              <p className="text-slate-500 text-sm">{t('agentBuilder', 'noDocuments')}</p>
             </div>
           ) : (
             <table className="w-full text-sm text-left">
               <thead className="bg-white border-b border-slate-200 text-xs uppercase text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Nama Dokumen</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                  <th className="px-4 py-3 font-semibold text-center">Chunks</th>
-                  <th className="px-4 py-3 font-semibold text-right">Aksi</th>
+                  <th className="px-4 py-3 font-semibold">{t('agentBuilder', 'documentName')}</th>
+                  <th className="px-4 py-3 font-semibold">{t('agentBuilder', 'status')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{t('agentBuilder', 'chunks')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{t('agentBuilder', 'actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
@@ -272,15 +274,15 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                     <td className="px-4 py-3">
                       {doc.status === 'ready' ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">
-                          <CheckCircle size={10} /> Siap
+                          <CheckCircle size={10} /> {t('agentBuilder', 'ready')}
                         </span>
                       ) : doc.status === 'failed' ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700" title={doc.errorMsg}>
-                          <AlertTriangle size={10} /> Gagal
+                          <AlertTriangle size={10} /> {t('agentBuilder', 'failed')}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700">
-                          <Clock size={10} className="animate-pulse" /> Proses
+                          <Clock size={10} className="animate-pulse" /> {t('agentBuilder', 'processing')}
                         </span>
                       )}
                     </td>
@@ -303,7 +305,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
             <div className="flex justify-between items-center px-5 py-4 border-b border-slate-100">
-              <h3 className="font-bold text-slate-800">Upload Dokumen (Khusus Agent Ini)</h3>
+              <h3 className="font-bold text-slate-800">{t('agentBuilder', 'uploadSpecific')}</h3>
               <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
             </div>
 
@@ -346,27 +348,27 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                   <>
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-2 transition-transform ${isDragging ? 'scale-110 ' + currentTab.color : currentTab.color}`}>{currentTab.icon}</div>
                     <p className="text-sm font-medium text-slate-700">
-                      {isDragging ? 'Lepaskan file di sini' : `Pilih atau drop file ${currentTab.label}`}
+                      {isDragging ? t('agentBuilder', 'dropFile') : `${t('agentBuilder', 'chooseOrDrop')} ${currentTab.label}`}
                     </p>
-                    <p className="text-xs text-slate-400 mt-1">Maks. 10MB ({currentTab.accept})</p>
+                    <p className="text-xs text-slate-400 mt-1">{t('agentBuilder', 'maxSize')} ({currentTab.accept})</p>
                   </>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Nama Dokumen *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('agentBuilder', 'docNameReq')}</label>
                 <input type="text" value={metaName} onChange={e => setMetaName(e.target.value)} required className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Deskripsi Singkat</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('agentBuilder', 'shortDesc')}</label>
                 <input type="text" value={description} onChange={e => setDescription(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
 
               <div className="pt-3 flex justify-end gap-2 border-t border-slate-100">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm bg-slate-100 text-slate-600 rounded-lg font-medium">Batal</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm bg-slate-100 text-slate-600 rounded-lg font-medium">{t('common', 'cancel')}</button>
                 <button type="submit" disabled={uploading || !selectedFile} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50">
-                  {uploading ? 'Mengupload...' : 'Upload Dokumen'}
+                  {uploading ? t('agentBuilder', 'uploading') : t('agentBuilder', 'uploadDocument')}
                 </button>
               </div>
             </form>
@@ -380,8 +382,8 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div className="flex justify-between items-center px-5 py-4 border-b border-slate-100">
               <div>
-                <h3 className="font-bold text-slate-800">Library Dokumen</h3>
-                <p className="text-xs text-slate-500">Pilih dokumen yang sudah pernah diunggah sebelumnya</p>
+                <h3 className="font-bold text-slate-800">{t('agentBuilder', 'documentLibrary')}</h3>
+                <p className="text-xs text-slate-500">{t('agentBuilder', 'documentLibraryDesc')}</p>
               </div>
               <button onClick={() => setShowLibrary(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
             </div>
@@ -390,7 +392,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
               {tenantDocs.length === 0 ? (
                 <div className="text-center py-10">
                   <Library size={32} className="mx-auto text-slate-300 mb-3" />
-                  <p className="text-slate-500 text-sm">Belum ada dokumen di Library.</p>
+                  <p className="text-slate-500 text-sm">{t('agentBuilder', 'noDocsInLibrary')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -412,7 +414,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                             disabled={isAlreadyAdded || linking}
                             className={`px-3 py-1 text-xs font-semibold rounded-lg ${isAlreadyAdded ? 'bg-slate-200 text-slate-500' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
                           >
-                            {isAlreadyAdded ? 'Sudah Ditambahkan' : linking ? 'Menautkan...' : 'Pilih Dokumen'}
+                            {isAlreadyAdded ? t('agentBuilder', 'alreadyAdded') : linking ? t('agentBuilder', 'linking') : t('agentBuilder', 'selectDocument')}
                           </button>
                         </div>
                       </div>
@@ -423,7 +425,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
             </div>
             
             <div className="p-4 border-t border-slate-100 flex justify-end">
-              <button onClick={() => setShowLibrary(false)} className="px-4 py-2 text-sm bg-slate-100 text-slate-600 rounded-lg font-medium">Tutup</button>
+              <button onClick={() => setShowLibrary(false)} className="px-4 py-2 text-sm bg-slate-100 text-slate-600 rounded-lg font-medium">{t('common', 'close')}</button>
             </div>
           </div>
         </div>

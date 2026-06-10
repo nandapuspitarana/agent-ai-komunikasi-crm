@@ -21,9 +21,12 @@ import {
 import { useSession } from 'next-auth/react';
 import ImageUpload from '@/components/ImageUpload';
 
+import { useTranslation } from '@/lib/i18n/I18nContext';
+
 type TabType = 'account' | 'users' | 'audit-logs' | 'tenant';
 
 export default function SettingsPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<TabType>('account');
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -273,18 +276,18 @@ export default function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'account', label: 'Account', icon: User },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'audit-logs', label: 'Audit Logs', icon: LogOut },
-    { id: 'tenant', label: 'Tenant Settings', icon: Building2 },
+    { id: 'account', label: t('settings', 'tabAccount'), icon: User },
+    { id: 'users', label: t('settings', 'tabUsers'), icon: Users },
+    { id: 'audit-logs', label: t('settings', 'tabAudit'), icon: LogOut },
+    { id: 'tenant', label: t('settings', 'tabTenant'), icon: Building2 },
   ];
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
-        <p className="text-slate-600 mt-2">Manage your account, users, and system settings</p>
+        <h1 className="text-3xl font-bold text-slate-900">{t('settings', 'title')}</h1>
+        <p className="text-slate-600 mt-2">{t('settings', 'subtitle')}</p>
       </div>
 
       {/* Tabs */}
@@ -314,13 +317,13 @@ export default function SettingsPage() {
         {/* Account Tab */}
         {activeTab === 'account' && (
           <div className="p-8">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Change Password</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-6">{t('settings', 'changePassword')}</h2>
 
             <form onSubmit={handlePasswordChange} className="max-w-md space-y-5">
               {/* Current Password */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Current Password
+                  {t('settings', 'currentPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -346,7 +349,7 @@ export default function SettingsPage() {
               {/* New Password */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  New Password
+                  {t('settings', 'newPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -372,7 +375,7 @@ export default function SettingsPage() {
               {/* Confirm Password */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Confirm Password
+                  {t('settings', 'confirmPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -420,7 +423,7 @@ export default function SettingsPage() {
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={18} />
-                {passwordLoading ? 'Saving...' : 'Save Password'}
+                {passwordLoading ? t('settings', 'saving') : t('settings', 'savePassword')}
               </button>
             </form>
           </div>
@@ -430,36 +433,36 @@ export default function SettingsPage() {
         {activeTab === 'users' && (
           <div className="p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-900">User Management</h2>
+              <h2 className="text-xl font-bold text-slate-900">{t('settings', 'userManagement')}</h2>
               <button 
                 onClick={() => setIsAddingUser(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus size={18} />
-                Add User
+                {t('settings', 'addUser')}
               </button>
             </div>
 
             {usersLoading ? (
               <div className="text-center py-8">
                 <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
-                <p className="text-slate-600 mt-3">Loading users...</p>
+                <p className="text-slate-600 mt-3">{t('settings', 'loadingUsers')}</p>
               </div>
             ) : users.length === 0 ? (
               <div className="text-center py-8 text-slate-500">
-                <p>No users found</p>
+                <p>{t('settings', 'noUsers')}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Name</th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Email</th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Role</th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Status</th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Last Login</th>
-                      <th className="px-4 py-3 text-right font-semibold text-slate-700">Actions</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('settings', 'name')}</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('settings', 'email')}</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('settings', 'role')}</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('settings', 'status')}</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('settings', 'lastLogin')}</th>
+                      <th className="px-4 py-3 text-right font-semibold text-slate-700">{t('settings', 'actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
@@ -505,17 +508,17 @@ export default function SettingsPage() {
             )}
 
             {!usersLoading && users.length > 0 && (
-              <p className="text-xs text-slate-500 mt-4">Showing {users.length} of {users.length} users</p>
+              <p className="text-xs text-slate-500 mt-4">{t('settings', 'showingUsers')} {users.length} {t('settings', 'of')} {users.length} {t('settings', 'users')}</p>
             )}
 
             {/* Edit User Modal */}
             {editingUser && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
                 <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
-                  <h3 className="text-lg font-bold mb-4 text-slate-900">Edit User</h3>
+                  <h3 className="text-lg font-bold mb-4 text-slate-900">{t('settings', 'editUser')}</h3>
                   <form onSubmit={handleUpdateUser} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">{t('settings', 'name')}</label>
                       <input
                         type="text"
                         value={editingUser.name || ''}
@@ -525,7 +528,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">{t('settings', 'email')}</label>
                       <input
                         type="email"
                         value={editingUser.email || ''}
@@ -535,16 +538,16 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Role (Hak Akses)</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">{t('settings', 'role')}</label>
                       <select
                         value={editingUser.role || ''}
                         onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
                         className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                         disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
                       >
-                        <option value="SUPER_ADMIN">Super Admin</option>
-                        <option value="AGENT">Agent</option>
-                        <option value="BUSINESS_PARTNER">Business Partner</option>
+                        <option value="SUPER_ADMIN">{t('settings', 'superAdmin')}</option>
+                        <option value="AGENT">{t('settings', 'agent')}</option>
+                        <option value="BUSINESS_PARTNER">{t('settings', 'businessPartner')}</option>
                       </select>
                       {(session?.user as any)?.role !== 'SUPER_ADMIN' && (
                         <p className="text-xs text-slate-500 mt-1">Only Super Admin can change roles.</p>
@@ -570,14 +573,14 @@ export default function SettingsPage() {
                         disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
                         className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                       />
-                      <label htmlFor="isActive" className="text-sm font-medium text-slate-700">Active Status</label>
+                      <label htmlFor="isActive" className="text-sm font-medium text-slate-700">{t('settings', 'activeStatus')}</label>
                     </div>
                     {editingUser.tenant && (
                       <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mt-4">
-                        <p className="text-sm font-bold text-slate-800 mb-2">Tenant Details (Sisi Admin)</p>
+                        <p className="text-sm font-bold text-slate-800 mb-2">{t('settings', 'tenantDetails')}</p>
                         <div className="space-y-2">
                           <p className="text-xs text-slate-600">
-                            <span className="font-medium">Tenant ID:</span>{' '}
+                            <span className="font-medium">{t('settings', 'tenantId')}:</span>{' '}
                             <code className="bg-slate-200 px-1 rounded ml-1">{editingUser.tenantId}</code>
                           </p>
                           <p className="text-xs text-slate-600">
@@ -604,14 +607,14 @@ export default function SettingsPage() {
                         onClick={() => setEditingUser(null)}
                         className="px-4 py-2 text-slate-700 font-medium hover:bg-slate-100 rounded-lg transition-colors"
                       >
-                        Cancel
+                        {t('settings', 'cancel')}
                       </button>
                       <button
                         type="submit"
                         disabled={isUpdatingUser}
                         className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
-                        {isUpdatingUser ? 'Saving...' : 'Save Changes'}
+                        {isUpdatingUser ? t('settings', 'saving') : t('settings', 'saveChanges')}
                       </button>
                     </div>
                   </form>
@@ -646,7 +649,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">{t('settings', 'password')}</label>
                       <input
                         type="password"
                         value={newUser.password}
@@ -657,45 +660,45 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Role (Hak Akses)</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">{t('settings', 'role')}</label>
                       <select
                         value={newUser.role}
                         onChange={(e) => setNewUser({...newUser, role: e.target.value})}
                         className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                         disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
                       >
-                        {(session?.user as any)?.role === 'SUPER_ADMIN' && <option value="SUPER_ADMIN">Super Admin</option>}
-                        <option value="AGENT">Agent</option>
-                        <option value="BUSINESS_PARTNER">Business Partner</option>
+                        {(session?.user as any)?.role === 'SUPER_ADMIN' && <option value="SUPER_ADMIN">{t('settings', 'superAdmin')}</option>}
+                        <option value="AGENT">{t('settings', 'agent')}</option>
+                        <option value="BUSINESS_PARTNER">{t('settings', 'businessPartner')}</option>
                       </select>
                     </div>
                     {(session?.user as any)?.role === 'SUPER_ADMIN' && (
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Bisnis Owner / Tenant</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">{t('settings', 'businessOwner')}</label>
                         <select
                           value={newUser.tenantId}
                           onChange={(e) => setNewUser({...newUser, tenantId: e.target.value})}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                         >
-                          <option value="">-- Kosongkan (Bukan Agent Spesifik) --</option>
+                          <option value="">-- Leave empty (Not a specific agent) --</option>
                           {tenantsList.map((t) => (
                             <option key={t.id} value={t.id}>{t.name} (ID: {t.id.substring(0, 8)}...)</option>
                           ))}
                           {newUser.role === 'BUSINESS_PARTNER' && (
-                            <option value="NEW">-- Buat Bisnis Baru (Otomatis) --</option>
+                            <option value="NEW">-- {t('settings', 'createNewBusiness')} --</option>
                           )}
                         </select>
                       </div>
                     )}
                     {newUser.tenantId === 'NEW' && (session?.user as any)?.role === 'SUPER_ADMIN' && (
                       <div className="pl-4 border-l-2 border-blue-500">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Nama Bisnis Baru</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">{t('settings', 'newBusinessName')}</label>
                         <input
                           type="text"
                           value={newTenantName}
                           onChange={(e) => setNewTenantName(e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50"
-                          placeholder={`Misal: Bisnis milik ${newUser.name || 'User'}`}
+                          placeholder={`E.g. Business owned by ${newUser.name || 'User'}`}
                           required={newUser.tenantId === 'NEW'}
                         />
                       </div>
@@ -706,14 +709,14 @@ export default function SettingsPage() {
                         onClick={() => setIsAddingUser(false)}
                         className="px-4 py-2 text-slate-700 font-medium hover:bg-slate-100 rounded-lg transition-colors"
                       >
-                        Cancel
+                        {t('settings', 'cancel')}
                       </button>
                       <button
                         type="submit"
                         disabled={isCreatingUser}
                         className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
-                        {isCreatingUser ? 'Creating...' : 'Create User'}
+                        {isCreatingUser ? t('settings', 'creating') : t('settings', 'createUser')}
                       </button>
                     </div>
                   </form>
@@ -726,16 +729,16 @@ export default function SettingsPage() {
         {/* Audit Logs Tab */}
         {activeTab === 'audit-logs' && (
           <div className="p-8">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Audit Logs</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-6">{t('settings', 'auditLogsTitle')}</h2>
 
             {auditLoading ? (
               <div className="text-center py-8">
                 <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
-                <p className="text-slate-600 mt-3">Loading audit logs...</p>
+                <p className="text-slate-600 mt-3">{t('settings', 'loadingAudit')}</p>
               </div>
             ) : auditLogs.length === 0 ? (
               <div className="text-center py-8 text-slate-500">
-                <p>No audit logs found</p>
+                <p>{t('settings', 'noAudit')}</p>
               </div>
             ) : (
               <div className="space-y-6 max-w-4xl">
@@ -797,7 +800,7 @@ export default function SettingsPage() {
         {/* Tenant Settings Tab */}
         {activeTab === 'tenant' && (
           <div className="p-8">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Tenant Settings</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-6">{t('settings', 'tabTenant')}</h2>
 
             {tenantLoading ? (
               <div className="text-center py-8">
@@ -844,14 +847,14 @@ export default function SettingsPage() {
                       Active AI Agent (Flow)
                     </label>
                     <p className="text-xs text-slate-500 mb-2">
-                      Pilih Agent AI (Flow) mana yang akan membalas pesan masuk dari pengguna.
+                      Select which AI Agent (Flow) will reply to incoming messages from users.
                     </p>
                     <select
                       value={tenant.activeFlowId || ''}
                       onChange={(e) => setTenant({ ...tenant, activeFlowId: e.target.value || null })}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
                     >
-                      <option value="">-- Gunakan pengaturan global (Default) --</option>
+                      <option value="">-- Use global settings (Default) --</option>
                       {tenant?.flows?.map((flow: any) => (
                         <option key={flow.id} value={flow.id}>
                           {flow.name}
@@ -866,7 +869,7 @@ export default function SettingsPage() {
                       Global AI System Prompt
                     </label>
                     <p className="text-xs text-slate-500 mb-2">
-                      Instruksi global untuk AI yang berlaku untuk semua agent di tenant ini.
+                      Global instructions for AI that apply to all agents in this tenant.
                     </p>
                     <textarea
                       value={tenant.aiSystemPrompt || ''}
@@ -898,7 +901,7 @@ export default function SettingsPage() {
                       Default Handoff Agent (Human Queue)
                     </label>
                     <p className="text-xs text-slate-500 mb-2">
-                      Siapa yang akan ditugaskan (atau nama siapa yang akan disebut oleh AI) ketika pengguna meminta bantuan manusia?
+                      Who will be assigned (or whose name will be mentioned by AI) when the user asks for human help?
                     </p>
                     <select
                       value={tenant.handoffAgentId || ''}
@@ -920,7 +923,7 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Brand Color</label>
-                      <p className="text-xs text-slate-500 mb-2">Warna utama untuk Header dan Tombol.</p>
+                      <p className="text-xs text-slate-500 mb-2">Main color for Header and Buttons.</p>
                       <div className="flex gap-2">
                         <input 
                           type="color" 
@@ -938,7 +941,7 @@ export default function SettingsPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">User Bubble</label>
-                      <p className="text-xs text-slate-500 mb-2">Warna balon chat untuk Pengguna.</p>
+                      <p className="text-xs text-slate-500 mb-2">Chat bubble color for User.</p>
                       <div className="flex gap-2">
                         <input 
                           type="color" 
@@ -956,7 +959,7 @@ export default function SettingsPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Bot Bubble</label>
-                      <p className="text-xs text-slate-500 mb-2">Warna balon chat untuk AI.</p>
+                      <p className="text-xs text-slate-500 mb-2">Chat bubble color for AI.</p>
                       <div className="flex gap-2">
                         <input 
                           type="color" 

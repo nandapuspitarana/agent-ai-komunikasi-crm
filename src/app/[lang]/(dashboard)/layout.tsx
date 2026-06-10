@@ -9,13 +9,15 @@ import {
   ChevronRight
 } from 'lucide-react';
 import UserMenu from '@/components/UserMenu';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/inbox', label: 'Omni-Inbox', icon: MessageSquare },
-  { href: '/agent', label: 'AI Agent', icon: Bot },
-  { href: '/integration', label: 'Integration', icon: Library },
-  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/dashboard', labelKey: 'overview', icon: LayoutDashboard },
+  { href: '/inbox', labelKey: 'inbox', icon: MessageSquare },
+  { href: '/agent', labelKey: 'agent', icon: Bot },
+  { href: '/integration', labelKey: 'integration', icon: Library },
+  { href: '/settings', labelKey: 'settings', icon: Settings },
 ];
 
 export default function DashboardLayout({
@@ -26,6 +28,7 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -56,11 +59,11 @@ export default function DashboardLayout({
       <div className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
         <div className="p-4 bg-slate-950 flex items-center gap-2 text-white">
           <LayoutDashboard size={24} className="text-blue-500" />
-          <span className="font-bold text-lg">SaaS CRM</span>
+          <span className="font-bold text-lg">{t('sidebar', 'saasCrm')}</span>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          {NAV_ITEMS.map(({ href, labelKey, icon: Icon }) => {
             const isActive = pathname === href || pathname.startsWith(href + '/');
             return (
               <Link
@@ -73,7 +76,7 @@ export default function DashboardLayout({
                 }`}
               >
                 <Icon size={18} className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'} />
-                <span className="text-sm font-medium">{label}</span>
+                <span className="text-sm font-medium">{t('sidebar', labelKey)}</span>
                 {isActive && <ChevronRight size={14} className="ml-auto opacity-70" />}
               </Link>
             );
@@ -91,16 +94,19 @@ export default function DashboardLayout({
         <header className="h-16 bg-white border-b border-slate-200 flex items-center px-6 justify-between shrink-0">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-slate-500">
-            {NAV_ITEMS.find(n => pathname === n.href || pathname.startsWith(n.href + '/'))?.label || 'Dashboard'}
+            {t('sidebar', NAV_ITEMS.find(n => pathname === n.href || pathname.startsWith(n.href + '/'))?.labelKey || 'overview')}
           </div>
           {session?.user && (
-            <UserMenu
-              user={{
-                email: session.user.email || '',
-                name: session.user.name || null,
-              }}
-              tenant={tenant}
-            />
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+              <UserMenu
+                user={{
+                  email: session.user.email || '',
+                  name: session.user.name || null,
+                }}
+                tenant={tenant}
+              />
+            </div>
           )}
         </header>
 

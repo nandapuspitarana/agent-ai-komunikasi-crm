@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Bot, User, MoreVertical, UserCheck, Loader2, PhoneCall } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 interface ChatWindowProps {
   tenantId: string;
@@ -28,8 +29,9 @@ export function ChatWindow({
   botName = 'Support Bot',
   botLogo = null,
 }: ChatWindowProps) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: 1, text: 'Hi! Ada yang bisa saya bantu hari ini? 😊', sender: 'bot' }
+    { id: 1, text: t('chatWidget', 'greeting'), sender: 'bot' }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isConnected, setIsConnected] = useState(false);
@@ -111,7 +113,7 @@ export function ChatWindow({
     socket.on('agent_joined', (data: { agentName: string }) => {
       setSessionStatus('agent');
       addMessage(
-        `✅ Agen ${data.agentName || 'kami'} sudah bergabung dan siap membantu Anda!`,
+        data.agentName ? `✅ Agent ${data.agentName} joined!` : t('chatWidget', 'agentJoined'),
         'system'
       );
     });
@@ -125,7 +127,7 @@ export function ChatWindow({
     socket.on('session_closed', () => {
       setSessionStatus('closed' as any);
       setShowReviewForm(true);
-      addMessage('Percakapan telah ditutup oleh agen.', 'system');
+      addMessage(t('chatWidget', 'agentClosed'), 'system');
     });
 
     return () => {
@@ -191,7 +193,7 @@ export function ChatWindow({
             addMessage(data.reply, 'bot');
           }
           addMessage(
-            '⏳ Anda sedang dalam antrian. Agen kami akan segera bergabung...',
+            t('chatWidget', 'queueMessage'),
             'system'
           );
           setIsSending(false);
@@ -204,12 +206,12 @@ export function ChatWindow({
         }
 
       } else {
-        addMessage('Maaf, terjadi kesalahan. Silakan coba lagi.', 'system');
+        addMessage(t('chatWidget', 'errorOccurred'), 'system');
         setIsSending(false);
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      addMessage('Tidak dapat terhubung ke server. Periksa koneksi Anda.', 'system');
+      addMessage(t('chatWidget', 'noConnection'), 'system');
       setIsSending(false);
     }
   };
@@ -250,11 +252,11 @@ export function ChatWindow({
   // Tentukan warna dan label status header
   const getStatusLabel = () => {
     switch (sessionStatus) {
-      case 'bot': return isConnected ? 'Online · AI Aktif' : 'Menghubungkan...';
-      case 'queue': return '⏳ Menunggu Agen';
-      case 'agent': return '👤 Terhubung ke Agen';
-      case 'closed' as any: return '✓ Percakapan Selesai';
-      case 'connecting': return 'Menghubungkan...';
+      case 'bot': return isConnected ? t('chatWidget', 'botActive') : t('chatWidget', 'connecting');
+      case 'queue': return t('chatWidget', 'waitingAgent');
+      case 'agent': return t('chatWidget', 'connectedAgent');
+      case 'closed' as any: return t('chatWidget', 'conversationClosed');
+      case 'connecting': return t('chatWidget', 'connecting');
     }
   };
 
@@ -300,7 +302,7 @@ export function ChatWindow({
 
       {/* Chat History Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <p className="text-center text-xs text-slate-400 mb-6">Percakapan Dimulai</p>
+        <p className="text-center text-xs text-slate-400 mb-6">{t('chatWidget', 'conversationStarted')}</p>
         
         {messages.map((msg) => {
           const isUser = msg.sender === 'user';
@@ -382,7 +384,7 @@ export function ChatWindow({
             className="w-full flex items-center justify-center gap-2 text-xs py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-50"
           >
             <PhoneCall size={13} />
-            Bicara dengan Agen Manusia
+            {t('chatWidget', 'talkToAgentBtn')}
           </button>
         </div>
       )}
@@ -391,7 +393,7 @@ export function ChatWindow({
       <div className="p-3 bg-white border-t border-slate-100 shadow-[0_-4px_15px_rgba(0,0,0,0.02)]">
         {showReviewForm && !reviewSubmitted ? (
           <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-4 p-2">
-            <p className="text-center text-sm font-semibold text-slate-700">Bagaimana layanan kami?</p>
+            <p className="text-center text-sm font-semibold text-slate-700">{t('chatWidget', 'reviewPrompt')}</p>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -406,7 +408,7 @@ export function ChatWindow({
             <textarea
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
-              placeholder="Tulis pendapat Anda (opsional)..."
+              placeholder={t('chatWidget', 'reviewPlaceholder')}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-300 resize-none h-16"
             />
             <button
@@ -415,7 +417,7 @@ export function ChatWindow({
               className="w-full py-2 rounded-xl text-white text-sm font-semibold disabled:opacity-50 transition-all"
               style={{ backgroundColor: widgetConfig.primaryColor }}
             >
-              Kirim Penilaian
+              {t('chatWidget', 'submitReview')}
             </button>
           </div>
         ) : reviewSubmitted ? (
@@ -423,11 +425,11 @@ export function ChatWindow({
             <div className="w-10 h-10 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <p className="text-sm font-medium text-slate-700">Terima kasih atas penilaian Anda!</p>
+            <p className="text-sm font-medium text-slate-700">{t('chatWidget', 'reviewThanks')}</p>
           </div>
         ) : (sessionStatus as any) === 'closed' ? (
           <div className="py-3 text-center">
-            <p className="text-sm text-slate-500">Percakapan telah berakhir.</p>
+            <p className="text-sm text-slate-500">{t('chatWidget', 'conversationClosed')}</p>
           </div>
         ) : (
           <form onSubmit={handleSend} className="flex items-center gap-2 relative">
@@ -437,10 +439,10 @@ export function ChatWindow({
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={
                 sessionStatus === 'queue' 
-                  ? 'Menunggu agen bergabung...' 
+                  ? t('chatWidget', 'queueMessage')
                   : sessionStatus === 'agent'
-                  ? 'Tulis pesan ke agen...'
-                  : 'Tulis pesan Anda...'
+                  ? t('chatWidget', 'writeMessageAgent')
+                  : t('chatWidget', 'writeMessage')
               }
               className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full px-5 py-3 text-sm outline-none transition-all placeholder-slate-400"
               style={{ '--tw-ring-color': widgetConfig.primaryColor } as React.CSSProperties}
@@ -457,7 +459,7 @@ export function ChatWindow({
         )}
         <div className="text-center mt-2">
           <p className="text-[10px] text-slate-400 font-medium tracking-wide">
-            {sessionStatus === 'bot' ? '🤖 Dijawab oleh AI' : sessionStatus === 'agent' ? '👤 Agen Aktif' : sessionStatus === 'queue' ? '⏳ Menunggu Agen' : '✓ Selesai'}
+            {sessionStatus === 'bot' ? t('chatWidget', 'botReplied') : sessionStatus === 'agent' ? t('chatWidget', 'agentActiveLabel') : sessionStatus === 'queue' ? t('chatWidget', 'waitingAgent') : t('chatWidget', 'doneLabel')}
           </p>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { Send, User, MessageSquare, PanelRight } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { io, Socket } from 'socket.io-client';
 import { CannedResponses } from '@/components/inbox/CannedResponses';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 interface Chat {
   id: string;
@@ -22,6 +23,7 @@ interface Chat {
 }
 
 export default function InboxPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
@@ -133,7 +135,7 @@ export default function InboxPage() {
           // Create new chat for unknown session
           const newChat: Chat = {
             id: data.sessionId,
-            contactId: 'Pengunjung Baru',
+            contactId: 'New Visitor',
             channel: 'widget',
             status: 'bot',
             createdAt: new Date(data.timestamp || Date.now()).toISOString(),
@@ -214,7 +216,7 @@ export default function InboxPage() {
             status: 'agent',
             messages: [...messages, {
               id: Date.now().toString() + Math.random(),
-              text: `✅ Agen ${data.agentName || 'kami'} bergabung ke percakapan.`,
+              text: `✅ Agent ${data.agentName || ''} joined the conversation.`,
               sender: 'system',
               timestamp: new Date().toISOString()
             }]
@@ -285,7 +287,7 @@ export default function InboxPage() {
               assignedAgentName: session?.user?.name,
               messages: [...(chat.messages || []), {
                 id: Date.now().toString() + Math.random(),
-                text: `✅ Anda mengambil alih percakapan.`,
+                text: `✅ You took over the conversation.`,
                 sender: 'system',
                 timestamp: new Date().toISOString()
               }]
@@ -318,7 +320,7 @@ export default function InboxPage() {
               assignedAgentName: newAgentName,
               messages: [...(chat.messages || []), {
                 id: Date.now().toString() + Math.random(),
-                text: `🔄 Percakapan ditransfer ke ${newAgentName}.`,
+                text: `🔄 Conversation transferred to ${newAgentName}.`,
                 sender: 'system',
                 timestamp: new Date().toISOString()
               }]
@@ -332,7 +334,7 @@ export default function InboxPage() {
         }
       } else {
         const err = await res.json();
-        alert('Gagal mentransfer percakapan: ' + err.error);
+        alert('Failed to transfer conversation: ' + err.error);
       }
     } catch (error) {
       console.error('Error reassigning chat:', error);
@@ -340,7 +342,7 @@ export default function InboxPage() {
   };
 
   const handleCloseChat = async (sessionId: string) => {
-    if (!confirm('Apakah Anda yakin ingin menutup percakapan ini dan mengirimkan permintaan review ke pengunjung?')) return;
+    if (!confirm('Are you sure you want to close this conversation and request a review from the visitor?')) return;
     
     try {
       const res = await fetch(`/api/chat/sessions/${sessionId}/close`, {
@@ -354,7 +356,7 @@ export default function InboxPage() {
               status: 'closed',
               messages: [...(chat.messages || []), {
                 id: Date.now().toString() + Math.random(),
-                text: `Percakapan telah ditutup oleh agen. Meminta review dari pengguna...`,
+                text: `Conversation has been closed by agent. Requesting review from user...`,
                 sender: 'system',
                 timestamp: new Date().toISOString()
               }]
@@ -438,14 +440,14 @@ export default function InboxPage() {
       {/* Sidebar List */}
       <div className="w-80 border-r border-slate-200 flex flex-col">
         <div className="p-4 border-b border-slate-200 bg-slate-50">
-          <h2 className="font-semibold text-slate-800">Omni-Inbox</h2>
-          <p className="text-xs text-slate-500">{chats.length} active conversations</p>
+          <h2 className="font-semibold text-slate-800">{t('inbox', 'omniInbox')}</h2>
+          <p className="text-xs text-slate-500">{chats.length} {t('inbox', 'activeConversations')}</p>
         </div>
         <div className="flex-1 overflow-y-auto">
           {isLoading ? (
-            <div className="p-4 text-center text-slate-500">Loading conversations...</div>
+            <div className="p-4 text-center text-slate-500">{t('inbox', 'loadingConversations')}</div>
           ) : chats.length === 0 ? (
-            <div className="p-4 text-center text-slate-500">No active conversations</div>
+            <div className="p-4 text-center text-slate-500">{t('inbox', 'noActiveConversations')}</div>
           ) : (
             chats.map(chat => (
               <div 
@@ -464,7 +466,7 @@ export default function InboxPage() {
                   </span>
                   {chat.status === 'queue' && (
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold animate-pulse">
-                      ⏳ Handoff ke Agen
+                      ⏳ Handoff
                     </span>
                   )}
                   {chat.status === 'bot' && (
@@ -474,12 +476,12 @@ export default function InboxPage() {
                   )}
                   {chat.status === 'agent' && (
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
-                      👤 Ditangani
+                      👤 Handled
                     </span>
                   )}
                   {chat.status === 'closed' && (
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-semibold">
-                      ✓ Selesai
+                      ✓ Done
                     </span>
                   )}
                 </div>
@@ -505,11 +507,11 @@ export default function InboxPage() {
                   <div className="flex items-center gap-3">
                     <p className="text-xs text-slate-500 flex items-center mt-0.5">
                       <span className={`w-2 h-2 rounded-full mr-1.5 ${chats.find(c => c.id === selectedChat)?.status === 'queue' ? 'bg-amber-400' : 'bg-green-500'}`}></span>
-                      {chats.find(c => c.id === selectedChat)?.status === 'queue' ? 'Menunggu Agen' : 'Aktif'}
+                      {chats.find(c => c.id === selectedChat)?.status === 'queue' ? t('inbox', 'waitingForAgent') : t('inbox', 'active')}
                     </p>
                     {chats.find(c => c.id === selectedChat)?.status === 'agent' && chats.find(c => c.id === selectedChat)?.assignedAgentName && (
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                        Ditangani oleh: <span className="font-medium text-slate-800">{chats.find(c => c.id === selectedChat)?.assignedAgentName}</span>
+                        {t('inbox', 'handledBy')} <span className="font-medium text-slate-800">{chats.find(c => c.id === selectedChat)?.assignedAgentName}</span>
                       </span>
                     )}
                   </div>
@@ -524,7 +526,7 @@ export default function InboxPage() {
                     value={chats.find(c => c.id === selectedChat)?.assignedAgentId || ''}
                     onChange={(e) => handleReassignChat(selectedChat, e.target.value)}
                   >
-                    <option value="" disabled>Transfer ke...</option>
+                    <option value="" disabled>{t('inbox', 'transferTo')}</option>
                     {agents.map(agent => (
                       <option key={agent.id} value={agent.id}>{agent.name}</option>
                     ))}
@@ -535,7 +537,7 @@ export default function InboxPage() {
                     onClick={() => handleClaimChat(selectedChat)}
                     className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center"
                   >
-                    Ambil Percakapan
+                    {t('inbox', 'takeConversation')}
                   </button>
                 )}
                 {chats.find(c => c.id === selectedChat)?.status === 'bot' && (
@@ -543,7 +545,7 @@ export default function InboxPage() {
                     onClick={() => handleClaimChat(selectedChat)}
                     className="px-3.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center"
                   >
-                    Intervensi AI (Ambil)
+                    {t('inbox', 'aiIntervention')}
                   </button>
                 )}
                 {(chats.find(c => c.id === selectedChat)?.status === 'agent' || chats.find(c => c.id === selectedChat)?.status === 'queue') && (
@@ -551,7 +553,7 @@ export default function InboxPage() {
                     onClick={() => handleCloseChat(selectedChat)}
                     className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center border border-slate-300"
                   >
-                    Tutup Percakapan
+                    {t('inbox', 'closeConversation')}
                   </button>
                 )}
               </div>
@@ -600,7 +602,7 @@ export default function InboxPage() {
               ) : (
                 <div className="flex justify-start">
                   <div className="max-w-md bg-white border border-slate-200 text-slate-700 p-3 rounded-2xl rounded-tl-sm shadow-sm">
-                    <p className="text-sm">Belum ada pesan.</p>
+                    <p className="text-sm">{t('inbox', 'noMessages')}</p>
                   </div>
                 </div>
               )}
@@ -614,7 +616,7 @@ export default function InboxPage() {
               if (chat.status === 'closed') {
                 return (
                   <div className="p-4 bg-slate-100 border-t border-slate-200 text-center text-slate-500 text-sm">
-                    Percakapan ini telah ditutup.
+                    {t('inbox', 'conversationClosedInfo')}
                   </div>
                 );
               }
@@ -623,7 +625,7 @@ export default function InboxPage() {
               if (chat.status === 'agent' && chat.assignedAgentId && chat.assignedAgentId !== currentUserId) {
                 return (
                   <div className="p-4 bg-slate-50 border-t border-slate-200 text-center text-slate-500 text-sm">
-                    Percakapan ini sedang ditangani oleh <span className="font-semibold text-slate-700">{chat.assignedAgentName || 'agen lain'}</span>. Anda hanya dapat memantau percakapan.
+                    {t('inbox', 'handledByAnother')} <span className="font-semibold text-slate-700">{chat.assignedAgentName || 'another agent'}</span>. {t('inbox', 'monitorOnly')}
                   </div>
                 );
               }
@@ -633,7 +635,7 @@ export default function InboxPage() {
                 <div className="flex items-center bg-slate-100 rounded-full pr-2 pl-4 py-1 mb-2">
                   <input 
                     type="text" 
-                    placeholder="Ketik pesan atau / untuk template balasan..." 
+                    placeholder={t('inbox', 'typeMessage')} 
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -672,7 +674,7 @@ export default function InboxPage() {
         ) : (
           <div className="flex-1 flex items-center justify-center flex-col text-slate-400">
             <MessageSquare size={48} className="mb-4 opacity-20" />
-            <p>Pilih percakapan untuk mulai berkirim pesan</p>
+            <p>{t('inbox', 'selectConversation')}</p>
           </div>
         )}
       </div>

@@ -13,6 +13,7 @@ import DOMPurify from 'dompurify';
 import { ConditionNode } from '@/components/flow-nodes/ConditionNode';
 import AgentKnowledgeTab from '@/components/AgentKnowledgeTab';
 import ImageUpload from '@/components/ImageUpload';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 // --- Custom Nodes for React Flow ---
 const QuestionNode = ({ data }: { data: any }) => {
@@ -73,8 +74,8 @@ const AnswerNode = ({ data }: { data: any }) => {
 
       {answerType === 'form' && (
         <div className="flex flex-col gap-1.5 mt-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200 shadow-inner">
-          <input disabled placeholder="Nama Lengkap" className="text-[11px] px-2 py-1.5 rounded border border-slate-200 bg-white w-full" />
-          <input disabled placeholder="Nomor Telepon" className="text-[11px] px-2 py-1.5 rounded border border-slate-200 bg-white w-full" />
+          <input disabled placeholder="Full Name" className="text-[11px] px-2 py-1.5 rounded border border-slate-200 bg-white w-full" />
+          <input disabled placeholder="Phone Number" className="text-[11px] px-2 py-1.5 rounded border border-slate-200 bg-white w-full" />
           <button disabled className="text-[11px] bg-blue-600 text-white py-1.5 rounded mt-1 font-medium shadow-sm">Submit Form</button>
         </div>
       )}
@@ -111,6 +112,7 @@ const nodeTypes = {
 };
 
 function AgentBuilderContent() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const flowIdParam = searchParams.get('id');
 
@@ -124,16 +126,16 @@ function AgentBuilderContent() {
     llmProvider: 'gemini',
     systemPrompt: 'You are a helpful sales assistant.',
     humanPrompt: 'User says: {input}',
-    language: 'id',
+    language: 'en',
     speakingStyle: 'professional',
     responseLength: 'medium',
-    welcomeMessage: 'Halo! Ada yang bisa saya bantu hari ini?',
+    welcomeMessage: 'Hi! How can I help you today?',
     welcomeMessageType: 'text',
     welcomeMessageOptions: '',
-    defaultResponse: 'Maaf, saya belum mengerti pertanyaan Anda. Silakan pilih menu di bawah ini:',
+    defaultResponse: 'Sorry, I don\'t understand your question. Please select a menu below:',
     defaultResponseType: 'options',
-    defaultResponseOptions: 'Help me choose, Bicara dengan Agen',
-    defaultFeedback: 'Apakah jawaban ini membantu?',
+    defaultResponseOptions: 'Help me choose, Talk to Agent',
+    defaultFeedback: 'Was this answer helpful?',
     urls: [''],
     themeBrandColor: '#801517',
     themeBotBubbleColor: '#ffffff',
@@ -304,13 +306,13 @@ function AgentBuilderContent() {
           llmProvider: 'gemini',
           systemPrompt: 'You are a helpful sales assistant.',
           humanPrompt: 'User says: {input}',
-          language: 'id',
+          language: 'en',
           speakingStyle: 'professional',
           responseLength: 'medium',
-          welcomeMessage: 'Halo! Ada yang bisa saya bantu hari ini?',
+          welcomeMessage: 'Hi! How can I help you today?',
           welcomeMessageType: 'text',
           welcomeMessageOptions: '',
-          defaultFeedback: 'Apakah jawaban ini membantu?',
+          defaultFeedback: 'Was this answer helpful?',
           urls: [''],
           botAvatarUrl: ''
         });
@@ -514,7 +516,7 @@ function AgentBuilderContent() {
     } catch (error: any) {
       setChatMessages([...newMessages, {
         role: 'assistant',
-        text: agentConfig.defaultResponse || `Maaf, sistem AI belum dapat membalas karena: ${error.message}. Pastikan pertanyaan Anda sesuai dengan daftar Intent/QnA yang ada.`,
+        text: agentConfig.defaultResponse || `Sorry, the AI system cannot reply right now because: ${error.message}. Please ensure your question matches the existing Intent/QnA list.`,
         type: agentConfig.defaultResponseType || 'text',
         options: agentConfig.defaultResponseOptions || ''
       }]);
@@ -654,7 +656,7 @@ function AgentBuilderContent() {
                         <label className="block text-sm font-medium text-slate-700 mb-1">
                           System Prompt
                         </label>
-                        <p className="text-xs text-slate-500 mb-2">Instruksi inti untuk AI. Berikan konteks persona, tugas, atau aturan khusus di sini. (Contoh: sertakan tag `[HANDOFF_REQUESTED]` jika pengguna ingin bicara dengan agen manusia).</p>
+                        <p className="text-xs text-slate-500 mb-2">Core instructions for AI. Provide persona context, tasks, or special rules here. (Example: include tag `[HANDOFF_REQUESTED]` if user wants to talk to human agent).</p>
                         <textarea 
                           value={agentConfig.systemPrompt || ''}
                           onChange={(e) => setAgentConfig({...agentConfig, systemPrompt: e.target.value})}
@@ -668,7 +670,7 @@ function AgentBuilderContent() {
                         <label className="block text-sm font-medium text-slate-700 mb-1">
                           Human Prompt
                         </label>
-                        <p className="text-xs text-slate-500 mb-2">Format pesan dari pengguna. Gunakan {'{input}'} untuk merepresentasikan pesan asli pengguna.</p>
+                        <p className="text-xs text-slate-500 mb-2">{t('agentBuilder', 'inputPlaceholder')}</p>
                         <input 
                           type="text" 
                           value={agentConfig.humanPrompt || ''}
@@ -682,7 +684,7 @@ function AgentBuilderContent() {
 
                   <div className="pt-4 border-t border-slate-100 mt-6">
                     <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 pb-2 border-b border-slate-100">Fallback / Default Response</h2>
-                    <p className="text-xs text-slate-500 mb-4">Balasan yang digunakan jika sistem gagal menjawab, atau bisa digunakan untuk merutekan percakapan ke agen manusia (tambahkan <code>[HANDOFF_REQUESTED]</code>).</p>
+                    <p className="text-xs text-slate-500 mb-4">{t('agentBuilder', 'fallbackPlaceholder')}</p>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Fallback Message</label>
@@ -691,7 +693,7 @@ function AgentBuilderContent() {
                           onChange={(e) => setAgentConfig({...agentConfig, defaultResponse: e.target.value})}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           rows={3}
-                          placeholder="Maaf, saya tidak mengerti. Saya teruskan ke agen kami ya. [HANDOFF_REQUESTED]"
+                          placeholder="Sorry, I don't understand. I will forward this to our agent. [HANDOFF_REQUESTED]"
                         />
                       </div>
                       <div>
@@ -948,48 +950,51 @@ function AgentBuilderContent() {
                         <div className="bg-purple-50/50 border border-purple-100 rounded-xl p-5 mb-6">
                           <div className="flex items-center gap-2 mb-3">
                             <Bot size={18} className="text-purple-600" />
-                            <h3 className="font-semibold text-slate-800">AI Persona & Kebutuhan Usaha</h3>
+                            <h3 className="font-semibold text-slate-800">AI Persona & Business Needs</h3>
                           </div>
-                          <p className="text-xs text-slate-500 mb-4">Atur bagaimana agen AI Anda berbicara dan memahami konteks bisnis Anda.</p>
+                          <p className="text-xs text-slate-500 mb-4">Set up how your AI agent speaks and understands your business context.</p>
                           
                           <div className="grid grid-cols-2 gap-4 mb-4">
                             <div>
-                              <label className="block text-xs font-medium text-slate-700 mb-1">Bahasa Utama</label>
+                              <label className="block text-xs font-medium text-slate-700 mb-1">Main Language</label>
                               <select 
                                 value={agentConfig.language || 'Bahasa Indonesia'}
                                 onChange={(e) => setAgentConfig({...agentConfig, language: e.target.value})}
                                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm"
                               >
-                                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                                <option value="Bahasa Indonesia">Indonesian</option>
                                 <option value="English">English</option>
-                                <option value="Bahasa Indonesia campur English (Jaksel)">Bahasa Campur (Jaksel)</option>
-                                <option value="Jawa">Jawa</option>
+                                <option value="Bahasa Indonesia campur English (Jaksel)">Mixed (Indonesian & English)</option>
+                                <option value="Jawa">Javanese</option>
+                                <option value="Mandarin">Chinese (Mandarin)</option>
+                                <option value="Korean">Korean</option>
+                                <option value="Thai">Thai</option>
                               </select>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-slate-700 mb-1">Gaya Bicara</label>
+                              <label className="block text-xs font-medium text-slate-700 mb-1">Speaking Style</label>
                               <select 
                                 value={agentConfig.speakingStyle || 'ramah dan profesional'}
                                 onChange={(e) => setAgentConfig({...agentConfig, speakingStyle: e.target.value})}
                                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm"
                               >
-                                <option value="ramah dan profesional">Ramah & Profesional</option>
-                                <option value="sangat santai dan asik layaknya teman">Santai & Asik</option>
-                                <option value="sangat formal dan baku">Formal & Baku</option>
-                                <option value="penuh antusiasme dan ceria">Antusias & Ceria</option>
+                                <option value="ramah dan profesional">Friendly & Professional</option>
+                                <option value="sangat santai dan asik layaknya teman">Casual & Fun</option>
+                                <option value="sangat formal dan baku">Formal & Standard</option>
+                                <option value="penuh antusiasme dan ceria">Enthusiastic & Cheerful</option>
                               </select>
                             </div>
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">Kebutuhan Usaha / Konteks (Opsional)</label>
+                            <label className="block text-xs font-medium text-slate-700 mb-1">Business Needs / Context (Optional)</label>
                             <textarea 
                               value={agentConfig.businessNeeds || ''}
                               onChange={(e) => setAgentConfig({...agentConfig, businessNeeds: e.target.value})}
                               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                               rows={3}
-                              placeholder="Contoh: Kami adalah klinik kecantikan yang fokus pada perawatan anti-aging. Berikan saran dengan nada meyakinkan."
+                              placeholder="Example: We are a beauty clinic focusing on anti-aging treatments. Provide advice in a convincing tone."
                             />
-                            <p className="text-[10px] text-slate-400 mt-1">Ini akan ditambahkan sebagai konteks utama saat AI membalas pesan.</p>
+                            <p className="text-[10px] text-slate-400 mt-1">{t('agentBuilder', 'contextPlaceholder')}</p>
                           </div>
                         </div>
 
@@ -997,9 +1002,9 @@ function AgentBuilderContent() {
                         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-6">
                           <div className="flex items-center gap-2 mb-3">
                             <MessageSquare size={18} className="text-blue-600" />
-                            <h3 className="font-semibold text-slate-800">Welcome Message / Sapaan</h3>
+                            <h3 className="font-semibold text-slate-800">Welcome Message / Greeting</h3>
                           </div>
-                          <p className="text-xs text-slate-500 mb-4">Pesan pertama yang akan dikirim AI saat pengguna membuka chat.</p>
+                          <p className="text-xs text-slate-500 mb-4">{t('agentBuilder', 'welcomePlaceholder')}</p>
                           
                           <div className="space-y-4">
                             <div>
@@ -1008,7 +1013,7 @@ function AgentBuilderContent() {
                                 onChange={(e) => setAgentConfig({...agentConfig, welcomeMessage: e.target.value})}
                                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 rows={2}
-                                placeholder="Halo! Ada yang bisa saya bantu hari ini?"
+                                placeholder="Hello! How can I help you today?"
                               />
                             </div>
                             <div className="flex gap-4">
@@ -1046,18 +1051,18 @@ function AgentBuilderContent() {
                             <Bot size={18} className="text-orange-600" />
                             <h3 className="font-semibold text-slate-800">Default Fallback Response</h3>
                           </div>
-                          <p className="text-xs text-slate-500 mb-4">Pesan yang akan dikirim AI jika pengguna mengetik sesuatu yang tidak dimengerti (tidak cocok dengan Intent/QnA manapun).</p>
+                          <p className="text-xs text-slate-500 mb-4">{t('agentBuilder', 'unknownPlaceholder')} (does not match any Intent/QnA).</p>
                           
                           <div className="space-y-4">
                             <div>
-                              <textarea 
-                                value={agentConfig.defaultResponse || ''}
-                                onChange={(e) => setAgentConfig({...agentConfig, defaultResponse: e.target.value})}
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                                rows={2}
-                                placeholder="Maaf, saya belum mengerti pertanyaan Anda..."
-                              />
-                            </div>
+                                <textarea 
+                                  value={agentConfig.defaultResponse || ''}
+                                  onChange={(e) => setAgentConfig({...agentConfig, defaultResponse: e.target.value})}
+                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                                  rows={2}
+                                  placeholder="Sorry, I don't understand your question..."
+                                />
+                              </div>
                             <div className="flex gap-4">
                               <div className="w-1/3">
                                 <label className="block text-xs font-medium text-slate-700 mb-1">Message Type</label>

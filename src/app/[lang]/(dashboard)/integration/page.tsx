@@ -3,8 +3,10 @@
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { Code, LayoutTemplate, Copy, CheckCircle2, Key } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 export default function IntegrationPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const tenantId = (session?.user as any)?.tenantId || 'YOUR_TENANT_ID';
   const [copiedScript, setCopiedScript] = useState(false);
@@ -71,8 +73,8 @@ function saas_crm_agent_inject_script() {
   return (
     <div className="p-8 max-w-5xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800">Website Integration</h1>
-        <p className="text-slate-500 mt-2">Connect your AI Agent to your website or platform using the snippets below.</p>
+        <h1 className="text-2xl font-bold text-slate-800">{t('integration', 'title')}</h1>
+        <p className="text-slate-500 mt-2">{t('integration', 'subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-8">
@@ -80,11 +82,11 @@ function saas_crm_agent_inject_script() {
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
           <div className="border-b border-slate-100 bg-slate-50 p-4 flex items-center gap-3">
             <Key className="text-amber-500" size={20} />
-            <h2 className="font-semibold text-slate-700">Your Tenant ID</h2>
+            <h2 className="font-semibold text-slate-700">{t('integration', 'tenantIdTitle')}</h2>
           </div>
           <div className="p-6">
             <p className="text-sm text-slate-600 mb-4">
-              This is your unique Tenant ID. You may need it for API integrations, webhooks, or configuring your AI Agent proxy.
+              {t('integration', 'tenantIdDesc')}
             </p>
             <div className="flex items-center gap-3">
               <code className="px-4 py-2 bg-slate-100 rounded-md border border-slate-200 text-slate-800 font-mono text-sm select-all">
@@ -93,10 +95,10 @@ function saas_crm_agent_inject_script() {
               <button
                 onClick={copyTenantId}
                 className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded transition-colors flex items-center gap-2"
-                title="Copy Tenant ID"
+                title={t('integration', 'copyTenantId')}
               >
                 {copiedTenantId ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
-                <span className="text-sm font-medium">{copiedTenantId ? 'Copied!' : 'Copy'}</span>
+                <span className="text-sm font-medium">{copiedTenantId ? t('integration', 'copied') : t('integration', 'copy')}</span>
               </button>
             </div>
           </div>
@@ -106,11 +108,10 @@ function saas_crm_agent_inject_script() {
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
           <div className="border-b border-slate-100 bg-slate-50 p-4 flex items-center gap-3">
             <Code className="text-blue-500" size={20} />
-            <h2 className="font-semibold text-slate-700">Native HTML / Javascript</h2>
+            <h2 className="font-semibold text-slate-700">{t('integration', 'htmlTitle')}</h2>
           </div>
           <div className="p-6">
-            <p className="text-sm text-slate-600 mb-4">
-              Paste this snippet right before the closing <code>&lt;/body&gt;</code> tag on all pages where you want the widget to appear.
+            <p className="text-sm text-slate-600 mb-4" dangerouslySetInnerHTML={{ __html: t('integration', 'htmlDesc').replace('</body>', '<code>&lt;/body&gt;</code>') }}>
             </p>
             <div className="relative group">
               <pre className="bg-slate-900 text-slate-300 p-4 rounded-lg text-sm font-mono overflow-x-auto leading-relaxed">
@@ -119,7 +120,7 @@ function saas_crm_agent_inject_script() {
               <button 
                 onClick={() => copyToClipboard(htmlScript, false)}
                 className="absolute top-3 right-3 p-2 bg-white/10 hover:bg-white/20 text-white rounded transition-colors"
-                title="Copy code"
+                title={t('integration', 'copyCode')}
               >
                 {copiedScript ? <CheckCircle2 size={16} className="text-green-400" /> : <Copy size={16} />}
               </button>
@@ -131,11 +132,10 @@ function saas_crm_agent_inject_script() {
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
           <div className="border-b border-slate-100 bg-slate-50 p-4 flex items-center gap-3">
             <LayoutTemplate className="text-indigo-500" size={20} />
-            <h2 className="font-semibold text-slate-700">WordPress Plugin (PHP)</h2>
+            <h2 className="font-semibold text-slate-700">{t('integration', 'wpTitle')}</h2>
           </div>
           <div className="p-6">
-            <p className="text-sm text-slate-600 mb-4">
-              If you are using WordPress, create a file named <code>saas-crm-agent.php</code> in your <code>wp-content/plugins/</code> directory and paste the code below. Then, activate the plugin from your WordPress Admin dashboard.
+            <p className="text-sm text-slate-600 mb-4" dangerouslySetInnerHTML={{ __html: t('integration', 'wpDesc').replace('saas-crm-agent.php', '<code>saas-crm-agent.php</code>').replace('wp-content/plugins/', '<code>wp-content/plugins/</code>') }}>
             </p>
             <div className="relative group">
               <pre className="bg-slate-900 text-slate-300 p-4 rounded-lg text-sm font-mono overflow-x-auto leading-relaxed">
@@ -144,7 +144,7 @@ function saas_crm_agent_inject_script() {
               <button 
                 onClick={() => copyToClipboard(wpPluginCode, true)}
                 className="absolute top-3 right-3 p-2 bg-white/10 hover:bg-white/20 text-white rounded transition-colors"
-                title="Copy code"
+                title={t('integration', 'copyCode')}
               >
                 {copiedWP ? <CheckCircle2 size={16} className="text-green-400" /> : <Copy size={16} />}
               </button>
