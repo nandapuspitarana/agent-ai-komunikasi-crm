@@ -10,4 +10,9 @@ const dictionaries = {
   th: () => import('@/dictionaries/th.json').then((module) => module.default),
 };
 
-export const getDictionary = async (locale: Locale) => dictionaries[locale]();
+export const getDictionary = async (locale: Locale) => {
+  if (dictionaries[locale]) {
+    return dictionaries[locale]();
+  }
+  return dictionaries['en'](); // Fallback to English if invalid locale (e.g. favicon.ico) is routed
+};

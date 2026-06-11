@@ -214,7 +214,7 @@ export async function POST(req: NextRequest) {
             qnaMatch = intent;
             maxMatchLength = Infinity;
             break;
-          } else if (userMsgLower.includes(lowerPhrase)) {
+          } else if (!tenant.aiEnabled && userMsgLower.includes(lowerPhrase)) {
             if (lowerPhrase.length > maxMatchLength) {
               maxMatchLength = lowerPhrase.length;
               qnaMatch = intent;
