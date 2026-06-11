@@ -559,7 +559,15 @@ export default function InboxPage() {
               </div>
             </div>
             
-            <div className="flex-1 p-6 overflow-y-auto space-y-4">
+            <div className="flex-1 p-6 overflow-y-auto space-y-4 relative">
+              <style dangerouslySetInnerHTML={{__html: `
+                .chat-html-content .form-card { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 8px; }
+                .chat-html-content .form-card_label { font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px; display: block; }
+                .chat-html-content .form-card_input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 8px; outline: none; }
+                .chat-html-content .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+                .chat-html-content .submit-btn { background: #3b82f6; color: white; border: none; border-radius: 6px; padding: 8px; width: 100%; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+                .chat-html-content .submit-btn:hover { background: #2563eb; }
+              `}} />
               {chats.find(c => c.id === selectedChat)?.messages && chats.find(c => c.id === selectedChat)!.messages!.length > 0 ? (
                 chats.find(c => c.id === selectedChat)?.messages?.map(msg => {
                   if (msg.sender === 'system') {
@@ -591,7 +599,10 @@ export default function InboxPage() {
                             </span>
                           </div>
                         )}
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                        <div 
+                          className="text-sm leading-relaxed whitespace-pre-wrap break-words chat-html-content" 
+                          dangerouslySetInnerHTML={{ __html: msg.text }} 
+                        />
                         <p className={`text-xs mt-1 ${isAgent ? 'text-blue-100' : 'text-slate-400'}`}>
                           {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>

@@ -15,6 +15,13 @@ function WidgetUIRenderer() {
   const position = searchParams?.get('position') || 'right'; // 'left' | 'right'
   const iconParam = searchParams?.get('icon') || '';
   
+  const [config, setConfig] = useState({
+    color: color,
+    name: name,
+    position: position,
+    icon: iconParam
+  });
+
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -24,17 +31,34 @@ function WidgetUIRenderer() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Fetch real widget configuration
+  useEffect(() => {
+    if (tenantId && tenantId !== 'demo-tenant-1234') {
+      fetch(`/api/widget/config?tenantId=${tenantId}`)
+        .then(res => res.json())
+        .then(data => {
+          setConfig({
+            color: data.primaryColor || color,
+            name: data.botName || name,
+            position: data.position || position,
+            icon: data.widgetIconUrl || iconParam
+          });
+        })
+        .catch(err => console.error(err));
+    }
+  }, [tenantId, color, name, position, iconParam]);
+
   // Position styles
-  const positionClasses = position === 'left' ? 'left-4 md:left-6' : 'right-4 md:right-6';
-  const chatWindowPositionClasses = position === 'left' 
+  const positionClasses = config.position === 'left' ? 'left-4 md:left-6' : 'right-4 md:right-6';
+  const chatWindowPositionClasses = config.position === 'left' 
     ? 'left-0 origin-bottom-left' 
     : 'right-0 origin-bottom-right';
   
-  const tooltipPositionClasses = position === 'left'
+  const tooltipPositionClasses = config.position === 'left'
     ? 'left-full ml-4 flex-row-reverse'
     : 'right-full mr-4';
 
-  const tooltipArrowClasses = position === 'left'
+  const tooltipArrowClasses = config.position === 'left'
     ? 'right-full border-r-white'
     : 'left-full border-l-white';
 
@@ -83,13 +107,12 @@ function WidgetUIRenderer() {
               <pre className="bg-[#0f172a] text-slate-50 p-6 rounded-2xl overflow-x-auto text-sm leading-relaxed font-mono shadow-inner">
 {`<!-- AI Communication CRM Widget -->
 <script>
-  window.ChatWidgetConfig = {
+  window.CRM_AGENT_CONFIG = {
     tenantId: "${tenantId}",
-    primaryColor: "${color}",
-    position: "${position}"
+    apiUrl: "${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3101'}"
   };
 </script>
-<script src="https://yourdomain.com/widget.js" async></script>`}
+<script src="${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3101'}/widget.js" async></script>`}
               </pre>
             </div>
           </section>
@@ -138,8 +161,8 @@ function WidgetUIRenderer() {
           {/* Render ChatWindow conditionally or keep it mounted for socket persistence */}
           <ChatWindow 
             tenantId={tenantId} 
-            primaryColor={color} 
-            botName={name} 
+            primaryColor={config.color} 
+            botName={config.name} 
           />
         </div>
 
@@ -152,14 +175,14 @@ function WidgetUIRenderer() {
             w-14 h-14 rounded-full shadow-lg flex items-center justify-center
             transition-all duration-300 hover:scale-105 active:scale-95 text-white relative z-50 self-end
           `}
-          style={{ backgroundColor: color }}
+          style={{ backgroundColor: config.color }}
           aria-label={isOpen ? "Tutup chat" : "Buka chat"}
         >
           {isOpen ? (
             <X className="w-6 h-6 animate-in fade-in zoom-in duration-200" />
           ) : (
-            iconParam && iconParam.startsWith('http') ? (
-              <img src={iconParam} alt="Chat Icon" className="w-8 h-8 object-contain animate-in fade-in zoom-in duration-200" />
+            config.icon && config.icon.startsWith('http') ? (
+              <img src={config.icon} alt="Chat Icon" className="w-8 h-8 object-contain animate-in fade-in zoom-in duration-200" />
             ) : (
               <MessageCircle className="w-6 h-6 animate-in fade-in zoom-in duration-200" />
             )

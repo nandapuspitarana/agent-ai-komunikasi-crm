@@ -55,7 +55,19 @@ export function ChatWindow({
   const tenantId = getTenantId();
 
   const addMessage = useCallback((text: string, sender: MessageSender, avatar?: string) => {
-    setMessages(prev => [...prev, { id: Date.now() + Math.random(), text, sender, avatar }]);
+    setMessages(prev => {
+      // Cek apakah pesan dengan teks yang sama persis baru saja ditambahkan (dalam 3 pesan terakhir)
+      // Menggunakan trim() untuk menghindari gagal cek karena whitespace minor
+      const isDuplicate = prev.slice(-3).some(m => 
+        m.sender === sender && m.text.trim() === text.trim()
+      );
+      
+      if (isDuplicate) {
+        return prev;
+      }
+
+      return [...prev, { id: Date.now() + Math.random(), text, sender, avatar }];
+    });
   }, []);
 
   const [widgetConfig, setWidgetConfig] = useState({
@@ -94,13 +106,15 @@ export function ChatWindow({
       })
       .catch(err => console.error('Error fetching widget config:', err));
 
+    // Ensure the Next.js API route is initialized before connecting
+    fetch('/api/socket').catch(err => console.error(err));
+
     const socket = io(window.location.origin, {
       path: '/api/socket',
       query: {
         sessionId: localSessionId.current,
         tenantId,
-      },
-      transports: ['websocket', 'polling'],
+      }
     });
 
     socketRef.current = socket;
@@ -140,6 +154,12 @@ export function ChatWindow({
       addMessage(t('chatWidget', 'agentClosed'), 'system');
     });
 
+    // Handle handoff requested
+    socket.on('handoff_requested', () => {
+      setSessionStatus('queue');
+      addMessage(t('chatWidget', 'queueMessage'), 'system');
+    });
+
     return () => {
       socket.disconnect();
     };
@@ -154,9 +174,12 @@ export function ChatWindow({
    * Mengirim pesan ke API backend (bukan Socket.io langsung).
    * API akan menangani AI reply, handoff, dan Socket.io emit.
    */
-  const sendMessage = async (messageText: string) => {
-    if (!messageText.trim() || isSending) return;
+  const isSendingRef = useRef(false);
 
+  const sendMessage = async (messageText: string) => {
+    if (!messageText.trim() || isSendingRef.current) return;
+
+    isSendingRef.current = true;
     setIsSending(true);
     addMessage(messageText, 'user');
     setInputValue('');
@@ -184,23 +207,18 @@ export function ChatWindow({
           socketRef.current?.emit('join_session', { sessionId: data.sessionId });
         }
 
-        // Jika AI tidak aktif atau API langsung mengembalikan reply (non-Socket.io mode)
+        // Jika API mengembalikan reply, segera tampilkan (addMessage sudah mencegah duplikasi teks)
         if (data.reply && sessionStatus === 'bot') {
-          // Tambah balasan langsung jika Socket.io tidak mengirim
-          // (Socket.io akan kirim event 'bot_reply' juga, tapi ini sebagai fallback)
-          // Untuk menghindari duplikasi, kita cek apakah Socket.io sudah connected
-          if (!isConnected) {
-            addMessage(data.reply, 'bot');
-            setIsSending(false);
-          }
-          // Jika Socket.io connected, biarkan event 'bot_reply' yang handle
+          addMessage(data.reply, 'bot');
+          setIsSending(false);
         }
 
         // Handle handoff
         if (data.handoffOccurred) {
           setSessionStatus('queue');
-          if (!isConnected && data.reply) {
-            addMessage(data.reply, 'bot');
+          if (data.reply && sessionStatus !== 'bot') {
+             // Jika sebelumnya bukan mode bot (tapi somehow handoff terjadi), render reply
+             addMessage(data.reply, 'bot');
           }
           addMessage(
             t('chatWidget', 'queueMessage'),
@@ -217,11 +235,12 @@ export function ChatWindow({
 
       } else {
         addMessage(t('chatWidget', 'errorOccurred'), 'system');
-        setIsSending(false);
       }
     } catch (error) {
       console.error('Error sending message:', error);
       addMessage(t('chatWidget', 'noConnection'), 'system');
+    } finally {
+      isSendingRef.current = false;
       setIsSending(false);
     }
   };
@@ -233,6 +252,53 @@ export function ChatWindow({
     if (sessionStatus !== 'bot') return;
     sendMessage('Saya ingin bicara dengan agen manusia');
   };
+
+  const sendMessageRef = useRef(sendMessage);
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  }, [sendMessage]);
+
+  useEffect(() => {
+    const handleWindowMessage = async (event: MessageEvent) => {
+      if (event.data?.type === 'widget_quick_reply' && event.data?.text) {
+        sendMessageRef.current(event.data.text);
+      } else if (event.data?.type === 'widget_form_submit' && event.data?.url && event.data?.payload) {
+        try {
+          const loadingMsg = event.data.loadingMessage || t('chatWidget', 'submittingForm', 'Submitting your details...');
+          addMessage(loadingMsg, 'system');
+          const res = await fetch('/api/widget/form-proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              url: event.data.url,
+              payload: event.data.payload,
+              sessionId: serverSessionId,
+              tenantId: tenantId
+            })
+          });
+          if (res.ok) {
+            // Render local representation of form submit
+            const formSummary = Object.entries(event.data.payload)
+              .map(([key, value]) => `- ${key}: ${value}`)
+              .join('\n');
+            addMessage(`📝 [Form Submitted]\n${formSummary}`, 'user');
+
+            const successMsg = event.data.successMessage || t('chatWidget', 'formSuccess', 'Thank you! Your request has been submitted successfully. Our team will contact you soon.');
+            addMessage(successMsg, 'bot');
+          } else {
+            const errorMsg = event.data.errorMessage || t('chatWidget', 'formError', 'Failed to submit form. Please try again later.');
+            addMessage(errorMsg, 'system');
+          }
+        } catch (err) {
+          const connectErrorMsg = event.data.connectionErrorMessage || t('chatWidget', 'formConnectionError', 'Error submitting form. Please check your connection.');
+          addMessage(connectErrorMsg, 'system');
+        }
+      }
+    };
+
+    window.addEventListener('message', handleWindowMessage);
+    return () => window.removeEventListener('message', handleWindowMessage);
+  }, [addMessage]);
 
   const submitReview = async () => {
     if (!serverSessionId || rating === 0) return;
@@ -282,6 +348,47 @@ export function ChatWindow({
 
   return (
     <div className="flex flex-col h-full w-full bg-slate-50 font-sans text-slate-800">
+      <style>{`
+        .widget-html-content {
+          --brand: ${widgetConfig.primaryColor};
+          --line: #e5e7eb;
+          --muted: #6b7280;
+          --soft: #faf7f7;
+        }
+        .widget-html-content .options { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 16px; }
+        .widget-html-content button.option { border:1px solid rgba(128,21,23,.2); background:#fff; color:var(--brand); padding:9px 11px; border-radius:14px; font-size:13px; cursor:pointer; transition:.15s ease; min-height:38px; }
+        .widget-html-content button.option:hover { background:var(--brand); color:#fff; }
+        .widget-html-content button.option.primary-choice { width:100%; text-align:left; border-color:rgba(128,21,23,.35); background:var(--soft); font-weight:700; }
+        .widget-html-content button.option.secondary-choice { background:#f9fafb; color:#374151; border-color:var(--line); }
+        .widget-html-content .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px; margin:10px 0; }
+        .widget-html-content .card-title { color:var(--brand); font-weight:700; margin-bottom:6px; }
+        .widget-html-content .centre-list, .widget-html-content .package-list { display:grid; gap:10px; margin:10px 0 16px; }
+        .widget-html-content .centre-card { background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+        .widget-html-content .package-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px; }
+        .widget-html-content .centre-photo { width:100%; height:118px; background:#efe7e7; background-size:cover; background-position:center; }
+        .widget-html-content .centre-content { padding:12px; }
+        .widget-html-content .centre-select, .widget-html-content .package-select { margin-top:10px; }
+        .widget-html-content .feature-list { margin:10px 0 0; padding-left:18px; color:#374151; font-size:12px; line-height:1.45; }
+        .widget-html-content .price { font-size:20px; font-weight:700; margin:8px 0 2px; }
+        .widget-html-content .price-option { border-top:1px solid var(--line); padding-top:10px; margin-top:10px; }
+        .widget-html-content .price-option:first-child { border-top:0; padding-top:0; margin-top:0; }
+        .widget-html-content .small { font-size:12px; color:var(--muted); }
+        .widget-html-content .cta-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+        .widget-html-content .cta { border:0; padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:700; font-size:13px; }
+        .widget-html-content .cta-note { margin-top:10px; padding-top:10px; border-top:1px solid var(--line); font-size:12px; color:var(--muted); }
+        .widget-html-content .primary { background:var(--brand); color:#fff; }
+        .widget-html-content .secondary { background:#f3f4f6; color:#374151; }
+        .widget-html-content .notice { background:#fff8e6; border:1px solid #f3d27b; color:#654a00; padding:10px 12px; border-radius:12px; font-size:12px; margin:8px 0; }
+        .widget-html-content .form-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px; margin:10px 0; }
+        .widget-html-content .form-card label { display:block; font-size:12px; color:#374151; font-weight:700; margin:10px 0 5px; }
+        .widget-html-content .form-card input, .widget-html-content .form-card select, .widget-html-content .form-card textarea { width:100%; border:1px solid var(--line); border-radius:10px; padding:10px; font-size:13px; font-family:Arial, Helvetica, sans-serif; color:#374151; outline:none; background-color: #fff; box-sizing: border-box; }
+        .widget-html-content .form-card input:focus, .widget-html-content .form-card select:focus, .widget-html-content .form-card textarea:focus { border-color:var(--brand); }
+        .widget-html-content .form-card textarea { min-height:70px; resize:vertical; }
+        .widget-html-content .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .widget-html-content .submit-btn { width:100%; border:0; background:var(--brand); color:#fff; border-radius:12px; padding:11px; font-weight:700; margin-top:12px; cursor:pointer; transition: opacity 0.2s; box-sizing: border-box; }
+        .widget-html-content .submit-btn:disabled { opacity:.72; cursor:default; }
+        .widget-html-content .submit-btn:hover:not(:disabled) { opacity:.9; }
+      `}</style>
       {/* Top Header */}
       <div 
         className="flex items-center justify-between p-4 shadow-sm z-10"

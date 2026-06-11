@@ -244,7 +244,7 @@ export async function POST(req: NextRequest) {
           aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
         }
       }
-    } else {
+    } else if (tenant.aiEnabled) {
       // Fetch document IDs associated with the active flow for RAG isolation
       let documentIds: string[] = [];
       if (tenant.activeFlowId) {
@@ -255,7 +255,7 @@ export async function POST(req: NextRequest) {
         documentIds = docs.map(d => d.proxyDocId).filter((id): id is string => id !== null);
       }
 
-      // Step 3: Call AI Engine
+      // Step 3: Call AI Engine (Session, RAG, etc)
       try {
         const aiResponse = await chatWithAgent({
           message: formattedMessage, // Send the formatted message if human prompt exists
@@ -266,11 +266,14 @@ export async function POST(req: NextRequest) {
           document_ids: documentIds,
         });
 
-        aiReplyRaw = aiResponse.reply || 'Maaf, saya tidak bisa menjawab saat ini.';
+        aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
       } catch (aiError) {
         console.error('[Widget Message] AI Engine error:', aiError);
-        aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami.  [HANDOFF_REQUESTED]';
+        aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
       }
+    } else {
+      // If AI Agent is not enabled, directly fallback to default message (much faster!)
+      aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, saya belum mengerti pesan Anda. Apakah Anda ingin berbicara dengan agen kami? [HANDOFF_REQUESTED]';
     }
 
     // Step 4: Parse AI response for handoff flag

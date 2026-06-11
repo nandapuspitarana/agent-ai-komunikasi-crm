@@ -2,17 +2,18 @@
   const CRM_HOST = 'http://localhost:3000'; // Ganti dengan URL Production Next.js Anda nanti
   
   function initWidget() {
-    // Cari data-tenant-id dari script tag yang memuat file ini
+    // Cari data-tenant-id dari script tag yang memuat file ini atau dari global config
     const scriptTag = document.currentScript || document.querySelector('script[src*="widget.js"]');
-    const tenantId = window.CRM_TENANT_ID || scriptTag?.getAttribute('data-tenant-id');
+    const tenantId = window.CRM_AGENT_CONFIG?.tenantId || window.CRM_TENANT_ID || scriptTag?.getAttribute('data-tenant-id');
+    const apiUrl = window.CRM_AGENT_CONFIG?.apiUrl || CRM_HOST;
 
     if (!tenantId) {
-      console.error('[CRM Widget] Tenant ID not found. Ensure data-tenant-id is set.');
+      console.error('[CRM Widget] Tenant ID not found. Ensure CRM_AGENT_CONFIG is set.');
       return;
     }
 
     // Handshake dengan backend
-    fetch(`${CRM_HOST}/api/widget/config?tenantId=${tenantId}`)
+    fetch(`${apiUrl}/api/widget/config?tenantId=${tenantId}`)
       .then(res => res.json())
       .then(config => {
         renderWidget(tenantId, config);
@@ -109,8 +110,9 @@
     const iframeContainer = document.createElement('div');
     iframeContainer.className = 'widget-iframe-container';
     
+    const apiUrl = window.CRM_AGENT_CONFIG?.apiUrl || CRM_HOST;
     const iframe = document.createElement('iframe');
-    iframe.src = \`\${CRM_HOST}/widget-ui?tenantId=\${tenantId}&color=\${encodeURIComponent(config.primaryColor)}&name=\${encodeURIComponent(config.botName)}&position=\${encodeURIComponent(config.position || 'right')}&icon=\${encodeURIComponent(config.widgetIconUrl || '')}\`;
+    iframe.src = `${apiUrl}/widget-ui?tenantId=${tenantId}&color=${encodeURIComponent(config.primaryColor)}&name=${encodeURIComponent(config.botName)}&position=${encodeURIComponent(config.position || 'right')}&icon=${encodeURIComponent(config.widgetIconUrl || '')}`;
     iframeContainer.appendChild(iframe);
     shadowRoot.appendChild(iframeContainer);
 
