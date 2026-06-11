@@ -17,8 +17,7 @@ export default function IntegrationPage() {
 <script>
   window.CRM_AGENT_CONFIG = {
     tenantId: "${tenantId}",
-    apiUrl: "http://localhost:3101",
-    position: "right"
+    apiUrl: "http://localhost:3101"
   };
 </script>
 <script src="http://localhost:3101/widget.js" defer></script>
@@ -44,8 +43,7 @@ function saas_crm_agent_inject_script() {
     echo '<script>\\n';
     echo '  window.CRM_AGENT_CONFIG = {\\n';
     echo '    tenantId: "' . esc_js($tenant_id) . '",\\n';
-    echo '    apiUrl: "' . esc_js($api_url) . '",\\n';
-    echo '    position: "right"\\n';
+    echo '    apiUrl: "' . esc_js($api_url) . '"\\n';
     echo '  };\\n';
     echo '</script>\\n';
     echo '<script src="' . esc_url($api_url) . '/widget.js" defer></script>\\n';

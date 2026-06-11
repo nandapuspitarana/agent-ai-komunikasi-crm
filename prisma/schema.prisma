@@ -104,6 +104,8 @@ model Tenant {
   themeBotBubbleColor  String?       @default("#ffffff")
   themeBrandLogo       String?       @db.Text
   botAvatarUrl         String?       @db.Text
+  widgetPosition       String?       @default("right")
+  widgetIconUrl        String?       @db.Text
   
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -111,6 +113,7 @@ model Tenant {
   integrations   Integration[]
   flows          Flow[]        @relation("TenantFlows")
   chatSessions   ChatSession[]
+  assets         Asset[]
 }
 
 model Integration {
@@ -203,3 +206,13 @@ model KnowledgeDocument {
   @@index([tenantId])
 }
 
+model Asset {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  name      String
+  data      String   @db.Text
+  createdAt DateTime @default(now())
+  
+  @@index([tenantId])
+}

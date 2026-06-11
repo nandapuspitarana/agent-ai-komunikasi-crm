@@ -804,6 +804,7 @@ function AgentBuilderContent() {
                               <option value="options">Options / Buttons</option>
                               <option value="form">Input Form</option>
                               <option value="card">Card Link</option>
+                              <option value="handoff">Text & Handoff to Human Agent</option>
                             </select>
                           </div>
 

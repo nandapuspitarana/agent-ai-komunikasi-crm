@@ -24,11 +24,17 @@
     // 1. Buat Wrapper / Host untuk Shadow DOM
     const host = document.createElement('div');
     host.id = 'crm-widget-host';
+    
+    const isLeft = config.position === 'left';
+    
     Object.assign(host.style, {
       position: 'fixed',
       bottom: '20px',
-      right: '20px',
-      zIndex: '999999' // Pastikan selalu di atas
+      [isLeft ? 'left' : 'right']: '20px',
+      zIndex: '999999', // Pastikan selalu di atas
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: isLeft ? 'flex-start' : 'flex-end'
     });
     document.body.appendChild(host);
 
@@ -51,10 +57,14 @@
         align-items: center;
         justify-content: center;
         transition: transform 0.2s;
-        float: right;
       }
       .widget-launcher:hover {
         transform: scale(1.05);
+      }
+      .widget-launcher img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
       }
       .widget-iframe-container {
         display: none;
@@ -67,10 +77,11 @@
         overflow: hidden;
         background: white;
         transition: opacity 0.3s ease;
+        transform-origin: bottom ${isLeft ? 'left' : 'right'};
       }
       .widget-iframe-container.open {
         display: block;
-        animation: fadeIn 0.3s ease;
+        animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       }
       iframe {
         width: 100%;
@@ -78,8 +89,8 @@
         border: none;
       }
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
       }
       @media (max-width: 480px) {
         .widget-iframe-container {
@@ -99,26 +110,32 @@
     iframeContainer.className = 'widget-iframe-container';
     
     const iframe = document.createElement('iframe');
-    iframe.src = `${CRM_HOST}/widget-ui?tenantId=${tenantId}&color=${encodeURIComponent(config.primaryColor)}&name=${encodeURIComponent(config.botName)}`;
+    iframe.src = \`\${CRM_HOST}/widget-ui?tenantId=\${tenantId}&color=\${encodeURIComponent(config.primaryColor)}&name=\${encodeURIComponent(config.botName)}&position=\${encodeURIComponent(config.position || 'right')}&icon=\${encodeURIComponent(config.widgetIconUrl || '')}\`;
     iframeContainer.appendChild(iframe);
     shadowRoot.appendChild(iframeContainer);
 
     // 5. Launcher Button (Togle Chat)
     const launcher = document.createElement('button');
     launcher.className = 'widget-launcher';
-    launcher.innerHTML = `
+    
+    const defaultIcon = \`
       <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
-    `;
+    \`;
+    const closeIcon = \`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>\`;
+    
+    const customIcon = config.widgetIconUrl ? \`<img src="\${config.widgetIconUrl}" alt="Chat" />\` : defaultIcon;
+
+    launcher.innerHTML = customIcon;
     
     let isOpen = false;
     launcher.onclick = () => {
       isOpen = !isOpen;
       if (isOpen) {
         iframeContainer.classList.add('open');
-        launcher.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+        launcher.innerHTML = closeIcon;
       } else {
         iframeContainer.classList.remove('open');
-        launcher.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>`;
+        launcher.innerHTML = customIcon;
       }
     };
     

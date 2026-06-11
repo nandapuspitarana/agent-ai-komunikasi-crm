@@ -58,6 +58,12 @@ export async function POST(req: NextRequest) {
 
     if (matchedIntent) {
       let finalReply = matchedIntent.response;
+      
+      // Auto-append handoff flag if response type is handoff
+      if (matchedIntent.type === 'handoff' && !finalReply.includes('[HANDOFF_REQUESTED]')) {
+        finalReply += ' [HANDOFF_REQUESTED]';
+      }
+
       const config: any = flow.config || {};
       
       // Use LLM to paraphrase the hardcoded response for a more natural conversational feel

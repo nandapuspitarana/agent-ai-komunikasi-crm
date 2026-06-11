@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Upload, X, Check } from 'lucide-react';
+import { Upload, X, Check, Image as ImageIcon, Loader2 } from 'lucide-react';
 
 interface ImageUploadProps {
   label: string;
@@ -23,6 +23,47 @@ export default function ImageUpload({
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImage || null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [libraryAssets, setLibraryAssets] = useState<any[]>([]);
+  const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
+
+  const fetchLibrary = async () => {
+    setIsLoadingLibrary(true);
+    try {
+      const res = await fetch('/api/assets');
+      if (res.ok) {
+        const data = await res.json();
+        setLibraryAssets(data.assets || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch library', error);
+    } finally {
+      setIsLoadingLibrary(false);
+    }
+  };
+
+  const handleOpenLibrary = () => {
+    setShowLibrary(true);
+    fetchLibrary();
+  };
+
+  const selectFromLibrary = (assetData: string) => {
+    setPreviewUrl(assetData);
+    onImageCropped(assetData);
+    setShowLibrary(false);
+  };
+
+  const uploadToLibrary = async (base64Data: string) => {
+    try {
+      await fetch('/api/assets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: base64Data }),
+      });
+    } catch (error) {
+      console.error('Failed to save to library', error);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
@@ -71,6 +112,7 @@ export default function ImageUpload({
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
         setPreviewUrl(compressedBase64);
         onImageCropped(compressedBase64);
+        uploadToLibrary(compressedBase64); // Automatically add to library
       };
       img.src = event.target?.result as string;
     };
@@ -119,13 +161,23 @@ export default function ImageUpload({
             className="hidden"
             id={`image-upload-${label.replace(/\s+/g, '-')}`}
           />
-          <label
-            htmlFor={`image-upload-${label.replace(/\s+/g, '-')}`}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 cursor-pointer transition-colors shadow-sm"
-          >
-            <Upload size={16} />
-            Choose Image
-          </label>
+          <div className="flex gap-2">
+            <label
+              htmlFor={`image-upload-${label.replace(/\s+/g, '-')}`}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 cursor-pointer transition-colors shadow-sm"
+            >
+              <Upload size={16} />
+              Upload New
+            </label>
+            <button
+              type="button"
+              onClick={handleOpenLibrary}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors shadow-sm"
+            >
+              <ImageIcon size={16} />
+              Choose from Library
+            </button>
+          </div>
           <p className="text-[11px] text-slate-500 mt-2">
             Max size: {maxFileSize}MB. Will be automatically cropped to square ({targetSize}x{targetSize}px) and compressed.
           </p>
@@ -133,6 +185,55 @@ export default function ImageUpload({
           {error && <p className="text-xs text-red-500 mt-2 flex items-center gap-1"><X size={12} /> {error}</p>}
         </div>
       </div>
+
+      {showLibrary && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-slate-100">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <ImageIcon size={18} className="text-blue-600"/> Asset Library
+              </h3>
+              <button onClick={() => setShowLibrary(false)} className="p-1 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1">
+              {isLoadingLibrary ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="animate-spin text-blue-500" size={32} />
+                </div>
+              ) : libraryAssets.length === 0 ? (
+                <div className="text-center py-12 flex flex-col items-center">
+                  <ImageIcon size={48} className="text-slate-200 mb-3" />
+                  <p className="text-slate-500 text-sm font-medium">No assets found</p>
+                  <p className="text-slate-400 text-xs mt-1">Upload an image first to add it to your library.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-4">
+                  {libraryAssets.map((asset) => (
+                    <button
+                      key={asset.id}
+                      onClick={() => selectFromLibrary(asset.data)}
+                      className="aspect-square rounded-lg border border-slate-200 overflow-hidden hover:border-blue-500 hover:ring-2 hover:ring-blue-200 hover:shadow-md transition-all group relative bg-slate-50"
+                      title={new Date(asset.createdAt).toLocaleDateString()}
+                    >
+                      <img src={asset.data} alt="Asset" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end rounded-b-xl">
+              <button 
+                onClick={() => setShowLibrary(false)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -130,6 +130,8 @@ export default function SettingsPage() {
           themeBotBubbleColor: tenant.themeBotBubbleColor,
           themeBrandLogo: tenant.themeBrandLogo,
           botAvatarUrl: tenant.botAvatarUrl,
+          widgetPosition: tenant.widgetPosition,
+          widgetIconUrl: tenant.widgetIconUrl,
         }),
       });
       if (res.ok) {
@@ -880,20 +882,6 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  {/* Bot Avatar */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Bot Avatar
-                    </label>
-                    <ImageUpload
-                      label="AI Bot Profile Picture"
-                      description="Upload an avatar image for your AI Agent. This will replace the default Bot icon in the widget chat."
-                      currentImage={tenant.botAvatarUrl}
-                      onImageCropped={(base64) => setTenant({ ...tenant, botAvatarUrl: base64 })}
-                      targetSize={200}
-                      maxFileSize={2}
-                    />
-                  </div>
 
                   {/* Handoff Agent */}
                   <div>
@@ -974,6 +962,32 @@ export default function SettingsPage() {
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none font-mono text-sm uppercase bg-white"
                         />
                       </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Widget Position</label>
+                      <p className="text-xs text-slate-500 mb-2">Float button position on the website.</p>
+                      <select
+                        value={tenant.widgetPosition || 'right'}
+                        onChange={(e) => setTenant({...tenant, widgetPosition: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      >
+                        <option value="right">Bottom Right</option>
+                        <option value="left">Bottom Left</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Float Button Icon</label>
+                      <p className="text-xs text-slate-500 mb-2">URL to custom icon (optional). E.g. https://domain.com/icon.png</p>
+                      <input 
+                        type="url" 
+                        placeholder="https://"
+                        value={tenant.widgetIconUrl || ''}
+                        onChange={(e) => setTenant({...tenant, widgetIconUrl: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      />
                     </div>
                   </div>
                 </div>

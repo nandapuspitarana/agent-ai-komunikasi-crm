@@ -36,10 +36,14 @@ export async function GET(request: Request) {
   const settings = {
     tenantId,
     primaryColor: tenant.themeBrandColor || '#2563eb',
-    welcomeMessage: 'Hi there! How can we help you today?',
+    welcomeMessage: flowConfig?.welcomeMessage || '',
+    welcomeMessageOptions: flowConfig?.welcomeMessageOptions ? flowConfig.welcomeMessageOptions.split(',').map((o: string) => o.trim()) : [],
     logoUrl: tenant.themeBrandLogo || 'https://via.placeholder.com/40',
-    botName: tenant.name || 'CRM Support Bot',
-    botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null
+    botName: flowConfig?.name || tenant.activeFlow?.name || 'CRM Support Bot',
+    tenantName: tenant.name || 'CRM Support',
+    botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
+    position: tenant.widgetPosition || 'right',
+    widgetIconUrl: tenant.widgetIconUrl || null
   };
 
   return NextResponse.json(settings, {

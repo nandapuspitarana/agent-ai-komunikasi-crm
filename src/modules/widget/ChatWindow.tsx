@@ -19,6 +19,7 @@ interface ChatMessage {
   text: string;
   sender: MessageSender;
   avatar?: string;
+  options?: string[];
 }
 
 type SessionStatus = 'bot' | 'agent' | 'queue' | 'connecting';
@@ -30,9 +31,7 @@ export function ChatWindow({
   botLogo = null,
 }: ChatWindowProps) {
   const { t } = useTranslation();
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: 1, text: t('chatWidget', 'greeting'), sender: 'bot' }
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -61,6 +60,7 @@ export function ChatWindow({
 
   const [widgetConfig, setWidgetConfig] = useState({
     name: botName,
+    tenantName: 'CRM Support',
     primaryColor: primaryColor,
     logo: botLogo,
     botAvatarUrl: null as string | null
@@ -76,10 +76,20 @@ export function ChatWindow({
           setWidgetConfig(prev => ({
             ...prev,
             name: data.botName || prev.name,
+            tenantName: data.tenantName || prev.tenantName,
             primaryColor: data.primaryColor || prev.primaryColor,
             logo: data.logoUrl || prev.logo,
             botAvatarUrl: data.botAvatarUrl || null
           }));
+          
+          if (data.welcomeMessage) {
+            setMessages([{ 
+              id: 1, 
+              text: data.welcomeMessage, 
+              sender: 'bot',
+              options: data.welcomeMessageOptions && data.welcomeMessageOptions.length > 0 ? data.welcomeMessageOptions : undefined
+            }]);
+          }
         }
       })
       .catch(err => console.error('Error fetching widget config:', err));
@@ -287,7 +297,7 @@ export function ChatWindow({
           </div>
           <div>
             <h2 className="font-semibold text-base leading-tight">
-              {sessionStatus === 'agent' ? 'Human Agent' : widgetConfig.name}
+              {sessionStatus === 'agent' ? 'Human Agent' : widgetConfig.tenantName}
             </h2>
             <p className="text-xs opacity-90 flex items-center mt-0.5">
               <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${getStatusColor()}`}></span>
@@ -319,43 +329,66 @@ export function ChatWindow({
           }
 
           return (
-            <div 
-              key={msg.id} 
-              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
-            >
-              {!isUser && (
-                <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center mr-2 mt-1 flex-shrink-0 overflow-hidden">
-                  {widgetConfig.botAvatarUrl && msg.sender === 'bot' ? (
-                    <img src={widgetConfig.botAvatarUrl} alt="Bot" className="w-full h-full object-cover" />
-                  ) : widgetConfig.logo && msg.sender === 'bot' ? (
-                    <img src={widgetConfig.logo} alt="Bot" className="w-full h-full object-cover" />
-                  ) : msg.avatar && msg.sender === 'agent' ? (
-                    <img src={msg.avatar} alt="Agent" className="w-full h-full object-cover" />
-                  ) : msg.sender === 'agent' ? (
-                    <User size={14} className="text-emerald-600" />
-                  ) : (
-                    <Bot size={14} className="text-slate-500" />
+            <div key={msg.id} className="flex flex-col mb-4">
+              <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                {!isUser && (
+                  <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center mr-2 mt-1 flex-shrink-0 overflow-hidden">
+                    {widgetConfig.botAvatarUrl && msg.sender === 'bot' ? (
+                      <img src={widgetConfig.botAvatarUrl} alt="Bot" className="w-full h-full object-cover" />
+                    ) : widgetConfig.logo && msg.sender === 'bot' ? (
+                      <img src={widgetConfig.logo} alt="Bot" className="w-full h-full object-cover" />
+                    ) : msg.avatar && msg.sender === 'agent' ? (
+                      <img src={msg.avatar} alt="Agent" className="w-full h-full object-cover" />
+                    ) : msg.sender === 'agent' ? (
+                      <User size={14} className="text-emerald-600" />
+                    ) : (
+                      <Bot size={14} className="text-slate-500" />
+                    )}
+                  </div>
+                )}
+                
+                <div className="flex flex-col max-w-[85%]">
+                  {!isUser && (
+                    <span className="text-[10px] text-slate-500 font-medium ml-1 mb-1">
+                      {msg.sender === 'agent' ? 'Human Agent' : widgetConfig.name}
+                    </span>
                   )}
+                  <div 
+                    className={`rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                      isUser 
+                        ? 'text-white rounded-br-sm' 
+                        : 'bg-white border border-slate-100 rounded-bl-sm'
+                    }`}
+                    style={isUser ? { backgroundColor: widgetConfig.primaryColor, marginLeft: 'auto' } : {}}
+                  >
+                    {isUser ? (
+                      <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                    ) : (
+                      <div 
+                        className="leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-a:text-blue-600 widget-html-content"
+                        dangerouslySetInnerHTML={{ __html: msg.text }} 
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Render options if available */}
+              {!isUser && msg.options && msg.options.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2 ml-8 pl-1">
+                  {msg.options.map((option, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => sendMessage(option)}
+                      disabled={isSending}
+                      className="px-3 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-blue-300 transition-colors shadow-sm disabled:opacity-50"
+                      style={{ borderColor: widgetConfig.primaryColor + '40', color: widgetConfig.primaryColor }}
+                    >
+                      {option}
+                    </button>
+                  ))}
                 </div>
               )}
-              
-              <div 
-                className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
-                  isUser 
-                    ? 'text-white rounded-br-sm' 
-                    : 'bg-white border border-slate-100 rounded-bl-sm'
-                }`}
-                style={isUser ? { backgroundColor: widgetConfig.primaryColor } : {}}
-              >
-                {isUser ? (
-                  <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                ) : (
-                  <div 
-                    className="leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-a:text-blue-600 widget-html-content"
-                    dangerouslySetInnerHTML={{ __html: msg.text }} 
-                  />
-                )}
-              </div>
             </div>
           );
         })}

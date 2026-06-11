@@ -231,6 +231,12 @@ export async function POST(req: NextRequest) {
 
     if (qnaMatch) {
       aiReplyRaw = qnaMatch.response;
+      
+      // Auto-append handoff flag if response type is handoff
+      if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
+        aiReplyRaw += ' [HANDOFF_REQUESTED]';
+      }
+
       // Add HTML options if present
       if (qnaMatch.options) {
         const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
