@@ -112,7 +112,7 @@
     
     const apiUrl = window.CRM_AGENT_CONFIG?.apiUrl || CRM_HOST;
     const iframe = document.createElement('iframe');
-    iframe.src = `${apiUrl}/widget-ui?tenantId=${tenantId}&color=${encodeURIComponent(config.primaryColor)}&name=${encodeURIComponent(config.botName)}&position=${encodeURIComponent(config.position || 'right')}&icon=${encodeURIComponent(config.widgetIconUrl || '')}`;
+    iframe.src = `${apiUrl}/widget-ui?mode=iframe&tenantId=${tenantId}&color=${encodeURIComponent(config.primaryColor)}&name=${encodeURIComponent(config.botName)}&position=${encodeURIComponent(config.position || 'right')}&icon=${encodeURIComponent(config.widgetIconUrl || '')}`;
     iframeContainer.appendChild(iframe);
     shadowRoot.appendChild(iframeContainer);
 
@@ -120,12 +120,12 @@
     const launcher = document.createElement('button');
     launcher.className = 'widget-launcher';
     
-    const defaultIcon = \`
+    const defaultIcon = `
       <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
-    \`;
-    const closeIcon = \`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>\`;
+    `;
+    const closeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
     
-    const customIcon = config.widgetIconUrl ? \`<img src="\${config.widgetIconUrl}" alt="Chat" />\` : defaultIcon;
+    const customIcon = config.widgetIconUrl ? `<img src="${config.widgetIconUrl}" alt="Chat" />` : defaultIcon;
 
     launcher.innerHTML = customIcon;
     

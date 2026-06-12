@@ -91,14 +91,36 @@ export async function chatWithAgent(request: AgentChatRequest): Promise<AgentCha
 
   // Fallback to Python AI Agent Proxy
   try {
-    const response = await fetch(`${AGENT_PROXY_URL}/api/v1/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-      signal: AbortSignal.timeout(120000), // 120s timeout
-    });
+    let response: Response | null = null;
+    let lastError: any = null;
+    
+    // Retry logic (1 retry, 2s delay) for transient connection errors during Uvicorn restart
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        response = await fetch(`${AGENT_PROXY_URL}/api/v1/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+          signal: AbortSignal.timeout(45000), // Increased to 45s for heavy RAG
+        });
+        break; // Success, exit retry loop
+      } catch (err: any) {
+        lastError = err;
+        // Only retry on network/connection errors, not timeout or parsing
+        if (attempt === 1 && err.message && (err.message.includes('ECONNREFUSED') || err.message.includes('fetch failed'))) {
+          console.warn(`[AI Agent] Proxy unreachable, retrying in 2s...`);
+          await new Promise(r => setTimeout(r, 2000));
+        } else {
+          throw err;
+        }
+      }
+    }
+
+    if (!response) {
+      throw lastError || new Error('Failed to fetch from proxy');
+    }
 
     if (!response.ok) {
       const errorText = await response.text();

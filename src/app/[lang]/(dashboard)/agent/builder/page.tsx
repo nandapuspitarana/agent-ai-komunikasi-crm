@@ -14,6 +14,7 @@ import { ConditionNode } from '@/components/flow-nodes/ConditionNode';
 import AgentKnowledgeTab from '@/components/AgentKnowledgeTab';
 import ImageUpload from '@/components/ImageUpload';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { ChatUI, ChatMessageData } from '@/components/chat/ChatUI';
 
 // --- Custom Nodes for React Flow ---
 const QuestionNode = ({ data }: { data: any }) => {
@@ -446,11 +447,14 @@ function AgentBuilderContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agentConfig.welcomeMessage, agentConfig.welcomeMessageType, agentConfig.welcomeMessageOptions]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim() || !currentFlowId) return;
+  const handleSendMessage = async (input?: string | React.FormEvent) => {
+    if (input && typeof input === 'object' && 'preventDefault' in input) {
+      input.preventDefault();
+    }
+    const userInput = typeof input === 'string' ? input : chatInput;
 
-    const userInput = chatInput;
+    if (!userInput.trim() || !currentFlowId) return;
+
     const newMessages = [...chatMessages, { role: 'user' as const, text: userInput }];
     setChatMessages(newMessages);
     setChatInput('');
@@ -1165,87 +1169,35 @@ function AgentBuilderContent() {
             {/* Test Panel removed to avoid Redis errors in environments without Redis */}
 
             {/* Chat Preview */}
-            <div className="px-4 pb-4">
+            <div className="p-4 pt-6">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Chat Preview</h3>
-              <div className="bg-slate-900 text-white rounded-lg overflow-hidden flex flex-col h-[400px]">
-                <div className="p-3 flex justify-between items-center flex-shrink-0" style={{ backgroundColor: tenantConfig.themeBrandColor || '#801517' }}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/30">
-                      <Bot size={18} className="text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-xs leading-tight text-white">{tenantConfig.name || 'Your Brand'}</h3>
-                      <p className="text-[10px] text-white/80 flex items-center gap-1 mt-0.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> Online now
-                      </p>
-                    </div>
-                  </div>
-                  <button onClick={() => {
+              <div className="rounded-xl border border-slate-200 overflow-hidden h-[450px] flex flex-col">
+                <ChatUI
+                  messages={chatMessages.map((msg, idx) => ({
+                    id: idx,
+                    text: msg.text,
+                    sender: msg.role === 'user' ? 'user' : 'bot',
+                    options: msg.options ? msg.options.split(',').map((o: string) => o.trim()) : undefined
+                  }))}
+                  isTyping={isTyping}
+                  status="bot"
+                  isConnected={true}
+                  config={{
+                    name: agentConfig.name || 'AI Assistant',
+                    tenantName: tenantConfig.name || 'Your Brand',
+                    primaryColor: tenantConfig.themeBrandColor || '#801517',
+                    botAvatarUrl: agentConfig.botAvatarUrl,
+                    logo: tenantConfig.logoUrl
+                  }}
+                  inputValue={chatInput}
+                  onInputChange={setChatInput}
+                  onSendMessage={handleSendMessage}
+                  onRestartChat={() => {
                     setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }]);
                     setPreviewSessionId(crypto.randomUUID());
-                  }} className="p-1.5 text-white/80 hover:text-white hover:bg-black/20 rounded transition-colors" title="Restart chat">
-                    <RotateCcw size={14} />
-                  </button>
-                </div>
-                <div className="flex-1 p-3 overflow-y-auto bg-slate-50 space-y-3">
-                  {chatMessages.map((msg, idx) => (
-                    <div key={idx} className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                      <div className={`flex gap-2 w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        {msg.role === 'assistant' && (
-                          <div className="w-6 h-6 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-5 border border-blue-200">
-                            <Bot size={12} className="text-blue-600" />
-                          </div>
-                        )}
-                        <div className={`flex flex-col max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                          {msg.role === 'assistant' && (
-                            <span className="text-[10px] text-slate-500 font-medium ml-1 mb-0.5">{agentConfig.name || 'AI Assistant'}</span>
-                          )}
-                          <div 
-                            className={`rounded-lg p-2.5 text-[12px] shadow-sm leading-relaxed ${msg.role === 'user' ? 'text-white rounded-br-none' : 'border border-slate-200 text-slate-800 rounded-bl-none'}`}
-                            style={{
-                              backgroundColor: msg.role === 'user' ? (tenantConfig.themeUserBubbleColor || '#801517') : (tenantConfig.themeBotBubbleColor || '#ffffff'),
-                              '--theme-brand': tenantConfig.themeBrandColor || '#801517'
-                            } as React.CSSProperties}
-                          >
-                            {msg.role === 'assistant' ? (
-                              <div 
-                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.text, { ADD_ATTR: ['pattern', 'title', 'oninput', 'onsubmit', 'placeholder', 'onclick'] }) }} 
-                                className="whitespace-pre-wrap [&>b]:font-bold [&>strong]:font-bold [&>i]:italic [&_.notice]:bg-yellow-50 [&_.notice]:p-1.5 [&_.notice]:rounded [&_.notice]:border [&_.notice]:border-yellow-200 [&_.notice]:text-yellow-800 [&_.notice]:my-1.5 [&_.notice]:text-[11px] [&_.card]:bg-white [&_.card]:border [&_.card]:border-slate-200 [&_.card]:rounded-xl [&_.card]:p-3 [&_.card]:my-2 [&_.card-title]:text-[var(--theme-brand)] [&_.card-title]:font-bold [&_.card-title]:mb-2 [&_.price-option]:border-t [&_.price-option]:border-slate-100 [&_.price-option]:pt-2 [&_.price-option]:mt-2 [&_.price-option:nth-child(2)]:border-0 [&_.price-option:nth-child(2)]:pt-0 [&_.price-option:nth-child(2)]:mt-0 [&_.price]:font-bold [&_.price]:text-[15px] [&_.price]:text-slate-800 [&_.price]:leading-tight [&_.small]:text-[11px] [&_.small]:text-slate-500 [&_.small]:leading-tight [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:my-1 [&_.cta-note]:mt-3 [&_.cta-note]:pt-2 [&_.cta-note]:border-t [&_.cta-note]:border-slate-100 [&_.cta-note]:text-[11px] [&_.cta-note]:text-slate-500 [&_.cta-note]:italic [&_.form-card]:bg-white [&_.form-card]:border [&_.form-card]:border-slate-200 [&_.form-card]:rounded-xl [&_.form-card]:p-3 [&_.form-card]:my-2 [&_.form-card_label]:block [&_.form-card_label]:text-[11px] [&_.form-card_label]:text-slate-700 [&_.form-card_label]:font-bold [&_.form-card_label]:mb-1 [&_.form-card_label]:mt-2 [&_.form-card_input]:w-full [&_.form-card_input]:border [&_.form-card_input]:border-slate-200 [&_.form-card_input]:rounded-lg [&_.form-card_input]:px-2.5 [&_.form-card_input]:py-2 [&_.form-card_input]:text-[11px] [&_.form-card_input]:outline-none [&_.form-card_input]:font-sans [&_.form-grid]:grid [&_.form-grid]:grid-cols-2 [&_.form-grid]:gap-2 [&_.submit-btn]:w-full [&_.submit-btn]:bg-[var(--theme-brand)] [&_.submit-btn]:text-white [&_.submit-btn]:rounded-xl [&_.submit-btn]:py-2 [&_.submit-btn]:font-bold [&_.submit-btn]:mt-3 [&_.submit-btn]:text-[11px]"
-                              />
-                            ) : (
-                              <div className="whitespace-pre-wrap">{msg.text}</div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {msg.role === 'assistant' && msg.type === 'options' && msg.options && (
-                        <div className="pl-7 flex flex-wrap gap-1 mt-1">
-                          {msg.options.split(',').map((opt, i) => (
-                            <button key={i} onClick={() => setChatInput(opt.trim())} className="px-2 py-1 bg-white border border-blue-200 text-blue-600 text-[10px] rounded-full hover:bg-blue-50 transition-colors text-left">
-                              {opt.trim()}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {isTyping && (
-                    <div className="flex gap-2 justify-start">
-                      <div className="w-5 h-5 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-0.5"><Bot size={10} className="text-blue-600" /></div>
-                      <div className="bg-white border border-slate-200 rounded-lg rounded-bl-none px-2 py-2 shadow-sm flex gap-1 items-center h-8">
-                        <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"></span>
-                        <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                        <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="p-2 bg-slate-800 border-t border-slate-700 flex-shrink-0">
-                  <form onSubmit={handleSendMessage} className="relative flex items-center">
-                    <input type="text" placeholder="Test..." className="w-full pl-3 pr-8 py-2 bg-slate-700 border border-slate-600 rounded-full text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500" value={chatInput} onChange={(e) => setChatInput(e.target.value)} />
-                    <button type="submit" disabled={!chatInput.trim() || isTyping} className="absolute right-1 p-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50"><Send size={12} /></button>
-                  </form>
-                </div>
+                  }}
+                  hideHeaderMoreOptions={true}
+                />
               </div>
             </div>
           </div>

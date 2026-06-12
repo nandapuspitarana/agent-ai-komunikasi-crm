@@ -35,12 +35,19 @@ export async function POST(
       },
     });
 
+    // Fetch agent's real name from the database
+    const agentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true }
+    });
+    const agentName = agentUser?.name || session.user.name || 'Agent';
+
     // Create system message about agent joining
     await prisma.message.create({
       data: {
         sessionId,
         senderType: 'system',
-        content: `Agen ${session.user.name || 'kami'} bergabung ke percakapan.`,
+        content: `Agen ${agentName} bergabung ke percakapan.`,
       },
     });
 
@@ -50,11 +57,11 @@ export async function POST(
       // Emit to widget session room
       io.to(`session:${sessionId}`).emit('agent_joined', {
         agentId: session.user.id,
-        agentName: session.user.name || 'Agent',
+        agentName,
       });
       io.to(`widget:${sessionId}`).emit('agent_joined', {
         agentId: session.user.id,
-        agentName: session.user.name || 'Agent',
+        agentName,
       });
 
       // Emit to all agent dashboards in tenant to update session status
@@ -62,7 +69,7 @@ export async function POST(
         sessionId,
         status: 'agent',
         assignedAgentId: session.user.id,
-        agentName: session.user.name || 'Agent',
+        agentName,
       });
     }
 

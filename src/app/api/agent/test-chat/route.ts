@@ -56,61 +56,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const config: any = flow.config || {};
+    let systemPrompt = config.systemPrompt || 'You are a helpful assistant.';
+
+    // If there is a matched intent, append its response to the system prompt as a reference
     if (matchedIntent) {
-      let finalReply = matchedIntent.response;
-      
       // Auto-append handoff flag if response type is handoff
-      if (matchedIntent.type === 'handoff' && !finalReply.includes('[HANDOFF_REQUESTED]')) {
-        finalReply += ' [HANDOFF_REQUESTED]';
+      let referenceResponse = matchedIntent.response;
+      if (matchedIntent.type === 'handoff' && !referenceResponse.includes('[HANDOFF_REQUESTED]')) {
+        referenceResponse += ' [HANDOFF_REQUESTED]';
       }
 
-      const config: any = flow.config || {};
-      
-      // Use LLM to paraphrase the hardcoded response for a more natural conversational feel
-      // IMPORTANT: Skip paraphrasing if the response contains HTML cards to prevent breaking the UI layout
-      const hasHtml = matchedIntent.response.includes('<div');
-      
-      if (!hasHtml && config.llmProvider === 'gemini' && process.env.GOOGLE_API_KEY) {
-        try {
-          const { GoogleGenerativeAI } = require('@google/generative-ai');
-          const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-          const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-          
-          const prompt = `You are ${config.name || 'an AI assistant'}. ${config.systemPrompt || ''}
-User message: "${message}"
-Pre-defined answer: "${matchedIntent.response}"
-
-Please rewrite the pre-defined answer so it sounds natural, conversational, and directly responds to the user's specific message. 
-CRITICAL RULES:
-1. Do NOT change the core meaning, prices, or facts of the pre-defined answer.
-2. If the pre-defined answer asks a question (like "Which city?"), you MUST also ask that EXACT same question at the end.
-3. Keep it concise and professional.
-4. Language: ${config.language || 'id'}.`;
-
-          const result = await model.generateContent(prompt);
-          if (result.response.text()) {
-            finalReply = result.response.text();
-          }
-        } catch (e) {
-          console.error('[Intent Paraphrase Error]', e);
-        }
-      }
-
-      return NextResponse.json({
-        reply: finalReply,
-        intent: matchedIntent.name,
-        type: matchedIntent.type,
-        options: matchedIntent.options,
-        sources: []
-      });
+      systemPrompt += `\n\n[USER INTENT MATCHED]\nThe user's request matches the intent '${matchedIntent.name}'. Use the following pre-defined response as the core factual reference for your answer: "${referenceResponse}". Rewrite it to be conversational, natural, and directly address the user's message while maintaining the exact same facts, prices, and questions.`;
     }
 
-    // 2. Fallback to LLM
-    const config: any = flow.config || {};
-    const systemPrompt = config.systemPrompt || 'You are a helpful assistant.';
     const humanPrompt = config.humanPrompt || 'User says: {input}';
-    
-    // Format message with humanPrompt template
     const formattedMessage = humanPrompt.replace('{input}', message);
 
     try {
@@ -123,7 +83,9 @@ CRITICAL RULES:
 
       return NextResponse.json({
         reply: aiResponse.reply,
-        intent: aiResponse.intent,
+        intent: matchedIntent ? matchedIntent.name : aiResponse.intent,
+        type: matchedIntent ? matchedIntent.type : 'text',
+        options: matchedIntent ? matchedIntent.options : '',
         sources: aiResponse.sources
       });
     } catch (aiError) {

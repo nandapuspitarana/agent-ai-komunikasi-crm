@@ -229,22 +229,7 @@ export async function POST(req: NextRequest) {
     let aiReplyRaw = '';
     let handoffOccurred = false;
 
-    if (qnaMatch) {
-      aiReplyRaw = qnaMatch.response;
-      
-      // Auto-append handoff flag if response type is handoff
-      if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
-        aiReplyRaw += ' [HANDOFF_REQUESTED]';
-      }
-
-      // Add HTML options if present
-      if (qnaMatch.options) {
-        const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
-        if (opts.length > 0) {
-          aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
-        }
-      }
-    } else if (tenant.aiEnabled) {
+    if (tenant.aiEnabled) {
       // Fetch document IDs associated with the active flow for RAG isolation
       let documentIds: string[] = [];
       if (tenant.activeFlowId) {
@@ -255,6 +240,15 @@ export async function POST(req: NextRequest) {
         documentIds = docs.map(d => d.proxyDocId).filter((id): id is string => id !== null);
       }
 
+      let dynamicSystemPrompt = systemPrompt;
+      if (qnaMatch) {
+        let referenceResponse = qnaMatch.response;
+        if (qnaMatch.responseType === 'handoff' && !referenceResponse.includes('[HANDOFF_REQUESTED]')) {
+          referenceResponse += ' [HANDOFF_REQUESTED]';
+        }
+        dynamicSystemPrompt += `\n\n[USER INTENT MATCHED]\nThe user's request matches the intent '${qnaMatch.name}'. Use the following pre-defined response as the core factual reference for your answer: "${referenceResponse}". Rewrite it to be conversational, natural, and directly address the user's message while maintaining the exact same facts, prices, and questions.`;
+      }
+
       // Step 3: Call AI Engine (Session, RAG, etc)
       try {
         const aiResponse = await chatWithAgent({
@@ -262,18 +256,39 @@ export async function POST(req: NextRequest) {
           session_id: currentSessionId,
           user_id: chatSession.contactId,
           tenant_id: tenantId,
-          system_prompt: systemPrompt,
+          system_prompt: dynamicSystemPrompt,
           document_ids: documentIds,
         });
 
         aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
+
+        // Re-append HTML options from QnA match if any
+        if (qnaMatch && qnaMatch.options) {
+          const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
+          if (opts.length > 0) {
+            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+          }
+        }
       } catch (aiError) {
         console.error('[Widget Message] AI Engine error:', aiError);
         aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
       }
     } else {
-      // If AI Agent is not enabled, directly fallback to default message (much faster!)
-      aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, saya belum mengerti pesan Anda. Apakah Anda ingin berbicara dengan agen kami? [HANDOFF_REQUESTED]';
+      // If AI Agent is not enabled, directly fallback to static message (much faster!)
+      if (qnaMatch) {
+        aiReplyRaw = qnaMatch.response;
+        if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
+          aiReplyRaw += ' [HANDOFF_REQUESTED]';
+        }
+        if (qnaMatch.options) {
+          const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
+          if (opts.length > 0) {
+            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+          }
+        }
+      } else {
+        aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, saya belum mengerti pesan Anda. Apakah Anda ingin berbicara dengan agen kami? [HANDOFF_REQUESTED]';
+      }
     }
 
     // Step 4: Parse AI response for handoff flag

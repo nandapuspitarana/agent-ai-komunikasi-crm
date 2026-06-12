@@ -43,6 +43,13 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    // Fetch agent's real name and avatar from the database
+    const agentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, avatarUrl: true }
+    });
+    const agentName = agentUser?.name || session.user.name || 'Agent';
+
     // Automatically claim session if it was in 'bot' or 'queue' mode
     let updatedStatus = chatSession.status;
     if (chatSession.status === 'bot' || chatSession.status === 'queue') {
@@ -60,7 +67,7 @@ export async function POST(req: NextRequest) {
         data: {
           sessionId,
           senderType: 'system',
-          content: `Agen ${session.user.name || 'kami'} bergabung ke percakapan.`
+          content: `Agen ${agentName} bergabung ke percakapan.`
         }
       });
     }
@@ -72,26 +79,20 @@ export async function POST(req: NextRequest) {
       if (chatSession.status === 'bot' || chatSession.status === 'queue') {
         io.to(`session:${sessionId}`).emit('agent_joined', {
           agentId: session.user.id,
-          agentName: session.user.name || 'Agent',
+          agentName,
         });
         io.to(`widget:${sessionId}`).emit('agent_joined', {
           agentId: session.user.id,
-          agentName: session.user.name || 'Agent',
+          agentName,
         });
         
         io.to(`inbox:${tenantId}`).emit('session_updated', {
           sessionId,
           status: 'agent',
           assignedAgentId: session.user.id,
-          agentName: session.user.name || 'Agent',
+          agentName,
         });
       }
-
-      // Get agent avatar
-      const agentUser = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { avatarUrl: true }
-      });
 
       // Emit agent message
       io.to(`session:${sessionId}`).emit('agent_message', {

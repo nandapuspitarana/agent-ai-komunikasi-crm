@@ -62,6 +62,21 @@ function WidgetUIRenderer() {
     ? 'right-full border-r-white'
     : 'left-full border-l-white';
 
+  const mode = searchParams?.get('mode') || 'preview';
+
+  // Jika dipanggil dari iframe widget.js, hanya tampilkan ChatWindow full-width
+  if (mode === 'iframe') {
+    return (
+      <div className="w-full h-screen bg-transparent overflow-hidden">
+        <ChatWindow 
+          tenantId={tenantId} 
+          primaryColor={config.color} 
+          botName={config.name} 
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans relative overflow-x-hidden">
       {/* NAVBAR MOCK */}

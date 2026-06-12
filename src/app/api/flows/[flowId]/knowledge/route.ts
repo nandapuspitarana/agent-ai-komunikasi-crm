@@ -72,7 +72,10 @@ export async function POST(
     proxyUrl = proxyUrl.replace('localhost', '127.0.0.1');
     try {
       const proxyFormData = new FormData();
-      proxyFormData.append('file', file);
+      const fileBuffer = await file.arrayBuffer();
+      const fileBlob = new Blob([fileBuffer], { type: file.type });
+      proxyFormData.append('file', fileBlob, file.name);
+      
       proxyFormData.append('meta_name', metaName);
       proxyFormData.append('agent_id', flowId);
       if (tagsRaw) proxyFormData.append('tags', tagsRaw);
@@ -98,6 +101,7 @@ export async function POST(
         return NextResponse.json({ ...doc, status: 'ready', chunkCount: proxyData.chunk_count });
       } else {
         const errText = await proxyRes.text();
+        console.error('[Knowledge POST] Proxy returned non-OK status:', proxyRes.status, 'Body:', errText);
         await prisma.knowledgeDocument.update({
           where: { id: doc.id },
           data: { status: 'failed', errorMsg: `Proxy error: ${proxyRes.status}` },
