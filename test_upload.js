@@ -13,7 +13,7 @@ async function testUpload() {
 
   console.log('Sending request to proxy...');
   try {
-    const res = await fetch('http://localhost:8000/api/v1/documents/ingest', {
+    const res = await fetch('http://localhost:8200/api/v1/documents/ingest', {
       method: 'POST',
       body: formData,
     });

@@ -21,7 +21,7 @@ export async function DELETE(
 
     // Try to also delete from Python proxy
     if (doc.proxyDocId) {
-      const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8000';
+      const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8200';
       try {
         await fetch(`${proxyUrl}/api/v1/documents/${doc.proxyDocId}`, {
           method: 'DELETE',

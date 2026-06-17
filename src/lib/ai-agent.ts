@@ -4,7 +4,7 @@
  * The local endpoint must accept a JSON payload and return a JSON `{ reply: string, ... }`.
  */
 
-const AGENT_PROXY_URL = (process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8000').replace('localhost', '127.0.0.1');
+const AGENT_PROXY_URL = (process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8200').replace('localhost', '127.0.0.1');
 const LOCAL_LLM_URL = (process.env.LOCAL_LLM_URL || '').replace('localhost', '127.0.0.1');
 const LOCAL_LLM_TYPE = process.env.LOCAL_LLM_TYPE || 'generic';
 

@@ -68,7 +68,7 @@ export async function POST(
     });
 
     // 2. Forward to Python AI proxy for vector ingestion
-    let proxyUrl = process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8000';
+    let proxyUrl = process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8200';
     proxyUrl = proxyUrl.replace('localhost', '127.0.0.1');
     try {
       const proxyFormData = new FormData();

@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { logDocumentUploaded } from '@/lib/audit-logger';
 
 export async function POST(req: NextRequest) {
-  const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8000';
+  const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8200';
   
   try {
     const session = await auth();

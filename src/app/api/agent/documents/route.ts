@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8000';
+  const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8200';
   
   try {
     const response = await fetch(`${proxyUrl}/api/v1/documents`, {
@@ -29,7 +29,7 @@ export async function GET() {
     return NextResponse.json(
       {
         error: isConnectionError
-          ? 'AI Engine tidak dapat dijangkau. Pastikan server Python (uvicorn) sudah berjalan di port 8000.'
+          ? 'AI Engine tidak dapat dijangkau. Pastikan server Python (uvicorn) sudah berjalan di port 8200.'
           : 'Gagal mengambil daftar dokumen.',
         documents: [],
         count: 0,

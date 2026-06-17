@@ -6,7 +6,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { documentId: string } }
 ) {
-  const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8000';
+  const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8200';
   const { documentId } = params;
 
   if (!documentId) {
