@@ -12,7 +12,7 @@ add_action('wp_footer', 'saas_crm_agent_inject_script');
 
 function saas_crm_agent_inject_script() {
     $tenant_id = "4dd9d2ab-2fcc-4136-8029-50f251494756";
-    $api_url = "http://localhost:3101";
+    $api_url = "http://localhost:8201";
     
     ?>
     <!-- Start of SaaS CRM Widget -->

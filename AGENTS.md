@@ -124,5 +124,5 @@ npm run db:push
 # Jalankan server development
 npm run dev
 ```
-Buka widget pengujian di `http://localhost:3101/widget-ui` dan masuk ke dashboard agen di `http://localhost:3101/inbox`.
+Buka widget pengujian di `http://localhost:8201/widget-ui` dan masuk ke dashboard agen di `http://localhost:8201/inbox`.
 

@@ -50,7 +50,7 @@ Setelah menjalankan seed, Anda dapat login dengan akun berikut:
    ```
    DATABASE_URL="postgresql://user:pass@localhost:5444/crm?schema=public"
    AUTH_SECRET="your-secret-key-change-this-in-production-min-32-chars"
-   NEXTAUTH_URL="http://localhost:3101"
+   NEXTAUTH_URL="http://localhost:8201"
    ```
 
 3. **Push database schema**:
@@ -69,7 +69,7 @@ Setelah menjalankan seed, Anda dapat login dengan akun berikut:
    ```
 
 6. **Access aplikasi**:
-   - Open browser: http://localhost:3101
+   - Open browser: http://localhost:8201
    - Login dengan salah satu test account di atas
 
 ## Protected Routes

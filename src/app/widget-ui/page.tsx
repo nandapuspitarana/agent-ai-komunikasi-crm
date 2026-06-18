@@ -124,10 +124,10 @@ function WidgetUIRenderer() {
 <script>
   window.CRM_AGENT_CONFIG = {
     tenantId: "${tenantId}",
-    apiUrl: "${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3101'}"
+    apiUrl: "${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8201'}"
   };
 </script>
-<script src="${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3101'}/widget.js" async></script>`}
+<script src="${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8201'}/widget.js" async></script>`}
               </pre>
             </div>
           </section>

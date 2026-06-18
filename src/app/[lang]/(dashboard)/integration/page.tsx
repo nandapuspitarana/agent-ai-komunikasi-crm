@@ -17,10 +17,10 @@ export default function IntegrationPage() {
 <script>
   window.CRM_AGENT_CONFIG = {
     tenantId: "${tenantId}",
-    apiUrl: "http://localhost:3101"
+    apiUrl: "http://localhost:8201"
   };
 </script>
-<script src="http://localhost:3101/widget.js" defer></script>
+<script src="http://localhost:8201/widget.js" defer></script>
 <!-- End of SaaS CRM Widget -->`;
 
   const wpPluginCode = `<?php
@@ -35,9 +35,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 add_action('wp_footer', 'saas_crm_agent_inject_script');
 
+/*********
+ * Injects the SaaS CRM widget script into the footer.
+ *********/
 function saas_crm_agent_inject_script() {
     $tenant_id = "${tenantId}";
-    $api_url = "http://localhost:3101";
+    $api_url = "http://localhost:8201";
     
     echo '<!-- Start of SaaS CRM Widget -->\\n';
     echo '<script>\\n';

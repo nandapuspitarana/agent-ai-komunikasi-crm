@@ -32,7 +32,7 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3101
+ENV PORT=8201
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install system utilities needed for alpine runtime
@@ -54,7 +54,7 @@ RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 
-EXPOSE 3101
+EXPOSE 8201
 
 # Run prisma migration/sync before starting the server
 CMD ["sh", "-c", "npx prisma db push && npm run start"]

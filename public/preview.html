@@ -104,7 +104,7 @@
             </div>
             <div class="control-group">
                 <label for="widgetUrl">Widget URL:</label>
-                <input type="text" id="widgetUrl" value="http://localhost:3101/widget-ui" placeholder="Widget URL">
+                <input type="text" id="widgetUrl" value="http://localhost:8201/widget-ui" placeholder="Widget URL">
             </div>
             <div class="control-group">
                 <button type="button" id="loadWidget">Load Widget</button>
@@ -162,7 +162,7 @@
         document.getElementById('loadWidget').addEventListener('click', () => {
             const tenantId = document.getElementById('tenantId').value.trim();
             const visitorName = document.getElementById('visitorName').value.trim() || generateRandomName();
-            const widgetUrl = document.getElementById('widgetUrl').value.trim() || 'http://localhost:3101/widget-ui';
+            const widgetUrl = document.getElementById('widgetUrl').value.trim() || 'http://localhost:8201/widget-ui';
             
             if (!tenantId) {
                 alert('Please enter a Tenant ID');

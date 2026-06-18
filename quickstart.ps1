@@ -7,7 +7,7 @@
 #>
 
 $ErrorActionPreference = "Stop"
-$CrmPort = 3101
+$CrmPort = 8201
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Cyan
@@ -47,7 +47,7 @@ if (-not (Test-Path ".env")) {
         Write-Host "║  Silakan periksa nilai berikut di .env:                 ║" -ForegroundColor Yellow
         Write-Host "║    DATABASE_URL    = postgresql://user:pass@...         ║" -ForegroundColor Yellow
         Write-Host "║    AUTH_SECRET     = secret min 32 karakter             ║" -ForegroundColor Yellow
-        Write-Host "║    NEXTAUTH_URL    = http://localhost:3101               ║" -ForegroundColor Yellow
+        Write-Host "║    NEXTAUTH_URL    = http://localhost:8201               ║" -ForegroundColor Yellow
         Write-Host "║    AGENT_PROXY_URL = http://127.0.0.1:8200              ║" -ForegroundColor Yellow
         Write-Host "╚══════════════════════════════════════════════════════════╝" -ForegroundColor Yellow
         Write-Host ""

@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     // TODO: Send email with reset link
     // For now, return the token (in production, this should be sent via email)
     console.log('Password reset token:', token);
-    console.log('Reset link: http://localhost:3101/reset-password?token=' + token);
+    console.log('Reset link: http://localhost:8201/reset-password?token=' + token);
 
     return NextResponse.json({
       success: true,

@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 echo.
 echo ============================================================
 echo   Agent AI Komunikasi CRM ^| Quick Start (Windows)
-echo   Next.js port: 3101  ^|  Node.js 20+
+echo   Next.js port: 8201  ^|  Node.js 20+
 echo ============================================================
 echo.
 
@@ -34,7 +34,7 @@ if not exist ".env" (
         echo              Periksa dan sesuaikan nilai berikut di .env:
         echo                DATABASE_URL    = postgresql://user:pass@localhost:5444/crm
         echo                AUTH_SECRET     = secret min 32 karakter
-        echo                NEXTAUTH_URL    = http://localhost:3101
+        echo                NEXTAUTH_URL    = http://localhost:8201
         echo                AGENT_PROXY_URL = http://127.0.0.1:8200
         echo.
         echo   Tekan sembarang tombol setelah memeriksa .env ...
@@ -96,9 +96,9 @@ echo.
 echo ============================================================
 echo   Menjalankan Next.js CRM Dev Server...
 echo.
-echo   Dashboard  : http://localhost:3101
-echo   Inbox      : http://localhost:3101/inbox
-echo   Widget UI  : http://localhost:3101/widget-ui
+echo   Dashboard  : http://localhost:8201
+echo   Inbox      : http://localhost:8201/inbox
+echo   Widget UI  : http://localhost:8201/widget-ui
 echo.
 echo   CATATAN: Pastikan AI Agent Proxy berjalan di port 8200
 echo   Tekan Ctrl+C untuk menghentikan server.

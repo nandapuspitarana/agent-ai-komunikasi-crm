@@ -58,7 +58,7 @@ Ensure you have the following installed:
    
    # NextAuth Configuration
    AUTH_SECRET="your-secret-key-change-this-in-production-min-32-chars"
-   NEXTAUTH_URL="http://localhost:3101"
+   NEXTAUTH_URL="http://localhost:8201"
    ```
 
 4. **Setup database**:
@@ -76,7 +76,7 @@ Ensure you have the following installed:
    ```
 
 6. **Access the application**:
-   Open [http://localhost:3101](http://localhost:3101) in your browser.
+   Open [http://localhost:8201](http://localhost:8201) in your browser.
 
 ---
 

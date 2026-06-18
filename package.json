@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "tailwind.config.js",
   "scripts": {
-    "dev": "next dev -p 3101",
+    "dev": "next dev -p 8201",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

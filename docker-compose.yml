@@ -6,7 +6,8 @@ services:
     image: crm-web:${CRM_VERSION:-latest}  # Supports dynamic version tag upgrades & rollbacks
     container_name: crm-web
     ports:
-      - "3101:3101"
+      - "8201:8201"
+
     env_file:
       - .env
     restart: always
