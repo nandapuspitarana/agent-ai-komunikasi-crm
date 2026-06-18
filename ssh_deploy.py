@@ -18,18 +18,22 @@ try:
     ssh.connect(host, username=username, password=password, timeout=10)
     print("Connected successfully!")
     
-    # Upload modified page.tsx
+    # Upload modified files
     sftp = ssh.open_sftp()
-    local_file = "src/app/[lang]/(dashboard)/agent/builder/page.tsx"
-    remote_file = "/tmp/page.tsx"
-    print(f"Uploading {local_file} to {remote_file}...")
-    sftp.put(local_file, remote_file)
+    
+    # page.tsx
+    sftp.put("src/app/[lang]/(dashboard)/agent/builder/page.tsx", "/tmp/page.tsx")
+    
+    # Providers.tsx
+    sftp.put("src/components/Providers.tsx", "/tmp/Providers.tsx")
+    
     sftp.close()
     print("Upload complete!")
     
     # Run commands
     commands = [
         f"echo {password} | sudo -S sh -c \"mv /tmp/page.tsx {path}/src/app/[lang]/(dashboard)/agent/builder/page.tsx\"",
+        f"echo {password} | sudo -S sh -c \"mv /tmp/Providers.tsx {path}/src/components/Providers.tsx\"",
         f"echo {password} | sudo -S sh -c \"cd {path} && docker compose build web --no-cache\"",
         f"echo {password} | sudo -S sh -c \"cd {path} && docker compose up -d web\""
     ]
