@@ -33,7 +33,7 @@ services:
     ports:
       - "3101:3101"
     env_file:
-      - .env.production
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
