@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
     const session = await auth();
@@ -14,7 +14,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sessionId = params.sessionId;
+    const { sessionId } = await params;
     if (!sessionId) {
       return NextResponse.json({ error: 'Session ID required' }, { status: 400 });
     }

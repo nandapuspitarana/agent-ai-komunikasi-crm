@@ -232,3 +232,27 @@ model Asset {
   @@index([tenantId])
   @@map("crm_agent_Asset")
 }
+
+model SessionContext {
+  id          String   @id @default(uuid())
+  tenantId    String
+  sessionId   String
+  data        Json
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@unique([tenantId, sessionId])
+  @@map("crm_agent_SessionContext")
+}
+
+model MessageQueue {
+  id          String   @id @default(uuid())
+  tenantId    String
+  sessionId   String
+  payload     Json
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, sessionId])
+  @@map("crm_agent_MessageQueue")
+}
+

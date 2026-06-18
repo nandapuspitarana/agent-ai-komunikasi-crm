@@ -47,7 +47,7 @@ export class FlowInterpreter {
   }
 
   private processMessageNode(node: Node) {
-    const message = node.data?.message || 'Pesan kosong';
+    const message = String(node.data?.message || 'Pesan kosong');
     const nextNode = this.getNextNode(node.id);
     this.context.currentStep = nextNode?.id || null;
     
@@ -59,7 +59,7 @@ export class FlowInterpreter {
   }
 
   private processInputNode(node: Node, input: string) {
-    const variableName = node.data?.variableName || 'user_input';
+    const variableName = String(node.data?.variableName || 'user_input');
     this.context.variables[variableName] = input;
     this.context.history.push(`Input saved to ${variableName}: ${input}`);
     
@@ -74,7 +74,7 @@ export class FlowInterpreter {
   }
 
   private processConditionNode(node: Node) {
-    const condition = node.data?.condition || '';
+    const condition = String(node.data?.condition || '');
     // Simple evaluation for demonstration (e.g., "var == 'value'")
     // In production, use a safe expression evaluator
     let isTrue = false;
@@ -103,7 +103,7 @@ export class FlowInterpreter {
   private processQuestionNode(node: Node, input: string) {
     // In a real system, this would use NLP/LLM to match intent
     // For now, simple keyword matching
-    const phrases = node.data?.phrases || [];
+    const phrases = (node.data?.phrases as string[]) || [];
     const isMatch = phrases.some((phrase: string) => input.toLowerCase().includes(phrase.toLowerCase()));
 
     if (isMatch) {
@@ -124,11 +124,11 @@ export class FlowInterpreter {
   }
 
   private processAnswerNode(node: Node) {
-    const answerType = node.data?.answerType || 'text';
-    let response = node.data?.label || 'Jawaban kosong';
+    const answerType = String(node.data?.answerType || 'text');
+    let response = String(node.data?.label || 'Jawaban kosong');
 
     if (answerType === 'options') {
-      const options = node.data?.options || [];
+      const options = (node.data?.options as string[]) || [];
       response += '\n\nPilihan: ' + options.join(' | ');
     }
 

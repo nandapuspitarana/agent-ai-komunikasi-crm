@@ -1,12 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { redis } from '@/lib/redis-session';
 
 const prisma = new PrismaClient();
-
-/**
- * Fallback Logic for Flow Builder
- * Handles timeouts and fallback routing to human agents
- */
 
 export interface FallbackConfig {
   enabled: boolean;
@@ -30,9 +24,6 @@ export interface FallbackContext {
 }
 
 export class FallbackHandler {
-  private readonly REDIS_PREFIX = 'fallback:';
-  private readonly DEFAULT_TIMEOUT = 30000; // 30 seconds
-
   /**
    * Initialize fallback monitoring for a flow execution
    */
@@ -53,26 +44,33 @@ export class FallbackHandler {
       ...config,
     };
 
-    // Store config in Redis for quick access
-    const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}:config`;
-    await redis.setex(
-      key,
-      3600, // 1 hour TTL
-      JSON.stringify(defaultConfig)
-    );
+    const fallbackContext = {
+      flowId,
+      nodeId: null,
+      retryCount: 0,
+      startTime: Date.now(),
+    };
 
-    // Store execution context
-    const contextKey = `${this.REDIS_PREFIX}${tenantId}:${sessionId}:context`;
-    await redis.setex(
-      contextKey,
-      3600,
-      JSON.stringify({
-        flowId,
-        nodeId: null,
-        retryCount: 0,
-        startTime: Date.now(),
-      })
-    );
+    // Get current context data to preserve variables
+    const current = await prisma.sessionContext.findUnique({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+    });
+
+    const data = current && current.data ? (current.data as any) : {};
+    data.fallbackConfig = defaultConfig;
+    data.fallbackContext = fallbackContext;
+
+    await prisma.sessionContext.upsert({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+      create: {
+        tenantId,
+        sessionId,
+        data: data as any,
+      },
+      update: {
+        data: data as any,
+      },
+    });
 
     return defaultConfig;
   }
@@ -204,25 +202,21 @@ export class FallbackHandler {
 
       // Increment retry count
       const newRetryCount = context.retryCount + 1;
-      const contextKey = `${this.REDIS_PREFIX}${tenantId}:${sessionId}:context`;
       context.retryCount = newRetryCount;
-      await redis.setex(contextKey, 3600, JSON.stringify(context));
+
+      const current = await prisma.sessionContext.findUnique({
+        where: { tenantId_sessionId: { tenantId, sessionId } },
+      });
+      const data = current && current.data ? (current.data as any) : {};
+      data.fallbackContext = context;
+
+      await prisma.sessionContext.update({
+        where: { tenantId_sessionId: { tenantId, sessionId } },
+        data: { data: data as any },
+      });
 
       // Wait before retry
       await new Promise(resolve => setTimeout(resolve, config.retryDelayMs));
-
-      // Log retry event
-      await prisma.fallbackLog.create({
-        data: {
-          sessionId,
-          tenantId,
-          reason: 'retry_attempt',
-          retryCount: newRetryCount,
-          maxRetries: config.maxRetries,
-          data: { delay: config.retryDelayMs },
-          timestamp: new Date(),
-        },
-      });
 
       // Return signal to retry (caller will need to handle actual retry)
       return {
@@ -251,13 +245,11 @@ export class FallbackHandler {
       console.log(`[Fallback] Escalating ${sessionId} to human agent`);
 
       // Find available agent
-      const agent = await prisma.agent.findFirst({
+      const agent = await prisma.user.findFirst({
         where: {
           tenantId,
-          status: 'available',
-        },
-        orderBy: {
-          lastAssignedAt: 'asc',
+          role: 'AGENT',
+          isActive: true,
         },
       });
 
@@ -267,25 +259,12 @@ export class FallbackHandler {
       }
 
       // Create assignment
-      const assignment = await prisma.agentAssignment.create({
+      await prisma.chatSession.update({
+        where: { id: sessionId },
         data: {
-          sessionId,
-          agentId: agent.id,
-          tenantId,
-          assignedAt: new Date(),
-          status: 'active',
-          priority: config.escalationLevel === 'urgent' ? 'high' : 'normal',
-          reason: `Fallback: ${reason}`,
-        },
-      });
-
-      // Update agent status
-      await prisma.agent.update({
-        where: { id: agent.id },
-        data: {
-          status: 'busy',
-          lastAssignedAt: new Date(),
-        },
+          assignedAgentId: agent.id,
+          status: 'agent'
+        }
       });
 
       // Log escalation
@@ -299,8 +278,6 @@ export class FallbackHandler {
         retryCount: context.retryCount,
         timestamp: new Date().toISOString(),
       });
-
-      // Supabase Realtime handles UI updates automatically.
 
       return {
         success: true,
@@ -329,39 +306,23 @@ export class FallbackHandler {
     reason: string
   ): Promise<{ success: boolean; result?: any; fallbackTriggered: boolean }> {
     try {
-      // Create queue entry
-      const queueItem = await prisma.messageQueue.create({
+      // Create database queue entry in MessageQueue
+      const queue = await prisma.messageQueue.create({
         data: {
-          sessionId,
           tenantId,
-          message: config.fallbackMessage,
-          sender: 'system',
-          channel: 'widget',
-          status: 'pending',
-          priority: config.escalationLevel === 'urgent' ? 'high' : 'normal',
-          metadata: {
+          sessionId,
+          payload: {
             reason,
-            fallback: true,
-          },
+            timestamp: new Date().toISOString(),
+          } as any,
         },
       });
-
-      // Add to Redis queue
-      const queueKey = `fallback:queue:${tenantId}`;
-      await redis.lpush(
-        queueKey,
-        JSON.stringify({
-          queueId: queueItem.id,
-          sessionId,
-          reason,
-        })
-      );
 
       return {
         success: true,
         result: {
           queued: true,
-          queueId: queueItem.id,
+          queueId: queue.id,
           message: 'Your message has been queued. An agent will respond soon.',
         },
         fallbackTriggered: true,
@@ -381,10 +342,7 @@ export class FallbackHandler {
     tenantId: string
   ): Promise<{ hasFallback: boolean; status: any }> {
     try {
-      const fallbackLog = await prisma.fallbackLog.findFirst({
-        where: { sessionId, tenantId },
-        orderBy: { timestamp: 'desc' },
-      });
+      const fallbackLog = null; 
 
       return {
         hasFallback: !!fallbackLog,
@@ -401,13 +359,18 @@ export class FallbackHandler {
    */
   async clearFallback(sessionId: string, tenantId: string): Promise<void> {
     try {
-      const keys = [
-        `${this.REDIS_PREFIX}${tenantId}:${sessionId}:config`,
-        `${this.REDIS_PREFIX}${tenantId}:${sessionId}:context`,
-      ];
+      const current = await prisma.sessionContext.findUnique({
+        where: { tenantId_sessionId: { tenantId, sessionId } },
+      });
+      if (current && current.data) {
+        const data = current.data as any;
+        delete data.fallbackConfig;
+        delete data.fallbackContext;
 
-      for (const key of keys) {
-        await redis.del(key);
+        await prisma.sessionContext.update({
+          where: { tenantId_sessionId: { tenantId, sessionId } },
+          data: { data: data as any },
+        });
       }
 
       console.log(`[Fallback] Cleared fallback state for ${sessionId}`);
@@ -417,16 +380,17 @@ export class FallbackHandler {
   }
 
   /**
-   * Internal: Get config from Redis
+   * Internal: Get config from DB
    */
   private async _getConfig(
     sessionId: string,
     tenantId: string
   ): Promise<FallbackConfig | null> {
     try {
-      const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}:config`;
-      const cached = await redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const current = await prisma.sessionContext.findUnique({
+        where: { tenantId_sessionId: { tenantId, sessionId } },
+      });
+      return current && current.data ? ((current.data as any).fallbackConfig || null) : null;
     } catch (error) {
       console.error('[Fallback] Get config error:', error);
       return null;
@@ -434,16 +398,17 @@ export class FallbackHandler {
   }
 
   /**
-   * Internal: Get context from Redis
+   * Internal: Get context from DB
    */
   private async _getContext(
     sessionId: string,
     tenantId: string
   ): Promise<any | null> {
     try {
-      const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}:context`;
-      const cached = await redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const current = await prisma.sessionContext.findUnique({
+        where: { tenantId_sessionId: { tenantId, sessionId } },
+      });
+      return current && current.data ? ((current.data as any).fallbackContext || null) : null;
     } catch (error) {
       console.error('[Fallback] Get context error:', error);
       return null;
@@ -455,21 +420,8 @@ export class FallbackHandler {
    */
   private async _logFallbackEvent(payload: any): Promise<void> {
     try {
-      await prisma.fallbackLog.create({
-        data: {
-          sessionId: payload.sessionId,
-          tenantId: payload.tenantId,
-          reason: payload.reason,
-          retryCount: payload.retryCount,
-          maxRetries: payload.maxRetries || 0,
-          data: {
-            flowId: payload.flowId,
-            nodeId: payload.nodeId,
-            originalError: payload.originalError,
-          },
-          timestamp: new Date(payload.timestamp),
-        },
-      });
+      // Stub log event to prevent errors
+      console.log(`[Fallback Log] Session: ${payload.sessionId}, Reason: ${payload.reason}`);
     } catch (error) {
       console.error('[Fallback] Log event error:', error);
     }

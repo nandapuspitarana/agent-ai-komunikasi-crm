@@ -6,9 +6,10 @@ const prisma = new PrismaClient();
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
+    const { sessionId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -19,7 +20,6 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden. Only Admins can reassign chats.' }, { status: 403 });
     }
 
-    const { sessionId } = params;
     const body = await req.json();
     const { assignedAgentId } = body;
 

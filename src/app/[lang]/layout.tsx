@@ -23,7 +23,7 @@ export default async function RootLayout({
     <html lang={lang}>
       <body>
         <I18nProvider locale={lang} dictionary={dictionary}>
-          <Providers lang={lang}>
+          <Providers>
             {children}
           </Providers>
         </I18nProvider>

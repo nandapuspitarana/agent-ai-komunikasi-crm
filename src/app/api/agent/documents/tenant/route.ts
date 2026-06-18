@@ -15,6 +15,10 @@ export async function GET(req: NextRequest) {
 
     const tenantId = session.user.tenantId;
 
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant ID missing' }, { status: 400 });
+    }
+
     // Fetch all ready documents for this tenant
     // Use distinct on proxyDocId so we don't list duplicates if a document is used in multiple flows
     const documents = await prisma.knowledgeDocument.findMany({

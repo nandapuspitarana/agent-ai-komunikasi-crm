@@ -115,7 +115,7 @@ const nodeTypes = {
 function AgentBuilderContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const flowIdParam = searchParams.get('id');
+  const flowIdParam = searchParams?.get('id') || null;
 
   const [activeTab, setActiveTab] = useState('faq');
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(flowIdParam);
@@ -141,7 +141,8 @@ function AgentBuilderContent() {
     themeBrandColor: '#801517',
     themeBotBubbleColor: '#ffffff',
     themeUserBubbleColor: '#801517',
-    botAvatarUrl: ''
+    botAvatarUrl: '',
+    businessNeeds: ''
   });
 
   // --- Unified Intent State ---
@@ -250,7 +251,7 @@ function AgentBuilderContent() {
   const removePhrase = (index: number) => {
     const active = intents.find(i => i.id === activeIntentId);
     if (!active) return;
-    const newPhrases = active.trainingPhrases.filter((_, i) => i !== index);
+    const newPhrases = active.trainingPhrases.filter((_: any, i: number) => i !== index);
     updateActiveIntent('trainingPhrases', newPhrases.length ? newPhrases : ['']);
   };
 
@@ -315,6 +316,7 @@ function AgentBuilderContent() {
           welcomeMessageOptions: '',
           defaultFeedback: 'Was this answer helpful?',
           urls: [''],
+          businessNeeds: '',
           botAvatarUrl: ''
         });
 
@@ -698,9 +700,9 @@ function AgentBuilderContent() {
                   <div className="pt-4 border-t border-slate-100">
                     <ImageUpload 
                       currentImage={agentConfig.botAvatarUrl} 
-                      onUpload={(url) => setAgentConfig({ ...agentConfig, botAvatarUrl: url })} 
-                      aspectRatio={1} 
-                      maxSize={2} 
+                      onImageCropped={(url) => setAgentConfig({ ...agentConfig, botAvatarUrl: url })}
+                      targetSize={256} 
+                      maxFileSize={2} 
                       label="Bot Avatar"
                     />
                   </div>
@@ -821,7 +823,7 @@ function AgentBuilderContent() {
                         <p className="text-xs text-slate-500 mb-4">Add multiple phrases or questions that should trigger this intent. Different questions will map to the same answer.</p>
 
                         <div className="space-y-2">
-                          {activeIntentData?.trainingPhrases.map((phrase, i) => (
+                          {activeIntentData?.trainingPhrases.map((phrase: any, i: number) => (
                             <div key={i} className="flex items-center gap-2">
                               <input
                                 type="text"

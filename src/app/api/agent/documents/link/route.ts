@@ -20,6 +20,10 @@ export async function POST(req: NextRequest) {
 
     const tenantId = session.user.tenantId;
 
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant ID missing' }, { status: 400 });
+    }
+
     // Verify the source document belongs to the tenant
     const sourceDoc = await prisma.knowledgeDocument.findFirst({
       where: {

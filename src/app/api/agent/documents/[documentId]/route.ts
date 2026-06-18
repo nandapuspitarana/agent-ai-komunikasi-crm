@@ -4,10 +4,10 @@ import { logDocumentDeleted } from '@/lib/audit-logger';
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { documentId: string } }
+  { params }: { params: Promise<{ documentId: string }> }
 ) {
   const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8200';
-  const { documentId } = params;
+  const { documentId } = await params;
 
   if (!documentId) {
     return NextResponse.json({ error: 'Document ID is required' }, { status: 400 });

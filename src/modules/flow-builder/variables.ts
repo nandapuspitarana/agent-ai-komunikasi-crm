@@ -1,13 +1,6 @@
-import { redis } from '@/lib/redis-session';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-
-/**
- * Variable System for Flow Builder
- * Manages user context variables saved in Redis for fast access
- * and Prisma for persistent storage
- */
 
 export interface VariableStore {
   sessionId: string;
@@ -16,81 +9,58 @@ export interface VariableStore {
   metadata: {
     createdAt: string;
     updatedAt: string;
-    expiresAt?: string;
   };
 }
 
-export class VariableManager {
-  private readonly REDIS_PREFIX = 'flow:vars:';
-  private readonly REDIS_TTL = 86400; // 24 hours
+interface DBContextPayload {
+  variables: Record<string, any>;
+  expirations: Record<string, string>; // Maps variableName to ISO String expiration date
+}
 
+export class VariableManager {
   /**
    * Initialize variable store for a session
    */
   async initializeSession(sessionId: string, tenantId: string, initialVars?: Record<string, any>) {
-    const store: VariableStore = {
-      sessionId,
-      tenantId,
+    const payload: DBContextPayload = {
       variables: initialVars || {},
-      metadata: {
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
+      expirations: {},
     };
 
-    const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}`;
-    
-    // Save to Redis with TTL
-    await redis.setex(key, this.REDIS_TTL, JSON.stringify(store));
-    
-    // Save to database for persistence
-    await prisma.sessionContext.upsert({
-      where: { sessionId },
+    const context = await prisma.sessionContext.upsert({
+      where: {
+        tenantId_sessionId: {
+          tenantId,
+          sessionId,
+        },
+      },
       create: {
-        sessionId,
         tenantId,
-        variables: store.variables,
-        metadata: store.metadata,
+        sessionId,
+        data: payload as any,
       },
       update: {
-        variables: store.variables,
-        metadata: store.metadata,
+        data: payload as any,
       },
     });
 
-    return store;
+    return {
+      sessionId,
+      tenantId,
+      variables: payload.variables,
+      metadata: {
+        createdAt: context.createdAt.toISOString(),
+        updatedAt: context.updatedAt.toISOString(),
+      },
+    };
   }
 
   /**
    * Get all variables for a session
    */
   async getVariables(sessionId: string, tenantId: string): Promise<Record<string, any>> {
-    const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}`;
-    
-    // Try Redis first (fast path)
-    const cached = await redis.get(key);
-    if (cached) {
-      const store: VariableStore = JSON.parse(cached);
-      return store.variables;
-    }
-
-    // Fall back to database
-    const context = await prisma.sessionContext.findUnique({
-      where: { sessionId },
-    });
-
-    if (context) {
-      // Restore to Redis
-      await redis.setex(key, this.REDIS_TTL, JSON.stringify({
-        sessionId,
-        tenantId,
-        variables: context.variables,
-        metadata: context.metadata,
-      }));
-      return context.variables;
-    }
-
-    return {};
+    const store = await this._getStore(sessionId, tenantId);
+    return store ? store.variables : {};
   }
 
   /**
@@ -102,27 +72,34 @@ export class VariableManager {
     variableName: string,
     value: any
   ) {
-    const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}`;
+    const currentStore = await this._getStore(sessionId, tenantId);
+    const variables = currentStore ? currentStore.variables : {};
     
-    // Get current store
-    let store = await this._getStore(sessionId, tenantId);
-    if (!store) {
-      store = await this.initializeSession(sessionId, tenantId);
-    }
+    // Check if there's any existing payload to retrieve expirations
+    const context = await prisma.sessionContext.findUnique({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+    });
+    
+    const expirations = context && context.data ? ((context.data as any).expirations || {}) : {};
+    
+    variables[variableName] = value;
+    // If it had an expiration, clean it up since it's set fresh
+    delete expirations[variableName];
 
-    // Update variable
-    store.variables[variableName] = value;
-    store.metadata.updatedAt = new Date().toISOString();
+    const payload: DBContextPayload = {
+      variables,
+      expirations,
+    };
 
-    // Save to Redis
-    await redis.setex(key, this.REDIS_TTL, JSON.stringify(store));
-
-    // Persist to database
-    await prisma.sessionContext.update({
-      where: { sessionId },
-      data: {
-        variables: store.variables,
-        metadata: store.metadata,
+    await prisma.sessionContext.upsert({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+      create: {
+        tenantId,
+        sessionId,
+        data: payload as any,
+      },
+      update: {
+        data: payload as any,
       },
     });
 
@@ -145,57 +122,65 @@ export class VariableManager {
     tenantId: string,
     updates: Record<string, any>
   ) {
-    const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}`;
-    
-    // Get current store
-    let store = await this._getStore(sessionId, tenantId);
-    if (!store) {
-      store = await this.initializeSession(sessionId, tenantId);
-    }
-
-    // Merge updates
-    store.variables = {
-      ...store.variables,
+    const currentStore = await this._getStore(sessionId, tenantId);
+    const variables = {
+      ...(currentStore ? currentStore.variables : {}),
       ...updates,
     };
-    store.metadata.updatedAt = new Date().toISOString();
 
-    // Save to Redis
-    await redis.setex(key, this.REDIS_TTL, JSON.stringify(store));
+    const context = await prisma.sessionContext.findUnique({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+    });
+    const expirations = context && context.data ? ((context.data as any).expirations || {}) : {};
+    
+    // Remove expiration for updated keys
+    for (const key of Object.keys(updates)) {
+      delete expirations[key];
+    }
 
-    // Persist to database
-    await prisma.sessionContext.update({
-      where: { sessionId },
-      data: {
-        variables: store.variables,
-        metadata: store.metadata,
+    const payload: DBContextPayload = {
+      variables,
+      expirations,
+    };
+
+    await prisma.sessionContext.upsert({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+      create: {
+        tenantId,
+        sessionId,
+        data: payload as any,
+      },
+      update: {
+        data: payload as any,
       },
     });
 
-    return store.variables;
+    return variables;
   }
 
   /**
    * Delete a variable
    */
   async deleteVariable(sessionId: string, tenantId: string, variableName: string) {
-    const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}`;
-    
-    let store = await this._getStore(sessionId, tenantId);
-    if (!store) return;
+    const context = await prisma.sessionContext.findUnique({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+    });
+    if (!context || !context.data) return;
 
-    delete store.variables[variableName];
-    store.metadata.updatedAt = new Date().toISOString();
+    const data = context.data as any as DBContextPayload;
+    const variables = data.variables || {};
+    const expirations = data.expirations || {};
 
-    // Update Redis
-    await redis.setex(key, this.REDIS_TTL, JSON.stringify(store));
+    delete variables[variableName];
+    delete expirations[variableName];
 
-    // Update database
     await prisma.sessionContext.update({
-      where: { sessionId },
+      where: { tenantId_sessionId: { tenantId, sessionId } },
       data: {
-        variables: store.variables,
-        metadata: store.metadata,
+        data: {
+          variables,
+          expirations,
+        } as any,
       },
     });
   }
@@ -204,14 +189,8 @@ export class VariableManager {
    * Clear all variables for a session
    */
   async clearSession(sessionId: string, tenantId: string) {
-    const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}`;
-    
-    // Remove from Redis
-    await redis.del(key);
-
-    // Remove from database
     await prisma.sessionContext.delete({
-      where: { sessionId },
+      where: { tenantId_sessionId: { tenantId, sessionId } },
     }).catch(() => {
       // Session might not exist in DB, that's ok
     });
@@ -226,15 +205,28 @@ export class VariableManager {
     variableName: string,
     expiresInSeconds: number
   ) {
-    const value = await this.getVariable(sessionId, tenantId, variableName);
-    if (value === undefined) return;
+    const context = await prisma.sessionContext.findUnique({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+    });
+    if (!context || !context.data) return;
 
-    // Store expiration info in a separate Redis key
-    const expiryKey = `${this.REDIS_PREFIX}${tenantId}:${sessionId}:expiry:${variableName}`;
-    await redis.setex(expiryKey, expiresInSeconds, '1');
+    const data = context.data as any as DBContextPayload;
+    const variables = data.variables || {};
+    const expirations = data.expirations || {};
 
-    // Check and cleanup expired variables periodically
-    this._scheduleExpiredVariableCleanup(sessionId, tenantId);
+    if (variables[variableName] === undefined) return;
+
+    expirations[variableName] = new Date(Date.now() + expiresInSeconds * 1000).toISOString();
+
+    await prisma.sessionContext.update({
+      where: { tenantId_sessionId: { tenantId, sessionId } },
+      data: {
+        data: {
+          variables,
+          expirations,
+        } as any,
+      },
+    });
   }
 
   /**
@@ -288,77 +280,53 @@ export class VariableManager {
   }
 
   /**
-   * Internal: Get store from Redis or DB
+   * Internal: Get store from DB and check expiration
    */
   private async _getStore(sessionId: string, tenantId: string): Promise<VariableStore | null> {
-    const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}`;
-    
-    // Try Redis
-    const cached = await redis.get(key);
-    if (cached) {
-      return JSON.parse(cached);
-    }
-
-    // Try database
     const context = await prisma.sessionContext.findUnique({
-      where: { sessionId },
+      where: { tenantId_sessionId: { tenantId, sessionId } },
     });
 
-    if (context) {
-      return {
-        sessionId,
-        tenantId,
-        variables: context.variables,
-        metadata: context.metadata,
-      };
+    if (!context || !context.data) {
+      return null;
     }
 
-    return null;
-  }
-
-  /**
-   * Internal: Schedule cleanup of expired variables
-   */
-  private _scheduleExpiredVariableCleanup(sessionId: string, tenantId: string) {
-    // This would be called periodically or when accessed
-    // In production, use a job queue (BullMQ) for this
-    setTimeout(() => {
-      this._cleanupExpiredVariables(sessionId, tenantId);
-    }, 5000);
-  }
-
-  /**
-   * Internal: Cleanup expired variables
-   */
-  private async _cleanupExpiredVariables(sessionId: string, tenantId: string) {
-    const store = await this._getStore(sessionId, tenantId);
-    if (!store) return;
-
+    const data = context.data as any as DBContextPayload;
+    const variables = data.variables || {};
+    const expirations = data.expirations || {};
+    
     let hasChanges = false;
+    const now = new Date();
 
-    for (const variableName of Object.keys(store.variables)) {
-      const expiryKey = `${this.REDIS_PREFIX}${tenantId}:${sessionId}:expiry:${variableName}`;
-      const hasExpired = !(await redis.exists(expiryKey));
-      
-      if (hasExpired) {
-        delete store.variables[variableName];
+    for (const [key, expireAtStr] of Object.entries(expirations)) {
+      if (new Date(expireAtStr) < now) {
+        delete variables[key];
+        delete expirations[key];
         hasChanges = true;
       }
     }
 
     if (hasChanges) {
-      const key = `${this.REDIS_PREFIX}${tenantId}:${sessionId}`;
-      store.metadata.updatedAt = new Date().toISOString();
-      await redis.setex(key, this.REDIS_TTL, JSON.stringify(store));
-      
       await prisma.sessionContext.update({
-        where: { sessionId },
+        where: { tenantId_sessionId: { tenantId, sessionId } },
         data: {
-          variables: store.variables,
-          metadata: store.metadata,
+          data: {
+            variables,
+            expirations,
+          } as any,
         },
       });
     }
+
+    return {
+      sessionId,
+      tenantId,
+      variables,
+      metadata: {
+        createdAt: context.createdAt.toISOString(),
+        updatedAt: context.updatedAt.toISOString(),
+      },
+    };
   }
 }
 

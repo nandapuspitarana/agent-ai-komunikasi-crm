@@ -64,7 +64,7 @@ export default function DashboardLayout({
 
         <nav className="flex-1 p-4 space-y-1">
           {NAV_ITEMS.map(({ href, labelKey, icon: Icon }) => {
-            const isActive = pathname === href || pathname.startsWith(href + '/');
+            const isActive = pathname === href || pathname?.startsWith(href + '/');
             return (
               <Link
                 key={href}
@@ -94,7 +94,7 @@ export default function DashboardLayout({
         <header className="h-16 bg-white border-b border-slate-200 flex items-center px-6 justify-between shrink-0">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-slate-500">
-            {t('sidebar', NAV_ITEMS.find(n => pathname === n.href || pathname.startsWith(n.href + '/'))?.labelKey || 'overview')}
+            {t('sidebar', NAV_ITEMS.find(n => pathname === n.href || pathname?.startsWith(n.href + '/'))?.labelKey || 'overview')}
           </div>
           {session?.user && (
             <div className="flex items-center gap-4">

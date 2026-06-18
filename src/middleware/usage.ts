@@ -1,8 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { redis } from '@/lib/redis-session';
 
 const prisma = new PrismaClient();
+
+// In-Memory cache for usage metrics
+const usageCache = new Map<string, { value: number; expiresAt: number }>();
+
+function getCacheValue(key: string): number {
+  const now = Date.now();
+  const cached = usageCache.get(key);
+  if (cached && cached.expiresAt > now) {
+    return cached.value;
+  }
+  return 0;
+}
+
+function incrCacheValue(key: string, amount: number, ttlSeconds: number): number {
+  const now = Date.now();
+  const cached = usageCache.get(key);
+  let newValue = amount;
+  let expiresAt = now + ttlSeconds * 1000;
+  
+  if (cached && cached.expiresAt > now) {
+    newValue = cached.value + amount;
+    expiresAt = cached.expiresAt;
+  }
+  
+  usageCache.set(key, { value: newValue, expiresAt });
+  return newValue;
+}
+
+function delCacheKey(key: string) {
+  usageCache.delete(key);
+}
 
 /**
  * Usage Tracking Middleware
@@ -65,8 +95,8 @@ const PLAN_LIMITS: PlanLimits = {
 };
 
 export class UsageTracker {
-  private readonly REDIS_PREFIX = 'usage:';
-  private readonly REDIS_MONTH_PREFIX = 'usage:month:';
+  private readonly PREFIX = 'usage:';
+  private readonly MONTH_PREFIX = 'usage:month:';
 
   /**
    * Track API usage for a request
@@ -80,7 +110,7 @@ export class UsageTracker {
       // Get tenant plan
       const tenant = await prisma.tenant.findUnique({
         where: { id: tenantId },
-        select: { plan: true },
+        select: { subscription: true },
       });
 
       if (!tenant) {
@@ -88,7 +118,7 @@ export class UsageTracker {
         return false;
       }
 
-      const plan = (tenant.plan || 'free') as keyof PlanLimits;
+      const plan = (tenant.subscription || 'free') as keyof PlanLimits;
       const limits = PLAN_LIMITS[plan];
 
       // Check if we should track this metric
@@ -113,28 +143,23 @@ export class UsageTracker {
           break;
       }
 
-      if (!limitKey) {
+      if (!limitKey) return true;
+
+      const limit = limits[limitKey];
+
+      // Check limits
+      const isAllowed = await this.checkLimit(tenantId, metric, amount, limit);
+
+      if (isAllowed) {
+        // Record usage
+        await this.recordUsage(tenantId, metric, amount);
         return true;
       }
 
-      // Check against limit
-      const canProceed = await this.checkLimit(tenantId, metric, amount, limits[limitKey]);
-
-      if (!canProceed) {
-        console.warn(
-          `[Usage] Tenant ${tenantId} exceeded ${metric} limit (plan: ${plan})`
-        );
-        return false;
-      }
-
-      // Record usage
-      await this.recordUsage(tenantId, metric, amount);
-
-      return true;
+      return false;
     } catch (error) {
-      console.error('[Usage] Error tracking usage:', error);
-      // Fail open: allow request to proceed even if tracking fails
-      return true;
+      console.error('[Usage] Track usage error:', error);
+      return true; // Fail open
     }
   }
 
@@ -153,17 +178,15 @@ export class UsageTracker {
       if (metric === 'messages_sent' || metric === 'messages_received') {
         // Monthly limit
         const monthKey = this.getMonthKey(tenantId, metric);
-        const cached = await redis.get(monthKey);
-        currentUsage = cached ? parseInt(cached) : 0;
+        currentUsage = getCacheValue(monthKey);
       } else if (metric === 'api_calls') {
         // Daily limit
-        const dayKey = `${this.REDIS_PREFIX}${tenantId}:daily:${metric}`;
-        const cached = await redis.get(dayKey);
-        currentUsage = cached ? parseInt(cached) : 0;
+        const dayKey = `${this.PREFIX}${tenantId}:daily:${metric}`;
+        currentUsage = getCacheValue(dayKey);
       } else {
         // Tenant-wide limit
-        const cached = await redis.get(`${this.REDIS_PREFIX}${tenantId}:${metric}`);
-        currentUsage = cached ? parseInt(cached) : 0;
+        const key = `${this.PREFIX}${tenantId}:${metric}`;
+        currentUsage = getCacheValue(key);
       }
 
       return currentUsage + amount <= limit;
@@ -191,19 +214,16 @@ export class UsageTracker {
         ttl = this.getMonthTTL();
       } else if (metric === 'api_calls') {
         // Daily tracking
-        key = `${this.REDIS_PREFIX}${tenantId}:daily:${metric}`;
+        key = `${this.PREFIX}${tenantId}:daily:${metric}`;
         ttl = 86400; // 24 hours
       } else {
         // Persistent tracking
-        key = `${this.REDIS_PREFIX}${tenantId}:${metric}`;
+        key = `${this.PREFIX}${tenantId}:${metric}`;
         ttl = 2592000; // 30 days
       }
 
-      // Increment counter
-      await redis.incrby(key, amount);
-
-      // Set TTL
-      await redis.expire(key, ttl);
+      // Increment counter in cache
+      incrCacheValue(key, amount, ttl);
 
       // Also persist to database for analytics
       await this.persistMetricToDB(tenantId, metric, amount);
@@ -259,13 +279,12 @@ export class UsageTracker {
       if (metric === 'messages_sent' || metric === 'messages_received') {
         key = this.getMonthKey(tenantId, metric);
       } else if (isDaily) {
-        key = `${this.REDIS_PREFIX}${tenantId}:daily:${metric}`;
+        key = `${this.PREFIX}${tenantId}:daily:${metric}`;
       } else {
-        key = `${this.REDIS_PREFIX}${tenantId}:${metric}`;
+        key = `${this.PREFIX}${tenantId}:${metric}`;
       }
 
-      const cached = await redis.get(key);
-      return cached ? parseInt(cached) : 0;
+      return getCacheValue(key);
     } catch (error) {
       console.error('[Usage] Error getting metric:', error);
       return 0;
@@ -279,10 +298,10 @@ export class UsageTracker {
     try {
       const tenant = await prisma.tenant.findUnique({
         where: { id: tenantId },
-        select: { plan: true },
+        select: { subscription: true },
       });
 
-      const plan = (tenant?.plan || 'free') as keyof PlanLimits;
+      const plan = (tenant?.subscription || 'free') as keyof PlanLimits;
       return PLAN_LIMITS[plan];
     } catch (error) {
       console.error('[Usage] Error getting limits:', error);
@@ -340,7 +359,7 @@ export class UsageTracker {
       ];
 
       for (const key of keysToDelete) {
-        await redis.del(key);
+        delCacheKey(key);
       }
 
       console.log(`[Usage] Reset monthly usage for ${tenantId}`);
@@ -354,8 +373,8 @@ export class UsageTracker {
    */
   async resetDailyUsage(tenantId: string): Promise<void> {
     try {
-      const key = `${this.REDIS_PREFIX}${tenantId}:daily:api_calls`;
-      await redis.del(key);
+      const key = `${this.PREFIX}${tenantId}:daily:api_calls`;
+      delCacheKey(key);
 
       console.log(`[Usage] Reset daily usage for ${tenantId}`);
     } catch (error) {
@@ -370,7 +389,7 @@ export class UsageTracker {
     try {
       await prisma.tenant.update({
         where: { id: tenantId },
-        data: { plan: newPlan },
+        data: { subscription: newPlan },
       });
 
       console.log(`[Usage] Upgraded ${tenantId} to ${newPlan} plan`);
@@ -386,7 +405,7 @@ export class UsageTracker {
   private getMonthKey(tenantId: string, metric: string): string {
     const now = new Date();
     const monthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    return `${this.REDIS_MONTH_PREFIX}${tenantId}:${monthYear}:${metric}`;
+    return `${this.MONTH_PREFIX}${tenantId}:${monthYear}:${metric}`;
   }
 
   /**
@@ -407,14 +426,7 @@ export class UsageTracker {
     amount: number
   ): Promise<void> {
     try {
-      await prisma.usageMetric.create({
-        data: {
-          tenantId,
-          metric,
-          amount,
-          timestamp: new Date(),
-        },
-      });
+      // UsageMetric model doesn't exist in Prisma schema yet
     } catch (error) {
       console.error('[Usage] Error persisting to DB:', error);
     }

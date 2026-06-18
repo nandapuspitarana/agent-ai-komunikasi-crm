@@ -1,9 +1,10 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import { PrismaClient } from '@prisma/client';
-import { redis } from '@/lib/redis-session';
 
 const prisma = new PrismaClient();
+const credentialsCache = new Map<string, { credentials: GoogleCredentials; expiresAt: number }>();
+
 
 /**
  * Google Sheets Integration
@@ -25,7 +26,7 @@ export interface GoogleCredentials {
 
 export class GoogleSheetsIntegration {
   private oauth2Client: OAuth2Client;
-  private readonly REDIS_PREFIX = 'google:sheets:';
+  private readonly CACHE_TTL_MS = 3600 * 1000; // 1 hour
 
   constructor() {
     this.oauth2Client = new OAuth2Client(
@@ -70,28 +71,37 @@ export class GoogleSheetsIntegration {
       };
 
       // Save credentials encrypted in database
-      await prisma.integration.upsert({
+      const existingIntegration = await prisma.integration.findFirst({
         where: {
-          tenantId_type: {
-            tenantId,
-            type: 'google_sheets',
-          },
-        },
-        create: {
           tenantId,
-          type: 'google_sheets',
-          credentials: credentials,
-          isActive: true,
-        },
-        update: {
-          credentials: credentials,
-          isActive: true,
+          provider: 'google_sheets',
         },
       });
 
-      // Cache in Redis
-      const cacheKey = `${this.REDIS_PREFIX}${tenantId}:credentials`;
-      await redis.setex(cacheKey, 3600, JSON.stringify(credentials));
+      if (existingIntegration) {
+        await prisma.integration.update({
+          where: { id: existingIntegration.id },
+          data: {
+            apiKey: JSON.stringify(credentials),
+            isActive: true,
+          },
+        });
+      } else {
+        await prisma.integration.create({
+          data: {
+            tenantId,
+            provider: 'google_sheets',
+            apiKey: JSON.stringify(credentials),
+            isActive: true,
+          },
+        });
+      }
+
+      // Cache in memory
+      credentialsCache.set(tenantId, {
+        credentials,
+        expiresAt: Date.now() + this.CACHE_TTL_MS,
+      });
 
       return credentials;
     } catch (error) {
@@ -104,32 +114,36 @@ export class GoogleSheetsIntegration {
    * Get stored credentials for a tenant
    */
   async getCredentials(tenantId: string): Promise<GoogleCredentials | null> {
-    // Try Redis cache first
-    const cacheKey = `${this.REDIS_PREFIX}${tenantId}:credentials`;
-    const cached = await redis.get(cacheKey);
-
-    if (cached) {
-      return JSON.parse(cached);
+    // Try cache first
+    const cached = credentialsCache.get(tenantId);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.credentials;
     }
 
     // Fetch from database
-    const integration = await prisma.integration.findUnique({
+    const integration = await prisma.integration.findFirst({
       where: {
-        tenantId_type: {
-          tenantId,
-          type: 'google_sheets',
-        },
+        tenantId,
+        provider: 'google_sheets',
       },
     });
 
-    if (!integration || !integration.credentials) {
+    if (!integration || !integration.apiKey) {
       return null;
     }
 
-    const credentials = integration.credentials as GoogleCredentials;
+    let credentials: GoogleCredentials;
+    try {
+      credentials = JSON.parse(integration.apiKey) as GoogleCredentials;
+    } catch (e) {
+      return null;
+    }
 
     // Cache for 1 hour
-    await redis.setex(cacheKey, 3600, JSON.stringify(credentials));
+    credentialsCache.set(tenantId, {
+      credentials,
+      expiresAt: Date.now() + this.CACHE_TTL_MS,
+    });
 
     return credentials;
   }
@@ -156,7 +170,7 @@ export class GoogleSheetsIntegration {
         await this._refreshAccessToken(tenantId, credentials);
       }
 
-      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client });
+      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client as any });
 
       const range = config.range || `${config.sheetName}!A:Z`;
 
@@ -204,7 +218,7 @@ export class GoogleSheetsIntegration {
         await this._refreshAccessToken(tenantId, credentials);
       }
 
-      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client });
+      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client as any });
 
       const range = config.range || `${config.sheetName}!A:Z`;
 
@@ -250,7 +264,7 @@ export class GoogleSheetsIntegration {
         await this._refreshAccessToken(tenantId, credentials);
       }
 
-      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client });
+      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client as any });
 
       const range = config.range || `${config.sheetName}!A1`;
 
@@ -294,7 +308,7 @@ export class GoogleSheetsIntegration {
 
       this.oauth2Client.setCredentials(credentials);
 
-      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client });
+      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client as any });
 
       const response = await sheets.spreadsheets.values.clear({
         spreadsheetId,
@@ -326,7 +340,7 @@ export class GoogleSheetsIntegration {
 
       this.oauth2Client.setCredentials(credentials);
 
-      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client });
+      const sheets = google.sheets({ version: 'v4', auth: this.oauth2Client as any });
 
       const response = await sheets.spreadsheets.get({
         spreadsheetId,
@@ -361,21 +375,21 @@ export class GoogleSheetsIntegration {
       };
 
       // Update in database
-      await prisma.integration.update({
+      await prisma.integration.updateMany({
         where: {
-          tenantId_type: {
-            tenantId,
-            type: 'google_sheets',
-          },
+          tenantId,
+          provider: 'google_sheets',
         },
         data: {
-          credentials: updated,
+          apiKey: JSON.stringify(updated),
         },
       });
 
       // Update cache
-      const cacheKey = `${this.REDIS_PREFIX}${tenantId}:credentials`;
-      await redis.setex(cacheKey, 3600, JSON.stringify(updated));
+      credentialsCache.set(tenantId, {
+        credentials: updated,
+        expiresAt: Date.now() + this.CACHE_TTL_MS,
+      });
 
       return updated;
     } catch (error) {

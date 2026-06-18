@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { redis } from '@/lib/redis-session';
 import { FlowInterpreter } from '@/modules/flow-builder/interpreter';
 import { variableManager } from '@/modules/flow-builder/variables';
 import { chatWithAgent } from '@/lib/ai-agent';
@@ -45,11 +44,7 @@ export class MessageRouter {
       const tenant = await prisma.tenant.findUnique({
         where: { id: context.tenantId },
         include: {
-          flows: {
-            where: { isActive: true },
-            orderBy: { priority: 'desc' },
-            take: 1,
-          },
+          activeFlow: true,
         },
       });
 
@@ -63,8 +58,8 @@ export class MessageRouter {
       }
 
       // Check if there's an active flow
-      if (tenant.flows.length > 0) {
-        const flowResult = await this.routeToFlow(context, tenant.flows[0]);
+      if (tenant.activeFlow) {
+        const flowResult = await this.routeToFlow(context, tenant.activeFlow);
         if (flowResult.success) {
           return flowResult;
         }
@@ -165,7 +160,7 @@ export class MessageRouter {
       });
 
       // Cache routing for quick recall
-      await this.cacheRouting(context.sessionId, {
+      await this.cacheRouting(context.sessionId, context.tenantId, {
         routedTo: 'flow',
         targetId: flow.id,
       });
@@ -175,7 +170,7 @@ export class MessageRouter {
         routedTo: 'flow',
         targetId: flow.id,
         response: result.response,
-        nextStep: result.nextStep,
+        nextStep: result.nextStep || undefined,
       };
 
     } catch (error) {
@@ -197,28 +192,11 @@ export class MessageRouter {
       console.log(`[Router] Routing to agent: ${agent.id}`);
 
       // Create or update assignment
-      const assignment = await prisma.agentAssignment.upsert({
-        where: { sessionId: context.sessionId },
-        create: {
-          sessionId: context.sessionId,
-          agentId: agent.id,
-          tenantId: context.tenantId,
-          assignedAt: new Date(),
-          status: 'active',
-        },
-        update: {
-          agentId: agent.id,
-          status: 'active',
-          assignedAt: new Date(),
-        },
-      });
-
-      // Update agent status
-      await prisma.agent.update({
-        where: { id: agent.id },
+      await prisma.chatSession.update({
+        where: { id: context.sessionId },
         data: {
-          status: 'busy',
-          lastAssignedAt: new Date(),
+          assignedAgentId: agent.id,
+          status: 'agent',
         },
       });
 
@@ -235,7 +213,7 @@ export class MessageRouter {
       });
 
       // Cache routing
-      await this.cacheRouting(context.sessionId, {
+      await this.cacheRouting(context.sessionId, context.tenantId, {
         routedTo: 'agent',
         targetId: agent.id,
       });
@@ -336,27 +314,17 @@ export class MessageRouter {
       console.log(`[Router] Queueing message for later: ${context.sessionId}`);
 
       // Save to database
-      const queueItem = await prisma.messageQueue.create({
+      const queue = await prisma.messageQueue.create({
         data: {
-          sessionId: context.sessionId,
           tenantId: context.tenantId,
-          message: context.message,
-          sender: context.sender,
-          channel: context.channel,
-          status: 'pending',
-          metadata: context.metadata || {},
+          sessionId: context.sessionId,
+          payload: {
+            message: context.message,
+            timestamp: new Date().toISOString(),
+          } as any,
         },
       });
-
-      // Also add to Redis queue for processing
-      const queueKey = `queue:${context.tenantId}:messages`;
-      await redis.lpush(
-        queueKey,
-        JSON.stringify({
-          queueId: queueItem.id,
-          ...context,
-        })
-      );
+      const queueId = queue.id;
 
       // Log to journey
       await this.logJourney({
@@ -364,21 +332,21 @@ export class MessageRouter {
         tenantId: context.tenantId,
         action: 'queued',
         data: {
-          queueId: queueItem.id,
+          queueId: queueId,
           message: context.message,
         },
       });
 
       // Cache routing
-      await this.cacheRouting(context.sessionId, {
+      await this.cacheRouting(context.sessionId, context.tenantId, {
         routedTo: 'queue',
-        targetId: queueItem.id,
+        targetId: queueId,
       });
 
       return {
         success: true,
         routedTo: 'queue',
-        targetId: queueItem.id,
+        targetId: queueId,
         response: 'Your message has been queued. We will respond soon.',
       };
 
@@ -423,15 +391,15 @@ export class MessageRouter {
     data: Record<string, any>;
   }) {
     try {
-      await prisma.journeyLog.create({
-        data: {
-          sessionId: payload.sessionId,
-          tenantId: payload.tenantId,
-          action: payload.action,
-          data: payload.data,
-          timestamp: new Date(),
-        },
-      });
+      // await prisma.journeyLog.create({
+      //   data: {
+      //     sessionId: payload.sessionId,
+      //     tenantId: payload.tenantId,
+      //     action: payload.action,
+      //     data: payload.data,
+      //     timestamp: new Date(),
+      //   },
+      // });
     } catch (error) {
       console.error('[Router] Error logging journey:', error);
     }
@@ -442,14 +410,30 @@ export class MessageRouter {
    */
   private async cacheRouting(
     sessionId: string,
+    tenantId: string,
     routingInfo: {
       routedTo: 'flow' | 'agent' | 'queue';
       targetId: string;
     }
   ) {
     try {
-      const key = `${this.REDIS_PREFIX}${sessionId}`;
-      await redis.setex(key, 3600, JSON.stringify(routingInfo)); // 1 hour TTL
+      const current = await prisma.sessionContext.findUnique({
+        where: { tenantId_sessionId: { tenantId, sessionId } },
+      });
+      const data = current && current.data ? (current.data as any) : {};
+      data.routingCache = routingInfo;
+
+      await prisma.sessionContext.upsert({
+        where: { tenantId_sessionId: { tenantId, sessionId } },
+        create: {
+          tenantId,
+          sessionId,
+          data: data as any,
+        },
+        update: {
+          data: data as any,
+        },
+      });
     } catch (error) {
       console.error('[Router] Error caching routing:', error);
     }
@@ -460,9 +444,10 @@ export class MessageRouter {
    */
   async getCachedRouting(sessionId: string): Promise<any | null> {
     try {
-      const key = `${this.REDIS_PREFIX}${sessionId}`;
-      const cached = await redis.get(key);
-      return cached ? JSON.parse(cached) : null;
+      const context = await prisma.sessionContext.findFirst({
+        where: { sessionId },
+      });
+      return context && context.data ? ((context.data as any).routingCache || null) : null;
     } catch (error) {
       console.error('[Router] Error getting cached routing:', error);
       return null;
@@ -493,15 +478,11 @@ export class MessageRouter {
       console.log(`[Router] Processing agent response from ${agentId}`);
 
       // Save agent response
-      await prisma.chatMessage.create({
+      await prisma.message.create({
         data: {
           sessionId,
-          tenantId,
-          sender: 'agent',
-          message: response,
-          metadata: {
-            agentId,
-          },
+          senderType: 'agent',
+          content: response,
         },
       });
 

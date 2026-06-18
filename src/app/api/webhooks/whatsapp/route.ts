@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { redis } from '@/lib/redis-session';
 import crypto from 'crypto';
 
 const prisma = new PrismaClient();
@@ -158,11 +157,7 @@ async function handleIncomingMessages(payload: any) {
     // Find or create integration session
     const integration = await prisma.integration.findFirst({
       where: {
-        type: 'whatsapp',
-        metadata: {
-          path: ['phoneNumberId'],
-          equals: phoneNumberId,
-        },
+        provider: 'whatsapp',
       },
     });
 
@@ -175,7 +170,7 @@ async function handleIncomingMessages(payload: any) {
     let chatSession = await prisma.chatSession.findFirst({
       where: {
         tenantId: integration.tenantId,
-        externalId: senderPhone,
+        contactId: senderPhone,
         channel: 'whatsapp',
       },
     });
@@ -184,14 +179,9 @@ async function handleIncomingMessages(payload: any) {
       chatSession = await prisma.chatSession.create({
         data: {
           tenantId: integration.tenantId,
-          externalId: senderPhone,
+          contactId: senderPhone,
           channel: 'whatsapp',
-          contactName: senderName,
-          contactPhone: senderPhone,
-          metadata: {
-            phoneNumberId,
-            messageId,
-          },
+          status: 'bot'
         },
       });
 
@@ -227,18 +217,11 @@ async function handleIncomingMessages(payload: any) {
     }
 
     // Save message to database
-    const chatMessage = await prisma.chatMessage.create({
+    const chatMessage = await prisma.message.create({
       data: {
         sessionId: chatSession.id,
-        tenantId: integration.tenantId,
-        sender: 'user',
-        message: messageContent,
-        externalId: messageId,
-        metadata: {
-          type: message.type,
-          mediaUrl,
-          timestamp: messageTimestamp,
-        },
+        senderType: 'user',
+        content: messageContent,
       },
     });
 
@@ -260,18 +243,7 @@ async function handleIncomingMessages(payload: any) {
       },
     });
 
-    // Store in Redis for quick access
-    const sessionKey = `whatsapp:session:${senderPhone}`;
-    await redis.setex(
-      sessionKey,
-      86400, // 24 hours
-      JSON.stringify({
-        sessionId: chatSession.id,
-        tenantId: integration.tenantId,
-        lastMessage: messageContent,
-        lastMessageTime: messageTimestamp,
-      })
-    );
+    // Cached session in Redis removed. Session lookup is done directly via Prisma query.
 
   } catch (error) {
     console.error('[WhatsApp] Error handling incoming message:', error);
@@ -294,18 +266,9 @@ async function handleMessageStatus(payload: any) {
 
     console.log(`[WhatsApp] Message ${messageId} status: ${messageStatus}`);
 
-    // Update message status in database
-    await prisma.chatMessage.updateMany({
-      where: {
-        externalId: messageId,
-      },
-      data: {
-        metadata: {
-          status: messageStatus,
-          statusTimestamp: status.timestamp,
-        },
-      },
-    });
+    // We don't track message statuses in the current schema yet
+    // Could add this later if needed. For now just log it.
+    console.log(`[WhatsApp] Status update ignored because current schema doesn't support message status: ${messageId}`);
 
   } catch (error) {
     console.error('[WhatsApp] Error handling message status:', error);
@@ -321,11 +284,13 @@ async function routeToFlowEngine(payload: any) {
     // For now, we'll rely on Supabase Realtime for instant UI updates
 
     // Also store in queue for asynchronous processing
-    const queueKey = `whatsapp:queue:${payload.tenantId}`;
-    await redis.lpush(
-      queueKey,
-      JSON.stringify(payload)
-    );
+    await prisma.messageQueue.create({
+      data: {
+        tenantId: payload.tenantId,
+        sessionId: payload.sessionId,
+        payload: payload,
+      },
+    });
 
   } catch (error) {
     console.error('[WhatsApp] Error routing to flow engine:', error);

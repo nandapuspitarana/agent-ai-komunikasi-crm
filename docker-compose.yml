@@ -1,29 +1,4 @@
-version: '3.8'
-
 services:
-  postgres:
-    image: postgres:15.6-alpine  # Pinned to specific minor version to prevent unintended updates
-    container_name: crm-postgres
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: crm
-    ports:
-      - "5444:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d crm"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7.2.4-alpine  # Pinned to specific minor version to prevent unintended updates
-    container_name: crm-redis
-    ports:
-      - "5448:6379"
-
   web:
     build:
       context: .
@@ -34,15 +9,5 @@ services:
       - "3101:3101"
     env_file:
       - .env
-    environment:
-      - DATABASE_URL=postgresql://user:pass@postgres:5432/crm?schema=public
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_started
     restart: always
 
-volumes:
-  postgres_data:
