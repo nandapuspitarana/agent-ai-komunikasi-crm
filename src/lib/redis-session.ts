@@ -1,6 +1,8 @@
 import Redis from 'ioredis';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  keyPrefix: process.env.REDIS_PREFIX || 'crm_agent:',
+});
 
 export async function setSession(sessionId: string, data: any, ttlSeconds: number = 3600) {
   await redis.set(`session:${sessionId}`, JSON.stringify(data), 'EX', ttlSeconds);

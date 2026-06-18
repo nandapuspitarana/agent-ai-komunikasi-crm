@@ -51,6 +51,8 @@ model User {
   auditLogs         AuditLog[]          @relation("AuditLogUser")
   performedAudits   AuditLog[]          @relation("AuditLogPerformedBy")
   passwordResetTokens PasswordResetToken[]
+
+  @@map("crm_agent_User")
 }
 
 model AuditLog {
@@ -71,6 +73,7 @@ model AuditLog {
   @@index([performedById])
   @@index([action])
   @@index([createdAt])
+  @@map("crm_agent_AuditLog")
 }
 
 model PasswordResetToken {
@@ -85,6 +88,7 @@ model PasswordResetToken {
   
   @@index([token])
   @@index([userId])
+  @@map("crm_agent_PasswordResetToken")
 }
 
 model Tenant {
@@ -114,6 +118,8 @@ model Tenant {
   flows          Flow[]        @relation("TenantFlows")
   chatSessions   ChatSession[]
   assets         Asset[]
+
+  @@map("crm_agent_Tenant")
 }
 
 model Integration {
@@ -123,6 +129,8 @@ model Integration {
   provider String
   apiKey   String
   isActive Boolean @default(true)
+
+  @@map("crm_agent_Integration")
 }
 
 model Flow {
@@ -140,6 +148,7 @@ model Flow {
   knowledgeDocs KnowledgeDocument[]
 
   @@index([tenantId])
+  @@map("crm_agent_Flow")
 }
 
 model Intent {
@@ -156,6 +165,7 @@ model Intent {
   updatedAt        DateTime @updatedAt
 
   @@index([flowId])
+  @@map("crm_agent_Intent")
 }
 
 model ChatSession {
@@ -173,6 +183,8 @@ model ChatSession {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @default(now()) @updatedAt
   messages         Message[]
+
+  @@map("crm_agent_ChatSession")
 }
 
 model Message {
@@ -182,6 +194,8 @@ model Message {
   senderType String
   content    String
   createdAt  DateTime    @default(now())
+
+  @@map("crm_agent_Message")
 }
 
 model KnowledgeDocument {
@@ -204,6 +218,7 @@ model KnowledgeDocument {
 
   @@index([flowId])
   @@index([tenantId])
+  @@map("crm_agent_KnowledgeDocument")
 }
 
 model Asset {
@@ -215,4 +230,5 @@ model Asset {
   createdAt DateTime @default(now())
   
   @@index([tenantId])
+  @@map("crm_agent_Asset")
 }
