@@ -8,8 +8,32 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || !session.user || !session.user.tenantId) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    let tenantId = (session.user as any).tenantId;
+    if (!tenantId) {
+      const existingTenant = await prisma.tenant.findFirst({
+        where: { name: `${(session.user as any).email}-default` }
+      });
+
+      if (existingTenant) {
+        tenantId = existingTenant.id;
+      } else {
+        const newTenant = await prisma.tenant.create({
+          data: {
+            name: `${(session.user as any).email}-default`,
+            subscription: 'free'
+          }
+        });
+        tenantId = newTenant.id;
+
+        await prisma.user.update({
+          where: { id: (session.user as any).id },
+          data: { tenantId: newTenant.id }
+        });
+      }
     }
 
     const body = await req.json();
@@ -43,7 +67,7 @@ export async function POST(req: NextRequest) {
       // 1. Create the Flow
       const flow = await tx.flow.create({
         data: {
-          tenantId: session.user.tenantId,
+          tenantId: tenantId,
           name: `${name} (Imported)`,
           description: description || null,
           config: config || {},

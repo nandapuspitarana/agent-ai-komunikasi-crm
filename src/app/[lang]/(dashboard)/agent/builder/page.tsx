@@ -2,8 +2,8 @@
 
 export const dynamic = 'force-dynamic';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Save, FileText, Link as LinkIcon, Settings, Globe, HelpCircle, Plus, Trash2, ArrowLeft, Send, Bot, User, RotateCcw, GitMerge, List, MessageSquare, LayoutList, FormInput, ExternalLink, Cpu, ChevronRight, Code, Download } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Save, FileText, Link as LinkIcon, Settings, Globe, HelpCircle, Plus, Trash2, ArrowLeft, Send, Bot, User, RotateCcw, GitMerge, List, MessageSquare, LayoutList, FormInput, ExternalLink, Cpu, ChevronRight, Code, Download, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, BackgroundVariant, addEdge, Handle, Position, applyNodeChanges, NodeChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -424,6 +424,43 @@ function AgentBuilderContent() {
     window.location.href = `/api/agent/flow/${currentFlowId}/export`;
   };
 
+  const [isImporting, setIsImporting] = useState(false);
+  const importFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    try {
+      const text = await file.text();
+      const payload = JSON.parse(text);
+
+      const response = await fetch('/api/agent/flow/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to import flow');
+      }
+
+      const data = await response.json();
+      alert('Import successful! Loading imported flow...');
+      handleLoadFlow(data.flow.id);
+    } catch (error: any) {
+      console.error('Import error:', error);
+      alert('Import failed: ' + error.message);
+    } finally {
+      setIsImporting(false);
+      if (importFileInputRef.current) {
+        importFileInputRef.current.value = '';
+      }
+    }
+  };
+
   // --- Chat Simulation ---
   const [previewSessionId, setPreviewSessionId] = useState<string>('');
   
@@ -546,6 +583,21 @@ function AgentBuilderContent() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <input 
+            type="file" 
+            accept=".json" 
+            ref={importFileInputRef}
+            onChange={handleImport}
+            className="hidden" 
+          />
+          <button
+            onClick={() => importFileInputRef.current?.click()}
+            disabled={isImporting}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-200 ${isImporting ? 'bg-slate-100 text-slate-400' : 'bg-white text-slate-700 hover:bg-slate-50'}`}
+            title="Import Agent Configuration"
+          >
+            <Upload size={16} className={isImporting ? 'animate-bounce' : ''} /> <span className="hidden sm:inline">{isImporting ? 'Importing...' : 'Import JSON'}</span>
+          </button>
           <button
             onClick={handleExport}
             className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg text-sm font-medium transition-colors border border-slate-200"

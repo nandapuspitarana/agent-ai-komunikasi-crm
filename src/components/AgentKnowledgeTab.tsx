@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   FileText, Upload, Trash2, RefreshCw, AlertCircle, CheckCircle,
   X, FileSpreadsheet, File, Tag, AlertTriangle,
-  Wifi, WifiOff, Plus, Clock, Search, Library
+  Wifi, WifiOff, Plus, Clock, Search, Library, Globe
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 

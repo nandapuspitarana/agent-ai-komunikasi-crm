@@ -20,7 +20,11 @@ export default function DashboardOverview() {
   const [dashboardData, setDashboardData] = useState<{
     stats: { totalChats: number, resolvedChats: number, pendingChats: number, inProgressChats: number },
     csat: { average: string, totalReviews: number, distribution: { stars: number, percentage: number }[] },
-    recentRatings: any[]
+    recentRatings: any[],
+    agentLeaderboard: any[],
+    aiStats: any,
+    recentAiReplies: any[],
+    insights: any
   } | null>(null);
 
   useEffect(() => {
@@ -73,7 +77,7 @@ export default function DashboardOverview() {
 
   const recentRatings = dashboardData?.recentRatings || [];
 
-  const agentLeaderboard = [
+  const agentLeaderboard = dashboardData?.agentLeaderboard && dashboardData.agentLeaderboard.length > 0 ? dashboardData.agentLeaderboard : [
     { id: 1, name: 'Agent Sarah', score: '4.9', resolved: 145, avatar: 'S' },
     { id: 2, name: 'Agent John', score: '4.8', resolved: 132, avatar: 'J' },
     { id: 3, name: 'AI Bot', score: '4.5', resolved: 540, avatar: 'B' },
@@ -81,17 +85,13 @@ export default function DashboardOverview() {
 
   // AI Agent Data
   const aiStats = [
-    { name: 'AI Avg. CSAT', value: '4.7/5.0', change: '+0.1', isPositive: true, icon: Star },
-    { name: 'AI Avg. Resolution Time', value: '1m 05s', change: '-30s', isPositive: true, icon: Clock },
-    { name: 'Effectiveness Index', value: '88%', change: '+5%', isPositive: true, icon: Zap },
-    { name: 'Total Time Saved', value: '120 hrs', change: '+12 hrs', isPositive: true, icon: Clock },
+    { name: 'AI Avg. CSAT', value: dashboardData?.aiStats?.avgCsat || '0.0', change: '+0.1', isPositive: true, icon: Star },
+    { name: 'AI Resolves', value: dashboardData?.aiStats?.resolvedChats || '0', change: '+10%', isPositive: true, icon: CheckCircle2 },
+    { name: 'Effectiveness Index', value: dashboardData?.aiStats?.effectiveness || '0%', change: '+5%', isPositive: true, icon: Zap },
+    { name: 'Total Time Saved', value: dashboardData?.aiStats?.timeSaved || '0 hrs', change: '+12 hrs', isPositive: true, icon: Clock },
   ];
 
-  const recentAiReplies = [
-    { id: 1, agent: 'SupportBot', user: 'Mike', message: 'I can help you reset your password. Please follow this link...', time: '5 mins ago' },
-    { id: 2, agent: 'SalesBot', user: 'Anna', message: 'Our Pro plan includes unlimited AI agents and custom branding.', time: '12 mins ago' },
-    { id: 3, agent: 'TechBot', user: 'David', message: 'Error 404 usually means the URL is incorrect. Have you checked the spelling?', time: '30 mins ago' },
-  ];
+  const recentAiReplies = dashboardData?.recentAiReplies && dashboardData.recentAiReplies.length > 0 ? dashboardData.recentAiReplies : [];
 
   return (
     <div className="p-8">
@@ -470,13 +470,13 @@ export default function DashboardOverview() {
                 </div>
               
               <div className="space-y-4">
-                {[
+                {(dashboardData?.insights?.commonIssues || [
                   { issue: 'Password Reset & Login', freq: '35%', count: 436, sentiment: 'Neutral' },
                   { issue: 'Billing / Subscription Upgrade', freq: '22%', count: 274, sentiment: 'Positive' },
                   { issue: 'Integration (WhatsApp/API)', freq: '18%', count: 224, sentiment: 'Negative' },
                   { issue: 'Custom AI Agent Configuration', freq: '15%', count: 187, sentiment: 'Neutral' },
                   { issue: 'Other / General Questions', freq: '10%', count: 127, sentiment: 'Neutral' },
-                ].map((item, idx) => (
+                ]).map((item: any, idx: number) => (
                   <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-slate-50">
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="font-semibold text-slate-800">{item.issue}</h4>

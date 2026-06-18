@@ -32,9 +32,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(flow);
     }
 
+    const isSuperAdmin = (session.user as any).role === 'SUPER_ADMIN';
+    const tenantId = (session.user as any).tenantId;
+
+    if (!isSuperAdmin && !tenantId) {
+      return NextResponse.json({ error: 'Unauthorized: No tenant assigned' }, { status: 401 });
+    }
+
+    const whereClause = isSuperAdmin ? {} : { tenantId: tenantId as string };
+
     // Get all flows
     const flows = await prisma.flow.findMany({
-      where: { tenantId: (session.user as any).tenantId },
+      where: whereClause,
       include: { intents: true },
       orderBy: { createdAt: 'desc' }
     });
@@ -202,7 +211,8 @@ export async function DELETE(request: NextRequest) {
       where: { id: flowId }
     });
 
-    if (!flow || flow.tenantId !== (session.user as any).tenantId) {
+    const isSuperAdmin = (session.user as any).role === 'SUPER_ADMIN';
+    if (!flow || (!isSuperAdmin && flow.tenantId !== (session.user as any).tenantId)) {
       return NextResponse.json({ error: 'Flow not found or unauthorized' }, { status: 404 });
     }
 
