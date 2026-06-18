@@ -61,8 +61,9 @@ export async function POST(request: NextRequest) {
 
     // TODO: Send email with reset link
     // For now, return the token (in production, this should be sent via email)
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || 'http://localhost:8201';
     console.log('Password reset token:', token);
-    console.log('Reset link: http://localhost:8201/reset-password?token=' + token);
+    console.log(`Reset link: ${baseUrl}/reset-password?token=${token}`);
 
     return NextResponse.json({
       success: true,

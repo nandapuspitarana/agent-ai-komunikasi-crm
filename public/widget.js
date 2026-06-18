@@ -1,9 +1,17 @@
 (function () {
-  const CRM_HOST = 'http://localhost:3000'; // Ganti dengan URL Production Next.js Anda nanti
+  const scriptTag = document.currentScript || document.querySelector('script[src*="widget.js"]');
+  
+  // Ambil origin script tag secara dinamis agar tidak hardcoded ke localhost
+  let CRM_HOST = 'http://localhost:8201';
+  if (scriptTag && scriptTag.src) {
+    try {
+      CRM_HOST = new URL(scriptTag.src).origin;
+    } catch (e) {
+      // Fallback
+    }
+  }
   
   function initWidget() {
-    // Cari data-tenant-id dari script tag yang memuat file ini atau dari global config
-    const scriptTag = document.currentScript || document.querySelector('script[src*="widget.js"]');
     const tenantId = window.CRM_AGENT_CONFIG?.tenantId || window.CRM_TENANT_ID || scriptTag?.getAttribute('data-tenant-id');
     const apiUrl = window.CRM_AGENT_CONFIG?.apiUrl || CRM_HOST;
 

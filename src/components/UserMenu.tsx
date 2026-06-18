@@ -31,7 +31,10 @@ export default function UserMenu({ user, tenant }: UserMenuProps) {
   }, []);
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/login' });
+    const callbackUrl = typeof window !== 'undefined' 
+      ? `${window.location.origin}/login` 
+      : '/login';
+    await signOut({ callbackUrl });
   };
 
   const initials = user.name
