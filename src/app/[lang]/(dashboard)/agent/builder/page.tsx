@@ -112,6 +112,16 @@ const nodeTypes = {
   answer: AnswerNode,
 };
 
+const generateUUID = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 function AgentBuilderContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -468,7 +478,7 @@ function AgentBuilderContent() {
   
   useEffect(() => {
     // Generate a valid UUID for the python backend on mount
-    setPreviewSessionId(crypto.randomUUID());
+    setPreviewSessionId(generateUUID());
   }, []);
 
   const [chatMessages, setChatMessages] = useState<{ role: 'assistant' | 'user', text: string, type?: string, options?: string }[]>([
@@ -1248,7 +1258,7 @@ function AgentBuilderContent() {
                   onSendMessage={handleSendMessage}
                   onRestartChat={() => {
                     setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }]);
-                    setPreviewSessionId(crypto.randomUUID());
+                    setPreviewSessionId(generateUUID());
                   }}
                   hideHeaderMoreOptions={true}
                 />
