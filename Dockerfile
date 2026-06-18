@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install system utilities needed for alpine builds
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 
 # Copy lock files and manifests
 COPY package*.json ./
@@ -34,6 +34,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3101
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Install system utilities needed for alpine runtime
+RUN apk add --no-cache libc6-compat openssl
 
 # Create standard non-root user/group
 RUN addgroup --system --gid 1001 nodejs && \
