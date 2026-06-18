@@ -3,11 +3,10 @@
 import { SessionProvider } from 'next-auth/react';
 
 if (typeof window !== 'undefined' && window.crypto && !window.crypto.randomUUID) {
-  window.crypto.randomUUID = function() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
+  // Polyfill for non-secure contexts (plain HTTP) where crypto.randomUUID is unavailable
+  (window.crypto as any).randomUUID = function(): `${string}-${string}-${string}-${string}-${string}` {
+    const hex = () => Math.floor(Math.random() * 16).toString(16);
+    return `${Array(8).fill(0).map(hex).join('')}-${Array(4).fill(0).map(hex).join('')}-4${Array(3).fill(0).map(hex).join('')}-${(8 + Math.floor(Math.random() * 4)).toString(16)}${Array(3).fill(0).map(hex).join('')}-${Array(12).fill(0).map(hex).join('')}` as `${string}-${string}-${string}-${string}-${string}`;
   };
 }
 
