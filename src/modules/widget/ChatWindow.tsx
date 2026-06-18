@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { supabase } from '@/lib/supabase-client';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 import { ChatUI, ChatMessageData, SessionStatus } from '@/components/chat/ChatUI';
 
@@ -30,7 +30,6 @@ export function ChatWindow({
   const [reviewText, setReviewText] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
-  const socketRef = useRef<Socket | null>(null);
   const localSessionId = useRef<string>(`widget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   
   const getTenantId = () => {
@@ -85,42 +84,64 @@ export function ChatWindow({
       })
       .catch(err => console.error('Error fetching widget config:', err));
 
-    fetch('/api/socket').catch(err => console.error(err));
+    setIsConnected(true);
+  }, [tenantId, addMessage, t]);
 
-    const socket = io(window.location.origin, {
-      path: '/api/socket',
-      query: { sessionId: localSessionId.current, tenantId }
-    });
+  useEffect(() => {
+    if (!serverSessionId) return;
 
-    socketRef.current = socket;
+    const channel = supabase.channel(`session_${serverSessionId}`);
 
-    socket.on('connect', () => setIsConnected(true));
-    socket.on('disconnect', () => setIsConnected(false));
-    socket.on('bot_reply', (data: { message: string; senderType: string, options?: string[] }) => {
-      addMessage(data.message, 'bot', undefined, data.options);
-      setIsSending(false);
-    });
-    socket.on('agent_joined', (data: { agentName: string }) => {
-      setSessionStatus('agent');
-      addMessage(data.agentName ? `✅ Agent ${data.agentName} joined!` : t('chatWidget', 'agentJoined'), 'system');
-    });
-    socket.on('agent_message', (data: { message: string, avatar?: string }) => {
-      addMessage(data.message, 'agent', data.avatar);
-    });
-    socket.on('session_closed', () => {
-      setSessionStatus('closed');
-      setShowReviewForm(true);
-      addMessage(t('chatWidget', 'agentClosed'), 'system');
-    });
-    socket.on('handoff_requested', () => {
-      setSessionStatus('queue');
-      addMessage(t('chatWidget', 'queueMessage'), 'system');
-    });
+    channel
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'crm',
+          table: 'crm_agent_Message',
+          filter: `sessionId=eq.${serverSessionId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as any;
+          if (newMsg.senderType === 'user') return;
+          
+          if (newMsg.senderType === 'bot') {
+            // Options are usually sent in the API response, but for DB inserts we just show the message
+            addMessage(newMsg.content, 'bot');
+            setIsSending(false);
+          } else if (newMsg.senderType === 'agent') {
+            addMessage(newMsg.content, 'agent');
+          } else if (newMsg.senderType === 'system') {
+            addMessage(newMsg.content, 'system');
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'crm',
+          table: 'crm_agent_ChatSession',
+          filter: `id=eq.${serverSessionId}`,
+        },
+        (payload) => {
+          const updatedSession = payload.new as any;
+          if (updatedSession.status === 'agent') {
+            setSessionStatus('agent');
+          } else if (updatedSession.status === 'closed') {
+            setSessionStatus('closed');
+            setShowReviewForm(true);
+          } else if (updatedSession.status === 'queue') {
+            setSessionStatus('queue');
+          }
+        }
+      )
+      .subscribe();
 
     return () => {
-      socket.disconnect();
+      supabase.removeChannel(channel);
     };
-  }, [tenantId, addMessage, t]);
+  }, [serverSessionId, addMessage, t]);
 
   const isSendingRef = useRef(false);
 
@@ -150,7 +171,6 @@ export function ChatWindow({
       if (response.ok) {
         if (data.sessionId && !serverSessionId) {
           setServerSessionId(data.sessionId);
-          socketRef.current?.emit('join_session', { sessionId: data.sessionId });
         }
         if (data.reply && sessionStatus === 'bot') {
           addMessage(data.reply, 'bot', undefined, data.options);

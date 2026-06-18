@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, MessageSquare, PanelRight } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { io, Socket } from 'socket.io-client';
+import { supabase } from '@/lib/supabase-client';
 import { CannedResponses } from '@/components/inbox/CannedResponses';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
@@ -31,7 +31,6 @@ export default function InboxPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCannedResponses, setShowCannedResponses] = useState(false);
   const [agents, setAgents] = useState<{id: string, name: string}[]>([]);
-  const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch active chat sessions
@@ -74,196 +73,96 @@ export default function InboxPage() {
     }
   }, [session]);
 
-  // Join the selected chat session room to receive realtime messages for it
-  useEffect(() => {
-    if (selectedChat && socketRef.current) {
-      socketRef.current.emit('join_session', { sessionId: selectedChat });
-      console.log('Emitted join_session for room:', selectedChat);
-    }
-  }, [selectedChat]);
-
-  // Initialize Socket.io connection
+  // Initialize Supabase Realtime connection
   useEffect(() => {
     if (!session?.user) return;
+    const tenantId = (session.user as any).tenantId;
 
-    const socket = io(window.location.origin, {
-      path: '/api/socket',
-      query: {
-        userId: (session.user as any).id,
-        tenantId: (session.user as any).tenantId
-      }
-    });
+    const channel = supabase.channel(`inbox_${tenantId}`);
 
-    socketRef.current = socket;
-
-    socket.on('connect', () => {
-      console.log('Agent connected to Inbox via Socket.io');
-      // If we already have a selected chat, make sure we join its room on reconnect
-      if (selectedChat) {
-        socket.emit('join_session', { sessionId: selectedChat });
-      }
-    });
-
-    // Listen for widget messages
-    socket.on('widget_message', (data) => {
-      console.log('Received widget message:', data);
-      setChats(prev => {
-        const existingChat = prev.find(chat => chat.id === data.sessionId);
-        if (existingChat) {
-          return prev.map(chat => {
-            if (chat.id === data.sessionId) {
-              const messages = chat.messages || [];
-              // Prevent duplicates
-              if (messages.some(m => m.text === data.message && m.sender === 'user')) {
-                return chat;
+    channel
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'crm', table: 'crm_agent_Message' },
+        (payload) => {
+          const data = payload.new as any;
+          setChats(prev => {
+            const existingChat = prev.find(chat => chat.id === data.sessionId);
+            if (!existingChat) return prev; // If we don't have the chat loaded, ignore it (ChatSession listener handles new sessions)
+            
+            return prev.map(chat => {
+              if (chat.id === data.sessionId) {
+                const messages = chat.messages || [];
+                // Prevent duplicates
+                if (messages.some(m => m.text === data.content && m.sender === data.senderType)) {
+                  return chat;
+                }
+                
+                return {
+                  ...chat,
+                  messages: [...messages, {
+                    id: data.id || (Date.now().toString() + Math.random()),
+                    text: data.content,
+                    sender: data.senderType,
+                    timestamp: new Date(data.createdAt || Date.now()).toISOString()
+                  }],
+                  preview: data.content,
+                  time: new Date(data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
               }
+              return chat;
+            });
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'crm', table: 'crm_agent_ChatSession', filter: `tenantId=eq.${tenantId}` },
+        (payload) => {
+          const updatedSession = payload.new as any;
+          setChats(prev => prev.map(chat => {
+            if (chat.id === updatedSession.id) {
               return {
                 ...chat,
-                messages: [...messages, {
-                  id: Date.now().toString() + Math.random(),
-                  text: data.message,
-                  sender: 'user',
-                  timestamp: new Date(data.timestamp || Date.now()).toISOString()
-                }],
-                preview: data.message,
-                time: new Date(data.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                status: updatedSession.status,
+                assignedAgentId: updatedSession.assignedAgentId || chat.assignedAgentId
               };
             }
             return chat;
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'crm', table: 'crm_agent_ChatSession', filter: `tenantId=eq.${tenantId}` },
+        (payload) => {
+          const newSession = payload.new as any;
+          setChats(prev => {
+            if (prev.some(c => c.id === newSession.id)) return prev;
+            const newChat: Chat = {
+              id: newSession.id,
+              contactId: newSession.contactName || newSession.contactPhone || 'New Visitor',
+              channel: newSession.channel || 'widget',
+              status: newSession.status || 'bot',
+              createdAt: new Date(newSession.createdAt || Date.now()).toISOString(),
+              time: new Date(newSession.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              preview: 'New session started...',
+              messages: []
+            };
+            return [newChat, ...prev];
           });
-        } else {
-          // Create new chat for unknown session
-          const newChat: Chat = {
-            id: data.sessionId,
-            contactId: 'New Visitor',
-            channel: 'widget',
-            status: 'bot',
-            createdAt: new Date(data.timestamp || Date.now()).toISOString(),
-            time: new Date(data.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            preview: data.message,
-            messages: [{
-              id: Date.now().toString(),
-              text: data.message,
-              sender: 'user',
-              timestamp: new Date(data.timestamp || Date.now()).toISOString()
-            }]
-          };
-          return [newChat, ...prev];
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Agent connected to Inbox via Supabase Realtime');
         }
       });
-    });
-
-    // Listen for bot responses
-    socket.on('bot_reply', (data: { sessionId: string; message: string; timestamp: string }) => {
-      console.log('Received bot reply:', data);
-      setChats(prev => prev.map(chat => {
-        if (chat.id === data.sessionId) {
-          const messages = chat.messages || [];
-          if (messages.some(m => m.text === data.message && m.sender === 'bot')) {
-            return chat;
-          }
-          return {
-            ...chat,
-            messages: [...messages, {
-              id: Date.now().toString() + Math.random(),
-              text: data.message,
-              sender: 'bot',
-              timestamp: new Date(data.timestamp || Date.now()).toISOString()
-            }],
-            preview: data.message,
-            time: new Date(data.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          };
-        }
-        return chat;
-      }));
-    });
-
-    // Listen for agent messages (sent by other sessions or tabs)
-    socket.on('agent_message', (data: { sessionId: string; message: string; timestamp: string }) => {
-      console.log('Received agent message:', data);
-      setChats(prev => prev.map(chat => {
-        if (chat.id === data.sessionId) {
-          const messages = chat.messages || [];
-          if (messages.some(m => m.text === data.message && m.sender === 'agent')) {
-            return chat;
-          }
-          return {
-            ...chat,
-            messages: [...messages, {
-              id: Date.now().toString() + Math.random(),
-              text: data.message,
-              sender: 'agent',
-              timestamp: new Date(data.timestamp || Date.now()).toISOString()
-            }],
-            preview: data.message,
-            time: new Date(data.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          };
-        }
-        return chat;
-      }));
-    });
-
-    // Listen for agent joined event
-    socket.on('agent_joined', (data: { agentName: string; agentId: string; sessionId?: string }) => {
-      console.log('Agent joined conversation:', data);
-      const sId = data.sessionId || selectedChat;
-      if (!sId) return;
-      setChats(prev => prev.map(chat => {
-        if (chat.id === sId) {
-          const messages = chat.messages || [];
-          return {
-            ...chat,
-            status: 'agent',
-            messages: [...messages, {
-              id: Date.now().toString() + Math.random(),
-              text: `✅ Agent ${data.agentName || ''} joined the conversation.`,
-              sender: 'system',
-              timestamp: new Date().toISOString()
-            }]
-          };
-        }
-        return chat;
-      }));
-    });
-
-    // Listen for handoff request notification
-    socket.on('handoff_requested', (data: { sessionId: string; reason: string; lastMessage: string }) => {
-      console.log('Handoff requested in tenant:', data);
-      setChats(prev => prev.map(chat => {
-        if (chat.id === data.sessionId) {
-          return {
-            ...chat,
-            status: 'queue',
-            preview: data.lastMessage || chat.preview,
-          };
-        }
-        return chat;
-      }));
-    });
-
-    // Listen for session updates (like status changes or assigned agent changes)
-    socket.on('session_updated', (data: { sessionId: string; status: string; assignedAgentId?: string }) => {
-      console.log('Session updated:', data);
-      setChats(prev => prev.map(chat => {
-        if (chat.id === data.sessionId) {
-          return {
-            ...chat,
-            status: data.status,
-            assignedAgentId: data.assignedAgentId || chat.assignedAgentId
-          };
-        }
-        return chat;
-      }));
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Agent disconnected from Inbox');
-    });
 
     return () => {
-      socket.disconnect();
+      supabase.removeChannel(channel);
     };
-  }, [session, selectedChat]);
+  }, [session]);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -328,10 +227,7 @@ export default function InboxPage() {
           }
           return chat;
         }));
-        // Notify others
-        if (socketRef.current) {
-          socketRef.current.emit('agent_joined', { sessionId: chatId });
-        }
+        // Supabase Realtime handles this UI update automatically
       } else {
         const err = await res.json();
         alert('Failed to transfer conversation: ' + err.error);

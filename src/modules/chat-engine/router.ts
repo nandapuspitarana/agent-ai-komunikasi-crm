@@ -470,14 +470,11 @@ export class MessageRouter {
   }
 
   /**
-   * Emit message to agent via Socket.io
+   * Emit message to agent
    */
   private emitToAgent(agentId: string, payload: any) {
     try {
-      const io = (global as any).socketIO;
-      if (io) {
-        io.to(`agent:${agentId}`).emit('incoming_message', payload);
-      }
+      // Supabase Realtime handles UI updates automatically
     } catch (error) {
       console.error('[Router] Error emitting to agent:', error);
     }

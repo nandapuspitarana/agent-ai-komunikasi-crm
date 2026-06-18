@@ -3,9 +3,9 @@ const prisma = new PrismaClient();
 async function main() {
   const tenants = await prisma.tenant.findMany({ include: { activeFlow: true } });
   console.log('Tenants:', tenants.map(t => ({ id: t.id, activeFlowId: t.activeFlowId })));
-  const docs = await prisma.knowledgeDocument.findMany({
-    select: { id: true, filename: true, status: true, proxyDocId: true, flowId: true }
+  const sessions = await prisma.chatSession.findMany({
+    include: { messages: true }
   });
-  console.log('\nDocuments:', docs);
+  console.log('\nChat Sessions:', JSON.stringify(sessions, null, 2));
 }
 main().finally(() => prisma.$disconnect());

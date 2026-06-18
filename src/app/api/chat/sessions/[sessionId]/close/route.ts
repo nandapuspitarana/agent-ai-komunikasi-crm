@@ -47,24 +47,7 @@ export async function POST(
     });
 
     // Emit Socket.io events
-    const io = (global as any).socketIO;
-    if (io) {
-      // Notify widget to show review form
-      io.to(`session:${sessionId}`).emit('session_closed', {
-        sessionId,
-        timestamp: new Date().toISOString()
-      });
-      io.to(`widget:${sessionId}`).emit('session_closed', {
-        sessionId,
-        timestamp: new Date().toISOString()
-      });
-
-      // Update inbox dashboard
-      io.to(`inbox:${chatSession.tenantId}`).emit('session_updated', {
-        sessionId,
-        status: 'closed'
-      });
-    }
+    // Supabase Realtime handles this automatically.
 
     return NextResponse.json({ success: true, session: updatedSession });
   } catch (error) {

@@ -300,17 +300,7 @@ export class FallbackHandler {
         timestamp: new Date().toISOString(),
       });
 
-      // Emit to agent via Socket.io
-      const io = (global as any).socketIO;
-      if (io) {
-        io.to(`agent:${agent.id}`).emit('incoming_escalation', {
-          sessionId,
-          reason,
-          fallback: true,
-          priority: config.escalationLevel,
-          message: config.fallbackMessage,
-        });
-      }
+      // Supabase Realtime handles UI updates automatically.
 
       return {
         success: true,

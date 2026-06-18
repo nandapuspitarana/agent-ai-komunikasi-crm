@@ -103,7 +103,7 @@ export async function chatWithAgent(request: AgentChatRequest): Promise<AgentCha
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(request),
-          signal: AbortSignal.timeout(45000), // Increased to 45s for heavy RAG
+          signal: AbortSignal.timeout(75000), // Increased to 75s for slow local LLMs
         });
         break; // Success, exit retry loop
       } catch (err: any) {

@@ -318,22 +318,7 @@ async function handleMessageStatus(payload: any) {
 async function routeToFlowEngine(payload: any) {
   try {
     // This would integrate with your flow engine
-    // For now, we'll emit to Socket.io if available
-
-    const io = (global as any).socketIO;
-    if (io) {
-      // Emit to agents connected to this tenant's inbox
-      io.to(`inbox:${payload.tenantId}`).emit('whatsapp_message', {
-        sessionId: payload.sessionId,
-        message: payload.message,
-        sender: payload.sender,
-        senderName: payload.senderName,
-        timestamp: new Date().toISOString(),
-        metadata: payload.metadata,
-      });
-
-      console.log(`[WhatsApp] Routed message to inbox:${payload.tenantId}`);
-    }
+    // For now, we'll rely on Supabase Realtime for instant UI updates
 
     // Also store in queue for asynchronous processing
     const queueKey = `whatsapp:queue:${payload.tenantId}`;

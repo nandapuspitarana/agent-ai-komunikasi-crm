@@ -34,21 +34,7 @@ export async function POST(req: NextRequest) {
         });
 
         // Broadcast to inbox
-        const io = (global as any).socketIO;
-        if (io && tenantId) {
-          io.to(`inbox:${tenantId}`).emit('widget_message', {
-            sessionId,
-            message: content,
-            timestamp: savedMsg.createdAt,
-            source: 'widget'
-          });
-          io.to(`session:${sessionId}`).emit('user_message', {
-            sessionId,
-            message: content,
-            senderType: 'user',
-            timestamp: savedMsg.createdAt.toISOString()
-          });
-        }
+        // Supabase Realtime handles this automatically.
       }
 
       return NextResponse.json({ success: true });

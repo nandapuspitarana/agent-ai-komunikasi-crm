@@ -52,26 +52,7 @@ export async function POST(
     });
 
     // Emit Socket.io event to notify widget
-    const io = (global as any).socketIO;
-    if (io) {
-      // Emit to widget session room
-      io.to(`session:${sessionId}`).emit('agent_joined', {
-        agentId: session.user.id,
-        agentName,
-      });
-      io.to(`widget:${sessionId}`).emit('agent_joined', {
-        agentId: session.user.id,
-        agentName,
-      });
-
-      // Emit to all agent dashboards in tenant to update session status
-      io.to(`inbox:${tenantId}`).emit('session_updated', {
-        sessionId,
-        status: 'agent',
-        assignedAgentId: session.user.id,
-        agentName,
-      });
-    }
+    // Supabase Realtime handles this automatically.
 
     return NextResponse.json({
       success: true,

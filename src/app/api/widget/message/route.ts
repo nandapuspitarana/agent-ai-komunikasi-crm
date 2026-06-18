@@ -86,36 +86,12 @@ export async function POST(req: NextRequest) {
     });
 
     // Broadcast user message to agent dashboard and other listeners immediately
-    const io = (global as any).socketIO;
-    if (io) {
-      io.to(`inbox:${tenantId}`).emit('widget_message', {
-        sessionId: currentSessionId,
-        message,
-        timestamp: savedUserMsg.createdAt,
-        source: 'widget'
-      });
-      io.to(`session:${currentSessionId}`).emit('user_message', {
-        sessionId: currentSessionId,
-        message,
-        senderType: 'user',
-        timestamp: savedUserMsg.createdAt.toISOString()
-      });
-    }
+    // Supabase Realtime will handle this via postgres_changes automatically.
 
     // === JIKA SESI SUDAH DI-HANDLE OLEH HUMAN AGENT ===
     if (chatSession.status === 'agent') {
       // Forward ke dashboard agent via Socket.io
-      const io = (global as any).socketIO;
-      if (io) {
-        io.to(`session:${currentSessionId}`).emit('user_message', {
-          sessionId: currentSessionId,
-          message,
-          tenantId,
-          senderType: 'user',
-          timestamp: new Date().toISOString(),
-        });
-      }
-
+      // Supabase Realtime handles this automatically.
       return NextResponse.json({
         sessionId: currentSessionId,
         status: 'agent',
@@ -148,19 +124,8 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Notify agent dashboard via Socket.io
-      const io = (global as any).socketIO;
-      if (io) {
-        io.to(`tenant:${tenantId}`).emit('handoff_requested', {
-          sessionId: currentSessionId,
-          tenantId,
-          contactId: chatSession.contactId,
-          channel,
-          lastMessage: message,
-          timestamp: new Date().toISOString(),
-          reason: ruleCheck.reason,
-        });
-      }
+      // Notify agent dashboard
+      // Supabase Realtime handles this automatically.
 
       return NextResponse.json({
         sessionId: currentSessionId,
@@ -303,19 +268,7 @@ export async function POST(req: NextRequest) {
       handoffOccurred = true;
 
       // Notify agent dashboard
-      const io = (global as any).socketIO;
-      if (io) {
-        io.to(`tenant:${tenantId}`).emit('handoff_requested', {
-          sessionId: currentSessionId,
-          tenantId,
-          contactId: chatSession.contactId,
-          channel,
-          lastMessage: message,
-          aiReply: cleanReply,
-          timestamp: new Date().toISOString(),
-          reason: 'AI-flagged handoff',
-        });
-      }
+      // Supabase Realtime handles this automatically.
     }
 
     // Step 5: Save AI reply to database
@@ -327,15 +280,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Step 6: Emit AI reply to the widget session via Socket.io (for real-time update)
-    if (io) {
-      io.to(`session:${currentSessionId}`).emit('bot_reply', {
-        sessionId: currentSessionId,
-        message: cleanReply,
-        senderType: 'bot',
-        timestamp: savedBotMessage.createdAt.toISOString(),
-      });
-    }
+    // Step 6: Supabase Realtime automatically broadcasts changes
 
     return NextResponse.json({
       sessionId: currentSessionId,

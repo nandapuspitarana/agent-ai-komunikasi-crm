@@ -73,43 +73,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Emit Socket.io events directly to widget and inbox agent dashboards
-    const io = (global as any).socketIO;
-    if (io) {
-      // If session was claimed, emit agent_joined event
-      if (chatSession.status === 'bot' || chatSession.status === 'queue') {
-        io.to(`session:${sessionId}`).emit('agent_joined', {
-          agentId: session.user.id,
-          agentName,
-        });
-        io.to(`widget:${sessionId}`).emit('agent_joined', {
-          agentId: session.user.id,
-          agentName,
-        });
-        
-        io.to(`inbox:${tenantId}`).emit('session_updated', {
-          sessionId,
-          status: 'agent',
-          assignedAgentId: session.user.id,
-          agentName,
-        });
-      }
-
-      // Emit agent message
-      io.to(`session:${sessionId}`).emit('agent_message', {
-        sessionId,
-        message: content,
-        senderType: 'agent',
-        timestamp: newMessage.createdAt.toISOString(),
-        avatar: agentUser?.avatarUrl || null
-      });
-      io.to(`widget:${sessionId}`).emit('agent_message', {
-        sessionId,
-        message: content,
-        senderType: 'agent',
-        timestamp: newMessage.createdAt.toISOString(),
-        avatar: agentUser?.avatarUrl || null
-      });
-    }
+    // Supabase Realtime handles this automatically.
 
     return NextResponse.json({ success: true, message: newMessage, status: updatedStatus });
   } catch (error) {
