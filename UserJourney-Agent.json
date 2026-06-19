@@ -57,7 +57,7 @@
         ],
         "responseType": "options",
         "response": "I recommend Private Office. Best for teams that need a private, ready-to-use office with flexible terms.\n\nWhich city are you interested in?",
-        "options": "Bangkok (PO), Beijing (PO), Hangzhou (PO), Hanoi (PO), Ho Chi Minh City (PO), Hong Kong (PO), Jakarta (PO), Kuala Lumpur (PO), Manila (PO), Seoul (PO), Shanghai (PO), Singapore (PO)",
+        "options": "Bangkok Private Office, Beijing Private Office, Hangzhou Private Office, Hanoi Private Office, Ho Chi Minh City Private Office, Hong Kong Private Office, Jakarta Private Office, Kuala Lumpur Private Office, Manila Private Office, Seoul Private Office, Shanghai Private Office, Singapore Private Office",
         "metadata": {}
       },
       {
@@ -69,7 +69,7 @@
         ],
         "responseType": "options",
         "response": "Private Office\nBest for teams that need a private, ready-to-use office with flexible terms.\n\nWhich city are you interested in?",
-        "options": "Bangkok (PO), Beijing (PO), Hangzhou (PO), Hanoi (PO), Ho Chi Minh City (PO), Hong Kong (PO), Jakarta (PO), Kuala Lumpur (PO), Manila (PO), Seoul (PO), Shanghai (PO), Singapore (PO)",
+        "options": "Bangkok Private Office, Beijing Private Office, Hangzhou Private Office, Hanoi Private Office, Ho Chi Minh City Private Office, Hong Kong Private Office, Jakarta Private Office, Kuala Lumpur Private Office, Manila Private Office, Seoul Private Office, Shanghai Private Office, Singapore Private Office",
         "metadata": {}
       },
       {
@@ -129,35 +129,35 @@
         ],
         "responseType": "options",
         "response": "Day Office\nPrivate office space available on a daily basis.\n\nWhich city are you interested in?",
-        "options": "Bangkok (PO), Beijing (PO), Hangzhou (PO), Hanoi (PO), Ho Chi Minh City (PO), Hong Kong (PO), Jakarta (PO), Kuala Lumpur (PO), Manila (PO), Seoul (PO), Shanghai (PO), Singapore (PO)",
+        "options": "Bangkok Private Office, Beijing Private Office, Hangzhou Private Office, Hanoi Private Office, Ho Chi Minh City Private Office, Hong Kong Private Office, Jakarta Private Office, Kuala Lumpur Private Office, Manila Private Office, Seoul Private Office, Shanghai Private Office, Singapore Private Office",
         "metadata": {}
       },
       {
         "name": "PO City: Kuala Lumpur",
         "trainingPhrases": [
-          "Kuala Lumpur (PO)",
+          "Kuala Lumpur Private Office",
           "In Kuala Lumpur for Private Office",
           "Kuala Lumpur Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Kuala Lumpur. Please choose a centre.",
-        "options": "Axiata Tower (PO), Q Sentral (PO), Manara Maxis 36 (PO), Manara Maxis 26 (PO)",
+        "options": "Axiata Tower Private Office, Q Sentral Private Office, Manara Maxis 36 Private Office, Manara Maxis 26 Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Axiata Tower",
         "trainingPhrases": [
-          "Axiata Tower (PO)"
+          "Axiata Tower Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axiata Tower (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Axiata Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-axiata-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axiata Tower (PO), Book a tour Axiata Tower (PO), Start again",
+        "options": "Request quotation Axiata Tower Private Office, Book a tour Axiata Tower Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Axiata Tower (PO)",
+        "name": "Action: Request Quotation Axiata Tower Private Office",
         "trainingPhrases": [
-          "Request quotation Axiata Tower (PO)",
+          "Request quotation Axiata Tower Private Office",
           "I want a quote for Axiata Tower Private Office"
         ],
         "responseType": "form",
@@ -166,9 +166,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Axiata Tower (PO)",
+        "name": "Action: Book a tour Axiata Tower Private Office",
         "trainingPhrases": [
-          "Book a tour Axiata Tower (PO)",
+          "Book a tour Axiata Tower Private Office",
           "Schedule a tour Axiata Tower Private Office"
         ],
         "responseType": "form",
@@ -179,17 +179,17 @@
       {
         "name": "PO Centre: Q Sentral",
         "trainingPhrases": [
-          "Q Sentral (PO)"
+          "Q Sentral Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Q Sentral (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Q Sentral are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-q-sentral/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Q Sentral (PO), Book a tour Q Sentral (PO), Start again",
+        "options": "Request quotation Q Sentral Private Office, Book a tour Q Sentral Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Q Sentral (PO)",
+        "name": "Action: Request Quotation Q Sentral Private Office",
         "trainingPhrases": [
-          "Request quotation Q Sentral (PO)",
+          "Request quotation Q Sentral Private Office",
           "I want a quote for Q Sentral Private Office"
         ],
         "responseType": "form",
@@ -198,9 +198,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Q Sentral (PO)",
+        "name": "Action: Book a tour Q Sentral Private Office",
         "trainingPhrases": [
-          "Book a tour Q Sentral (PO)",
+          "Book a tour Q Sentral Private Office",
           "Schedule a tour Q Sentral Private Office"
         ],
         "responseType": "form",
@@ -211,17 +211,17 @@
       {
         "name": "PO Centre: Manara Maxis 36",
         "trainingPhrases": [
-          "Manara Maxis 36 (PO)"
+          "Manara Maxis 36 Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 36 (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Manara Maxis 36 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-36th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 36 (PO), Book a tour Manara Maxis 36 (PO), Start again",
+        "options": "Request quotation Manara Maxis 36 Private Office, Book a tour Manara Maxis 36 Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Manara Maxis 36 (PO)",
+        "name": "Action: Request Quotation Manara Maxis 36 Private Office",
         "trainingPhrases": [
-          "Request quotation Manara Maxis 36 (PO)",
+          "Request quotation Manara Maxis 36 Private Office",
           "I want a quote for Manara Maxis 36 Private Office"
         ],
         "responseType": "form",
@@ -230,9 +230,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Manara Maxis 36 (PO)",
+        "name": "Action: Book a tour Manara Maxis 36 Private Office",
         "trainingPhrases": [
-          "Book a tour Manara Maxis 36 (PO)",
+          "Book a tour Manara Maxis 36 Private Office",
           "Schedule a tour Manara Maxis 36 Private Office"
         ],
         "responseType": "form",
@@ -243,17 +243,17 @@
       {
         "name": "PO Centre: Manara Maxis 26",
         "trainingPhrases": [
-          "Manara Maxis 26 (PO)"
+          "Manara Maxis 26 Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 26 (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Manara Maxis 26 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-26th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 26 (PO), Book a tour Manara Maxis 26 (PO), Start again",
+        "options": "Request quotation Manara Maxis 26 Private Office, Book a tour Manara Maxis 26 Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Manara Maxis 26 (PO)",
+        "name": "Action: Request Quotation Manara Maxis 26 Private Office",
         "trainingPhrases": [
-          "Request quotation Manara Maxis 26 (PO)",
+          "Request quotation Manara Maxis 26 Private Office",
           "I want a quote for Manara Maxis 26 Private Office"
         ],
         "responseType": "form",
@@ -262,9 +262,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Manara Maxis 26 (PO)",
+        "name": "Action: Book a tour Manara Maxis 26 Private Office",
         "trainingPhrases": [
-          "Book a tour Manara Maxis 26 (PO)",
+          "Book a tour Manara Maxis 26 Private Office",
           "Schedule a tour Manara Maxis 26 Private Office"
         ],
         "responseType": "form",
@@ -275,29 +275,29 @@
       {
         "name": "PO City: Hong Kong",
         "trainingPhrases": [
-          "Hong Kong (PO)",
+          "Hong Kong Private Office",
           "In Hong Kong for Private Office",
           "Hong Kong Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hong Kong. Please choose a centre.",
-        "options": "Chinachem Tower (PO), K11 Atelier Victoria Dockside (PO)",
+        "options": "Chinachem Tower Private Office, K11 Atelier Victoria Dockside Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Chinachem Tower",
         "trainingPhrases": [
-          "Chinachem Tower (PO)"
+          "Chinachem Tower Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Chinachem Tower (Hong Kong) - Private Office</div><div class='small'>Our private offices at Chinachem Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/chinachem-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Chinachem Tower (PO), Book a tour Chinachem Tower (PO), Start again",
+        "options": "Request quotation Chinachem Tower Private Office, Book a tour Chinachem Tower Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Chinachem Tower (PO)",
+        "name": "Action: Request Quotation Chinachem Tower Private Office",
         "trainingPhrases": [
-          "Request quotation Chinachem Tower (PO)",
+          "Request quotation Chinachem Tower Private Office",
           "I want a quote for Chinachem Tower Private Office"
         ],
         "responseType": "form",
@@ -306,9 +306,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Chinachem Tower (PO)",
+        "name": "Action: Book a tour Chinachem Tower Private Office",
         "trainingPhrases": [
-          "Book a tour Chinachem Tower (PO)",
+          "Book a tour Chinachem Tower Private Office",
           "Schedule a tour Chinachem Tower Private Office"
         ],
         "responseType": "form",
@@ -319,17 +319,17 @@
       {
         "name": "PO Centre: K11 Atelier Victoria Dockside",
         "trainingPhrases": [
-          "K11 Atelier Victoria Dockside (PO)"
+          "K11 Atelier Victoria Dockside Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>K11 Atelier Victoria Dockside (Hong Kong) - Private Office</div><div class='small'>Our private offices at K11 Atelier Victoria Dockside are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hongkong-k11-atelier/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation K11 Atelier Victoria Dockside (PO), Book a tour K11 Atelier Victoria Dockside (PO), Start again",
+        "options": "Request quotation K11 Atelier Victoria Dockside Private Office, Book a tour K11 Atelier Victoria Dockside Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation K11 Atelier Victoria Dockside (PO)",
+        "name": "Action: Request Quotation K11 Atelier Victoria Dockside Private Office",
         "trainingPhrases": [
-          "Request quotation K11 Atelier Victoria Dockside (PO)",
+          "Request quotation K11 Atelier Victoria Dockside Private Office",
           "I want a quote for K11 Atelier Victoria Dockside Private Office"
         ],
         "responseType": "form",
@@ -338,9 +338,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour K11 Atelier Victoria Dockside (PO)",
+        "name": "Action: Book a tour K11 Atelier Victoria Dockside Private Office",
         "trainingPhrases": [
-          "Book a tour K11 Atelier Victoria Dockside (PO)",
+          "Book a tour K11 Atelier Victoria Dockside Private Office",
           "Schedule a tour K11 Atelier Victoria Dockside Private Office"
         ],
         "responseType": "form",
@@ -351,29 +351,29 @@
       {
         "name": "PO City: Beijing",
         "trainingPhrases": [
-          "Beijing (PO)",
+          "Beijing Private Office",
           "In Beijing for Private Office",
           "Beijing Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Beijing. Please choose a centre.",
-        "options": "Sunshine Financial Center (PO), The Exchange Twin Towers (PO)",
+        "options": "Sunshine Financial Center Private Office, The Exchange Twin Towers Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Sunshine Financial Center",
         "trainingPhrases": [
-          "Sunshine Financial Center (PO)"
+          "Sunshine Financial Center Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sunshine Financial Center (Beijing) - Private Office</div><div class='small'>Our private offices at Sunshine Financial Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/sunshine-financial-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sunshine Financial Center (PO), Book a tour Sunshine Financial Center (PO), Start again",
+        "options": "Request quotation Sunshine Financial Center Private Office, Book a tour Sunshine Financial Center Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Sunshine Financial Center (PO)",
+        "name": "Action: Request Quotation Sunshine Financial Center Private Office",
         "trainingPhrases": [
-          "Request quotation Sunshine Financial Center (PO)",
+          "Request quotation Sunshine Financial Center Private Office",
           "I want a quote for Sunshine Financial Center Private Office"
         ],
         "responseType": "form",
@@ -382,9 +382,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Sunshine Financial Center (PO)",
+        "name": "Action: Book a tour Sunshine Financial Center Private Office",
         "trainingPhrases": [
-          "Book a tour Sunshine Financial Center (PO)",
+          "Book a tour Sunshine Financial Center Private Office",
           "Schedule a tour Sunshine Financial Center Private Office"
         ],
         "responseType": "form",
@@ -395,17 +395,17 @@
       {
         "name": "PO Centre: The Exchange Twin Towers",
         "trainingPhrases": [
-          "The Exchange Twin Towers (PO)"
+          "The Exchange Twin Towers Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>The Exchange Twin Towers (Beijing) - Private Office</div><div class='small'>Our private offices at The Exchange Twin Towers are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/beijing-the-exchange-twin-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation The Exchange Twin Towers (PO), Book a tour The Exchange Twin Towers (PO), Start again",
+        "options": "Request quotation The Exchange Twin Towers Private Office, Book a tour The Exchange Twin Towers Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation The Exchange Twin Towers (PO)",
+        "name": "Action: Request Quotation The Exchange Twin Towers Private Office",
         "trainingPhrases": [
-          "Request quotation The Exchange Twin Towers (PO)",
+          "Request quotation The Exchange Twin Towers Private Office",
           "I want a quote for The Exchange Twin Towers Private Office"
         ],
         "responseType": "form",
@@ -414,9 +414,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour The Exchange Twin Towers (PO)",
+        "name": "Action: Book a tour The Exchange Twin Towers Private Office",
         "trainingPhrases": [
-          "Book a tour The Exchange Twin Towers (PO)",
+          "Book a tour The Exchange Twin Towers Private Office",
           "Schedule a tour The Exchange Twin Towers Private Office"
         ],
         "responseType": "form",
@@ -427,29 +427,29 @@
       {
         "name": "PO City: Shanghai",
         "trainingPhrases": [
-          "Shanghai (PO)",
+          "Shanghai Private Office",
           "In Shanghai for Private Office",
           "Shanghai Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Shanghai. Please choose a centre.",
-        "options": "Lujiazui Finance Plaza (PO), Shanghai World Financial Center (PO), Hong Kong New World Tower (K11) (PO)",
+        "options": "Lujiazui Finance Plaza Private Office, Shanghai World Financial Center Private Office, Hong Kong New World Tower (K11) Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Lujiazui Finance Plaza",
         "trainingPhrases": [
-          "Lujiazui Finance Plaza (PO)"
+          "Lujiazui Finance Plaza Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lujiazui Finance Plaza (Shanghai) - Private Office</div><div class='small'>Our private offices at Lujiazui Finance Plaza are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/lujiazui-financial-plaza/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lujiazui Finance Plaza (PO), Book a tour Lujiazui Finance Plaza (PO), Start again",
+        "options": "Request quotation Lujiazui Finance Plaza Private Office, Book a tour Lujiazui Finance Plaza Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Lujiazui Finance Plaza (PO)",
+        "name": "Action: Request Quotation Lujiazui Finance Plaza Private Office",
         "trainingPhrases": [
-          "Request quotation Lujiazui Finance Plaza (PO)",
+          "Request quotation Lujiazui Finance Plaza Private Office",
           "I want a quote for Lujiazui Finance Plaza Private Office"
         ],
         "responseType": "form",
@@ -458,9 +458,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Lujiazui Finance Plaza (PO)",
+        "name": "Action: Book a tour Lujiazui Finance Plaza Private Office",
         "trainingPhrases": [
-          "Book a tour Lujiazui Finance Plaza (PO)",
+          "Book a tour Lujiazui Finance Plaza Private Office",
           "Schedule a tour Lujiazui Finance Plaza Private Office"
         ],
         "responseType": "form",
@@ -471,17 +471,17 @@
       {
         "name": "PO Centre: Shanghai World Financial Center",
         "trainingPhrases": [
-          "Shanghai World Financial Center (PO)"
+          "Shanghai World Financial Center Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Shanghai World Financial Center (Shanghai) - Private Office</div><div class='small'>Our private offices at Shanghai World Financial Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-world-financial-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Shanghai World Financial Center (PO), Book a tour Shanghai World Financial Center (PO), Start again",
+        "options": "Request quotation Shanghai World Financial Center Private Office, Book a tour Shanghai World Financial Center Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Shanghai World Financial Center (PO)",
+        "name": "Action: Request Quotation Shanghai World Financial Center Private Office",
         "trainingPhrases": [
-          "Request quotation Shanghai World Financial Center (PO)",
+          "Request quotation Shanghai World Financial Center Private Office",
           "I want a quote for Shanghai World Financial Center Private Office"
         ],
         "responseType": "form",
@@ -490,9 +490,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Shanghai World Financial Center (PO)",
+        "name": "Action: Book a tour Shanghai World Financial Center Private Office",
         "trainingPhrases": [
-          "Book a tour Shanghai World Financial Center (PO)",
+          "Book a tour Shanghai World Financial Center Private Office",
           "Schedule a tour Shanghai World Financial Center Private Office"
         ],
         "responseType": "form",
@@ -503,17 +503,17 @@
       {
         "name": "PO Centre: Hong Kong New World Tower (K11)",
         "trainingPhrases": [
-          "Hong Kong New World Tower (K11) (PO)"
+          "Hong Kong New World Tower (K11) Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hong Kong New World Tower (K11) (Shanghai) - Private Office</div><div class='small'>Our private offices at Hong Kong New World Tower (K11) are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-puxi-hong-kong-new-world-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hong Kong New World Tower (K11) (PO), Book a tour Hong Kong New World Tower (K11) (PO), Start again",
+        "options": "Request quotation Hong Kong New World Tower (K11) Private Office, Book a tour Hong Kong New World Tower (K11) Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Hong Kong New World Tower (K11) (PO)",
+        "name": "Action: Request Quotation Hong Kong New World Tower (K11) Private Office",
         "trainingPhrases": [
-          "Request quotation Hong Kong New World Tower (K11) (PO)",
+          "Request quotation Hong Kong New World Tower (K11) Private Office",
           "I want a quote for Hong Kong New World Tower (K11) Private Office"
         ],
         "responseType": "form",
@@ -522,9 +522,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Hong Kong New World Tower (K11) (PO)",
+        "name": "Action: Book a tour Hong Kong New World Tower (K11) Private Office",
         "trainingPhrases": [
-          "Book a tour Hong Kong New World Tower (K11) (PO)",
+          "Book a tour Hong Kong New World Tower (K11) Private Office",
           "Schedule a tour Hong Kong New World Tower (K11) Private Office"
         ],
         "responseType": "form",
@@ -535,29 +535,29 @@
       {
         "name": "PO City: Hangzhou",
         "trainingPhrases": [
-          "Hangzhou (PO)",
+          "Hangzhou Private Office",
           "In Hangzhou for Private Office",
           "Hangzhou Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hangzhou. Please choose a centre.",
-        "options": "Ping An Finance Center (PO)",
+        "options": "Ping An Finance Center Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Ping An Finance Center",
         "trainingPhrases": [
-          "Ping An Finance Center (PO)"
+          "Ping An Finance Center Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Ping An Finance Center (Hangzhou) - Private Office</div><div class='small'>Our private offices at Ping An Finance Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ping-an-finance-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Ping An Finance Center (PO), Book a tour Ping An Finance Center (PO), Start again",
+        "options": "Request quotation Ping An Finance Center Private Office, Book a tour Ping An Finance Center Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Ping An Finance Center (PO)",
+        "name": "Action: Request Quotation Ping An Finance Center Private Office",
         "trainingPhrases": [
-          "Request quotation Ping An Finance Center (PO)",
+          "Request quotation Ping An Finance Center Private Office",
           "I want a quote for Ping An Finance Center Private Office"
         ],
         "responseType": "form",
@@ -566,9 +566,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Ping An Finance Center (PO)",
+        "name": "Action: Book a tour Ping An Finance Center Private Office",
         "trainingPhrases": [
-          "Book a tour Ping An Finance Center (PO)",
+          "Book a tour Ping An Finance Center Private Office",
           "Schedule a tour Ping An Finance Center Private Office"
         ],
         "responseType": "form",
@@ -579,29 +579,29 @@
       {
         "name": "PO City: Manila",
         "trainingPhrases": [
-          "Manila (PO)",
+          "Manila Private Office",
           "In Manila for Private Office",
           "Manila Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Manila. Please choose a centre.",
-        "options": "Lkg Tower (PO)",
+        "options": "Lkg Tower Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Lkg Tower",
         "trainingPhrases": [
-          "Lkg Tower (PO)"
+          "Lkg Tower Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lkg Tower (Manila) - Private Office</div><div class='small'>Our private offices at Lkg Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/office-space-for-rent-manila/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lkg Tower (PO), Book a tour Lkg Tower (PO), Start again",
+        "options": "Request quotation Lkg Tower Private Office, Book a tour Lkg Tower Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Lkg Tower (PO)",
+        "name": "Action: Request Quotation Lkg Tower Private Office",
         "trainingPhrases": [
-          "Request quotation Lkg Tower (PO)",
+          "Request quotation Lkg Tower Private Office",
           "I want a quote for Lkg Tower Private Office"
         ],
         "responseType": "form",
@@ -610,9 +610,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Lkg Tower (PO)",
+        "name": "Action: Book a tour Lkg Tower Private Office",
         "trainingPhrases": [
-          "Book a tour Lkg Tower (PO)",
+          "Book a tour Lkg Tower Private Office",
           "Schedule a tour Lkg Tower Private Office"
         ],
         "responseType": "form",
@@ -623,29 +623,29 @@
       {
         "name": "PO City: Jakarta",
         "trainingPhrases": [
-          "Jakarta (PO)",
+          "Jakarta Private Office",
           "In Jakarta for Private Office",
           "Jakarta Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Jakarta. Please choose a centre.",
-        "options": "Sahid Sudirman Center (PO), Axa Tower (PO), Indonesia Stock Exchange Tower 2 (PO), One Pacific Place (PO)",
+        "options": "Sahid Sudirman Center Private Office, Axa Tower Private Office, Indonesia Stock Exchange Tower 2 Private Office, One Pacific Place Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Sahid Sudirman Center",
         "trainingPhrases": [
-          "Sahid Sudirman Center (PO)"
+          "Sahid Sudirman Center Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sahid Sudirman Center (Jakarta) - Private Office</div><div class='small'>Our private offices at Sahid Sudirman Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-sahid-sudirman-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sahid Sudirman Center (PO), Book a tour Sahid Sudirman Center (PO), Start again",
+        "options": "Request quotation Sahid Sudirman Center Private Office, Book a tour Sahid Sudirman Center Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Sahid Sudirman Center (PO)",
+        "name": "Action: Request Quotation Sahid Sudirman Center Private Office",
         "trainingPhrases": [
-          "Request quotation Sahid Sudirman Center (PO)",
+          "Request quotation Sahid Sudirman Center Private Office",
           "I want a quote for Sahid Sudirman Center Private Office"
         ],
         "responseType": "form",
@@ -654,9 +654,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Sahid Sudirman Center (PO)",
+        "name": "Action: Book a tour Sahid Sudirman Center Private Office",
         "trainingPhrases": [
-          "Book a tour Sahid Sudirman Center (PO)",
+          "Book a tour Sahid Sudirman Center Private Office",
           "Schedule a tour Sahid Sudirman Center Private Office"
         ],
         "responseType": "form",
@@ -667,17 +667,17 @@
       {
         "name": "PO Centre: Axa Tower",
         "trainingPhrases": [
-          "Axa Tower (PO)"
+          "Axa Tower Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axa Tower (Jakarta) - Private Office</div><div class='small'>Our private offices at Axa Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-axa/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axa Tower (PO), Book a tour Axa Tower (PO), Start again",
+        "options": "Request quotation Axa Tower Private Office, Book a tour Axa Tower Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Axa Tower (PO)",
+        "name": "Action: Request Quotation Axa Tower Private Office",
         "trainingPhrases": [
-          "Request quotation Axa Tower (PO)",
+          "Request quotation Axa Tower Private Office",
           "I want a quote for Axa Tower Private Office"
         ],
         "responseType": "form",
@@ -686,9 +686,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Axa Tower (PO)",
+        "name": "Action: Book a tour Axa Tower Private Office",
         "trainingPhrases": [
-          "Book a tour Axa Tower (PO)",
+          "Book a tour Axa Tower Private Office",
           "Schedule a tour Axa Tower Private Office"
         ],
         "responseType": "form",
@@ -699,17 +699,17 @@
       {
         "name": "PO Centre: Indonesia Stock Exchange Tower 2",
         "trainingPhrases": [
-          "Indonesia Stock Exchange Tower 2 (PO)"
+          "Indonesia Stock Exchange Tower 2 Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Indonesia Stock Exchange Tower 2 (Jakarta) - Private Office</div><div class='small'>Our private offices at Indonesia Stock Exchange Tower 2 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-stock-exchange/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Indonesia Stock Exchange Tower 2 (PO), Book a tour Indonesia Stock Exchange Tower 2 (PO), Start again",
+        "options": "Request quotation Indonesia Stock Exchange Tower 2 Private Office, Book a tour Indonesia Stock Exchange Tower 2 Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Indonesia Stock Exchange Tower 2 (PO)",
+        "name": "Action: Request Quotation Indonesia Stock Exchange Tower 2 Private Office",
         "trainingPhrases": [
-          "Request quotation Indonesia Stock Exchange Tower 2 (PO)",
+          "Request quotation Indonesia Stock Exchange Tower 2 Private Office",
           "I want a quote for Indonesia Stock Exchange Tower 2 Private Office"
         ],
         "responseType": "form",
@@ -718,9 +718,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Indonesia Stock Exchange Tower 2 (PO)",
+        "name": "Action: Book a tour Indonesia Stock Exchange Tower 2 Private Office",
         "trainingPhrases": [
-          "Book a tour Indonesia Stock Exchange Tower 2 (PO)",
+          "Book a tour Indonesia Stock Exchange Tower 2 Private Office",
           "Schedule a tour Indonesia Stock Exchange Tower 2 Private Office"
         ],
         "responseType": "form",
@@ -731,17 +731,17 @@
       {
         "name": "PO Centre: One Pacific Place",
         "trainingPhrases": [
-          "One Pacific Place (PO)"
+          "One Pacific Place Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>One Pacific Place (Jakarta) - Private Office</div><div class='small'>Our private offices at One Pacific Place are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-one-pacific-place/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation One Pacific Place (PO), Book a tour One Pacific Place (PO), Start again",
+        "options": "Request quotation One Pacific Place Private Office, Book a tour One Pacific Place Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation One Pacific Place (PO)",
+        "name": "Action: Request Quotation One Pacific Place Private Office",
         "trainingPhrases": [
-          "Request quotation One Pacific Place (PO)",
+          "Request quotation One Pacific Place Private Office",
           "I want a quote for One Pacific Place Private Office"
         ],
         "responseType": "form",
@@ -750,9 +750,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour One Pacific Place (PO)",
+        "name": "Action: Book a tour One Pacific Place Private Office",
         "trainingPhrases": [
-          "Book a tour One Pacific Place (PO)",
+          "Book a tour One Pacific Place Private Office",
           "Schedule a tour One Pacific Place Private Office"
         ],
         "responseType": "form",
@@ -763,29 +763,29 @@
       {
         "name": "PO City: Singapore",
         "trainingPhrases": [
-          "Singapore (PO)",
+          "Singapore Private Office",
           "In Singapore for Private Office",
           "Singapore Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Singapore. Please choose a centre.",
-        "options": "Centennial Tower (PO)",
+        "options": "Centennial Tower Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Centennial Tower",
         "trainingPhrases": [
-          "Centennial Tower (PO)"
+          "Centennial Tower Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Centennial Tower (Singapore) - Private Office</div><div class='small'>Our private offices at Centennial Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/centennial-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Centennial Tower (PO), Book a tour Centennial Tower (PO), Start again",
+        "options": "Request quotation Centennial Tower Private Office, Book a tour Centennial Tower Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Centennial Tower (PO)",
+        "name": "Action: Request Quotation Centennial Tower Private Office",
         "trainingPhrases": [
-          "Request quotation Centennial Tower (PO)",
+          "Request quotation Centennial Tower Private Office",
           "I want a quote for Centennial Tower Private Office"
         ],
         "responseType": "form",
@@ -794,9 +794,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Centennial Tower (PO)",
+        "name": "Action: Book a tour Centennial Tower Private Office",
         "trainingPhrases": [
-          "Book a tour Centennial Tower (PO)",
+          "Book a tour Centennial Tower Private Office",
           "Schedule a tour Centennial Tower Private Office"
         ],
         "responseType": "form",
@@ -807,29 +807,29 @@
       {
         "name": "PO City: Seoul",
         "trainingPhrases": [
-          "Seoul (PO)",
+          "Seoul Private Office",
           "In Seoul for Private Office",
           "Seoul Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Seoul. Please choose a centre.",
-        "options": "Kyobo Building (PO), Parnas Tower (PO)",
+        "options": "Kyobo Building Private Office, Parnas Tower Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Kyobo Building",
         "trainingPhrases": [
-          "Kyobo Building (PO)"
+          "Kyobo Building Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Kyobo Building (Seoul) - Private Office</div><div class='small'>Our private offices at Kyobo Building are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-kyobo-building/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Kyobo Building (PO), Book a tour Kyobo Building (PO), Start again",
+        "options": "Request quotation Kyobo Building Private Office, Book a tour Kyobo Building Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Kyobo Building (PO)",
+        "name": "Action: Request Quotation Kyobo Building Private Office",
         "trainingPhrases": [
-          "Request quotation Kyobo Building (PO)",
+          "Request quotation Kyobo Building Private Office",
           "I want a quote for Kyobo Building Private Office"
         ],
         "responseType": "form",
@@ -838,9 +838,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Kyobo Building (PO)",
+        "name": "Action: Book a tour Kyobo Building Private Office",
         "trainingPhrases": [
-          "Book a tour Kyobo Building (PO)",
+          "Book a tour Kyobo Building Private Office",
           "Schedule a tour Kyobo Building Private Office"
         ],
         "responseType": "form",
@@ -851,17 +851,17 @@
       {
         "name": "PO Centre: Parnas Tower",
         "trainingPhrases": [
-          "Parnas Tower (PO)"
+          "Parnas Tower Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Parnas Tower (Seoul) - Private Office</div><div class='small'>Our private offices at Parnas Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-gangnam-parnas-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Parnas Tower (PO), Book a tour Parnas Tower (PO), Start again",
+        "options": "Request quotation Parnas Tower Private Office, Book a tour Parnas Tower Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Parnas Tower (PO)",
+        "name": "Action: Request Quotation Parnas Tower Private Office",
         "trainingPhrases": [
-          "Request quotation Parnas Tower (PO)",
+          "Request quotation Parnas Tower Private Office",
           "I want a quote for Parnas Tower Private Office"
         ],
         "responseType": "form",
@@ -870,9 +870,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Parnas Tower (PO)",
+        "name": "Action: Book a tour Parnas Tower Private Office",
         "trainingPhrases": [
-          "Book a tour Parnas Tower (PO)",
+          "Book a tour Parnas Tower Private Office",
           "Schedule a tour Parnas Tower Private Office"
         ],
         "responseType": "form",
@@ -883,29 +883,29 @@
       {
         "name": "PO City: Bangkok",
         "trainingPhrases": [
-          "Bangkok (PO)",
+          "Bangkok Private Office",
           "In Bangkok for Private Office",
           "Bangkok Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Bangkok. Please choose a centre.",
-        "options": "Athenee Tower (PO)",
+        "options": "Athenee Tower Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Athenee Tower",
         "trainingPhrases": [
-          "Athenee Tower (PO)"
+          "Athenee Tower Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Athenee Tower (Bangkok) - Private Office</div><div class='small'>Our private offices at Athenee Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/bangkok-athenee-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Athenee Tower (PO), Book a tour Athenee Tower (PO), Start again",
+        "options": "Request quotation Athenee Tower Private Office, Book a tour Athenee Tower Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Athenee Tower (PO)",
+        "name": "Action: Request Quotation Athenee Tower Private Office",
         "trainingPhrases": [
-          "Request quotation Athenee Tower (PO)",
+          "Request quotation Athenee Tower Private Office",
           "I want a quote for Athenee Tower Private Office"
         ],
         "responseType": "form",
@@ -914,9 +914,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Athenee Tower (PO)",
+        "name": "Action: Book a tour Athenee Tower Private Office",
         "trainingPhrases": [
-          "Book a tour Athenee Tower (PO)",
+          "Book a tour Athenee Tower Private Office",
           "Schedule a tour Athenee Tower Private Office"
         ],
         "responseType": "form",
@@ -927,29 +927,29 @@
       {
         "name": "PO City: Hanoi",
         "trainingPhrases": [
-          "Hanoi (PO)",
+          "Hanoi Private Office",
           "In Hanoi for Private Office",
           "Hanoi Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hanoi. Please choose a centre.",
-        "options": "Hanoi Lotte Center (PO)",
+        "options": "Hanoi Lotte Center Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Hanoi Lotte Center",
         "trainingPhrases": [
-          "Hanoi Lotte Center (PO)"
+          "Hanoi Lotte Center Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hanoi Lotte Center (Hanoi) - Private Office</div><div class='small'>Our private offices at Hanoi Lotte Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hanoi-lotte-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hanoi Lotte Center (PO), Book a tour Hanoi Lotte Center (PO), Start again",
+        "options": "Request quotation Hanoi Lotte Center Private Office, Book a tour Hanoi Lotte Center Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Hanoi Lotte Center (PO)",
+        "name": "Action: Request Quotation Hanoi Lotte Center Private Office",
         "trainingPhrases": [
-          "Request quotation Hanoi Lotte Center (PO)",
+          "Request quotation Hanoi Lotte Center Private Office",
           "I want a quote for Hanoi Lotte Center Private Office"
         ],
         "responseType": "form",
@@ -958,9 +958,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Hanoi Lotte Center (PO)",
+        "name": "Action: Book a tour Hanoi Lotte Center Private Office",
         "trainingPhrases": [
-          "Book a tour Hanoi Lotte Center (PO)",
+          "Book a tour Hanoi Lotte Center Private Office",
           "Schedule a tour Hanoi Lotte Center Private Office"
         ],
         "responseType": "form",
@@ -971,29 +971,29 @@
       {
         "name": "PO City: Ho Chi Minh City",
         "trainingPhrases": [
-          "Ho Chi Minh City (PO)",
+          "Ho Chi Minh City Private Office",
           "In Ho Chi Minh City for Private Office",
           "Ho Chi Minh City Private Office"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Ho Chi Minh City. Please choose a centre.",
-        "options": "Vietcombank Tower (PO)",
+        "options": "Vietcombank Tower Private Office",
         "metadata": {}
       },
       {
         "name": "PO Centre: Vietcombank Tower",
         "trainingPhrases": [
-          "Vietcombank Tower (PO)"
+          "Vietcombank Tower Private Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Vietcombank Tower (Ho Chi Minh City) - Private Office</div><div class='small'>Our private offices at Vietcombank Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Vietcombank Tower (PO), Book a tour Vietcombank Tower (PO), Start again",
+        "options": "Request quotation Vietcombank Tower Private Office, Book a tour Vietcombank Tower Private Office, Start again",
         "metadata": {}
       },
       {
-        "name": "Action: Request Quotation Vietcombank Tower (PO)",
+        "name": "Action: Request Quotation Vietcombank Tower Private Office",
         "trainingPhrases": [
-          "Request quotation Vietcombank Tower (PO)",
+          "Request quotation Vietcombank Tower Private Office",
           "I want a quote for Vietcombank Tower Private Office"
         ],
         "responseType": "form",
@@ -1002,9 +1002,9 @@
         "metadata": {}
       },
       {
-        "name": "Action: Book a tour Vietcombank Tower (PO)",
+        "name": "Action: Book a tour Vietcombank Tower Private Office",
         "trainingPhrases": [
-          "Book a tour Vietcombank Tower (PO)",
+          "Book a tour Vietcombank Tower Private Office",
           "Schedule a tour Vietcombank Tower Private Office"
         ],
         "responseType": "form",
