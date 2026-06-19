@@ -6,6 +6,7 @@ import { ChatWindow } from '@/modules/widget/ChatWindow';
 import { MessageCircle, X, CheckCircle2, Code, LayoutTemplate } from 'lucide-react';
 import siteConfig from '@/config/site.js';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const iconMap: Record<string, any> = { LayoutTemplate };
 
@@ -79,13 +80,16 @@ export default function Home() {
           <a href="#" className="hover:text-brand transition-colors">{t('homepage', 'docs', 'Dokumentasi')}</a>
           <a href="#" className="hover:text-brand transition-colors">{t('homepage', 'contact', 'Kontak')}</a>
         </div>
-        {/* Login Button */}
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-2 px-5 py-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold rounded-full shadow-md shadow-brand/20 transition-all duration-200 hover:scale-105 active:scale-95"
-        >
-          {t('homepage', 'login', 'Login')}
-        </Link>
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          {/* Login Button */}
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 px-5 py-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold rounded-full shadow-md shadow-brand/20 transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            {t('homepage', 'login', 'Login')}
+          </Link>
+        </div>
       </nav>
 
       {/* MOCK WEBSITE BACKGROUND - CARA PENGGUNAAN */}
