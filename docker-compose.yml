@@ -2,11 +2,8 @@ version: '3.8'
 
 networks:
   default:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.220.0.0/16
+    name: crm_shared_network
+    external: true
 
 services:
   web:
