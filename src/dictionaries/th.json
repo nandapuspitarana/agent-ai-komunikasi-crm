@@ -211,5 +211,26 @@
     "copyCode": "คัดลอกโค้ด",
     "wpTitle": "ปลั๊กอิน WordPress (PHP)",
     "wpDesc": "หากคุณกำลังใช้ WordPress ให้สร้างไฟล์ชื่อ saas-crm-agent.php ในไดเรกทอรี wp-content/plugins/ ของคุณแล้ววางโค้ดด้านล่าง จากนั้นเปิดใช้งานปลั๊กอินจากแดชบอร์ด WordPress Admin ของคุณ"
+  },
+  "homepage": {
+    "product": "Product",
+    "pricing": "Pricing",
+    "docs": "Documentation",
+    "contact": "Contact",
+    "login": "Login",
+    "heroTitle": "Widget Preview & How to Use",
+    "heroDesc": "This is a simulated view of your website. The smart chat widget has been installed in the corner of the screen and is ready to use.",
+    "copyCodeTitle": "Copy Embed Code",
+    "copyCodeDesc": "To activate this widget on your website, copy the snippet code below and paste it right before the closing </body> tag in your HTML.",
+    "activeFeaturesTitle": "Active Features",
+    "featAi": "Automated Artificial Intelligence (AI)",
+    "featHandoff": "Human agent handoff",
+    "featBrand": "Brand identity and color customization",
+    "featRealtime": "Real-time connection via WebSocket",
+    "featResponsive": "Responsive view for all devices",
+    "featReview": "Automatic review / feedback form",
+    "needHelp": "Need help?",
+    "closeChat": "Close chat",
+    "openChat": "Open chat"
   }
 }

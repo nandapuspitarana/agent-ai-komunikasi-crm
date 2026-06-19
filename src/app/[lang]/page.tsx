@@ -5,10 +5,12 @@ import { useState, useEffect } from 'react';
 import { ChatWindow } from '@/modules/widget/ChatWindow';
 import { MessageCircle, X, CheckCircle2, Code, LayoutTemplate } from 'lucide-react';
 import siteConfig from '@/config/site.js';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 const iconMap: Record<string, any> = { LayoutTemplate };
 
 export default function Home() {
+  const { t } = useTranslation();
   const tenantId = 'default-tenant';
   const defaultColor = '#dc2626';
   const defaultName = 'Support Bot';
@@ -72,17 +74,17 @@ export default function Home() {
           <span className="font-bold text-xl text-slate-800">{siteConfig.name}</span>
         </div>
         <div className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
-          <a href="#" className="hover:text-brand transition-colors">Produk</a>
-          <a href="#" className="hover:text-brand transition-colors">Harga</a>
-          <a href="#" className="hover:text-brand transition-colors">Dokumentasi</a>
-          <a href="#" className="hover:text-brand transition-colors">Kontak</a>
+          <a href="#" className="hover:text-brand transition-colors">{t('homepage', 'product', 'Produk')}</a>
+          <a href="#" className="hover:text-brand transition-colors">{t('homepage', 'pricing', 'Harga')}</a>
+          <a href="#" className="hover:text-brand transition-colors">{t('homepage', 'docs', 'Dokumentasi')}</a>
+          <a href="#" className="hover:text-brand transition-colors">{t('homepage', 'contact', 'Kontak')}</a>
         </div>
         {/* Login Button */}
         <Link
           href="/login"
           className="inline-flex items-center gap-2 px-5 py-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold rounded-full shadow-md shadow-brand/20 transition-all duration-200 hover:scale-105 active:scale-95"
         >
-          Login
+          {t('homepage', 'login', 'Login')}
         </Link>
       </nav>
 
@@ -93,10 +95,10 @@ export default function Home() {
             <Code className="text-brand w-8 h-8" />
           </div>
           <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
-            Preview Widget &amp; Cara Penggunaan
+            {t('homepage', 'heroTitle', 'Preview Widget & Cara Penggunaan')}
           </h1>
           <p className="text-lg md:text-xl text-slate-600 max-w-2xl leading-relaxed">
-            Ini adalah tampilan simulasi website Anda. Widget chat pintar telah dipasang di sudut layar dan siap digunakan.
+            {t('homepage', 'heroDesc', 'Ini adalah tampilan simulasi website Anda. Widget chat pintar telah dipasang di sudut layar dan siap digunakan.')}
           </p>
         </header>
 
@@ -104,11 +106,10 @@ export default function Home() {
           <section className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200/60">
             <h2 className="text-xl font-bold text-slate-800 mb-5 flex items-center">
               <span className="flex items-center justify-center w-8 h-8 rounded-full bg-brand-bg text-brand text-sm mr-3 font-bold">1</span>
-              Salin Kode Embed
+              {t('homepage', 'copyCodeTitle', 'Salin Kode Embed')}
             </h2>
             <p className="text-slate-600 mb-6 leading-relaxed">
-              Untuk mengaktifkan widget ini di website Anda, salin kode snippet di bawah ini dan tempelkan tepat sebelum tag penutup{' '}
-              <code className="bg-slate-100 px-2 py-1 rounded text-sm text-pink-600 font-mono">&lt;/body&gt;</code> di HTML Anda.
+              {t('homepage', 'copyCodeDesc', 'Untuk mengaktifkan widget ini di website Anda, salin kode snippet di bawah ini dan tempelkan tepat sebelum tag penutup </body> di HTML Anda.')}
             </p>
             <div className="relative group">
               <pre className="bg-[#0f172a] text-slate-50 p-6 rounded-2xl overflow-x-auto text-sm leading-relaxed font-mono shadow-inner">
@@ -127,16 +128,16 @@ export default function Home() {
           <section className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200/60">
             <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center">
               <span className="flex items-center justify-center w-8 h-8 rounded-full bg-brand-bg text-brand text-sm mr-3 font-bold">2</span>
-              Fitur yang Aktif
+              {t('homepage', 'activeFeaturesTitle', 'Fitur yang Aktif')}
             </h2>
             <div className="grid md:grid-cols-2 gap-y-4 gap-x-8">
               {[
-                'Kecerdasan Buatan (AI) otomatis',
-                'Transisi ke agen manusia (Handoff)',
-                'Penyesuaian warna dan identitas merek',
-                'Koneksi real-time via WebSocket',
-                'Tampilan responsif semua perangkat',
-                'Formulir review / feedback otomatis'
+                t('homepage', 'featAi', 'Kecerdasan Buatan (AI) otomatis'),
+                t('homepage', 'featHandoff', 'Transisi ke agen manusia (Handoff)'),
+                t('homepage', 'featBrand', 'Penyesuaian warna dan identitas merek'),
+                t('homepage', 'featRealtime', 'Koneksi real-time via WebSocket'),
+                t('homepage', 'featResponsive', 'Tampilan responsif semua perangkat'),
+                t('homepage', 'featReview', 'Formulir review / feedback otomatis')
               ].map((feature, i) => (
                 <div key={i} className="flex items-center p-3 rounded-xl hover:bg-slate-50 transition-colors">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
@@ -182,7 +183,7 @@ export default function Home() {
             transition-all duration-300 hover:scale-105 active:scale-95 text-white relative z-50 self-end
           `}
           style={{ backgroundColor: config.color }}
-          aria-label={isOpen ? 'Tutup chat' : 'Buka chat'}
+          aria-label={isOpen ? t('homepage', 'closeChat', 'Tutup chat') : t('homepage', 'openChat', 'Buka chat')}
         >
           {isOpen ? (
             <X className="w-6 h-6 animate-in fade-in zoom-in duration-200" />
@@ -203,7 +204,7 @@ export default function Home() {
                 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
               `}
             >
-              Butuh bantuan?
+              {t('homepage', 'needHelp', 'Butuh bantuan?')}
               <span className={`absolute top-1/2 -translate-y-1/2 border-[6px] border-transparent ${tooltipArrowClasses}`}></span>
             </span>
           )}

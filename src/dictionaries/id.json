@@ -211,5 +211,26 @@
     "copyCode": "Salin kode",
     "wpTitle": "Plugin WordPress (PHP)",
     "wpDesc": "Jika Anda menggunakan WordPress, buat file bernama saas-crm-agent.php di direktori wp-content/plugins/ Anda dan tempel kode di bawah ini. Kemudian, aktifkan plugin dari dasbor Admin WordPress Anda."
+  },
+  "homepage": {
+    "product": "Produk",
+    "pricing": "Harga",
+    "docs": "Dokumentasi",
+    "contact": "Kontak",
+    "login": "Login",
+    "heroTitle": "Preview Widget & Cara Penggunaan",
+    "heroDesc": "Ini adalah tampilan simulasi website Anda. Widget chat pintar telah dipasang di sudut layar dan siap digunakan.",
+    "copyCodeTitle": "Salin Kode Embed",
+    "copyCodeDesc": "Untuk mengaktifkan widget ini di website Anda, salin kode snippet di bawah ini dan tempelkan tepat sebelum tag penutup </body> di HTML Anda.",
+    "activeFeaturesTitle": "Fitur yang Aktif",
+    "featAi": "Kecerdasan Buatan (AI) otomatis",
+    "featHandoff": "Transisi ke agen manusia (Handoff)",
+    "featBrand": "Penyesuaian warna dan identitas merek",
+    "featRealtime": "Koneksi real-time via WebSocket",
+    "featResponsive": "Tampilan responsif semua perangkat",
+    "featReview": "Formulir review / feedback otomatis",
+    "needHelp": "Butuh bantuan?",
+    "closeChat": "Tutup chat",
+    "openChat": "Buka chat"
   }
 }

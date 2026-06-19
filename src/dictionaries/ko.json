@@ -211,5 +211,26 @@
     "copyCode": "코드 복사",
     "wpTitle": "워드프레스 플러그인 (PHP)",
     "wpDesc": "워드프레스를 사용하는 경우 wp-content/plugins/ 디렉토리에 saas-crm-agent.php라는 파일을 만들고 아래 코드를 붙여넣으세요. 그런 다음 워드프레스 관리자 대시보드에서 플러그인을 활성화하세요."
+  },
+  "homepage": {
+    "product": "Product",
+    "pricing": "Pricing",
+    "docs": "Documentation",
+    "contact": "Contact",
+    "login": "Login",
+    "heroTitle": "Widget Preview & How to Use",
+    "heroDesc": "This is a simulated view of your website. The smart chat widget has been installed in the corner of the screen and is ready to use.",
+    "copyCodeTitle": "Copy Embed Code",
+    "copyCodeDesc": "To activate this widget on your website, copy the snippet code below and paste it right before the closing </body> tag in your HTML.",
+    "activeFeaturesTitle": "Active Features",
+    "featAi": "Automated Artificial Intelligence (AI)",
+    "featHandoff": "Human agent handoff",
+    "featBrand": "Brand identity and color customization",
+    "featRealtime": "Real-time connection via WebSocket",
+    "featResponsive": "Responsive view for all devices",
+    "featReview": "Automatic review / feedback form",
+    "needHelp": "Need help?",
+    "closeChat": "Close chat",
+    "openChat": "Open chat"
   }
 }
