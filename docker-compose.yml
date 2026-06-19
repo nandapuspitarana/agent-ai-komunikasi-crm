@@ -1,3 +1,14 @@
+version: '3.8'
+
+networks:
+  agent-ai-komunikasi-crm_default:
+    name: agent-ai-komunikasi-crm_default
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.220.0.0/16
+
 services:
   web:
     build:
@@ -7,8 +18,8 @@ services:
     container_name: crm-web
     ports:
       - "8201:8201"
-
     env_file:
       - .env
+    networks:
+      - agent-ai-komunikasi-crm_default
     restart: always
-
