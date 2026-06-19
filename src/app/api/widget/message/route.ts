@@ -206,38 +206,53 @@ export async function POST(req: NextRequest) {
       }
 
       let dynamicSystemPrompt = systemPrompt;
+      let bypassLLM = false;
+
       if (qnaMatch) {
-        let referenceResponse = qnaMatch.response;
-        if (qnaMatch.responseType === 'handoff' && !referenceResponse.includes('[HANDOFF_REQUESTED]')) {
-          referenceResponse += ' [HANDOFF_REQUESTED]';
-        }
-        dynamicSystemPrompt += `\n\n[USER INTENT MATCHED]\nThe user's request matches the intent '${qnaMatch.name}'. Use the following pre-defined response as the core factual reference for your answer: "${referenceResponse}". Rewrite it to be conversational, natural, and directly address the user's message while maintaining the exact same facts, prices, and questions.`;
-      }
-
-      // Step 3: Call AI Engine (Session, RAG, etc)
-      try {
-        const aiResponse = await chatWithAgent({
-          message: formattedMessage, // Send the formatted message if human prompt exists
-          session_id: currentSessionId,
-          user_id: chatSession.contactId,
-          tenant_id: tenantId,
-          system_prompt: dynamicSystemPrompt,
-          document_ids: documentIds,
-        });
-
-        aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
-
-        // Re-append HTML options from QnA match if any
-        if (qnaMatch && qnaMatch.options) {
-          const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
-          if (opts.length > 0) {
-            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+        if (['form', 'options', 'card'].includes(qnaMatch.responseType)) {
+          // Bypass LLM for rich UI responses to prevent HTML stripping
+          bypassLLM = true;
+          aiReplyRaw = qnaMatch.response;
+          if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
+            aiReplyRaw += ' [HANDOFF_REQUESTED]';
           }
+        } else {
+          // For simple text, let LLM rewrite it conversationally
+          let referenceResponse = qnaMatch.response;
+          if (qnaMatch.responseType === 'handoff' && !referenceResponse.includes('[HANDOFF_REQUESTED]')) {
+            referenceResponse += ' [HANDOFF_REQUESTED]';
+          }
+          dynamicSystemPrompt += `\n\n[USER INTENT MATCHED]\nThe user's request matches the intent '${qnaMatch.name}'. Use the following pre-defined response as the core factual reference for your answer: "${referenceResponse}". Rewrite it to be conversational, natural, and directly address the user's message while maintaining the exact same facts, prices, and questions.`;
         }
-      } catch (aiError) {
-        console.error('[Widget Message] AI Engine error:', aiError);
-        aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
       }
+
+      if (!bypassLLM) {
+        // Step 3: Call AI Engine (Session, RAG, etc)
+        try {
+          const aiResponse = await chatWithAgent({
+            message: formattedMessage, // Send the formatted message if human prompt exists
+            session_id: currentSessionId,
+            user_id: chatSession.contactId,
+            tenant_id: tenantId,
+            system_prompt: dynamicSystemPrompt,
+            document_ids: documentIds,
+          });
+
+          aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
+        } catch (aiError) {
+          console.error('[Widget Message] AI Engine error:', aiError);
+          aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
+        }
+      }
+
+      // Re-append HTML options from QnA match if any
+      if (qnaMatch && qnaMatch.options) {
+        const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
+        if (opts.length > 0) {
+          aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+        }
+      }
+
     } else {
       // If AI Agent is not enabled, directly fallback to static message (much faster!)
       if (qnaMatch) {
