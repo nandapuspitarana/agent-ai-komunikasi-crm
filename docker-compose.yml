@@ -1,8 +1,7 @@
 version: '3.8'
 
 networks:
-  agent-ai-komunikasi-crm_default:
-    name: agent-ai-komunikasi-crm_default
+  default:
     driver: bridge
     ipam:
       driver: default
@@ -20,6 +19,4 @@ services:
       - "8201:8201"
     env_file:
       - .env
-    networks:
-      - agent-ai-komunikasi-crm_default
     restart: always
