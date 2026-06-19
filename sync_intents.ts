@@ -10,7 +10,7 @@ async function main() {
   const intents = data.data.intents;
 
   const flow = await prisma.flow.findFirst({
-    where: { name: 'Default Flow' }
+    where: { name: 'CEO SUITE User Journey2 (Imported)' }
   });
 
   if (!flow) {

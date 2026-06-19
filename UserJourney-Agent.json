@@ -65,7 +65,8 @@
         "trainingPhrases": [
           "Private Office",
           "I want a private office",
-          "i need private office"
+          "i need private office",
+          "(PO)"
         ],
         "responseType": "options",
         "response": "Private Office\nBest for teams that need a private, ready-to-use office with flexible terms.\n\nWhich city are you interested in?",
@@ -137,7 +138,10 @@
         "trainingPhrases": [
           "Kuala Lumpur Private Office",
           "In Kuala Lumpur for Private Office",
-          "Kuala Lumpur Private Office"
+          "Kuala Lumpur Private Office",
+          "Kuala Lumpur (PO)",
+          "In Kuala Lumpur for (PO)",
+          "Kuala Lumpur (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Kuala Lumpur. Please choose a centre.",
@@ -147,7 +151,8 @@
       {
         "name": "PO Centre: Axiata Tower",
         "trainingPhrases": [
-          "Axiata Tower Private Office"
+          "Axiata Tower Private Office",
+          "Axiata Tower (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axiata Tower (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Axiata Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-axiata-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -158,7 +163,9 @@
         "name": "Action: Request Quotation Axiata Tower Private Office",
         "trainingPhrases": [
           "Request quotation Axiata Tower Private Office",
-          "I want a quote for Axiata Tower Private Office"
+          "I want a quote for Axiata Tower Private Office",
+          "Request quotation Axiata Tower (PO)",
+          "I want a quote for Axiata Tower (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Axiata Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Axiata+Tower&city=Kuala+Lumpur&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -169,7 +176,9 @@
         "name": "Action: Book a tour Axiata Tower Private Office",
         "trainingPhrases": [
           "Book a tour Axiata Tower Private Office",
-          "Schedule a tour Axiata Tower Private Office"
+          "Schedule a tour Axiata Tower Private Office",
+          "Book a tour Axiata Tower (PO)",
+          "Schedule a tour Axiata Tower (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Axiata Tower.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Axiata+Tower&city=Kuala+Lumpur&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -179,7 +188,8 @@
       {
         "name": "PO Centre: Q Sentral",
         "trainingPhrases": [
-          "Q Sentral Private Office"
+          "Q Sentral Private Office",
+          "Q Sentral (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Q Sentral (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Q Sentral are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-q-sentral/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -190,7 +200,9 @@
         "name": "Action: Request Quotation Q Sentral Private Office",
         "trainingPhrases": [
           "Request quotation Q Sentral Private Office",
-          "I want a quote for Q Sentral Private Office"
+          "I want a quote for Q Sentral Private Office",
+          "Request quotation Q Sentral (PO)",
+          "I want a quote for Q Sentral (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Q Sentral. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Q+Sentral&city=Kuala+Lumpur&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -201,7 +213,9 @@
         "name": "Action: Book a tour Q Sentral Private Office",
         "trainingPhrases": [
           "Book a tour Q Sentral Private Office",
-          "Schedule a tour Q Sentral Private Office"
+          "Schedule a tour Q Sentral Private Office",
+          "Book a tour Q Sentral (PO)",
+          "Schedule a tour Q Sentral (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Q Sentral.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Q+Sentral&city=Kuala+Lumpur&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -211,7 +225,8 @@
       {
         "name": "PO Centre: Manara Maxis 36",
         "trainingPhrases": [
-          "Manara Maxis 36 Private Office"
+          "Manara Maxis 36 Private Office",
+          "Manara Maxis 36 (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 36 (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Manara Maxis 36 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-36th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -222,7 +237,9 @@
         "name": "Action: Request Quotation Manara Maxis 36 Private Office",
         "trainingPhrases": [
           "Request quotation Manara Maxis 36 Private Office",
-          "I want a quote for Manara Maxis 36 Private Office"
+          "I want a quote for Manara Maxis 36 Private Office",
+          "Request quotation Manara Maxis 36 (PO)",
+          "I want a quote for Manara Maxis 36 (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Manara Maxis 36. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Manara+Maxis+36&city=Kuala+Lumpur&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -233,7 +250,9 @@
         "name": "Action: Book a tour Manara Maxis 36 Private Office",
         "trainingPhrases": [
           "Book a tour Manara Maxis 36 Private Office",
-          "Schedule a tour Manara Maxis 36 Private Office"
+          "Schedule a tour Manara Maxis 36 Private Office",
+          "Book a tour Manara Maxis 36 (PO)",
+          "Schedule a tour Manara Maxis 36 (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Manara Maxis 36.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Manara+Maxis+36&city=Kuala+Lumpur&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -243,7 +262,8 @@
       {
         "name": "PO Centre: Manara Maxis 26",
         "trainingPhrases": [
-          "Manara Maxis 26 Private Office"
+          "Manara Maxis 26 Private Office",
+          "Manara Maxis 26 (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 26 (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Manara Maxis 26 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-26th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -254,7 +274,9 @@
         "name": "Action: Request Quotation Manara Maxis 26 Private Office",
         "trainingPhrases": [
           "Request quotation Manara Maxis 26 Private Office",
-          "I want a quote for Manara Maxis 26 Private Office"
+          "I want a quote for Manara Maxis 26 Private Office",
+          "Request quotation Manara Maxis 26 (PO)",
+          "I want a quote for Manara Maxis 26 (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Manara Maxis 26. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Manara+Maxis+26&city=Kuala+Lumpur&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -265,7 +287,9 @@
         "name": "Action: Book a tour Manara Maxis 26 Private Office",
         "trainingPhrases": [
           "Book a tour Manara Maxis 26 Private Office",
-          "Schedule a tour Manara Maxis 26 Private Office"
+          "Schedule a tour Manara Maxis 26 Private Office",
+          "Book a tour Manara Maxis 26 (PO)",
+          "Schedule a tour Manara Maxis 26 (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Manara Maxis 26.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Manara+Maxis+26&city=Kuala+Lumpur&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -277,7 +301,10 @@
         "trainingPhrases": [
           "Hong Kong Private Office",
           "In Hong Kong for Private Office",
-          "Hong Kong Private Office"
+          "Hong Kong Private Office",
+          "Hong Kong (PO)",
+          "In Hong Kong for (PO)",
+          "Hong Kong (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hong Kong. Please choose a centre.",
@@ -287,7 +314,8 @@
       {
         "name": "PO Centre: Chinachem Tower",
         "trainingPhrases": [
-          "Chinachem Tower Private Office"
+          "Chinachem Tower Private Office",
+          "Chinachem Tower (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Chinachem Tower (Hong Kong) - Private Office</div><div class='small'>Our private offices at Chinachem Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/chinachem-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -298,7 +326,9 @@
         "name": "Action: Request Quotation Chinachem Tower Private Office",
         "trainingPhrases": [
           "Request quotation Chinachem Tower Private Office",
-          "I want a quote for Chinachem Tower Private Office"
+          "I want a quote for Chinachem Tower Private Office",
+          "Request quotation Chinachem Tower (PO)",
+          "I want a quote for Chinachem Tower (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Chinachem Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Chinachem+Tower&city=Hong+Kong&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -309,7 +339,9 @@
         "name": "Action: Book a tour Chinachem Tower Private Office",
         "trainingPhrases": [
           "Book a tour Chinachem Tower Private Office",
-          "Schedule a tour Chinachem Tower Private Office"
+          "Schedule a tour Chinachem Tower Private Office",
+          "Book a tour Chinachem Tower (PO)",
+          "Schedule a tour Chinachem Tower (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Chinachem Tower.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Chinachem+Tower&city=Hong+Kong&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -319,7 +351,8 @@
       {
         "name": "PO Centre: K11 Atelier Victoria Dockside",
         "trainingPhrases": [
-          "K11 Atelier Victoria Dockside Private Office"
+          "K11 Atelier Victoria Dockside Private Office",
+          "K11 Atelier Victoria Dockside (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>K11 Atelier Victoria Dockside (Hong Kong) - Private Office</div><div class='small'>Our private offices at K11 Atelier Victoria Dockside are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hongkong-k11-atelier/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -330,7 +363,9 @@
         "name": "Action: Request Quotation K11 Atelier Victoria Dockside Private Office",
         "trainingPhrases": [
           "Request quotation K11 Atelier Victoria Dockside Private Office",
-          "I want a quote for K11 Atelier Victoria Dockside Private Office"
+          "I want a quote for K11 Atelier Victoria Dockside Private Office",
+          "Request quotation K11 Atelier Victoria Dockside (PO)",
+          "I want a quote for K11 Atelier Victoria Dockside (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for K11 Atelier Victoria Dockside. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=K11+Atelier+Victoria+Dockside&city=Hong+Kong&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -341,7 +376,9 @@
         "name": "Action: Book a tour K11 Atelier Victoria Dockside Private Office",
         "trainingPhrases": [
           "Book a tour K11 Atelier Victoria Dockside Private Office",
-          "Schedule a tour K11 Atelier Victoria Dockside Private Office"
+          "Schedule a tour K11 Atelier Victoria Dockside Private Office",
+          "Book a tour K11 Atelier Victoria Dockside (PO)",
+          "Schedule a tour K11 Atelier Victoria Dockside (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at K11 Atelier Victoria Dockside.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=K11+Atelier+Victoria+Dockside&city=Hong+Kong&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -353,7 +390,10 @@
         "trainingPhrases": [
           "Beijing Private Office",
           "In Beijing for Private Office",
-          "Beijing Private Office"
+          "Beijing Private Office",
+          "Beijing (PO)",
+          "In Beijing for (PO)",
+          "Beijing (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Beijing. Please choose a centre.",
@@ -363,7 +403,8 @@
       {
         "name": "PO Centre: Sunshine Financial Center",
         "trainingPhrases": [
-          "Sunshine Financial Center Private Office"
+          "Sunshine Financial Center Private Office",
+          "Sunshine Financial Center (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sunshine Financial Center (Beijing) - Private Office</div><div class='small'>Our private offices at Sunshine Financial Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/sunshine-financial-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -374,7 +415,9 @@
         "name": "Action: Request Quotation Sunshine Financial Center Private Office",
         "trainingPhrases": [
           "Request quotation Sunshine Financial Center Private Office",
-          "I want a quote for Sunshine Financial Center Private Office"
+          "I want a quote for Sunshine Financial Center Private Office",
+          "Request quotation Sunshine Financial Center (PO)",
+          "I want a quote for Sunshine Financial Center (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Sunshine Financial Center. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Sunshine+Financial+Center&city=Beijing&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -385,7 +428,9 @@
         "name": "Action: Book a tour Sunshine Financial Center Private Office",
         "trainingPhrases": [
           "Book a tour Sunshine Financial Center Private Office",
-          "Schedule a tour Sunshine Financial Center Private Office"
+          "Schedule a tour Sunshine Financial Center Private Office",
+          "Book a tour Sunshine Financial Center (PO)",
+          "Schedule a tour Sunshine Financial Center (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Sunshine Financial Center.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Sunshine+Financial+Center&city=Beijing&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -395,7 +440,8 @@
       {
         "name": "PO Centre: The Exchange Twin Towers",
         "trainingPhrases": [
-          "The Exchange Twin Towers Private Office"
+          "The Exchange Twin Towers Private Office",
+          "The Exchange Twin Towers (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>The Exchange Twin Towers (Beijing) - Private Office</div><div class='small'>Our private offices at The Exchange Twin Towers are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/beijing-the-exchange-twin-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -406,7 +452,9 @@
         "name": "Action: Request Quotation The Exchange Twin Towers Private Office",
         "trainingPhrases": [
           "Request quotation The Exchange Twin Towers Private Office",
-          "I want a quote for The Exchange Twin Towers Private Office"
+          "I want a quote for The Exchange Twin Towers Private Office",
+          "Request quotation The Exchange Twin Towers (PO)",
+          "I want a quote for The Exchange Twin Towers (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for The Exchange Twin Towers. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=The+Exchange+Twin+Towers&city=Beijing&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -417,7 +465,9 @@
         "name": "Action: Book a tour The Exchange Twin Towers Private Office",
         "trainingPhrases": [
           "Book a tour The Exchange Twin Towers Private Office",
-          "Schedule a tour The Exchange Twin Towers Private Office"
+          "Schedule a tour The Exchange Twin Towers Private Office",
+          "Book a tour The Exchange Twin Towers (PO)",
+          "Schedule a tour The Exchange Twin Towers (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at The Exchange Twin Towers.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=The+Exchange+Twin+Towers&city=Beijing&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -429,7 +479,10 @@
         "trainingPhrases": [
           "Shanghai Private Office",
           "In Shanghai for Private Office",
-          "Shanghai Private Office"
+          "Shanghai Private Office",
+          "Shanghai (PO)",
+          "In Shanghai for (PO)",
+          "Shanghai (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Shanghai. Please choose a centre.",
@@ -439,7 +492,8 @@
       {
         "name": "PO Centre: Lujiazui Finance Plaza",
         "trainingPhrases": [
-          "Lujiazui Finance Plaza Private Office"
+          "Lujiazui Finance Plaza Private Office",
+          "Lujiazui Finance Plaza (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lujiazui Finance Plaza (Shanghai) - Private Office</div><div class='small'>Our private offices at Lujiazui Finance Plaza are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/lujiazui-financial-plaza/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -450,7 +504,9 @@
         "name": "Action: Request Quotation Lujiazui Finance Plaza Private Office",
         "trainingPhrases": [
           "Request quotation Lujiazui Finance Plaza Private Office",
-          "I want a quote for Lujiazui Finance Plaza Private Office"
+          "I want a quote for Lujiazui Finance Plaza Private Office",
+          "Request quotation Lujiazui Finance Plaza (PO)",
+          "I want a quote for Lujiazui Finance Plaza (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Lujiazui Finance Plaza. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Lujiazui+Finance+Plaza&city=Shanghai&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -461,7 +517,9 @@
         "name": "Action: Book a tour Lujiazui Finance Plaza Private Office",
         "trainingPhrases": [
           "Book a tour Lujiazui Finance Plaza Private Office",
-          "Schedule a tour Lujiazui Finance Plaza Private Office"
+          "Schedule a tour Lujiazui Finance Plaza Private Office",
+          "Book a tour Lujiazui Finance Plaza (PO)",
+          "Schedule a tour Lujiazui Finance Plaza (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Lujiazui Finance Plaza.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Lujiazui+Finance+Plaza&city=Shanghai&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -471,7 +529,8 @@
       {
         "name": "PO Centre: Shanghai World Financial Center",
         "trainingPhrases": [
-          "Shanghai World Financial Center Private Office"
+          "Shanghai World Financial Center Private Office",
+          "Shanghai World Financial Center (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Shanghai World Financial Center (Shanghai) - Private Office</div><div class='small'>Our private offices at Shanghai World Financial Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-world-financial-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -482,7 +541,9 @@
         "name": "Action: Request Quotation Shanghai World Financial Center Private Office",
         "trainingPhrases": [
           "Request quotation Shanghai World Financial Center Private Office",
-          "I want a quote for Shanghai World Financial Center Private Office"
+          "I want a quote for Shanghai World Financial Center Private Office",
+          "Request quotation Shanghai World Financial Center (PO)",
+          "I want a quote for Shanghai World Financial Center (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Shanghai World Financial Center. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Shanghai+World+Financial+Center&city=Shanghai&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -493,7 +554,9 @@
         "name": "Action: Book a tour Shanghai World Financial Center Private Office",
         "trainingPhrases": [
           "Book a tour Shanghai World Financial Center Private Office",
-          "Schedule a tour Shanghai World Financial Center Private Office"
+          "Schedule a tour Shanghai World Financial Center Private Office",
+          "Book a tour Shanghai World Financial Center (PO)",
+          "Schedule a tour Shanghai World Financial Center (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Shanghai World Financial Center.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Shanghai+World+Financial+Center&city=Shanghai&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -503,7 +566,8 @@
       {
         "name": "PO Centre: Hong Kong New World Tower (K11)",
         "trainingPhrases": [
-          "Hong Kong New World Tower (K11) Private Office"
+          "Hong Kong New World Tower (K11) Private Office",
+          "Hong Kong New World Tower (K11) (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hong Kong New World Tower (K11) (Shanghai) - Private Office</div><div class='small'>Our private offices at Hong Kong New World Tower (K11) are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-puxi-hong-kong-new-world-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -514,7 +578,9 @@
         "name": "Action: Request Quotation Hong Kong New World Tower (K11) Private Office",
         "trainingPhrases": [
           "Request quotation Hong Kong New World Tower (K11) Private Office",
-          "I want a quote for Hong Kong New World Tower (K11) Private Office"
+          "I want a quote for Hong Kong New World Tower (K11) Private Office",
+          "Request quotation Hong Kong New World Tower (K11) (PO)",
+          "I want a quote for Hong Kong New World Tower (K11) (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Hong Kong New World Tower (K11). Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Hong+Kong+New+World+Tower+(K11)&city=Shanghai&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -525,7 +591,9 @@
         "name": "Action: Book a tour Hong Kong New World Tower (K11) Private Office",
         "trainingPhrases": [
           "Book a tour Hong Kong New World Tower (K11) Private Office",
-          "Schedule a tour Hong Kong New World Tower (K11) Private Office"
+          "Schedule a tour Hong Kong New World Tower (K11) Private Office",
+          "Book a tour Hong Kong New World Tower (K11) (PO)",
+          "Schedule a tour Hong Kong New World Tower (K11) (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Hong Kong New World Tower (K11).<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Hong+Kong+New+World+Tower+(K11)&city=Shanghai&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -537,7 +605,10 @@
         "trainingPhrases": [
           "Hangzhou Private Office",
           "In Hangzhou for Private Office",
-          "Hangzhou Private Office"
+          "Hangzhou Private Office",
+          "Hangzhou (PO)",
+          "In Hangzhou for (PO)",
+          "Hangzhou (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hangzhou. Please choose a centre.",
@@ -547,7 +618,8 @@
       {
         "name": "PO Centre: Ping An Finance Center",
         "trainingPhrases": [
-          "Ping An Finance Center Private Office"
+          "Ping An Finance Center Private Office",
+          "Ping An Finance Center (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Ping An Finance Center (Hangzhou) - Private Office</div><div class='small'>Our private offices at Ping An Finance Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ping-an-finance-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -558,7 +630,9 @@
         "name": "Action: Request Quotation Ping An Finance Center Private Office",
         "trainingPhrases": [
           "Request quotation Ping An Finance Center Private Office",
-          "I want a quote for Ping An Finance Center Private Office"
+          "I want a quote for Ping An Finance Center Private Office",
+          "Request quotation Ping An Finance Center (PO)",
+          "I want a quote for Ping An Finance Center (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Ping An Finance Center. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Ping+An+Finance+Center&city=Hangzhou&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -569,7 +643,9 @@
         "name": "Action: Book a tour Ping An Finance Center Private Office",
         "trainingPhrases": [
           "Book a tour Ping An Finance Center Private Office",
-          "Schedule a tour Ping An Finance Center Private Office"
+          "Schedule a tour Ping An Finance Center Private Office",
+          "Book a tour Ping An Finance Center (PO)",
+          "Schedule a tour Ping An Finance Center (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Ping An Finance Center.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Ping+An+Finance+Center&city=Hangzhou&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -581,7 +657,10 @@
         "trainingPhrases": [
           "Manila Private Office",
           "In Manila for Private Office",
-          "Manila Private Office"
+          "Manila Private Office",
+          "Manila (PO)",
+          "In Manila for (PO)",
+          "Manila (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Manila. Please choose a centre.",
@@ -591,7 +670,8 @@
       {
         "name": "PO Centre: Lkg Tower",
         "trainingPhrases": [
-          "Lkg Tower Private Office"
+          "Lkg Tower Private Office",
+          "Lkg Tower (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lkg Tower (Manila) - Private Office</div><div class='small'>Our private offices at Lkg Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/office-space-for-rent-manila/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -602,7 +682,9 @@
         "name": "Action: Request Quotation Lkg Tower Private Office",
         "trainingPhrases": [
           "Request quotation Lkg Tower Private Office",
-          "I want a quote for Lkg Tower Private Office"
+          "I want a quote for Lkg Tower Private Office",
+          "Request quotation Lkg Tower (PO)",
+          "I want a quote for Lkg Tower (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Lkg Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Lkg+Tower&city=Manila&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -613,7 +695,9 @@
         "name": "Action: Book a tour Lkg Tower Private Office",
         "trainingPhrases": [
           "Book a tour Lkg Tower Private Office",
-          "Schedule a tour Lkg Tower Private Office"
+          "Schedule a tour Lkg Tower Private Office",
+          "Book a tour Lkg Tower (PO)",
+          "Schedule a tour Lkg Tower (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Lkg Tower.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Lkg+Tower&city=Manila&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -625,7 +709,10 @@
         "trainingPhrases": [
           "Jakarta Private Office",
           "In Jakarta for Private Office",
-          "Jakarta Private Office"
+          "Jakarta Private Office",
+          "Jakarta (PO)",
+          "In Jakarta for (PO)",
+          "Jakarta (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Jakarta. Please choose a centre.",
@@ -635,7 +722,8 @@
       {
         "name": "PO Centre: Sahid Sudirman Center",
         "trainingPhrases": [
-          "Sahid Sudirman Center Private Office"
+          "Sahid Sudirman Center Private Office",
+          "Sahid Sudirman Center (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sahid Sudirman Center (Jakarta) - Private Office</div><div class='small'>Our private offices at Sahid Sudirman Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-sahid-sudirman-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -646,7 +734,9 @@
         "name": "Action: Request Quotation Sahid Sudirman Center Private Office",
         "trainingPhrases": [
           "Request quotation Sahid Sudirman Center Private Office",
-          "I want a quote for Sahid Sudirman Center Private Office"
+          "I want a quote for Sahid Sudirman Center Private Office",
+          "Request quotation Sahid Sudirman Center (PO)",
+          "I want a quote for Sahid Sudirman Center (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Sahid Sudirman Center. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Sahid+Sudirman+Center&city=Jakarta&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -657,7 +747,9 @@
         "name": "Action: Book a tour Sahid Sudirman Center Private Office",
         "trainingPhrases": [
           "Book a tour Sahid Sudirman Center Private Office",
-          "Schedule a tour Sahid Sudirman Center Private Office"
+          "Schedule a tour Sahid Sudirman Center Private Office",
+          "Book a tour Sahid Sudirman Center (PO)",
+          "Schedule a tour Sahid Sudirman Center (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Sahid Sudirman Center.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Sahid+Sudirman+Center&city=Jakarta&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -667,7 +759,8 @@
       {
         "name": "PO Centre: Axa Tower",
         "trainingPhrases": [
-          "Axa Tower Private Office"
+          "Axa Tower Private Office",
+          "Axa Tower (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axa Tower (Jakarta) - Private Office</div><div class='small'>Our private offices at Axa Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-axa/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -678,7 +771,9 @@
         "name": "Action: Request Quotation Axa Tower Private Office",
         "trainingPhrases": [
           "Request quotation Axa Tower Private Office",
-          "I want a quote for Axa Tower Private Office"
+          "I want a quote for Axa Tower Private Office",
+          "Request quotation Axa Tower (PO)",
+          "I want a quote for Axa Tower (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Axa Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Axa+Tower&city=Jakarta&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -689,7 +784,9 @@
         "name": "Action: Book a tour Axa Tower Private Office",
         "trainingPhrases": [
           "Book a tour Axa Tower Private Office",
-          "Schedule a tour Axa Tower Private Office"
+          "Schedule a tour Axa Tower Private Office",
+          "Book a tour Axa Tower (PO)",
+          "Schedule a tour Axa Tower (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Axa Tower.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Axa+Tower&city=Jakarta&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -699,7 +796,8 @@
       {
         "name": "PO Centre: Indonesia Stock Exchange Tower 2",
         "trainingPhrases": [
-          "Indonesia Stock Exchange Tower 2 Private Office"
+          "Indonesia Stock Exchange Tower 2 Private Office",
+          "Indonesia Stock Exchange Tower 2 (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Indonesia Stock Exchange Tower 2 (Jakarta) - Private Office</div><div class='small'>Our private offices at Indonesia Stock Exchange Tower 2 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-stock-exchange/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -710,7 +808,9 @@
         "name": "Action: Request Quotation Indonesia Stock Exchange Tower 2 Private Office",
         "trainingPhrases": [
           "Request quotation Indonesia Stock Exchange Tower 2 Private Office",
-          "I want a quote for Indonesia Stock Exchange Tower 2 Private Office"
+          "I want a quote for Indonesia Stock Exchange Tower 2 Private Office",
+          "Request quotation Indonesia Stock Exchange Tower 2 (PO)",
+          "I want a quote for Indonesia Stock Exchange Tower 2 (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Indonesia Stock Exchange Tower 2. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Indonesia+Stock+Exchange+Tower+2&city=Jakarta&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -721,7 +821,9 @@
         "name": "Action: Book a tour Indonesia Stock Exchange Tower 2 Private Office",
         "trainingPhrases": [
           "Book a tour Indonesia Stock Exchange Tower 2 Private Office",
-          "Schedule a tour Indonesia Stock Exchange Tower 2 Private Office"
+          "Schedule a tour Indonesia Stock Exchange Tower 2 Private Office",
+          "Book a tour Indonesia Stock Exchange Tower 2 (PO)",
+          "Schedule a tour Indonesia Stock Exchange Tower 2 (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Indonesia Stock Exchange Tower 2.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Indonesia+Stock+Exchange+Tower+2&city=Jakarta&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -731,7 +833,8 @@
       {
         "name": "PO Centre: One Pacific Place",
         "trainingPhrases": [
-          "One Pacific Place Private Office"
+          "One Pacific Place Private Office",
+          "One Pacific Place (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>One Pacific Place (Jakarta) - Private Office</div><div class='small'>Our private offices at One Pacific Place are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-one-pacific-place/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -742,7 +845,9 @@
         "name": "Action: Request Quotation One Pacific Place Private Office",
         "trainingPhrases": [
           "Request quotation One Pacific Place Private Office",
-          "I want a quote for One Pacific Place Private Office"
+          "I want a quote for One Pacific Place Private Office",
+          "Request quotation One Pacific Place (PO)",
+          "I want a quote for One Pacific Place (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for One Pacific Place. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=One+Pacific+Place&city=Jakarta&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -753,7 +858,9 @@
         "name": "Action: Book a tour One Pacific Place Private Office",
         "trainingPhrases": [
           "Book a tour One Pacific Place Private Office",
-          "Schedule a tour One Pacific Place Private Office"
+          "Schedule a tour One Pacific Place Private Office",
+          "Book a tour One Pacific Place (PO)",
+          "Schedule a tour One Pacific Place (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at One Pacific Place.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=One+Pacific+Place&city=Jakarta&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -765,7 +872,10 @@
         "trainingPhrases": [
           "Singapore Private Office",
           "In Singapore for Private Office",
-          "Singapore Private Office"
+          "Singapore Private Office",
+          "Singapore (PO)",
+          "In Singapore for (PO)",
+          "Singapore (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Singapore. Please choose a centre.",
@@ -775,7 +885,8 @@
       {
         "name": "PO Centre: Centennial Tower",
         "trainingPhrases": [
-          "Centennial Tower Private Office"
+          "Centennial Tower Private Office",
+          "Centennial Tower (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Centennial Tower (Singapore) - Private Office</div><div class='small'>Our private offices at Centennial Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/centennial-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -786,7 +897,9 @@
         "name": "Action: Request Quotation Centennial Tower Private Office",
         "trainingPhrases": [
           "Request quotation Centennial Tower Private Office",
-          "I want a quote for Centennial Tower Private Office"
+          "I want a quote for Centennial Tower Private Office",
+          "Request quotation Centennial Tower (PO)",
+          "I want a quote for Centennial Tower (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Centennial Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Centennial+Tower&city=Singapore&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -797,7 +910,9 @@
         "name": "Action: Book a tour Centennial Tower Private Office",
         "trainingPhrases": [
           "Book a tour Centennial Tower Private Office",
-          "Schedule a tour Centennial Tower Private Office"
+          "Schedule a tour Centennial Tower Private Office",
+          "Book a tour Centennial Tower (PO)",
+          "Schedule a tour Centennial Tower (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Centennial Tower.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Centennial+Tower&city=Singapore&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -809,7 +924,10 @@
         "trainingPhrases": [
           "Seoul Private Office",
           "In Seoul for Private Office",
-          "Seoul Private Office"
+          "Seoul Private Office",
+          "Seoul (PO)",
+          "In Seoul for (PO)",
+          "Seoul (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Seoul. Please choose a centre.",
@@ -819,7 +937,8 @@
       {
         "name": "PO Centre: Kyobo Building",
         "trainingPhrases": [
-          "Kyobo Building Private Office"
+          "Kyobo Building Private Office",
+          "Kyobo Building (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Kyobo Building (Seoul) - Private Office</div><div class='small'>Our private offices at Kyobo Building are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-kyobo-building/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -830,7 +949,9 @@
         "name": "Action: Request Quotation Kyobo Building Private Office",
         "trainingPhrases": [
           "Request quotation Kyobo Building Private Office",
-          "I want a quote for Kyobo Building Private Office"
+          "I want a quote for Kyobo Building Private Office",
+          "Request quotation Kyobo Building (PO)",
+          "I want a quote for Kyobo Building (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Kyobo Building. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Kyobo+Building&city=Seoul&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -841,7 +962,9 @@
         "name": "Action: Book a tour Kyobo Building Private Office",
         "trainingPhrases": [
           "Book a tour Kyobo Building Private Office",
-          "Schedule a tour Kyobo Building Private Office"
+          "Schedule a tour Kyobo Building Private Office",
+          "Book a tour Kyobo Building (PO)",
+          "Schedule a tour Kyobo Building (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Kyobo Building.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Kyobo+Building&city=Seoul&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -851,7 +974,8 @@
       {
         "name": "PO Centre: Parnas Tower",
         "trainingPhrases": [
-          "Parnas Tower Private Office"
+          "Parnas Tower Private Office",
+          "Parnas Tower (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Parnas Tower (Seoul) - Private Office</div><div class='small'>Our private offices at Parnas Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-gangnam-parnas-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -862,7 +986,9 @@
         "name": "Action: Request Quotation Parnas Tower Private Office",
         "trainingPhrases": [
           "Request quotation Parnas Tower Private Office",
-          "I want a quote for Parnas Tower Private Office"
+          "I want a quote for Parnas Tower Private Office",
+          "Request quotation Parnas Tower (PO)",
+          "I want a quote for Parnas Tower (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Parnas Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Parnas+Tower&city=Seoul&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -873,7 +999,9 @@
         "name": "Action: Book a tour Parnas Tower Private Office",
         "trainingPhrases": [
           "Book a tour Parnas Tower Private Office",
-          "Schedule a tour Parnas Tower Private Office"
+          "Schedule a tour Parnas Tower Private Office",
+          "Book a tour Parnas Tower (PO)",
+          "Schedule a tour Parnas Tower (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Parnas Tower.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Parnas+Tower&city=Seoul&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -885,7 +1013,10 @@
         "trainingPhrases": [
           "Bangkok Private Office",
           "In Bangkok for Private Office",
-          "Bangkok Private Office"
+          "Bangkok Private Office",
+          "Bangkok (PO)",
+          "In Bangkok for (PO)",
+          "Bangkok (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Bangkok. Please choose a centre.",
@@ -895,7 +1026,8 @@
       {
         "name": "PO Centre: Athenee Tower",
         "trainingPhrases": [
-          "Athenee Tower Private Office"
+          "Athenee Tower Private Office",
+          "Athenee Tower (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Athenee Tower (Bangkok) - Private Office</div><div class='small'>Our private offices at Athenee Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/bangkok-athenee-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -906,7 +1038,9 @@
         "name": "Action: Request Quotation Athenee Tower Private Office",
         "trainingPhrases": [
           "Request quotation Athenee Tower Private Office",
-          "I want a quote for Athenee Tower Private Office"
+          "I want a quote for Athenee Tower Private Office",
+          "Request quotation Athenee Tower (PO)",
+          "I want a quote for Athenee Tower (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Athenee Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Athenee+Tower&city=Bangkok&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -917,7 +1051,9 @@
         "name": "Action: Book a tour Athenee Tower Private Office",
         "trainingPhrases": [
           "Book a tour Athenee Tower Private Office",
-          "Schedule a tour Athenee Tower Private Office"
+          "Schedule a tour Athenee Tower Private Office",
+          "Book a tour Athenee Tower (PO)",
+          "Schedule a tour Athenee Tower (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Athenee Tower.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Athenee+Tower&city=Bangkok&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -929,7 +1065,10 @@
         "trainingPhrases": [
           "Hanoi Private Office",
           "In Hanoi for Private Office",
-          "Hanoi Private Office"
+          "Hanoi Private Office",
+          "Hanoi (PO)",
+          "In Hanoi for (PO)",
+          "Hanoi (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hanoi. Please choose a centre.",
@@ -939,7 +1078,8 @@
       {
         "name": "PO Centre: Hanoi Lotte Center",
         "trainingPhrases": [
-          "Hanoi Lotte Center Private Office"
+          "Hanoi Lotte Center Private Office",
+          "Hanoi Lotte Center (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hanoi Lotte Center (Hanoi) - Private Office</div><div class='small'>Our private offices at Hanoi Lotte Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hanoi-lotte-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -950,7 +1090,9 @@
         "name": "Action: Request Quotation Hanoi Lotte Center Private Office",
         "trainingPhrases": [
           "Request quotation Hanoi Lotte Center Private Office",
-          "I want a quote for Hanoi Lotte Center Private Office"
+          "I want a quote for Hanoi Lotte Center Private Office",
+          "Request quotation Hanoi Lotte Center (PO)",
+          "I want a quote for Hanoi Lotte Center (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Hanoi Lotte Center. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Hanoi+Lotte+Center&city=Hanoi&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -961,7 +1103,9 @@
         "name": "Action: Book a tour Hanoi Lotte Center Private Office",
         "trainingPhrases": [
           "Book a tour Hanoi Lotte Center Private Office",
-          "Schedule a tour Hanoi Lotte Center Private Office"
+          "Schedule a tour Hanoi Lotte Center Private Office",
+          "Book a tour Hanoi Lotte Center (PO)",
+          "Schedule a tour Hanoi Lotte Center (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Hanoi Lotte Center.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Hanoi+Lotte+Center&city=Hanoi&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
@@ -973,7 +1117,10 @@
         "trainingPhrases": [
           "Ho Chi Minh City Private Office",
           "In Ho Chi Minh City for Private Office",
-          "Ho Chi Minh City Private Office"
+          "Ho Chi Minh City Private Office",
+          "Ho Chi Minh City (PO)",
+          "In Ho Chi Minh City for (PO)",
+          "Ho Chi Minh City (PO)"
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Ho Chi Minh City. Please choose a centre.",
@@ -983,7 +1130,8 @@
       {
         "name": "PO Centre: Vietcombank Tower",
         "trainingPhrases": [
-          "Vietcombank Tower Private Office"
+          "Vietcombank Tower Private Office",
+          "Vietcombank Tower (PO)"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Vietcombank Tower (Ho Chi Minh City) - Private Office</div><div class='small'>Our private offices at Vietcombank Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
@@ -994,7 +1142,9 @@
         "name": "Action: Request Quotation Vietcombank Tower Private Office",
         "trainingPhrases": [
           "Request quotation Vietcombank Tower Private Office",
-          "I want a quote for Vietcombank Tower Private Office"
+          "I want a quote for Vietcombank Tower Private Office",
+          "Request quotation Vietcombank Tower (PO)",
+          "I want a quote for Vietcombank Tower (PO)"
         ],
         "responseType": "form",
         "response": "Our team will review Private Office availability for Vietcombank Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Vietcombank+Tower&city=Ho+Chi+Minh+City&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>",
@@ -1005,7 +1155,9 @@
         "name": "Action: Book a tour Vietcombank Tower Private Office",
         "trainingPhrases": [
           "Book a tour Vietcombank Tower Private Office",
-          "Schedule a tour Vietcombank Tower Private Office"
+          "Schedule a tour Vietcombank Tower Private Office",
+          "Book a tour Vietcombank Tower (PO)",
+          "Schedule a tour Vietcombank Tower (PO)"
         ],
         "responseType": "form",
         "response": "Schedule a tour for Private Office at Vietcombank Tower.<div class='form-card'><div class='form-grid'><div><label class='form-card_label'>Date</label><input type='date' class='form-card_input'/></div><div><label class='form-card_label'>Time</label><input type='time' class='form-card_input'/></div></div><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Vietcombank+Tower&city=Ho+Chi+Minh+City&product=Private+Office',payload:d}, '*');\">Schedule Tour</button></div>",
