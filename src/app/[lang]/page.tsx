@@ -1,96 +1,208 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, MessageSquare, Workflow, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChatWindow } from '@/modules/widget/ChatWindow';
+import { MessageCircle, X, CheckCircle2, Code, LayoutTemplate } from 'lucide-react';
 
 export default function Home() {
+  const tenantId = 'default-tenant';
+  const defaultColor = '#2563eb';
+  const defaultName = 'Support Bot';
+
+  const [config, setConfig] = useState({
+    color: defaultColor,
+    name: defaultName,
+    position: 'right',
+    icon: '',
+  });
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Auto open widget slightly after load
+  useEffect(() => {
+    const timer = setTimeout(() => setIsOpen(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Fetch real widget configuration
+  useEffect(() => {
+    fetch(`/api/widget/config?tenantId=${tenantId}`)
+      .then(res => res.json())
+      .then(data => {
+        setConfig({
+          color: data.primaryColor || defaultColor,
+          name: data.botName || defaultName,
+          position: data.position || 'right',
+          icon: data.widgetIconUrl || '',
+        });
+      })
+      .catch(err => console.error(err));
+  }, []);
+
+  // Position styles
+  const positionClasses = config.position === 'left' ? 'left-4 md:left-6' : 'right-4 md:right-6';
+  const chatWindowPositionClasses = config.position === 'left'
+    ? 'left-0 origin-bottom-left'
+    : 'right-0 origin-bottom-right';
+
+  const tooltipPositionClasses = config.position === 'left'
+    ? 'left-full ml-4 flex-row-reverse'
+    : 'right-full mr-4';
+
+  const tooltipArrowClasses = config.position === 'left'
+    ? 'right-full border-r-white'
+    : 'left-full border-l-white';
+
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-50 font-sans selection:bg-blue-500/30">
-      {/* Header */}
-      <header className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-900/50 backdrop-blur-md">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tighter">
-            <div className="w-8 h-8 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-lg flex items-center justify-center">
-              <Zap size={18} className="text-white" />
-            </div>
-            ZetaCRM
+    <div className="min-h-screen bg-slate-50 font-sans relative overflow-x-hidden">
+      {/* NAVBAR MOCK */}
+      <nav className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <LayoutTemplate className="w-5 h-5 text-white" />
           </div>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-            <Link href="#features" className="hover:text-white transition-colors">Features</Link>
-            <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium hover:text-white transition-colors">
-              Sign In
-            </Link>
-            <Link href="/login" className="text-sm font-medium bg-white text-slate-900 px-4 py-2 rounded-full hover:bg-slate-200 transition-colors">
-              Get Started
-            </Link>
-          </div>
+          <span className="font-bold text-xl text-slate-800">SaaSCompany</span>
         </div>
-      </header>
+        <div className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+          <a href="#" className="hover:text-blue-600 transition-colors">Produk</a>
+          <a href="#" className="hover:text-blue-600 transition-colors">Harga</a>
+          <a href="#" className="hover:text-blue-600 transition-colors">Dokumentasi</a>
+          <a href="#" className="hover:text-blue-600 transition-colors">Kontak</a>
+        </div>
+        {/* Login Button */}
+        <Link
+          href="/login"
+          className="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-full shadow-md shadow-blue-500/20 transition-all duration-200 hover:scale-105 active:scale-95"
+        >
+          Login
+        </Link>
+      </nav>
 
-      {/* Hero Section */}
-      <main>
-        <section className="pt-32 pb-20 md:pt-48 md:pb-32 px-6">
-          <div className="container mx-auto text-center max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium mb-8 border border-blue-500/20">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-              </span>
-              v1.0 is now live
-            </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
-              The Omni-Channel CRM <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
-                Powered by AI
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Seamlessly integrate WhatsApp, web widgets, and AI-driven workflows into one powerful, embeddable CRM engine. Built for modern SaaS.
+      {/* MOCK WEBSITE BACKGROUND - CARA PENGGUNAAN */}
+      <div className="max-w-4xl mx-auto px-6 py-16 pb-32">
+        <header className="mb-12 text-center md:text-left">
+          <div className="inline-flex items-center justify-center p-3 bg-blue-100/50 rounded-2xl mb-6">
+            <Code className="text-blue-600 w-8 h-8" />
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+            Preview Widget &amp; Cara Penggunaan
+          </h1>
+          <p className="text-lg md:text-xl text-slate-600 max-w-2xl leading-relaxed">
+            Ini adalah tampilan simulasi website Anda. Widget chat pintar telah dipasang di sudut layar dan siap digunakan.
+          </p>
+        </header>
+
+        <div className="space-y-8">
+          <section className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200/60">
+            <h2 className="text-xl font-bold text-slate-800 mb-5 flex items-center">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm mr-3 font-bold">1</span>
+              Salin Kode Embed
+            </h2>
+            <p className="text-slate-600 mb-6 leading-relaxed">
+              Untuk mengaktifkan widget ini di website Anda, salin kode snippet di bawah ini dan tempelkan tepat sebelum tag penutup{' '}
+              <code className="bg-slate-100 px-2 py-1 rounded text-sm text-pink-600 font-mono">&lt;/body&gt;</code> di HTML Anda.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-medium transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2">
-                Start for free <ArrowRight size={18} />
-              </Link>
+            <div className="relative group">
+              <pre className="bg-[#0f172a] text-slate-50 p-6 rounded-2xl overflow-x-auto text-sm leading-relaxed font-mono shadow-inner">
+{`<!-- AI Communication CRM Widget -->
+<script>
+  window.CRM_AGENT_CONFIG = {
+    tenantId: "${tenantId}",
+    apiUrl: "http://192.168.20.242:8201"
+  };
+</script>
+<script src="http://192.168.20.242:8201/widget.js" async></script>`}
+              </pre>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Features Preview */}
-        <section id="features" className="py-20 px-6 bg-slate-950/50 border-t border-white/5">
-          <div className="container mx-auto">
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 hover:border-blue-500/50 transition-colors">
-                <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mb-6">
-                  <MessageSquare size={24} />
+          <section className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200/60">
+            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm mr-3 font-bold">2</span>
+              Fitur yang Aktif
+            </h2>
+            <div className="grid md:grid-cols-2 gap-y-4 gap-x-8">
+              {[
+                'Kecerdasan Buatan (AI) otomatis',
+                'Transisi ke agen manusia (Handoff)',
+                'Penyesuaian warna dan identitas merek',
+                'Koneksi real-time via WebSocket',
+                'Tampilan responsif semua perangkat',
+                'Formulir review / feedback otomatis'
+              ].map((feature, i) => (
+                <div key={i} className="flex items-center p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  </div>
+                  <span className="text-slate-700 font-medium">{feature}</span>
                 </div>
-                <h3 className="text-xl font-bold mb-3">Omni-Inbox</h3>
-                <p className="text-slate-400 leading-relaxed">
-                  Manage conversations from WhatsApp, Web Widgets, and social media in one unified interface.
-                </p>
-              </div>
-              <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 hover:border-purple-500/50 transition-colors">
-                <div className="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center mb-6">
-                  <Workflow size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Visual Flow Builder</h3>
-                <p className="text-slate-400 leading-relaxed">
-                  Drag and drop to create complex conversational AI workflows without writing a single line of code.
-                </p>
-              </div>
-              <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 hover:border-indigo-500/50 transition-colors">
-                <div className="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-6">
-                  <Zap size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-3">AI Agent Proxy</h3>
-                <p className="text-slate-400 leading-relaxed">
-                  Decoupled AI engine integration allows you to swap or upgrade your LLM providers seamlessly.
-                </p>
-              </div>
+              ))}
             </div>
-          </div>
-        </section>
-      </main>
+          </section>
+        </div>
+      </div>
+
+      {/* FLOATING WIDGET AREA */}
+      <div className={`fixed bottom-4 md:bottom-6 z-50 ${positionClasses} flex flex-col`}>
+        {/* Chat Window Container */}
+        <div
+          className={`
+            transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] absolute bottom-16 md:bottom-20
+            ${isOpen
+              ? 'opacity-100 translate-y-0 pointer-events-auto'
+              : 'opacity-0 translate-y-8 pointer-events-none'
+            }
+            w-[calc(100vw-2rem)] md:w-[380px] h-[600px] max-h-[calc(100vh-8rem)]
+            bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200/60
+            ${chatWindowPositionClasses}
+          `}
+        >
+          <ChatWindow
+            tenantId={tenantId}
+            primaryColor={config.color}
+            botName={config.name}
+          />
+        </div>
+
+        {/* Floating Button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className={`
+            w-14 h-14 rounded-full shadow-lg flex items-center justify-center
+            transition-all duration-300 hover:scale-105 active:scale-95 text-white relative z-50 self-end
+          `}
+          style={{ backgroundColor: config.color }}
+          aria-label={isOpen ? 'Tutup chat' : 'Buka chat'}
+        >
+          {isOpen ? (
+            <X className="w-6 h-6 animate-in fade-in zoom-in duration-200" />
+          ) : (
+            config.icon && config.icon.startsWith('http') ? (
+              <img src={config.icon} alt="Chat Icon" className="w-8 h-8 object-contain animate-in fade-in zoom-in duration-200" />
+            ) : (
+              <MessageCircle className="w-6 h-6 animate-in fade-in zoom-in duration-200" />
+            )
+          )}
+
+          {/* Tooltip */}
+          {!isOpen && (
+            <span
+              className={`
+                absolute ${tooltipPositionClasses} top-1/2 -translate-y-1/2 bg-white text-slate-800 text-sm px-4 py-2 rounded-xl shadow-lg border border-slate-100
+                whitespace-nowrap transition-all duration-300 font-medium
+                ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
+              `}
+            >
+              Butuh bantuan?
+              <span className={`absolute top-1/2 -translate-y-1/2 border-[6px] border-transparent ${tooltipArrowClasses}`}></span>
+            </span>
+          )}
+        </button>
+      </div>
     </div>
   );
 }

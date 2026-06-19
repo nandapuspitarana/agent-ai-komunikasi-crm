@@ -11,8 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 add_action('wp_footer', 'saas_crm_agent_inject_script');
 
 function saas_crm_agent_inject_script() {
-    $tenant_id = "4dd9d2ab-2fcc-4136-8029-50f251494756";
-    $api_url = "http://192.168.20.242:8201";
+    $tenant_id = "968102a6-21b8-41dc-9f62-d7b088c9cb5f";
+    $api_url = "http://192.168.20.242:8201"; 
     
     ?>
     <!-- Start of SaaS CRM Widget -->
