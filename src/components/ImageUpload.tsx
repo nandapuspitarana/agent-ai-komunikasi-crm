@@ -172,7 +172,7 @@ export default function ImageUpload({
             <button
               type="button"
               onClick={handleOpenLibrary}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-bg text-brand-hover border border-brand/20 text-sm font-medium rounded-lg hover:bg-brand-bg transition-colors shadow-sm"
             >
               <ImageIcon size={16} />
               Choose from Library
@@ -191,7 +191,7 @@ export default function ImageUpload({
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-4 border-b border-slate-100">
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                <ImageIcon size={18} className="text-blue-600"/> Asset Library
+                <ImageIcon size={18} className="text-brand"/> Asset Library
               </h3>
               <button onClick={() => setShowLibrary(false)} className="p-1 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
                 <X size={18} />
@@ -200,7 +200,7 @@ export default function ImageUpload({
             <div className="p-6 overflow-y-auto flex-1">
               {isLoadingLibrary ? (
                 <div className="flex justify-center items-center py-12">
-                  <Loader2 className="animate-spin text-blue-500" size={32} />
+                  <Loader2 className="animate-spin text-brand-light" size={32} />
                 </div>
               ) : libraryAssets.length === 0 ? (
                 <div className="text-center py-12 flex flex-col items-center">
@@ -214,7 +214,7 @@ export default function ImageUpload({
                     <button
                       key={asset.id}
                       onClick={() => selectFromLibrary(asset.data)}
-                      className="aspect-square rounded-lg border border-slate-200 overflow-hidden hover:border-blue-500 hover:ring-2 hover:ring-blue-200 hover:shadow-md transition-all group relative bg-slate-50"
+                      className="aspect-square rounded-lg border border-slate-200 overflow-hidden hover:border-brand-light hover:ring-2 hover:ring-brand/30 hover:shadow-md transition-all group relative bg-slate-50"
                       title={new Date(asset.createdAt).toLocaleDateString()}
                     >
                       <img src={asset.data} alt="Asset" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

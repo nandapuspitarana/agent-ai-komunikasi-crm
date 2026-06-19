@@ -87,7 +87,7 @@ export default function AgentsListPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <Bot className="text-blue-600" /> AI Agents
+              <Bot className="text-brand" /> AI Agents
             </h1>
             <p className="text-slate-500 mt-1">Manage and monitor your agents.</p>
           </div>
@@ -96,7 +96,7 @@ export default function AgentsListPage() {
               <span>{importing ? 'Importing...' : 'Import JSON'}</span>
               <input type="file" accept=".json" className="hidden" onChange={handleImport} disabled={importing} />
             </label>
-            <Link href="/agent/builder" className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
+            <Link href="/agent/builder" className="flex items-center justify-center gap-2 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition-all shadow-md hover:shadow-lg">
               <Plus size={18} /> Create New Agent
             </Link>
           </div>
@@ -109,7 +109,7 @@ export default function AgentsListPage() {
             <input 
               type="text" 
               placeholder="Search agents by name or ID..."
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none transition-all"
             />
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function AgentsListPage() {
                 agents.map((agent) => (
                   <tr key={agent.id} className="hover:bg-slate-50 transition-colors">
                     <td className="py-3 px-4 font-medium text-slate-900 flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-brand-bg text-brand flex items-center justify-center">
                         <Bot size={16} />
                       </div>
                       {agent.name}
@@ -168,7 +168,7 @@ export default function AgentsListPage() {
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         {/* Currently builder doesn't support ?id= mapping directly from URL natively in the snippet given, but we will pass it anyway */}
-                        <Link href={`/agent/builder?id=${agent.id}`} className="p-1.5 text-slate-400 hover:text-blue-600 transition-colors" title="Edit Agent">
+                        <Link href={`/agent/builder?id=${agent.id}`} className="p-1.5 text-slate-400 hover:text-brand transition-colors" title="Edit Agent">
                           <Edit2 size={16} />
                         </Link>
                         <button onClick={() => handleDelete(agent.id)} className="p-1.5 text-slate-400 hover:text-red-600 transition-colors" title="Delete Agent">

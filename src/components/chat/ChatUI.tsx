@@ -245,7 +245,7 @@ export function ChatUI({
                       <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                     ) : (
                       <div 
-                        className="leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-a:text-blue-600 widget-html-content"
+                        className="leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-a:text-brand widget-html-content"
                         dangerouslySetInnerHTML={{ __html: msg.text }} 
                       />
                     )}
@@ -261,7 +261,7 @@ export function ChatUI({
                       key={idx}
                       onClick={() => onSendMessage(option)}
                       disabled={isTyping || status === 'closed'}
-                      className="px-3 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-blue-300 transition-colors shadow-sm disabled:opacity-50"
+                      className="px-3 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-brand/30 transition-colors shadow-sm disabled:opacity-50"
                       style={{ borderColor: config.primaryColor + '40', color: config.primaryColor }}
                     >
                       {option}
@@ -322,7 +322,7 @@ export function ChatUI({
               value={reviewText || ''}
               onChange={(e) => onReviewTextChange(e.target.value)}
               placeholder={t('chatWidget', 'reviewPlaceholder')}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-300 resize-none h-16"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-brand/30 resize-none h-16"
             />
             <button
               onClick={onSubmitReview}

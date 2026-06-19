@@ -22,7 +22,7 @@ export const InputNode = ({ data }: { data: any }) => {
 
       <div className="bg-slate-50 p-2 rounded border border-slate-200">
         <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">Save to Variable</div>
-        <div className="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded">
+        <div className="text-xs font-mono text-brand bg-brand-bg px-2 py-1 rounded">
           {data.variableName || 'user_input'}
         </div>
       </div>

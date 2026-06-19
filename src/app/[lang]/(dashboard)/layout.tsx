@@ -40,7 +40,7 @@ export default function DashboardLayout({
     return (
       <div className="flex h-screen items-center justify-center bg-slate-50">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-slate-200 border-t-brand rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading...</p>
         </div>
       </div>
@@ -58,7 +58,7 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <div className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
         <div className="p-4 bg-slate-950 flex items-center gap-2 text-white">
-          <LayoutDashboard size={24} className="text-blue-500" />
+          <LayoutDashboard size={24} className="text-brand-light" />
           <span className="font-bold text-lg">{t('sidebar', 'saasCrm')}</span>
         </div>
 
@@ -71,7 +71,7 @@ export default function DashboardLayout({
                 href={href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-sm'
+                    ? 'bg-brand text-white shadow-sm'
                     : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`}
               >

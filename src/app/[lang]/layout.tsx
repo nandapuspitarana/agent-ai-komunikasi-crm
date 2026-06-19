@@ -4,7 +4,7 @@ import { getDictionary, Locale } from '@/lib/i18n';
 import { I18nProvider } from '@/lib/i18n/I18nContext';
 
 export const metadata = {
-  title: 'Modern AlkyonCRM',
+  title: 'Modern CeosuiteBOT',
   description: 'Omnichannel CRM and Flow Builder',
 };
 

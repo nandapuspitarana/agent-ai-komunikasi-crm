@@ -349,7 +349,7 @@ export default function InboxPage() {
               <div 
                 key={chat.id} 
                 onClick={() => setSelectedChat(chat.id)}
-                className={`p-4 border-b border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors ${selectedChat === chat.id ? 'bg-blue-50/50 border-l-4 border-l-blue-500' : ''}`}
+                className={`p-4 border-b border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors ${selectedChat === chat.id ? 'bg-brand-bg/50 border-l-4 border-l-brand' : ''}`}
               >
                 <div className="flex justify-between items-start mb-1">
                   <span className="font-medium text-sm text-slate-800">{chat.contactId}</span>
@@ -366,7 +366,7 @@ export default function InboxPage() {
                     </span>
                   )}
                   {chat.status === 'bot' && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-semibold">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-bg text-brand font-semibold">
                       🤖 AI Bot
                     </span>
                   )}
@@ -393,7 +393,7 @@ export default function InboxPage() {
           <>
             <div className="p-4 bg-white border-b border-slate-200 flex items-center justify-between shadow-sm z-10">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center mr-3 shadow-inner">
+                <div className="w-10 h-10 bg-brand-bg text-brand-hover rounded-full flex items-center justify-center mr-3 shadow-inner">
                   <User size={20} />
                 </div>
                 <div>
@@ -439,7 +439,7 @@ export default function InboxPage() {
                 {chats.find(c => c.id === selectedChat)?.status === 'bot' && (
                   <button
                     onClick={() => handleClaimChat(selectedChat)}
-                    className="px-3.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center"
+                    className="px-3.5 py-1.5 bg-brand-light hover:bg-brand text-white text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center"
                   >
                     {t('inbox', 'aiIntervention')}
                   </button>
@@ -483,7 +483,7 @@ export default function InboxPage() {
                     <div key={msg.id} className={`flex ${isAgent ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-md p-3 rounded-2xl ${
                         isAgent 
-                          ? 'bg-blue-600 text-white rounded-br-sm shadow-sm' 
+                          ? 'bg-brand text-white rounded-br-sm shadow-sm' 
                           : isBot 
                           ? 'bg-amber-50 border border-amber-100 text-slate-700 rounded-tl-sm shadow-sm' 
                           : 'bg-white border border-slate-200 text-slate-700 rounded-tl-sm shadow-sm'
@@ -499,7 +499,7 @@ export default function InboxPage() {
                           className="text-sm leading-relaxed whitespace-pre-wrap break-words chat-html-content" 
                           dangerouslySetInnerHTML={{ __html: msg.text }} 
                         />
-                        <p className={`text-xs mt-1 ${isAgent ? 'text-blue-100' : 'text-slate-400'}`}>
+                        <p className={`text-xs mt-1 ${isAgent ? 'text-brand-bg' : 'text-slate-400'}`}>
                           {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
@@ -550,14 +550,14 @@ export default function InboxPage() {
                   />
                   <button 
                     onClick={() => setShowCannedResponses(!showCannedResponses)}
-                    className="p-2 text-slate-500 hover:text-blue-600 transition-colors mr-1"
+                    className="p-2 text-slate-500 hover:text-brand transition-colors mr-1"
                     title="Canned Responses"
                   >
                     <PanelRight size={18} />
                   </button>
                   <button 
                     onClick={handleSendMessage}
-                    className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                    className="p-2 bg-brand text-white rounded-full hover:bg-brand-hover transition-colors"
                   >
                     <Send size={16} className="ml-0.5" />
                   </button>

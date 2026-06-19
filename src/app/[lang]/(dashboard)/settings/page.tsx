@@ -303,7 +303,7 @@ export default function SettingsPage() {
               onClick={() => setActiveTab(tab.id as TabType)}
               className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 ${
                 isActive
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-brand-light text-brand'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -334,7 +334,7 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setPasswordForm({ ...passwordForm, currentPassword: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all"
                     placeholder="Enter current password"
                     required
                   />
@@ -360,7 +360,7 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setPasswordForm({ ...passwordForm, newPassword: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all"
                     placeholder="Enter new password (min 8 chars)"
                     required
                   />
@@ -386,7 +386,7 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all"
                     placeholder="Confirm new password"
                     required
                   />
@@ -422,7 +422,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={passwordLoading}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand text-white font-medium rounded-lg hover:bg-brand-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={18} />
                 {passwordLoading ? t('settings', 'saving') : t('settings', 'savePassword')}
@@ -438,7 +438,7 @@ export default function SettingsPage() {
               <h2 className="text-xl font-bold text-slate-900">{t('settings', 'userManagement')}</h2>
               <button 
                 onClick={() => setIsAddingUser(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-brand text-white font-medium rounded-lg hover:bg-brand-hover transition-colors"
               >
                 <Plus size={18} />
                 {t('settings', 'addUser')}
@@ -447,7 +447,7 @@ export default function SettingsPage() {
 
             {usersLoading ? (
               <div className="text-center py-8">
-                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
                 <p className="text-slate-600 mt-3">{t('settings', 'loadingUsers')}</p>
               </div>
             ) : users.length === 0 ? (
@@ -475,7 +475,7 @@ export default function SettingsPage() {
                         <td className="px-4 py-3">
                           <span className={`px-2.5 py-0.5 font-medium rounded-full text-xs ${
                             user.role === 'SUPER_ADMIN' ? 'bg-purple-100 text-purple-700' :
-                            user.role === 'AGENT' ? 'bg-blue-100 text-blue-700' :
+                            user.role === 'AGENT' ? 'bg-brand-bg text-brand-hover' :
                             'bg-green-100 text-green-700'
                           }`}>
                             {user.role}
@@ -494,7 +494,7 @@ export default function SettingsPage() {
                         <td className="px-4 py-3 text-right flex items-center justify-end gap-2">
                           <button 
                             onClick={() => setEditingUser(user)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-brand hover:bg-brand-bg rounded-lg transition-colors"
                           >
                             <Edit2 size={16} />
                           </button>
@@ -525,7 +525,7 @@ export default function SettingsPage() {
                         type="text"
                         value={editingUser.name || ''}
                         onChange={(e) => setEditingUser({...editingUser, name: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none"
                         required
                       />
                     </div>
@@ -535,7 +535,7 @@ export default function SettingsPage() {
                         type="email"
                         value={editingUser.email || ''}
                         onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none"
                         required
                       />
                     </div>
@@ -544,7 +544,7 @@ export default function SettingsPage() {
                       <select
                         value={editingUser.role || ''}
                         onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none bg-white"
                         disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
                       >
                         <option value="SUPER_ADMIN">{t('settings', 'superAdmin')}</option>
@@ -573,7 +573,7 @@ export default function SettingsPage() {
                         checked={editingUser.isActive || false}
                         onChange={(e) => setEditingUser({...editingUser, isActive: e.target.checked})}
                         disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-brand rounded focus:ring-brand"
                       />
                       <label htmlFor="isActive" className="text-sm font-medium text-slate-700">{t('settings', 'activeStatus')}</label>
                     </div>
@@ -593,7 +593,7 @@ export default function SettingsPage() {
                         <div className="mt-4 grid grid-cols-2 gap-3">
                           <div className="bg-white p-3 rounded border border-slate-200 text-center">
                             <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Human Agents</p>
-                            <p className="font-bold text-xl text-blue-600">{editingUser.tenant._count?.users || 0}</p>
+                            <p className="font-bold text-xl text-brand">{editingUser.tenant._count?.users || 0}</p>
                           </div>
                           <div className="bg-white p-3 rounded border border-slate-200 text-center">
                             <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">AI Flows</p>
@@ -614,7 +614,7 @@ export default function SettingsPage() {
                       <button
                         type="submit"
                         disabled={isUpdatingUser}
-                        className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                        className="px-4 py-2 bg-brand text-white font-medium rounded-lg hover:bg-brand-hover transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
                         {isUpdatingUser ? t('settings', 'saving') : t('settings', 'saveChanges')}
                       </button>
@@ -636,7 +636,7 @@ export default function SettingsPage() {
                         type="text"
                         value={newUser.name}
                         onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none"
                         required
                       />
                     </div>
@@ -646,7 +646,7 @@ export default function SettingsPage() {
                         type="email"
                         value={newUser.email}
                         onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none"
                         required
                       />
                     </div>
@@ -656,7 +656,7 @@ export default function SettingsPage() {
                         type="password"
                         value={newUser.password}
                         onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none"
                         required
                         minLength={6}
                       />
@@ -666,7 +666,7 @@ export default function SettingsPage() {
                       <select
                         value={newUser.role}
                         onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none bg-white"
                         disabled={(session?.user as any)?.role !== 'SUPER_ADMIN'}
                       >
                         {(session?.user as any)?.role === 'SUPER_ADMIN' && <option value="SUPER_ADMIN">{t('settings', 'superAdmin')}</option>}
@@ -680,7 +680,7 @@ export default function SettingsPage() {
                         <select
                           value={newUser.tenantId}
                           onChange={(e) => setNewUser({...newUser, tenantId: e.target.value})}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none bg-white"
                         >
                           <option value="">-- Leave empty (Not a specific agent) --</option>
                           {tenantsList.map((t) => (
@@ -693,13 +693,13 @@ export default function SettingsPage() {
                       </div>
                     )}
                     {newUser.tenantId === 'NEW' && (session?.user as any)?.role === 'SUPER_ADMIN' && (
-                      <div className="pl-4 border-l-2 border-blue-500">
+                      <div className="pl-4 border-l-2 border-brand-light">
                         <label className="block text-sm font-medium text-slate-700 mb-1">{t('settings', 'newBusinessName')}</label>
                         <input
                           type="text"
                           value={newTenantName}
                           onChange={(e) => setNewTenantName(e.target.value)}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none bg-brand-bg"
                           placeholder={`E.g. Business owned by ${newUser.name || 'User'}`}
                           required={newUser.tenantId === 'NEW'}
                         />
@@ -716,7 +716,7 @@ export default function SettingsPage() {
                       <button
                         type="submit"
                         disabled={isCreatingUser}
-                        className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                        className="px-4 py-2 bg-brand text-white font-medium rounded-lg hover:bg-brand-hover transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
                         {isCreatingUser ? t('settings', 'creating') : t('settings', 'createUser')}
                       </button>
@@ -735,7 +735,7 @@ export default function SettingsPage() {
 
             {auditLoading ? (
               <div className="text-center py-8">
-                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
                 <p className="text-slate-600 mt-3">{t('settings', 'loadingAudit')}</p>
               </div>
             ) : auditLogs.length === 0 ? (
@@ -746,18 +746,18 @@ export default function SettingsPage() {
               <div className="space-y-6 max-w-4xl">
                 {auditLogs.map((log, index) => {
                   const actionColors: Record<string, { bg: string; text: string; dot: string }> = {
-                    'LOGIN': { bg: 'bg-blue-50', text: 'text-blue-900', dot: 'bg-blue-600' },
+                    'LOGIN': { bg: 'bg-brand-bg', text: 'text-brand', dot: 'bg-brand' },
                     'LOGOUT': { bg: 'bg-slate-50', text: 'text-slate-900', dot: 'bg-slate-600' },
                     'PASSWORD_CHANGED': { bg: 'bg-yellow-50', text: 'text-yellow-900', dot: 'bg-yellow-600' },
                     'USER_CREATED': { bg: 'bg-green-50', text: 'text-green-900', dot: 'bg-green-600' },
-                    'USER_UPDATED': { bg: 'bg-blue-50', text: 'text-blue-900', dot: 'bg-blue-600' },
+                    'USER_UPDATED': { bg: 'bg-brand-bg', text: 'text-brand', dot: 'bg-brand' },
                     'USER_DELETED': { bg: 'bg-red-50', text: 'text-red-900', dot: 'bg-red-600' },
                     'ROLE_CHANGED': { bg: 'bg-purple-50', text: 'text-purple-900', dot: 'bg-purple-600' },
                     'STATUS_CHANGED': { bg: 'bg-orange-50', text: 'text-orange-900', dot: 'bg-orange-600' },
                     'DOCUMENT_UPLOADED': { bg: 'bg-emerald-50', text: 'text-emerald-900', dot: 'bg-emerald-600' },
                     'DOCUMENT_DELETED': { bg: 'bg-red-50', text: 'text-red-900', dot: 'bg-red-600' },
                     'AI_AGENT_CREATED': { bg: 'bg-indigo-50', text: 'text-indigo-900', dot: 'bg-indigo-600' },
-                    'AI_AGENT_UPDATED': { bg: 'bg-blue-50', text: 'text-blue-900', dot: 'bg-blue-600' },
+                    'AI_AGENT_UPDATED': { bg: 'bg-brand-bg', text: 'text-brand', dot: 'bg-brand' },
                     'AI_AGENT_DELETED': { bg: 'bg-red-50', text: 'text-red-900', dot: 'bg-red-600' },
                     'DATA_IMPORTED': { bg: 'bg-teal-50', text: 'text-teal-900', dot: 'bg-teal-600' },
                     'DATA_EXPORTED': { bg: 'bg-cyan-50', text: 'text-cyan-900', dot: 'bg-cyan-600' },
@@ -806,7 +806,7 @@ export default function SettingsPage() {
 
             {tenantLoading ? (
               <div className="text-center py-8">
-                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
                 <p className="text-slate-600 mt-3">Loading tenant settings...</p>
               </div>
             ) : !tenant ? (
@@ -824,7 +824,7 @@ export default function SettingsPage() {
                     type="text"
                     value={tenant.name || ''}
                     onChange={(e) => setTenant({ ...tenant, name: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all"
                   />
                 </div>
 
@@ -854,7 +854,7 @@ export default function SettingsPage() {
                     <select
                       value={tenant.activeFlowId || ''}
                       onChange={(e) => setTenant({ ...tenant, activeFlowId: e.target.value || null })}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                     >
                       <option value="">-- Use global settings (Default) --</option>
                       {tenant?.flows?.map((flow: any) => (
@@ -877,7 +877,7 @@ export default function SettingsPage() {
                       value={tenant.aiSystemPrompt || ''}
                       onChange={(e) => setTenant({ ...tenant, aiSystemPrompt: e.target.value })}
                       rows={4}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-mono text-sm"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all font-mono text-sm"
                       placeholder="You are a helpful assistant..."
                     />
                   </div>
@@ -894,7 +894,7 @@ export default function SettingsPage() {
                     <select
                       value={tenant.handoffAgentId || ''}
                       onChange={(e) => setTenant({ ...tenant, handoffAgentId: e.target.value || null })}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                     >
                       <option value="">-- No specific agent (Queue) --</option>
                       {users.map((user) => (
@@ -972,7 +972,7 @@ export default function SettingsPage() {
                       <select
                         value={tenant.widgetPosition || 'right'}
                         onChange={(e) => setTenant({...tenant, widgetPosition: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white"
                       >
                         <option value="right">Bottom Right</option>
                         <option value="left">Bottom Left</option>
@@ -986,7 +986,7 @@ export default function SettingsPage() {
                         placeholder="https://"
                         value={tenant.widgetIconUrl || ''}
                         onChange={(e) => setTenant({...tenant, widgetIconUrl: e.target.value})}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-white"
                       />
                     </div>
                   </div>
@@ -997,7 +997,7 @@ export default function SettingsPage() {
                   <button
                     type="submit"
                     disabled={tenantSaveLoading}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-brand text-white font-medium rounded-lg hover:bg-brand-hover transition-colors disabled:opacity-50"
                   >
                     <Save size={18} />
                     {tenantSaveLoading ? 'Saving...' : 'Save Settings'}

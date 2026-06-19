@@ -20,7 +20,7 @@ export default function IntegrationPage() {
     }
   }, []);
 
-  const htmlScript = `<!-- Start of AlkyonCRM Widget -->
+  const htmlScript = `<!-- Start of CeosuiteBOT Widget -->
 <script>
   window.CRM_AGENT_CONFIG = {
     tenantId: "${tenantId}",
@@ -28,14 +28,14 @@ export default function IntegrationPage() {
   };
 </script>
 <script src="${baseUrl}/widget.js" async></script>
-<!-- End of AlkyonCRM Widget -->`;
+<!-- End of CeosuiteBOT Widget -->`;
 
   const wpPluginCode = `<?php
 /**
- * Plugin Name: AlkyonCRM Agent Widget
- * Description: Embeds the AlkyonCRM AI Agent into your WordPress site.
+ * Plugin Name: CeosuiteBOT Agent Widget
+ * Description: Embeds the CeosuiteBOT AI Agent into your WordPress site.
  * Version: 1.0.0
- * Author: AlkyonCRM
+ * Author: CeosuiteBOT
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 add_action('wp_footer', 'saas_crm_agent_inject_script');
 
 /*********
- * Injects the AlkyonCRM widget script into the footer.
+ * Injects the CeosuiteBOT widget script into the footer.
  *********/
 function saas_crm_agent_inject_script() {
     $tenantId = esc_js(get_option('saas_crm_tenant_id', ''));
@@ -52,7 +52,7 @@ function saas_crm_agent_inject_script() {
         return; // Don't inject if no tenant ID is set
     }
 
-    echo '<!-- Start of AlkyonCRM Widget -->\\n';
+    echo '<!-- Start of CeosuiteBOT Widget -->\\n';
     echo '<script>\\n';
     echo '  window.CRM_AGENT_CONFIG = {\\n';
     echo '    tenantId: "' . $tenantId . '",\\n';
@@ -60,7 +60,7 @@ function saas_crm_agent_inject_script() {
     echo '  };\\n';
     echo '</script>\\n';
     echo '<script src="${baseUrl}/widget.js" async></script>\\n';
-    echo '<!-- End of AlkyonCRM Widget -->\\n';
+    echo '<!-- End of CeosuiteBOT Widget -->\\n';
 }
 ?>`;
 
@@ -118,7 +118,7 @@ function saas_crm_agent_inject_script() {
         {/* HTML Integration */}
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
           <div className="border-b border-slate-100 bg-slate-50 p-4 flex items-center gap-3">
-            <Code className="text-blue-500" size={20} />
+            <Code className="text-brand-light" size={20} />
             <h2 className="font-semibold text-slate-700">{t('integration', 'htmlTitle')}</h2>
           </div>
           <div className="p-6">

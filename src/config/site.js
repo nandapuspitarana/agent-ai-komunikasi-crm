@@ -1,5 +1,5 @@
 module.exports = {
-  name: "AlkyonCRM",
+  name: "CeosuiteBOT",
   theme: {
     primary: "#6F2D2D",
     primaryHover: "#5c2424", // A darker shade for hover

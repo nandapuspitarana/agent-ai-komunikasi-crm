@@ -231,7 +231,7 @@ export async function POST(req: NextRequest) {
         if (qnaMatch && qnaMatch.options) {
           const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
           if (opts.length > 0) {
-            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
           }
         }
       } catch (aiError) {
@@ -248,7 +248,7 @@ export async function POST(req: NextRequest) {
         if (qnaMatch.options) {
           const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
           if (opts.length > 0) {
-            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
           }
         }
       } else {

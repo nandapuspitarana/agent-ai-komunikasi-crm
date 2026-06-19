@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: AlkyonCRM Agent Widget
- * Description: Embeds the AlkyonCRM AI Agent into your WordPress site.
+ * Plugin Name: CeosuiteBOT Agent Widget
+ * Description: Embeds the CeosuiteBOT AI Agent into your WordPress site.
  * Version: 1.0.0
- * Author: AlkyonCRM
+ * Author: CeosuiteBOT
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -15,7 +15,7 @@ function saas_crm_agent_inject_script() {
     $api_url = "http://192.168.20.242:8201"; 
     
     ?>
-    <!-- Start of AlkyonCRM Widget -->
+    <!-- Start of CeosuiteBOT Widget -->
     <script>
       window.CRM_AGENT_CONFIG = {
         tenantId: "<?php echo esc_js($tenant_id); ?>",
@@ -23,7 +23,7 @@ function saas_crm_agent_inject_script() {
       };
     </script>
     <script src="<?php echo esc_url($api_url); ?>/widget.js" defer></script>
-    <!-- End of AlkyonCRM Widget -->
+    <!-- End of CeosuiteBOT Widget -->
     <?php
 }
 ?>

@@ -94,7 +94,7 @@ function ResetPasswordForm() {
               </p>
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                className="inline-flex items-center gap-2 text-brand hover:text-brand-hover font-medium"
               >
                 Go to Login
               </Link>
@@ -109,8 +109,8 @@ function ResetPasswordForm() {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-6 h-6 text-blue-600" />
+          <div className="w-12 h-12 bg-brand-bg rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-6 h-6 text-brand" />
           </div>
           <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             Reset Password
@@ -146,7 +146,7 @@ function ResetPasswordForm() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
-                  className="appearance-none block w-full pl-10 pr-10 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all"
+                  className="appearance-none block w-full pl-10 pr-10 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent sm:text-sm transition-all"
                   placeholder="Enter new password"
                 />
                 <button
@@ -192,7 +192,7 @@ function ResetPasswordForm() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="appearance-none block w-full pl-10 pr-10 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all"
+                  className="appearance-none block w-full pl-10 pr-10 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent sm:text-sm transition-all"
                   placeholder="Confirm new password"
                 />
                 <button
@@ -211,7 +211,7 @@ function ResetPasswordForm() {
             <button
               type="submit"
               disabled={loading || newPassword !== confirmPassword || newPassword.length < 8}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-brand hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? 'Resetting Password...' : 'Reset Password'}
             </button>
@@ -219,7 +219,7 @@ function ResetPasswordForm() {
             <div className="text-center">
               <Link
                 href="/login"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm text-brand hover:text-brand-hover font-medium"
               >
                 Back to Login
               </Link>
@@ -235,7 +235,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand"></div>
       </div>
     }>
       <ResetPasswordForm />
