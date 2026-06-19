@@ -4,7 +4,10 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Zap, ArrowRight, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Zap, ArrowRight, Mail, Lock, AlertCircle, LayoutTemplate } from 'lucide-react';
+import siteConfig from '@/config/site.js';
+
+const iconMap: Record<string, any> = { LayoutTemplate, Zap };
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,13 +45,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-blue-500/30">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-brand-light/30">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2 font-bold text-2xl tracking-tighter text-slate-900 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <Zap size={22} className="text-white" />
+          <div className="w-10 h-10 bg-brand rounded-xl flex items-center justify-center shadow-lg shadow-brand/20">
+            {(() => {
+              const LogoIcon = iconMap[siteConfig.logoIcon] || LayoutTemplate;
+              return <LogoIcon size={22} className="text-white" />;
+            })()}
           </div>
-          ZetaCRM
+          {siteConfig.name}
         </Link>
         <h2 className="text-center text-3xl font-extrabold text-slate-900 tracking-tight">
           Welcome back
@@ -83,7 +89,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   required
                   defaultValue=""
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all"
+                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent sm:text-sm transition-all"
                 />
               </div>
             </div>
@@ -103,7 +109,7 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   required
                   defaultValue=""
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all"
+                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent sm:text-sm transition-all"
                 />
               </div>
             </div>
@@ -114,7 +120,7 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                  className="h-4 w-4 text-brand focus:ring-brand border-slate-300 rounded"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
                   Remember me
@@ -122,7 +128,7 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm">
-                <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+                <Link href="/forgot-password" className="font-medium text-brand hover:text-brand-light">
                   Forgot password?
                 </Link>
               </div>
@@ -132,7 +138,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-brand hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

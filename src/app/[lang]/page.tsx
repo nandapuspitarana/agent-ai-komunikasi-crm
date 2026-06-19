@@ -4,10 +4,13 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { ChatWindow } from '@/modules/widget/ChatWindow';
 import { MessageCircle, X, CheckCircle2, Code, LayoutTemplate } from 'lucide-react';
+import siteConfig from '@/config/site.js';
+
+const iconMap: Record<string, any> = { LayoutTemplate };
 
 export default function Home() {
   const tenantId = 'default-tenant';
-  const defaultColor = '#2563eb';
+  const defaultColor = '#dc2626';
   const defaultName = 'Support Bot';
 
   const [config, setConfig] = useState({
@@ -60,21 +63,24 @@ export default function Home() {
       {/* NAVBAR MOCK */}
       <nav className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <LayoutTemplate className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center">
+            {(() => {
+              const LogoIcon = iconMap[siteConfig.logoIcon] || LayoutTemplate;
+              return <LogoIcon className="w-5 h-5 text-white" />;
+            })()}
           </div>
-          <span className="font-bold text-xl text-slate-800">SaaSCompany</span>
+          <span className="font-bold text-xl text-slate-800">{siteConfig.name}</span>
         </div>
         <div className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
-          <a href="#" className="hover:text-blue-600 transition-colors">Produk</a>
-          <a href="#" className="hover:text-blue-600 transition-colors">Harga</a>
-          <a href="#" className="hover:text-blue-600 transition-colors">Dokumentasi</a>
-          <a href="#" className="hover:text-blue-600 transition-colors">Kontak</a>
+          <a href="#" className="hover:text-brand transition-colors">Produk</a>
+          <a href="#" className="hover:text-brand transition-colors">Harga</a>
+          <a href="#" className="hover:text-brand transition-colors">Dokumentasi</a>
+          <a href="#" className="hover:text-brand transition-colors">Kontak</a>
         </div>
         {/* Login Button */}
         <Link
           href="/login"
-          className="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-full shadow-md shadow-blue-500/20 transition-all duration-200 hover:scale-105 active:scale-95"
+          className="inline-flex items-center gap-2 px-5 py-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold rounded-full shadow-md shadow-brand/20 transition-all duration-200 hover:scale-105 active:scale-95"
         >
           Login
         </Link>
@@ -83,8 +89,8 @@ export default function Home() {
       {/* MOCK WEBSITE BACKGROUND - CARA PENGGUNAAN */}
       <div className="max-w-4xl mx-auto px-6 py-16 pb-32">
         <header className="mb-12 text-center md:text-left">
-          <div className="inline-flex items-center justify-center p-3 bg-blue-100/50 rounded-2xl mb-6">
-            <Code className="text-blue-600 w-8 h-8" />
+          <div className="inline-flex items-center justify-center p-3 bg-brand-bg rounded-2xl mb-6">
+            <Code className="text-brand w-8 h-8" />
           </div>
           <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
             Preview Widget &amp; Cara Penggunaan
@@ -97,7 +103,7 @@ export default function Home() {
         <div className="space-y-8">
           <section className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200/60">
             <h2 className="text-xl font-bold text-slate-800 mb-5 flex items-center">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm mr-3 font-bold">1</span>
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-brand-bg text-brand text-sm mr-3 font-bold">1</span>
               Salin Kode Embed
             </h2>
             <p className="text-slate-600 mb-6 leading-relaxed">
@@ -120,7 +126,7 @@ export default function Home() {
 
           <section className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200/60">
             <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm mr-3 font-bold">2</span>
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-brand-bg text-brand text-sm mr-3 font-bold">2</span>
               Fitur yang Aktif
             </h2>
             <div className="grid md:grid-cols-2 gap-y-4 gap-x-8">
