@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, User, MessageSquare, PanelRight } from 'lucide-react';
+import { Send, User, MessageSquare, PanelRight, MapPin, Monitor, Smartphone, Globe, Star, ChevronRight, X, Phone, Mail } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { supabase } from '@/lib/supabase-client';
 import { CannedResponses } from '@/components/inbox/CannedResponses';
@@ -31,6 +31,9 @@ export default function InboxPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCannedResponses, setShowCannedResponses] = useState(false);
   const [agents, setAgents] = useState<{id: string, name: string}[]>([]);
+  const [visitorInfo, setVisitorInfo] = useState<any | null>(null);
+  const [visitorLoading, setVisitorLoading] = useState(false);
+  const [showVisitorPanel, setShowVisitorPanel] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch active chat sessions
@@ -167,6 +170,19 @@ export default function InboxPage() {
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [selectedChat, chats]);
+
+  // Fetch visitor info when chat is selected
+  useEffect(() => {
+    if (!selectedChat) { setVisitorInfo(null); return; }
+    const chat = chats.find(c => c.id === selectedChat);
+    if (!chat?.contactId) { setVisitorInfo(null); return; }
+    setVisitorLoading(true);
+    fetch(`/api/visitors/by-contact/${encodeURIComponent(chat.contactId)}`)
+      .then(r => r.json())
+      .then(data => setVisitorInfo(data.visitor || null))
+      .catch(() => setVisitorInfo(null))
+      .finally(() => setVisitorLoading(false));
   }, [selectedChat, chats]);
 
   // Function to manually claim a conversation
@@ -329,6 +345,17 @@ export default function InboxPage() {
       console.error('Error sending message:', error);
       // Revert optimistic update or show error
     }
+  };
+
+  const getLeadBadge = (classification: string) => {
+    const map: Record<string, { color: string; label: string }> = {
+      cold: { color: 'bg-slate-100 text-slate-600', label: '🧊 Cold' },
+      warm: { color: 'bg-yellow-100 text-yellow-700', label: '🌤️ Warm' },
+      hot_lead: { color: 'bg-orange-100 text-orange-700', label: '🔥 Hot Lead' },
+      booking: { color: 'bg-green-100 text-green-700', label: '💰 Booking' },
+      support: { color: 'bg-blue-100 text-blue-700', label: '🛠️ Support' },
+    };
+    return map[classification] || { color: 'bg-slate-100 text-slate-600', label: classification };
   };
 
   return (
@@ -585,6 +612,144 @@ export default function InboxPage() {
           </div>
         )}
       </div>
+
+      {/* Right Panel: Visitor Info */}
+      {showVisitorPanel && selectedChat && (
+        <div className="w-72 border-l border-slate-200 flex flex-col overflow-y-auto bg-slate-50">
+          <div className="p-4 border-b border-slate-200 bg-white flex items-center justify-between">
+            <h3 className="font-semibold text-slate-800 text-sm">Info Prospek</h3>
+            <button onClick={() => setShowVisitorPanel(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
+              <X size={14} />
+            </button>
+          </div>
+
+          {visitorLoading ? (
+            <div className="p-6 text-center text-xs text-slate-400">Memuat data...</div>
+          ) : !visitorInfo ? (
+            <div className="p-6 text-center">
+              <User size={32} className="mx-auto text-slate-200 mb-2" />
+              <p className="text-xs text-slate-400">Data prospek belum tersedia.<br />Akan muncul setelah ada percakapan.</p>
+            </div>
+          ) : (
+            <div className="flex-1 p-4 space-y-4">
+              {/* Avatar + Identity */}
+              <div className="bg-white rounded-xl p-4 border border-slate-200 text-center">
+                <div className="w-14 h-14 bg-brand-bg text-brand-hover rounded-full flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+                  {visitorInfo.name ? visitorInfo.name.charAt(0).toUpperCase() : '?'}
+                </div>
+                <p className="font-bold text-slate-800 text-sm">{visitorInfo.name || 'Prospek Anonim'}</p>
+                {visitorInfo.email && <p className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1"><Mail size={10} /> {visitorInfo.email}</p>}
+                {visitorInfo.phone && <p className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-0.5"><Phone size={10} /> {visitorInfo.phone}</p>}
+              </div>
+
+              {/* Lead Score */}
+              <div className="bg-white rounded-xl p-4 border border-slate-200">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Status Prospek</p>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-xs px-2 py-1 rounded-full font-semibold ${getLeadBadge(visitorInfo.leadClassification || 'cold').color}`}>
+                    {getLeadBadge(visitorInfo.leadClassification || 'cold').label}
+                  </span>
+                  <span className="text-sm font-bold text-slate-700">{visitorInfo.leadScore || 0} pts</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-brand to-orange-400 h-2 rounded-full transition-all"
+                    style={{ width: `${Math.min(100, visitorInfo.leadScore || 0)}%` }}
+                  />
+                </div>
+                {visitorInfo.topicsDiscussed?.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {visitorInfo.topicsDiscussed.map((topic: string) => (
+                      <span key={topic} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">{topic}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Location + Device */}
+              {(visitorInfo.city || visitorInfo.country || visitorInfo.deviceType || visitorInfo.browserName) && (
+                <div className="bg-white rounded-xl p-4 border border-slate-200">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Perangkat & Lokasi</p>
+                  <div className="space-y-2">
+                    {(visitorInfo.city || visitorInfo.country) && (
+                      <div className="flex items-center gap-2">
+                        <MapPin size={12} className="text-slate-400 shrink-0" />
+                        <span className="text-xs text-slate-600">{[visitorInfo.city, visitorInfo.country].filter(Boolean).join(', ')}</span>
+                      </div>
+                    )}
+                    {visitorInfo.latitude && visitorInfo.longitude && (
+                      <a
+                        href={`https://www.google.com/maps?q=${visitorInfo.latitude},${visitorInfo.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-brand hover:underline flex items-center gap-1"
+                      >
+                        <Globe size={10} /> Lihat di Maps
+                      </a>
+                    )}
+                    {visitorInfo.deviceType && (
+                      <div className="flex items-center gap-2">
+                        {visitorInfo.deviceType === 'mobile' ? <Smartphone size={12} className="text-slate-400" /> : <Monitor size={12} className="text-slate-400" />}
+                        <span className="text-xs text-slate-600 capitalize">{visitorInfo.deviceType} · {visitorInfo.browserName || ''} {visitorInfo.os ? `· ${visitorInfo.os}` : ''}</span>
+                      </div>
+                    )}
+                    {visitorInfo.referrerUrl && (
+                      <div className="flex items-start gap-2">
+                        <ChevronRight size={12} className="text-slate-400 shrink-0 mt-0.5" />
+                        <span className="text-[10px] text-slate-500 break-all">{visitorInfo.referrerUrl}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Custom Metadata from Extractors */}
+              {visitorInfo.metadata && typeof visitorInfo.metadata === 'object' && !Array.isArray(visitorInfo.metadata) && Object.keys(visitorInfo.metadata).length > 0 && (
+                <div className="bg-white rounded-xl p-4 border border-slate-200">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Data Tambahan (Kustom)</p>
+                  <div className="space-y-2">
+                    {Object.entries(visitorInfo.metadata as Record<string, string>).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-start gap-2">
+                        <span className="text-xs text-slate-500 font-medium capitalize shrink-0">{key.replace(/_/g, ' ')}:</span>
+                        <span className="text-xs text-slate-800 font-semibold text-right">{String(value)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sessions Summary */}
+              <div className="bg-white rounded-xl p-4 border border-slate-200">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Riwayat Interaksi</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-brand">{visitorInfo.sessions || 0}</p>
+                    <p className="text-[10px] text-slate-500">Sesi</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-slate-700">{visitorInfo.messageCount || 0}</p>
+                    <p className="text-[10px] text-slate-500">Pesan</p>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-400 mt-3 text-center">
+                  Terakhir aktif: {visitorInfo.lastSeenAt ? new Date(visitorInfo.lastSeenAt).toLocaleString('id-ID') : '-'}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Toggle button when panel is hidden */}
+      {!showVisitorPanel && selectedChat && (
+        <button
+          onClick={() => setShowVisitorPanel(true)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-slate-200 shadow-md rounded-l-lg p-2 text-slate-500 hover:text-brand hover:border-brand transition-colors"
+          title="Tampilkan Info Prospek"
+        >
+          <User size={16} />
+        </button>
+      )}
     </div>
   );
 }

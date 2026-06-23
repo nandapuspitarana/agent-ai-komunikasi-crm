@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
 import { canAccessAdminPanel } from '@/lib/auth-utils';
 import { logAIAgentCreated, logAIAgentUpdated, logAIAgentDeleted } from '@/lib/audit-logger';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // GET /api/flows - Get all flows for tenant
 export async function GET(request: NextRequest) {

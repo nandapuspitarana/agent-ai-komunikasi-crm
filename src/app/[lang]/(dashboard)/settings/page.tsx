@@ -17,13 +17,16 @@ import {
   CheckCircle,
   AlertCircle,
   LogOut,
+  UserSearch,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import ImageUpload from '@/components/ImageUpload';
+import VisitorConfigPanel from '@/components/settings/VisitorConfigPanel';
+import { getVisitorConfig, VisitorConfig } from '@/lib/visitor-config';
 
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
-type TabType = 'account' | 'users' | 'audit-logs' | 'tenant';
+type TabType = 'account' | 'users' | 'audit-logs' | 'tenant' | 'visitors-config';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
@@ -60,6 +63,7 @@ export default function SettingsPage() {
   const [tenant, setTenant] = useState<any>(null);
   const [tenantLoading, setTenantLoading] = useState(false);
   const [tenantSaveLoading, setTenantSaveLoading] = useState(false);
+  const [visitorConfig, setVisitorConfig] = useState<VisitorConfig | null>(null);
 
   // Fetch users & tenants
   useEffect(() => {
@@ -92,7 +96,7 @@ export default function SettingsPage() {
 
   // Fetch tenant settings
   useEffect(() => {
-    if (activeTab === 'tenant') {
+    if (activeTab === 'tenant' || activeTab === 'visitors-config') {
       fetchTenantSettings();
     }
   }, [activeTab]);
@@ -104,6 +108,11 @@ export default function SettingsPage() {
       if (res.ok) {
         const data = await res.json();
         setTenant(data.tenant);
+        if (data.tenant?.visitorConfig) {
+          setVisitorConfig(getVisitorConfig(data.tenant.visitorConfig));
+        } else {
+          setVisitorConfig(getVisitorConfig({}));
+        }
       }
     } catch (error) {
       console.error('Failed to fetch tenant:', error);
@@ -132,6 +141,7 @@ export default function SettingsPage() {
           botAvatarUrl: tenant.botAvatarUrl,
           widgetPosition: tenant.widgetPosition,
           widgetIconUrl: tenant.widgetIconUrl,
+          visitorConfig: visitorConfig,
         }),
       });
       if (res.ok) {
@@ -282,6 +292,7 @@ export default function SettingsPage() {
     { id: 'users', label: t('settings', 'tabUsers'), icon: Users },
     { id: 'audit-logs', label: t('settings', 'tabAudit'), icon: LogOut },
     { id: 'tenant', label: t('settings', 'tabTenant'), icon: Building2 },
+    { id: 'visitors-config', label: 'Prospek', icon: UserSearch },
   ];
 
   return (
@@ -1004,6 +1015,38 @@ export default function SettingsPage() {
                   </button>
                 </div>
               </form>
+            )}
+          </div>
+        )}
+
+        {/* Visitors Config Tab */}
+        {activeTab === 'visitors-config' && (
+          <div className="p-8">
+            <h2 className="text-xl font-bold text-slate-900 mb-6">Visitor Collection Settings</h2>
+            
+            {tenantLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
+                <p className="text-slate-600 mt-3">Loading settings...</p>
+              </div>
+            ) : visitorConfig && (
+              <div className="max-w-4xl">
+                <VisitorConfigPanel 
+                  config={visitorConfig} 
+                  onChange={(newConfig) => setVisitorConfig(newConfig)} 
+                />
+                
+                <div className="mt-8 pt-6 border-t border-slate-200">
+                  <button
+                    onClick={handleTenantSave}
+                    disabled={tenantSaveLoading}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-brand text-white font-medium rounded-lg hover:bg-brand-hover transition-colors disabled:opacity-50"
+                  >
+                    <Save size={18} />
+                    {tenantSaveLoading ? 'Saving...' : 'Save Configuration'}
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}

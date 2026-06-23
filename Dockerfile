@@ -57,4 +57,4 @@ USER nextjs
 EXPOSE 8201
 
 # Run prisma migration/sync before starting the server
-CMD ["sh", "-c", "npx prisma db push && npm run start"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm run start"]

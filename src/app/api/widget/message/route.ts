@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { chatWithAgent } from '@/lib/ai-agent';
 import {
   checkHandoffIntent,
   buildSystemPrompt,
   parseAIResponseForHandoff,
+  parseClassificationTag,
+  parseDataExtractionTag
 } from '@/lib/ai-rules';
+import { getVisitorConfig } from '@/lib/visitor-config';
+import { extractVisitorData } from '@/lib/visitor-extractor';
+import { updateVisitorFromExtraction, upsertVisitorProfile, updateVisitorClassification, shouldTriggerLeadForm } from '@/lib/visitor-service';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -75,6 +79,8 @@ export async function POST(req: NextRequest) {
       return corsResponse({ error: 'Tenant not found' }, { status: 404 });
     }
 
+    const visitorConfig = getVisitorConfig(tenant.visitorConfig);
+
     // Find or create chat session
     let chatSession = sessionId
       ? await prisma.chatSession.findUnique({ where: { id: sessionId } })
@@ -92,6 +98,7 @@ export async function POST(req: NextRequest) {
     }
 
     const currentSessionId = chatSession.id;
+    const resolvedContactId = contactId || chatSession.contactId;
 
     // Save incoming user message
     const savedUserMsg = await prisma.message.create({
@@ -101,6 +108,38 @@ export async function POST(req: NextRequest) {
         content: message,
       },
     });
+
+    // Ensure VisitorProfile exists (useful for internal testing /widget-ui where init doesn't run)
+    if (visitorConfig.enabled && resolvedContactId) {
+      await upsertVisitorProfile(tenantId, resolvedContactId, {
+        referrerUrl: 'Chat Init',
+        pageUrl: 'Widget UI Preview'
+      }).catch(err => console.error('[Visitor Tracking] Upsert error:', err));
+    }
+
+    // Phase 3: Layer 2 - NLP Extraction (Fire and forget, wrap in try/catch to be non-blocking)
+    if (visitorConfig.enabled && visitorConfig.layer2_nlp && resolvedContactId) {
+      try {
+        const extractedData = extractVisitorData(message, visitorConfig);
+        if (Object.keys(extractedData).length > 0) {
+          // Fire and forget update
+          updateVisitorFromExtraction(tenantId, resolvedContactId, extractedData).catch(err => {
+            console.error('[Visitor Tracking] Background extraction error:', err);
+          });
+        }
+        
+        // Also update last seen and message count
+        prisma.visitorProfile.update({
+          where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
+          data: { 
+            lastSeenAt: new Date(),
+            messageCount: { increment: 1 }
+          }
+        }).catch(() => {}); // Ignore errors
+      } catch (err) {
+        console.error('[Visitor Tracking] Extraction error:', err);
+      }
+    }
 
     // Broadcast user message to agent dashboard and other listeners immediately
     // Supabase Realtime will handle this via postgres_changes automatically.
@@ -172,6 +211,8 @@ export async function POST(req: NextRequest) {
       language: flowConfig.language,
       speakingStyle: flowConfig.speakingStyle,
       businessNeeds: flowConfig.businessNeeds,
+      enableClassification: visitorConfig.enabled && visitorConfig.layer4_classification,
+      enableExtraction: visitorConfig.enabled && visitorConfig.layer2_nlp,
     });
 
     let formattedMessage = message;
@@ -289,8 +330,47 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Step 4: Parse AI response for handoff flag
-    const { cleanReply, handoffRequested } = parseAIResponseForHandoff(aiReplyRaw);
+    // Step 4: Parse AI response for handoff flag, classification, and data extraction
+    const { cleanReply: parsedExtraction, extractedData } = parseDataExtractionTag(aiReplyRaw);
+    const { cleanReply: parsedClassification, classification } = parseClassificationTag(parsedExtraction);
+    const { cleanReply, handoffRequested } = parseAIResponseForHandoff(parsedClassification);
+
+    let triggerLeadForm = false;
+    let leadFormConfig = null;
+
+    if (Object.keys(extractedData).length > 0 && resolvedContactId) {
+      updateVisitorFromExtraction(tenantId, resolvedContactId, extractedData).catch(err => {
+        console.error('[Visitor Tracking] Background AI data extraction update error:', err);
+      });
+    }
+
+    if (classification && resolvedContactId) {
+      // Background classification update
+      updateVisitorClassification(tenantId, resolvedContactId, classification, visitorConfig).catch(err => {
+        console.error('[Visitor Tracking] Background classification update error:', err);
+      });
+
+      // Layer 3 - Contextual Lead Form (check synchronously since we need to return it in response)
+      try {
+        const shouldTrigger = await shouldTriggerLeadForm(tenantId, resolvedContactId, classification, visitorConfig);
+        if (shouldTrigger) {
+          triggerLeadForm = true;
+          leadFormConfig = {
+            fields: visitorConfig.leadFormFields,
+            title: visitorConfig.leadFormTitle,
+            skippable: visitorConfig.leadFormSkippable
+          };
+          
+          // Mark as shown so it doesn't trigger again
+          await prisma.visitorProfile.update({
+            where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
+            data: { leadFormShown: true }
+          });
+        }
+      } catch (err) {
+        console.error('[Visitor Tracking] Lead form trigger error:', err);
+      }
+    }
 
     if (handoffRequested) {
       // Update session status
@@ -320,6 +400,8 @@ export async function POST(req: NextRequest) {
       status: handoffOccurred ? 'queue' : 'bot',
       reply: cleanReply,
       handoffOccurred,
+      triggerLeadForm,
+      ...(triggerLeadForm && { leadFormConfig })
     });
   } catch (error) {
     console.error('[Widget Message API] Error:', error);

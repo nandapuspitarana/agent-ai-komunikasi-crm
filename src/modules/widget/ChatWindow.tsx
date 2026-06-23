@@ -80,6 +80,30 @@ export function ChatWindow({
               options: data.welcomeMessageOptions && data.welcomeMessageOptions.length > 0 ? data.welcomeMessageOptions : undefined
             }]);
           }
+
+          // Request Geolocation if enabled
+          if (data.layer1_geolocation && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const { latitude, longitude } = position.coords;
+                // Send to backend silently
+                fetch('/api/widget/visitor/geo', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    tenantId,
+                    contactId: localSessionId.current,
+                    latitude,
+                    longitude
+                  })
+                }).catch(err => console.error('Geo API error:', err));
+              },
+              (error) => {
+                console.warn('Geolocation permission denied or failed:', error.message);
+              },
+              { timeout: 10000, maximumAge: 60000 }
+            );
+          }
         }
       })
       .catch(err => console.error('Error fetching widget config:', err));

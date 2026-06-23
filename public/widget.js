@@ -121,6 +121,7 @@
     const apiUrl = window.CRM_AGENT_CONFIG?.apiUrl || CRM_HOST;
     const iframe = document.createElement('iframe');
     iframe.src = `${apiUrl}/widget-ui?mode=iframe&tenantId=${tenantId}&color=${encodeURIComponent(config.primaryColor)}&name=${encodeURIComponent(config.botName)}&position=${encodeURIComponent(config.position || 'right')}&icon=${encodeURIComponent(config.widgetIconUrl || '')}`;
+    iframe.allow = "geolocation";
     iframeContainer.appendChild(iframe);
     shadowRoot.appendChild(iframeContainer);
 

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
@@ -69,7 +68,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, aiSystemPrompt, handoffAgentId, activeFlowId, themeBrandColor, themeUserBubbleColor, themeBotBubbleColor, themeBrandLogo, botAvatarUrl, widgetPosition, widgetIconUrl } = body;
+    const { name, aiSystemPrompt, handoffAgentId, activeFlowId, themeBrandColor, themeUserBubbleColor, themeBotBubbleColor, themeBrandLogo, botAvatarUrl, widgetPosition, widgetIconUrl, visitorConfig } = body;
 
     const updatedTenant = await prisma.tenant.update({
       where: { id: tenantId },
@@ -85,6 +84,7 @@ export async function PUT(req: NextRequest) {
         botAvatarUrl,
         widgetPosition,
         widgetIconUrl,
+        ...(visitorConfig !== undefined && { visitorConfig }),
       },
     });
 
