@@ -112,6 +112,7 @@ model Tenant {
   botAvatarUrl         String?       @db.Text
   widgetPosition       String?       @default("right")
   widgetIconUrl        String?       @db.Text
+  visitorConfig        Json          @default("{}")
   
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -120,6 +121,7 @@ model Tenant {
   flows          Flow[]        @relation("TenantFlows")
   chatSessions   ChatSession[]
   assets         Asset[]
+  visitorProfiles VisitorProfile[]
 
   @@map("crm_agent_Tenant")
 }
@@ -256,5 +258,55 @@ model MessageQueue {
 
   @@index([tenantId, sessionId])
   @@map("crm_agent_MessageQueue")
+}
+
+model VisitorProfile {
+  id            String   @id @default(uuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  contactId     String
+
+  // Layer 2: Extracted from chat (NLP)
+  name          String?
+  email         String?
+  phone         String?
+
+  // Layer 1: Passive browser metadata
+  latitude      Float?
+  longitude     Float?
+  city          String?
+  country       String?
+  referrerUrl   String?  @db.Text
+  pageUrl       String?  @db.Text
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  deviceType    String?   // "mobile" | "desktop" | "tablet"
+  browserName   String?
+  os            String?
+
+  // Layer 4: AI Classification
+  leadClassification  String   @default("cold")
+  leadScore           Int      @default(0)
+  topicsDiscussed     String[]
+  lastIntent          String?
+
+  // State flags
+  leadFormShown       Boolean  @default(false)
+
+  // Dynamic metadata (JSON array)
+  metadata      Json     @default("[]")
+
+  sessions      Int      @default(0)
+  messageCount  Int      @default(0)
+  lastSeenAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([tenantId, contactId])
+  @@index([tenantId])
+  @@index([leadClassification])
+  @@index([email])
+  @@map("crm_agent_VisitorProfile")
 }
 

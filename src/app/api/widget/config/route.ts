@@ -1,8 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -33,6 +32,10 @@ export async function GET(request: Request) {
 
   const flowConfig = tenant.activeFlow?.config as any;
 
+  const visitorConfig = typeof tenant.visitorConfig === 'object' && tenant.visitorConfig 
+    ? tenant.visitorConfig as any 
+    : {};
+
   const settings = {
     tenantId,
     primaryColor: tenant.themeBrandColor || '#2563eb',
@@ -43,7 +46,8 @@ export async function GET(request: Request) {
     tenantName: tenant.name || 'CRM Support',
     botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
     position: tenant.widgetPosition || 'right',
-    widgetIconUrl: tenant.widgetIconUrl || null
+    widgetIconUrl: tenant.widgetIconUrl || null,
+    layer1_geolocation: visitorConfig.layer1_geolocation ?? true
   };
 
   return NextResponse.json(settings, {
