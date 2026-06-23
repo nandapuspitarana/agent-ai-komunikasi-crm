@@ -17,3 +17,4 @@ services:
     env_file:
       - .env
     restart: always
+    command: ["sh", "-c", "npx prisma db push --accept-data-loss && npm run start"]
