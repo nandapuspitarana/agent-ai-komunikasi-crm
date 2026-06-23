@@ -292,7 +292,7 @@ export default function SettingsPage() {
     { id: 'users', label: t('settings', 'tabUsers'), icon: Users },
     { id: 'audit-logs', label: t('settings', 'tabAudit'), icon: LogOut },
     { id: 'tenant', label: t('settings', 'tabTenant'), icon: Building2 },
-    { id: 'visitors-config', label: 'Pengunjung', icon: UserSearch },
+    { id: 'visitors-config', label: 'Prospek', icon: UserSearch },
   ];
 
   return (

@@ -617,7 +617,7 @@ export default function InboxPage() {
       {showVisitorPanel && selectedChat && (
         <div className="w-72 border-l border-slate-200 flex flex-col overflow-y-auto bg-slate-50">
           <div className="p-4 border-b border-slate-200 bg-white flex items-center justify-between">
-            <h3 className="font-semibold text-slate-800 text-sm">Info Pengunjung</h3>
+            <h3 className="font-semibold text-slate-800 text-sm">Info Prospek</h3>
             <button onClick={() => setShowVisitorPanel(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
               <X size={14} />
             </button>
@@ -628,7 +628,7 @@ export default function InboxPage() {
           ) : !visitorInfo ? (
             <div className="p-6 text-center">
               <User size={32} className="mx-auto text-slate-200 mb-2" />
-              <p className="text-xs text-slate-400">Data pengunjung belum tersedia.<br />Akan muncul setelah ada percakapan.</p>
+              <p className="text-xs text-slate-400">Data prospek belum tersedia.<br />Akan muncul setelah ada percakapan.</p>
             </div>
           ) : (
             <div className="flex-1 p-4 space-y-4">
@@ -637,7 +637,7 @@ export default function InboxPage() {
                 <div className="w-14 h-14 bg-brand-bg text-brand-hover rounded-full flex items-center justify-center mx-auto mb-3 text-xl font-bold">
                   {visitorInfo.name ? visitorInfo.name.charAt(0).toUpperCase() : '?'}
                 </div>
-                <p className="font-bold text-slate-800 text-sm">{visitorInfo.name || 'Pengunjung Anonim'}</p>
+                <p className="font-bold text-slate-800 text-sm">{visitorInfo.name || 'Prospek Anonim'}</p>
                 {visitorInfo.email && <p className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1"><Mail size={10} /> {visitorInfo.email}</p>}
                 {visitorInfo.phone && <p className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-0.5"><Phone size={10} /> {visitorInfo.phone}</p>}
               </div>
@@ -745,7 +745,7 @@ export default function InboxPage() {
         <button
           onClick={() => setShowVisitorPanel(true)}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-slate-200 shadow-md rounded-l-lg p-2 text-slate-500 hover:text-brand hover:border-brand transition-colors"
-          title="Tampilkan Info Pengunjung"
+          title="Tampilkan Info Prospek"
         >
           <User size={16} />
         </button>
