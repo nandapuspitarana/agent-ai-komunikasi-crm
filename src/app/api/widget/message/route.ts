@@ -9,6 +9,23 @@ import {
 
 const prisma = new PrismaClient();
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+function corsResponse(data: any, init?: ResponseInit) {
+  return NextResponse.json(data, {
+    ...init,
+    headers: {
+      ...init?.headers,
+      ...corsHeaders,
+    },
+  });
+}
+
+
 /**
  * POST /api/widget/message
  * 
@@ -33,7 +50,7 @@ export async function POST(req: NextRequest) {
     const { sessionId, tenantId, message, contactId, channel = 'widget' } = body;
 
     if (!tenantId || !message) {
-      return NextResponse.json(
+      return corsResponse(
         { error: 'Missing required fields: tenantId, message' },
         { status: 400 }
       );
@@ -55,7 +72,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!tenant) {
-      return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
+      return corsResponse({ error: 'Tenant not found' }, { status: 404 });
     }
 
     // Find or create chat session
@@ -92,7 +109,7 @@ export async function POST(req: NextRequest) {
     if (chatSession.status === 'agent') {
       // Forward ke dashboard agent via Socket.io
       // Supabase Realtime handles this automatically.
-      return NextResponse.json({
+      return corsResponse({
         sessionId: currentSessionId,
         status: 'agent',
         reply: null, // Agent akan membalas sendiri dari dashboard
@@ -127,7 +144,7 @@ export async function POST(req: NextRequest) {
       // Notify agent dashboard
       // Supabase Realtime handles this automatically.
 
-      return NextResponse.json({
+      return corsResponse({
         sessionId: currentSessionId,
         status: 'queue',
         reply: handoffMessage,
@@ -234,6 +251,7 @@ export async function POST(req: NextRequest) {
             session_id: currentSessionId,
             user_id: chatSession.contactId,
             tenant_id: tenantId,
+            flow_id: tenant.activeFlowId || undefined,  // RAG isolation: scope to active AI Bot
             system_prompt: dynamicSystemPrompt,
             document_ids: documentIds,
           });
@@ -297,7 +315,7 @@ export async function POST(req: NextRequest) {
 
     // Step 6: Supabase Realtime automatically broadcasts changes
 
-    return NextResponse.json({
+    return corsResponse({
       sessionId: currentSessionId,
       status: handoffOccurred ? 'queue' : 'bot',
       reply: cleanReply,
@@ -305,9 +323,16 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('[Widget Message API] Error:', error);
-    return NextResponse.json(
+    return corsResponse(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
 }

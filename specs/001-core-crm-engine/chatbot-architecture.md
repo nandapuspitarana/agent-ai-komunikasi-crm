@@ -350,3 +350,83 @@ CLIENT-SIDE:
 **Performance**: Optimized (caching, minimal queries)
 
 This architecture supports 1000+ concurrent sessions with proper database pooling.
+
+---
+
+## RAG Isolation Architecture (Per AI Bot)
+
+### Isolation Model
+
+Each AI Bot (identified by `flowId` in Next.js / `flow_id` in proxy) maintains a **fully isolated RAG namespace** in Supabase. Documents from Bot A can never leak into Bot B responses.
+
+**Isolation Key**: `(tenant_id, flow_id)`
+
+```
+crm_documents:
+  - tenant_id (TEXT)  -- Isolation key (nullable, legacy rows = NULL = excluded)
+  - flow_id   (TEXT)  -- Bot identifier
+  - bot_name  (TEXT)  -- Human-readable bot label
+
+crm_document_chunks:
+  - tenant_id (TEXT)  -- Denormalized for fast pre-filter
+  - flow_id   (TEXT)  -- Denormalized for fast pre-filter
+  - embedding (VECTOR 1536)
+
+crm_agent_sessions:
+  - tenant_id (TEXT)  -- Scope session to tenant
+  - flow_id   (TEXT)  -- Scope session to bot
+```
+
+### Database Indexes
+
+```
+crm_document_chunks:
+  idx_chunks_bot       ON (flow_id, tenant_id)   <- scalar pre-filter BEFORE vector <=>
+  idx_chunks_embedding USING hnsw (embedding)    <- ANN search (unchanged)
+
+crm_documents:
+  idx_documents_bot        ON (flow_id, tenant_id)
+  idx_documents_status_bot ON (flow_id, tenant_id, status)
+
+crm_agent_sessions:
+  idx_sessions_bot ON (tenant_id, flow_id, user_id)
+```
+
+### Ingest Flow (New)
+
+```
+Next.js POST /api/flows/[flowId]/knowledge
+  -> proxy POST /api/v1/documents/ingest
+     Form: { file, flow_id(required), tenant_id(required), bot_name }
+  -> IngestionPipeline stamps (flow_id, tenant_id) on EVERY chunk
+  -> insert_chunks: hard error if either key missing
+```
+
+### Chat / Retrieval Flow (New)
+
+```
+Widget -> /api/widget/message { tenantId, message }
+  -> chatWithAgent({ tenant_id, flow_id: tenant.activeFlowId })
+  -> proxy /api/v1/chat { tenant_id, flow_id }
+  -> Orchestrator -> RAGTool (hard error if flow_id/tenant_id missing)
+  -> Retriever -> DocumentRepository
+  -> RPC match_document_chunks_scoped(p_flow_id, p_tenant_id)
+     WHERE dc.flow_id = p_flow_id AND dc.tenant_id = p_tenant_id
+  -> Only this bot's chunks returned (zero cross-bot leakage)
+```
+
+### Hard Error Policy
+
+| Layer | Error |
+|-------|-------|
+| DocumentRepository._require_isolation_keys() | ValueError |
+| Retriever.retrieve() | ValueError |
+| RAGTool.execute() | ToolResult(error) |
+| api/chat.py | HTTP 422 |
+| api/ingestion.py | HTTP 422 |
+| SQL match_document_chunks_scoped | RAISE EXCEPTION |
+
+### Legacy Data
+
+Rows without flow_id/tenant_id (NULL) are automatically excluded —
+WHERE dc.flow_id = p_flow_id never matches NULL. No backfill required.

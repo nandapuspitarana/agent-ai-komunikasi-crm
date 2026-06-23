@@ -127,7 +127,7 @@ function AgentBuilderContent() {
   const searchParams = useSearchParams();
   const flowIdParam = searchParams?.get('id') || null;
 
-  const [activeTab, setActiveTab] = useState('faq');
+  const [activeTab, setActiveTab] = useState('settings');
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(flowIdParam);
 
   const [agentConfig, setAgentConfig] = useState({
@@ -692,7 +692,7 @@ function AgentBuilderContent() {
                     <label className="block text-sm font-medium text-slate-700 mb-1">Agent Name</label>
                     <input 
                       type="text" 
-                      value={agentConfig.name}
+                      value={agentConfig.name || ''}
                       onChange={(e) => setAgentConfig({...agentConfig, name: e.target.value})}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light"
                     />
@@ -817,7 +817,7 @@ function AgentBuilderContent() {
                       <input
                         type="text"
                         className="text-2xl font-bold text-slate-900 bg-transparent border-none outline-none w-full placeholder-slate-300"
-                        value={activeIntentData?.name}
+                        value={activeIntentData?.name ?? ''}
                         onChange={e => updateActiveIntent('name', e.target.value)}
                         placeholder="Intent Name"
                       />
@@ -865,7 +865,7 @@ function AgentBuilderContent() {
                             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Response Type</label>
                             <select
                               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
-                              value={activeIntentData?.answerType}
+                              value={activeIntentData?.answerType ?? 'text'}
                               onChange={e => updateActiveIntent('answerType', e.target.value)}
                             >
                               <option value="text">Text Only</option>
@@ -881,7 +881,7 @@ function AgentBuilderContent() {
                             <textarea
                               rows={3}
                               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-slate-50"
-                              value={activeIntentData?.answer}
+                              value={activeIntentData?.answer ?? ''}
                               onChange={e => updateActiveIntent('answer', e.target.value)}
                               placeholder="Type the agent's message..."
                             />
@@ -893,7 +893,7 @@ function AgentBuilderContent() {
                               <input
                                 type="text"
                                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-slate-50"
-                                value={activeIntentData?.options}
+                                value={activeIntentData?.options ?? ''}
                                 onChange={e => updateActiveIntent('options', e.target.value)}
                                 placeholder="e.g. Komplain, Cek Status, Lainnya"
                               />
@@ -905,7 +905,7 @@ function AgentBuilderContent() {
                               <input
                                 type="text"
                                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-slate-50"
-                                value={activeIntentData?.cardTitle}
+                                value={activeIntentData?.cardTitle ?? ''}
                                 onChange={e => updateActiveIntent('cardTitle', e.target.value)}
                                 placeholder="e.g. Promo Spesial"
                               />
@@ -987,7 +987,7 @@ function AgentBuilderContent() {
                           <textarea
                             rows={4}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 outline-none text-sm bg-slate-800 text-green-400 font-mono"
-                            value={activeIntentData?.customPayload}
+                            value={activeIntentData?.customPayload ?? ''}
                             onChange={e => updateActiveIntent('customPayload', e.target.value)}
                             placeholder='{\n  "action": "your_action_name"\n}'
                           />
