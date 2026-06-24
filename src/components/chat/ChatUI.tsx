@@ -256,17 +256,23 @@ export function ChatUI({
               {/* Render options if available */}
               {!isUser && msg.options && msg.options.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2 ml-8 pl-1">
-                  {msg.options.map((option, idx) => (
+                  {msg.options.map((optionRaw, idx) => {
+                    const pipeIdx = optionRaw.indexOf('|');
+                    const label = pipeIdx !== -1 ? optionRaw.substring(0, pipeIdx).trim() : optionRaw.trim();
+                    const value = pipeIdx !== -1 ? optionRaw.substring(pipeIdx + 1).trim() : optionRaw.trim();
+                    return (
                     <button
                       key={idx}
-                      onClick={() => onSendMessage(option)}
+                      onClick={() => onSendMessage(value)}
                       disabled={isTyping || status === 'closed'}
                       className="px-3 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-brand/30 transition-colors shadow-sm disabled:opacity-50"
                       style={{ borderColor: config.primaryColor + '40', color: config.primaryColor }}
+                      title={pipeIdx !== -1 ? `Sends: ${value}` : undefined}
                     >
-                      {option}
+                      {label}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -57,7 +57,7 @@
         ],
         "responseType": "options",
         "response": "I recommend Private Office. Best for teams that need a private, ready-to-use office with flexible terms.\n\nWhich city are you interested in?",
-        "options": "Bangkok Private Office, Beijing Private Office, Hangzhou Private Office, Hanoi Private Office, Ho Chi Minh City Private Office, Hong Kong Private Office, Jakarta Private Office, Kuala Lumpur Private Office, Manila Private Office, Seoul Private Office, Shanghai Private Office, Singapore Private Office",
+        "options": "Bangkok|Bangkok Private Office, Beijing|Beijing Private Office, Hangzhou|Hangzhou Private Office, Hanoi|Hanoi Private Office, Ho Chi Minh City|Ho Chi Minh City Private Office, Hong Kong|Hong Kong Private Office, Jakarta|Jakarta Private Office, Kuala Lumpur|Kuala Lumpur Private Office, Manila|Manila Private Office, Seoul|Seoul Private Office, Shanghai|Shanghai Private Office, Singapore|Singapore Private Office",
         "metadata": {}
       },
       {
@@ -70,7 +70,7 @@
         ],
         "responseType": "options",
         "response": "Private Office\nBest for teams that need a private, ready-to-use office with flexible terms.\n\nWhich city are you interested in?",
-        "options": "Bangkok Private Office, Beijing Private Office, Hangzhou Private Office, Hanoi Private Office, Ho Chi Minh City Private Office, Hong Kong Private Office, Jakarta Private Office, Kuala Lumpur Private Office, Manila Private Office, Seoul Private Office, Shanghai Private Office, Singapore Private Office",
+        "options": "Bangkok|Bangkok Private Office, Beijing|Beijing Private Office, Hangzhou|Hangzhou Private Office, Hanoi|Hanoi Private Office, Ho Chi Minh City|Ho Chi Minh City Private Office, Hong Kong|Hong Kong Private Office, Jakarta|Jakarta Private Office, Kuala Lumpur|Kuala Lumpur Private Office, Manila|Manila Private Office, Seoul|Seoul Private Office, Shanghai|Shanghai Private Office, Singapore|Singapore Private Office",
         "metadata": {}
       },
       {
@@ -83,7 +83,7 @@
         ],
         "responseType": "options",
         "response": "Meeting Room\nFully equipped meeting rooms for your professional gatherings.\n\nWhich city are you interested in?",
-        "options": "Bangkok (MR), Beijing (MR), Hangzhou (MR), Hanoi (MR), Ho Chi Minh City (MR), Hong Kong (MR), Jakarta (MR), Kuala Lumpur (MR), Manila (MR), Seoul (MR), Shanghai (MR), Singapore (MR)",
+        "options": "Bangkok|Bangkok Meeting Room, Beijing|Beijing Meeting Room, Hangzhou|Hangzhou Meeting Room, Hanoi|Hanoi Meeting Room, Ho Chi Minh City|Ho Chi Minh City Meeting Room, Hong Kong|Hong Kong Meeting Room, Jakarta|Jakarta Meeting Room, Kuala Lumpur|Kuala Lumpur Meeting Room, Manila|Manila Meeting Room, Seoul|Seoul Meeting Room, Shanghai|Shanghai Meeting Room, Singapore|Singapore Meeting Room",
         "metadata": {}
       },
       {
@@ -95,7 +95,7 @@
         ],
         "responseType": "options",
         "response": "Virtual Office\nEstablish a premium business address without the physical space overhead.\n\nWhich city are you interested in?",
-        "options": "Bangkok (VO), Beijing (VO), Hangzhou (VO), Hanoi (VO), Ho Chi Minh City (VO), Hong Kong (VO), Jakarta (VO), Kuala Lumpur (VO), Manila (VO), Seoul (VO), Shanghai (VO), Singapore (VO)",
+        "options": "Bangkok|Bangkok Virtual Office, Beijing|Beijing Virtual Office, Hangzhou|Hangzhou Virtual Office, Hanoi|Hanoi Virtual Office, Ho Chi Minh City|Ho Chi Minh City Virtual Office, Hong Kong|Hong Kong Virtual Office, Jakarta|Jakarta Virtual Office, Kuala Lumpur|Kuala Lumpur Virtual Office, Manila|Manila Virtual Office, Seoul|Seoul Virtual Office, Shanghai|Shanghai Virtual Office, Singapore|Singapore Virtual Office",
         "metadata": {}
       },
       {
@@ -107,7 +107,7 @@
         ],
         "responseType": "options",
         "response": "Dedicated Workstation\nYour own personal desk in a shared premium environment.\n\nWhich city are you interested in?",
-        "options": "Bangkok (DW), Beijing (DW), Hangzhou (DW), Hanoi (DW), Ho Chi Minh City (DW), Hong Kong (DW), Jakarta (DW), Kuala Lumpur (DW), Manila (DW), Seoul (DW), Shanghai (DW), Singapore (DW)",
+        "options": "Bangkok|Bangkok Dedicated Workstation, Beijing|Beijing Dedicated Workstation, Hangzhou|Hangzhou Dedicated Workstation, Hanoi|Hanoi Dedicated Workstation, Ho Chi Minh City|Ho Chi Minh City Dedicated Workstation, Hong Kong|Hong Kong Dedicated Workstation, Jakarta|Jakarta Dedicated Workstation, Kuala Lumpur|Kuala Lumpur Dedicated Workstation, Manila|Manila Dedicated Workstation, Seoul|Seoul Dedicated Workstation, Shanghai|Shanghai Dedicated Workstation, Singapore|Singapore Dedicated Workstation",
         "metadata": {}
       },
       {
@@ -130,7 +130,7 @@
         ],
         "responseType": "options",
         "response": "Day Office\nPrivate office space available on a daily basis.\n\nWhich city are you interested in?",
-        "options": "Bangkok Private Office, Beijing Private Office, Hangzhou Private Office, Hanoi Private Office, Ho Chi Minh City Private Office, Hong Kong Private Office, Jakarta Private Office, Kuala Lumpur Private Office, Manila Private Office, Seoul Private Office, Shanghai Private Office, Singapore Private Office",
+        "options": "Bangkok|Bangkok Private Office, Beijing|Beijing Private Office, Hangzhou|Hangzhou Private Office, Hanoi|Hanoi Private Office, Ho Chi Minh City|Ho Chi Minh City Private Office, Hong Kong|Hong Kong Private Office, Jakarta|Jakarta Private Office, Kuala Lumpur|Kuala Lumpur Private Office, Manila|Manila Private Office, Seoul|Seoul Private Office, Shanghai|Shanghai Private Office, Singapore|Singapore Private Office",
         "metadata": {}
       },
       {
@@ -145,7 +145,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Kuala Lumpur. Please choose a centre.",
-        "options": "Axiata Tower Private Office, Q Sentral Private Office, Manara Maxis 36 Private Office, Manara Maxis 26 Private Office",
+        "options": "Axiata Tower|Axiata Tower Private Office, Q Sentral|Q Sentral Private Office, Manara Maxis 36|Manara Maxis 36 Private Office, Manara Maxis 26|Manara Maxis 26 Private Office",
         "metadata": {}
       },
       {
@@ -156,7 +156,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axiata Tower (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Axiata Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-axiata-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axiata Tower Private Office, Book a tour Axiata Tower Private Office, Start again",
+        "options": "Request Quotation|Request quotation Axiata Tower Private Office, Book a Tour|Book a tour Axiata Tower Private Office, Start again",
         "metadata": {}
       },
       {
@@ -193,7 +193,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Q Sentral (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Q Sentral are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-q-sentral/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Q Sentral Private Office, Book a tour Q Sentral Private Office, Start again",
+        "options": "Request Quotation|Request quotation Q Sentral Private Office, Book a Tour|Book a tour Q Sentral Private Office, Start again",
         "metadata": {}
       },
       {
@@ -230,7 +230,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 36 (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Manara Maxis 36 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-36th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 36 Private Office, Book a tour Manara Maxis 36 Private Office, Start again",
+        "options": "Request Quotation|Request quotation Manara Maxis 36 Private Office, Book a Tour|Book a tour Manara Maxis 36 Private Office, Start again",
         "metadata": {}
       },
       {
@@ -267,7 +267,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 26 (Kuala Lumpur) - Private Office</div><div class='small'>Our private offices at Manara Maxis 26 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-26th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 26 Private Office, Book a tour Manara Maxis 26 Private Office, Start again",
+        "options": "Request Quotation|Request quotation Manara Maxis 26 Private Office, Book a Tour|Book a tour Manara Maxis 26 Private Office, Start again",
         "metadata": {}
       },
       {
@@ -308,7 +308,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hong Kong. Please choose a centre.",
-        "options": "Chinachem Tower Private Office, K11 Atelier Victoria Dockside Private Office",
+        "options": "Chinachem Tower|Chinachem Tower Private Office, K11 Atelier Victoria Dockside|K11 Atelier Victoria Dockside Private Office",
         "metadata": {}
       },
       {
@@ -319,7 +319,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Chinachem Tower (Hong Kong) - Private Office</div><div class='small'>Our private offices at Chinachem Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/chinachem-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Chinachem Tower Private Office, Book a tour Chinachem Tower Private Office, Start again",
+        "options": "Request Quotation|Request quotation Chinachem Tower Private Office, Book a Tour|Book a tour Chinachem Tower Private Office, Start again",
         "metadata": {}
       },
       {
@@ -356,7 +356,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>K11 Atelier Victoria Dockside (Hong Kong) - Private Office</div><div class='small'>Our private offices at K11 Atelier Victoria Dockside are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hongkong-k11-atelier/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation K11 Atelier Victoria Dockside Private Office, Book a tour K11 Atelier Victoria Dockside Private Office, Start again",
+        "options": "Request Quotation|Request quotation K11 Atelier Victoria Dockside Private Office, Book a Tour|Book a tour K11 Atelier Victoria Dockside Private Office, Start again",
         "metadata": {}
       },
       {
@@ -397,7 +397,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Beijing. Please choose a centre.",
-        "options": "Sunshine Financial Center Private Office, The Exchange Twin Towers Private Office",
+        "options": "Sunshine Financial Center|Sunshine Financial Center Private Office, The Exchange Twin Towers|The Exchange Twin Towers Private Office",
         "metadata": {}
       },
       {
@@ -408,7 +408,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sunshine Financial Center (Beijing) - Private Office</div><div class='small'>Our private offices at Sunshine Financial Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/sunshine-financial-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sunshine Financial Center Private Office, Book a tour Sunshine Financial Center Private Office, Start again",
+        "options": "Request Quotation|Request quotation Sunshine Financial Center Private Office, Book a Tour|Book a tour Sunshine Financial Center Private Office, Start again",
         "metadata": {}
       },
       {
@@ -445,7 +445,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>The Exchange Twin Towers (Beijing) - Private Office</div><div class='small'>Our private offices at The Exchange Twin Towers are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/beijing-the-exchange-twin-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation The Exchange Twin Towers Private Office, Book a tour The Exchange Twin Towers Private Office, Start again",
+        "options": "Request Quotation|Request quotation The Exchange Twin Towers Private Office, Book a Tour|Book a tour The Exchange Twin Towers Private Office, Start again",
         "metadata": {}
       },
       {
@@ -486,7 +486,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Shanghai. Please choose a centre.",
-        "options": "Lujiazui Finance Plaza Private Office, Shanghai World Financial Center Private Office, Hong Kong New World Tower (K11) Private Office",
+        "options": "Lujiazui Finance Plaza|Lujiazui Finance Plaza Private Office, Shanghai World Financial Center|Shanghai World Financial Center Private Office, Hong Kong New World Tower (K11)|Hong Kong New World Tower (K11) Private Office",
         "metadata": {}
       },
       {
@@ -497,7 +497,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lujiazui Finance Plaza (Shanghai) - Private Office</div><div class='small'>Our private offices at Lujiazui Finance Plaza are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/lujiazui-financial-plaza/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lujiazui Finance Plaza Private Office, Book a tour Lujiazui Finance Plaza Private Office, Start again",
+        "options": "Request Quotation|Request quotation Lujiazui Finance Plaza Private Office, Book a Tour|Book a tour Lujiazui Finance Plaza Private Office, Start again",
         "metadata": {}
       },
       {
@@ -534,7 +534,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Shanghai World Financial Center (Shanghai) - Private Office</div><div class='small'>Our private offices at Shanghai World Financial Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-world-financial-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Shanghai World Financial Center Private Office, Book a tour Shanghai World Financial Center Private Office, Start again",
+        "options": "Request Quotation|Request quotation Shanghai World Financial Center Private Office, Book a Tour|Book a tour Shanghai World Financial Center Private Office, Start again",
         "metadata": {}
       },
       {
@@ -571,7 +571,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hong Kong New World Tower (K11) (Shanghai) - Private Office</div><div class='small'>Our private offices at Hong Kong New World Tower (K11) are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-puxi-hong-kong-new-world-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hong Kong New World Tower (K11) Private Office, Book a tour Hong Kong New World Tower (K11) Private Office, Start again",
+        "options": "Request Quotation|Request quotation Hong Kong New World Tower (K11) Private Office, Book a Tour|Book a tour Hong Kong New World Tower (K11) Private Office, Start again",
         "metadata": {}
       },
       {
@@ -612,7 +612,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hangzhou. Please choose a centre.",
-        "options": "Ping An Finance Center Private Office",
+        "options": "Ping An Finance Center|Ping An Finance Center Private Office",
         "metadata": {}
       },
       {
@@ -623,7 +623,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Ping An Finance Center (Hangzhou) - Private Office</div><div class='small'>Our private offices at Ping An Finance Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ping-an-finance-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Ping An Finance Center Private Office, Book a tour Ping An Finance Center Private Office, Start again",
+        "options": "Request Quotation|Request quotation Ping An Finance Center Private Office, Book a Tour|Book a tour Ping An Finance Center Private Office, Start again",
         "metadata": {}
       },
       {
@@ -664,7 +664,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Manila. Please choose a centre.",
-        "options": "Lkg Tower Private Office",
+        "options": "Lkg Tower|Lkg Tower Private Office",
         "metadata": {}
       },
       {
@@ -675,7 +675,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lkg Tower (Manila) - Private Office</div><div class='small'>Our private offices at Lkg Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/office-space-for-rent-manila/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lkg Tower Private Office, Book a tour Lkg Tower Private Office, Start again",
+        "options": "Request Quotation|Request quotation Lkg Tower Private Office, Book a Tour|Book a tour Lkg Tower Private Office, Start again",
         "metadata": {}
       },
       {
@@ -716,7 +716,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Jakarta. Please choose a centre.",
-        "options": "Sahid Sudirman Center Private Office, Axa Tower Private Office, Indonesia Stock Exchange Tower 2 Private Office, One Pacific Place Private Office",
+        "options": "Sahid Sudirman Center|Sahid Sudirman Center Private Office, Axa Tower|Axa Tower Private Office, Indonesia Stock Exchange Tower 2|Indonesia Stock Exchange Tower 2 Private Office, One Pacific Place|One Pacific Place Private Office",
         "metadata": {}
       },
       {
@@ -727,7 +727,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sahid Sudirman Center (Jakarta) - Private Office</div><div class='small'>Our private offices at Sahid Sudirman Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-sahid-sudirman-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sahid Sudirman Center Private Office, Book a tour Sahid Sudirman Center Private Office, Start again",
+        "options": "Request Quotation|Request quotation Sahid Sudirman Center Private Office, Book a Tour|Book a tour Sahid Sudirman Center Private Office, Start again",
         "metadata": {}
       },
       {
@@ -764,7 +764,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axa Tower (Jakarta) - Private Office</div><div class='small'>Our private offices at Axa Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-axa/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axa Tower Private Office, Book a tour Axa Tower Private Office, Start again",
+        "options": "Request Quotation|Request quotation Axa Tower Private Office, Book a Tour|Book a tour Axa Tower Private Office, Start again",
         "metadata": {}
       },
       {
@@ -801,7 +801,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Indonesia Stock Exchange Tower 2 (Jakarta) - Private Office</div><div class='small'>Our private offices at Indonesia Stock Exchange Tower 2 are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-stock-exchange/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Indonesia Stock Exchange Tower 2 Private Office, Book a tour Indonesia Stock Exchange Tower 2 Private Office, Start again",
+        "options": "Request Quotation|Request quotation Indonesia Stock Exchange Tower 2 Private Office, Book a Tour|Book a tour Indonesia Stock Exchange Tower 2 Private Office, Start again",
         "metadata": {}
       },
       {
@@ -838,7 +838,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>One Pacific Place (Jakarta) - Private Office</div><div class='small'>Our private offices at One Pacific Place are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-one-pacific-place/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation One Pacific Place Private Office, Book a tour One Pacific Place Private Office, Start again",
+        "options": "Request Quotation|Request quotation One Pacific Place Private Office, Book a Tour|Book a tour One Pacific Place Private Office, Start again",
         "metadata": {}
       },
       {
@@ -879,7 +879,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Singapore. Please choose a centre.",
-        "options": "Centennial Tower Private Office",
+        "options": "Centennial Tower|Centennial Tower Private Office",
         "metadata": {}
       },
       {
@@ -890,7 +890,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Centennial Tower (Singapore) - Private Office</div><div class='small'>Our private offices at Centennial Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/centennial-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Centennial Tower Private Office, Book a tour Centennial Tower Private Office, Start again",
+        "options": "Request Quotation|Request quotation Centennial Tower Private Office, Book a Tour|Book a tour Centennial Tower Private Office, Start again",
         "metadata": {}
       },
       {
@@ -931,7 +931,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Seoul. Please choose a centre.",
-        "options": "Kyobo Building Private Office, Parnas Tower Private Office",
+        "options": "Kyobo|Kyobo Building Private Office, Parnas Tower|Parnas Tower Private Office",
         "metadata": {}
       },
       {
@@ -942,7 +942,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Kyobo Building (Seoul) - Private Office</div><div class='small'>Our private offices at Kyobo Building are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-kyobo-building/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Kyobo Building Private Office, Book a tour Kyobo Building Private Office, Start again",
+        "options": "Request Quotation|Request quotation Kyobo Building Private Office, Book a Tour|Book a tour Kyobo Building Private Office, Start again",
         "metadata": {}
       },
       {
@@ -979,7 +979,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Parnas Tower (Seoul) - Private Office</div><div class='small'>Our private offices at Parnas Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-gangnam-parnas-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Parnas Tower Private Office, Book a tour Parnas Tower Private Office, Start again",
+        "options": "Request Quotation|Request quotation Parnas Tower Private Office, Book a Tour|Book a tour Parnas Tower Private Office, Start again",
         "metadata": {}
       },
       {
@@ -1020,7 +1020,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Bangkok. Please choose a centre.",
-        "options": "Athenee Tower Private Office",
+        "options": "Athenee Tower|Athenee Tower Private Office",
         "metadata": {}
       },
       {
@@ -1031,7 +1031,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Athenee Tower (Bangkok) - Private Office</div><div class='small'>Our private offices at Athenee Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/bangkok-athenee-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Athenee Tower Private Office, Book a tour Athenee Tower Private Office, Start again",
+        "options": "Request Quotation|Request quotation Athenee Tower Private Office, Book a Tour|Book a tour Athenee Tower Private Office, Start again",
         "metadata": {}
       },
       {
@@ -1072,7 +1072,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Hanoi. Please choose a centre.",
-        "options": "Hanoi Lotte Center Private Office",
+        "options": "Hanoi Lotte Center|Hanoi Lotte Center Private Office",
         "metadata": {}
       },
       {
@@ -1083,7 +1083,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hanoi Lotte Center (Hanoi) - Private Office</div><div class='small'>Our private offices at Hanoi Lotte Center are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hanoi-lotte-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hanoi Lotte Center Private Office, Book a tour Hanoi Lotte Center Private Office, Start again",
+        "options": "Request Quotation|Request quotation Hanoi Lotte Center Private Office, Book a Tour|Book a tour Hanoi Lotte Center Private Office, Start again",
         "metadata": {}
       },
       {
@@ -1124,7 +1124,7 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Private Office locations in Ho Chi Minh City. Please choose a centre.",
-        "options": "Vietcombank Tower Private Office",
+        "options": "Vietcombank Tower|Vietcombank Tower Private Office",
         "metadata": {}
       },
       {
@@ -1135,7 +1135,7 @@
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Vietcombank Tower (Ho Chi Minh City) - Private Office</div><div class='small'>Our private offices at Vietcombank Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Vietcombank Tower Private Office, Book a tour Vietcombank Tower Private Office, Start again",
+        "options": "Request Quotation|Request quotation Vietcombank Tower Private Office, Book a Tour|Book a tour Vietcombank Tower Private Office, Start again",
         "metadata": {}
       },
       {
@@ -1173,23 +1173,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Kuala Lumpur. Please choose a centre.",
-        "options": "Axiata Tower (MR), Q Sentral (MR), Manara Maxis 36 (MR), Manara Maxis 26 (MR)",
+        "options": "Axiata Tower|Axiata Tower Meeting Room, Q Sentral|Q Sentral Meeting Room, Manara Maxis 36|Manara Maxis 36 Meeting Room, Manara Maxis 26|Manara Maxis 26 Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Axiata Tower",
         "trainingPhrases": [
-          "Axiata Tower (MR)"
+          "Axiata Tower (MR)",
+          "Axiata Tower Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axiata Tower (Kuala Lumpur) - Meeting Room</div><div class='small'>Our meeting rooms at Axiata Tower are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-axiata-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axiata Tower (MR), Book a tour Axiata Tower (MR), Start again",
+        "options": "Request Quotation|Request quotation Axiata Tower (MR), Book a Tour|Book a tour Axiata Tower (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Axiata Tower (MR)",
         "trainingPhrases": [
           "Request quotation Axiata Tower (MR)",
+          "Request quotation Axiata Tower Meeting Room",
           "I want a quote for Axiata Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1201,6 +1203,7 @@
         "name": "Action: Book a tour Axiata Tower (MR)",
         "trainingPhrases": [
           "Book a tour Axiata Tower (MR)",
+          "Book a tour Axiata Tower Meeting Room",
           "Schedule a tour Axiata Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1211,17 +1214,19 @@
       {
         "name": "MR Centre: Q Sentral",
         "trainingPhrases": [
-          "Q Sentral (MR)"
+          "Q Sentral (MR)",
+          "Q Sentral Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Q Sentral (Kuala Lumpur) - Meeting Room</div><div class='small'>Our meeting rooms at Q Sentral are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-q-sentral/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Q Sentral (MR), Book a tour Q Sentral (MR), Start again",
+        "options": "Request Quotation|Request quotation Q Sentral (MR), Book a Tour|Book a tour Q Sentral (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Q Sentral (MR)",
         "trainingPhrases": [
           "Request quotation Q Sentral (MR)",
+          "Request quotation Q Sentral Meeting Room",
           "I want a quote for Q Sentral Meeting Room"
         ],
         "responseType": "form",
@@ -1233,6 +1238,7 @@
         "name": "Action: Book a tour Q Sentral (MR)",
         "trainingPhrases": [
           "Book a tour Q Sentral (MR)",
+          "Book a tour Q Sentral Meeting Room",
           "Schedule a tour Q Sentral Meeting Room"
         ],
         "responseType": "form",
@@ -1243,17 +1249,19 @@
       {
         "name": "MR Centre: Manara Maxis 36",
         "trainingPhrases": [
-          "Manara Maxis 36 (MR)"
+          "Manara Maxis 36 (MR)",
+          "Manara Maxis 36 Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 36 (Kuala Lumpur) - Meeting Room</div><div class='small'>Our meeting rooms at Manara Maxis 36 are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-36th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 36 (MR), Book a tour Manara Maxis 36 (MR), Start again",
+        "options": "Request Quotation|Request quotation Manara Maxis 36 (MR), Book a Tour|Book a tour Manara Maxis 36 (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Manara Maxis 36 (MR)",
         "trainingPhrases": [
           "Request quotation Manara Maxis 36 (MR)",
+          "Request quotation Manara Maxis 36 Meeting Room",
           "I want a quote for Manara Maxis 36 Meeting Room"
         ],
         "responseType": "form",
@@ -1265,6 +1273,7 @@
         "name": "Action: Book a tour Manara Maxis 36 (MR)",
         "trainingPhrases": [
           "Book a tour Manara Maxis 36 (MR)",
+          "Book a tour Manara Maxis 36 Meeting Room",
           "Schedule a tour Manara Maxis 36 Meeting Room"
         ],
         "responseType": "form",
@@ -1275,17 +1284,19 @@
       {
         "name": "MR Centre: Manara Maxis 26",
         "trainingPhrases": [
-          "Manara Maxis 26 (MR)"
+          "Manara Maxis 26 (MR)",
+          "Manara Maxis 26 Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 26 (Kuala Lumpur) - Meeting Room</div><div class='small'>Our meeting rooms at Manara Maxis 26 are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-26th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 26 (MR), Book a tour Manara Maxis 26 (MR), Start again",
+        "options": "Request Quotation|Request quotation Manara Maxis 26 (MR), Book a Tour|Book a tour Manara Maxis 26 (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Manara Maxis 26 (MR)",
         "trainingPhrases": [
           "Request quotation Manara Maxis 26 (MR)",
+          "Request quotation Manara Maxis 26 Meeting Room",
           "I want a quote for Manara Maxis 26 Meeting Room"
         ],
         "responseType": "form",
@@ -1297,6 +1308,7 @@
         "name": "Action: Book a tour Manara Maxis 26 (MR)",
         "trainingPhrases": [
           "Book a tour Manara Maxis 26 (MR)",
+          "Book a tour Manara Maxis 26 Meeting Room",
           "Schedule a tour Manara Maxis 26 Meeting Room"
         ],
         "responseType": "form",
@@ -1313,23 +1325,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Hong Kong. Please choose a centre.",
-        "options": "Chinachem Tower (MR), K11 Atelier Victoria Dockside (MR)",
+        "options": "Chinachem Tower|Chinachem Tower Meeting Room, K11 Atelier Victoria Dockside|K11 Atelier Victoria Dockside Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Chinachem Tower",
         "trainingPhrases": [
-          "Chinachem Tower (MR)"
+          "Chinachem Tower (MR)",
+          "Chinachem Tower Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Chinachem Tower (Hong Kong) - Meeting Room</div><div class='small'>Our meeting rooms at Chinachem Tower are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/chinachem-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Chinachem Tower (MR), Book a tour Chinachem Tower (MR), Start again",
+        "options": "Request Quotation|Request quotation Chinachem Tower (MR), Book a Tour|Book a tour Chinachem Tower (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Chinachem Tower (MR)",
         "trainingPhrases": [
           "Request quotation Chinachem Tower (MR)",
+          "Request quotation Chinachem Tower Meeting Room",
           "I want a quote for Chinachem Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1341,6 +1355,7 @@
         "name": "Action: Book a tour Chinachem Tower (MR)",
         "trainingPhrases": [
           "Book a tour Chinachem Tower (MR)",
+          "Book a tour Chinachem Tower Meeting Room",
           "Schedule a tour Chinachem Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1351,17 +1366,19 @@
       {
         "name": "MR Centre: K11 Atelier Victoria Dockside",
         "trainingPhrases": [
-          "K11 Atelier Victoria Dockside (MR)"
+          "K11 Atelier Victoria Dockside (MR)",
+          "K11 Atelier Victoria Dockside Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>K11 Atelier Victoria Dockside (Hong Kong) - Meeting Room</div><div class='small'>Our meeting rooms at K11 Atelier Victoria Dockside are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hongkong-k11-atelier/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation K11 Atelier Victoria Dockside (MR), Book a tour K11 Atelier Victoria Dockside (MR), Start again",
+        "options": "Request Quotation|Request quotation K11 Atelier Victoria Dockside (MR), Book a Tour|Book a tour K11 Atelier Victoria Dockside (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation K11 Atelier Victoria Dockside (MR)",
         "trainingPhrases": [
           "Request quotation K11 Atelier Victoria Dockside (MR)",
+          "Request quotation K11 Atelier Victoria Dockside Meeting Room",
           "I want a quote for K11 Atelier Victoria Dockside Meeting Room"
         ],
         "responseType": "form",
@@ -1373,6 +1390,7 @@
         "name": "Action: Book a tour K11 Atelier Victoria Dockside (MR)",
         "trainingPhrases": [
           "Book a tour K11 Atelier Victoria Dockside (MR)",
+          "Book a tour K11 Atelier Victoria Dockside Meeting Room",
           "Schedule a tour K11 Atelier Victoria Dockside Meeting Room"
         ],
         "responseType": "form",
@@ -1389,23 +1407,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Beijing. Please choose a centre.",
-        "options": "Sunshine Financial Center (MR), The Exchange Twin Towers (MR)",
+        "options": "Sunshine Financial Center|Sunshine Financial Center Meeting Room, The Exchange Twin Towers|The Exchange Twin Towers Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Sunshine Financial Center",
         "trainingPhrases": [
-          "Sunshine Financial Center (MR)"
+          "Sunshine Financial Center (MR)",
+          "Sunshine Financial Center Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sunshine Financial Center (Beijing) - Meeting Room</div><div class='small'>Our meeting rooms at Sunshine Financial Center are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/sunshine-financial-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sunshine Financial Center (MR), Book a tour Sunshine Financial Center (MR), Start again",
+        "options": "Request Quotation|Request quotation Sunshine Financial Center (MR), Book a Tour|Book a tour Sunshine Financial Center (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Sunshine Financial Center (MR)",
         "trainingPhrases": [
           "Request quotation Sunshine Financial Center (MR)",
+          "Request quotation Sunshine Financial Center Meeting Room",
           "I want a quote for Sunshine Financial Center Meeting Room"
         ],
         "responseType": "form",
@@ -1417,6 +1437,7 @@
         "name": "Action: Book a tour Sunshine Financial Center (MR)",
         "trainingPhrases": [
           "Book a tour Sunshine Financial Center (MR)",
+          "Book a tour Sunshine Financial Center Meeting Room",
           "Schedule a tour Sunshine Financial Center Meeting Room"
         ],
         "responseType": "form",
@@ -1427,17 +1448,19 @@
       {
         "name": "MR Centre: The Exchange Twin Towers",
         "trainingPhrases": [
-          "The Exchange Twin Towers (MR)"
+          "The Exchange Twin Towers (MR)",
+          "The Exchange Twin Towers Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>The Exchange Twin Towers (Beijing) - Meeting Room</div><div class='small'>Our meeting rooms at The Exchange Twin Towers are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/beijing-the-exchange-twin-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation The Exchange Twin Towers (MR), Book a tour The Exchange Twin Towers (MR), Start again",
+        "options": "Request Quotation|Request quotation The Exchange Twin Towers (MR), Book a Tour|Book a tour The Exchange Twin Towers (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation The Exchange Twin Towers (MR)",
         "trainingPhrases": [
           "Request quotation The Exchange Twin Towers (MR)",
+          "Request quotation The Exchange Twin Towers Meeting Room",
           "I want a quote for The Exchange Twin Towers Meeting Room"
         ],
         "responseType": "form",
@@ -1449,6 +1472,7 @@
         "name": "Action: Book a tour The Exchange Twin Towers (MR)",
         "trainingPhrases": [
           "Book a tour The Exchange Twin Towers (MR)",
+          "Book a tour The Exchange Twin Towers Meeting Room",
           "Schedule a tour The Exchange Twin Towers Meeting Room"
         ],
         "responseType": "form",
@@ -1465,23 +1489,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Shanghai. Please choose a centre.",
-        "options": "Lujiazui Finance Plaza (MR), Shanghai World Financial Center (MR), Hong Kong New World Tower (K11) (MR)",
+        "options": "Lujiazui Finance Plaza|Lujiazui Finance Plaza Meeting Room, Shanghai World Financial Center|Shanghai World Financial Center Meeting Room, Hong Kong New World Tower (K11)|Hong Kong New World Tower (K11) Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Lujiazui Finance Plaza",
         "trainingPhrases": [
-          "Lujiazui Finance Plaza (MR)"
+          "Lujiazui Finance Plaza (MR)",
+          "Lujiazui Finance Plaza Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lujiazui Finance Plaza (Shanghai) - Meeting Room</div><div class='small'>Our meeting rooms at Lujiazui Finance Plaza are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/lujiazui-financial-plaza/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lujiazui Finance Plaza (MR), Book a tour Lujiazui Finance Plaza (MR), Start again",
+        "options": "Request Quotation|Request quotation Lujiazui Finance Plaza (MR), Book a Tour|Book a tour Lujiazui Finance Plaza (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Lujiazui Finance Plaza (MR)",
         "trainingPhrases": [
           "Request quotation Lujiazui Finance Plaza (MR)",
+          "Request quotation Lujiazui Finance Plaza Meeting Room",
           "I want a quote for Lujiazui Finance Plaza Meeting Room"
         ],
         "responseType": "form",
@@ -1493,6 +1519,7 @@
         "name": "Action: Book a tour Lujiazui Finance Plaza (MR)",
         "trainingPhrases": [
           "Book a tour Lujiazui Finance Plaza (MR)",
+          "Book a tour Lujiazui Finance Plaza Meeting Room",
           "Schedule a tour Lujiazui Finance Plaza Meeting Room"
         ],
         "responseType": "form",
@@ -1503,17 +1530,19 @@
       {
         "name": "MR Centre: Shanghai World Financial Center",
         "trainingPhrases": [
-          "Shanghai World Financial Center (MR)"
+          "Shanghai World Financial Center (MR)",
+          "Shanghai World Financial Center Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Shanghai World Financial Center (Shanghai) - Meeting Room</div><div class='small'>Our meeting rooms at Shanghai World Financial Center are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-world-financial-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Shanghai World Financial Center (MR), Book a tour Shanghai World Financial Center (MR), Start again",
+        "options": "Request Quotation|Request quotation Shanghai World Financial Center (MR), Book a Tour|Book a tour Shanghai World Financial Center (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Shanghai World Financial Center (MR)",
         "trainingPhrases": [
           "Request quotation Shanghai World Financial Center (MR)",
+          "Request quotation Shanghai World Financial Center Meeting Room",
           "I want a quote for Shanghai World Financial Center Meeting Room"
         ],
         "responseType": "form",
@@ -1525,6 +1554,7 @@
         "name": "Action: Book a tour Shanghai World Financial Center (MR)",
         "trainingPhrases": [
           "Book a tour Shanghai World Financial Center (MR)",
+          "Book a tour Shanghai World Financial Center Meeting Room",
           "Schedule a tour Shanghai World Financial Center Meeting Room"
         ],
         "responseType": "form",
@@ -1535,17 +1565,19 @@
       {
         "name": "MR Centre: Hong Kong New World Tower (K11)",
         "trainingPhrases": [
-          "Hong Kong New World Tower (K11) (MR)"
+          "Hong Kong New World Tower (K11) (MR)",
+          "Hong Kong New World Tower (K11) Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hong Kong New World Tower (K11) (Shanghai) - Meeting Room</div><div class='small'>Our meeting rooms at Hong Kong New World Tower (K11) are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-puxi-hong-kong-new-world-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hong Kong New World Tower (K11) (MR), Book a tour Hong Kong New World Tower (K11) (MR), Start again",
+        "options": "Request Quotation|Request quotation Hong Kong New World Tower (K11) (MR), Book a Tour|Book a tour Hong Kong New World Tower (K11) (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Hong Kong New World Tower (K11) (MR)",
         "trainingPhrases": [
           "Request quotation Hong Kong New World Tower (K11) (MR)",
+          "Request quotation Hong Kong New World Tower (K11) Meeting Room",
           "I want a quote for Hong Kong New World Tower (K11) Meeting Room"
         ],
         "responseType": "form",
@@ -1557,6 +1589,7 @@
         "name": "Action: Book a tour Hong Kong New World Tower (K11) (MR)",
         "trainingPhrases": [
           "Book a tour Hong Kong New World Tower (K11) (MR)",
+          "Book a tour Hong Kong New World Tower (K11) Meeting Room",
           "Schedule a tour Hong Kong New World Tower (K11) Meeting Room"
         ],
         "responseType": "form",
@@ -1573,23 +1606,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Hangzhou. Please choose a centre.",
-        "options": "Ping An Finance Center (MR)",
+        "options": "Ping An Finance Center|Ping An Finance Center Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Ping An Finance Center",
         "trainingPhrases": [
-          "Ping An Finance Center (MR)"
+          "Ping An Finance Center (MR)",
+          "Ping An Finance Center Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Ping An Finance Center (Hangzhou) - Meeting Room</div><div class='small'>Our meeting rooms at Ping An Finance Center are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ping-an-finance-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Ping An Finance Center (MR), Book a tour Ping An Finance Center (MR), Start again",
+        "options": "Request Quotation|Request quotation Ping An Finance Center (MR), Book a Tour|Book a tour Ping An Finance Center (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Ping An Finance Center (MR)",
         "trainingPhrases": [
           "Request quotation Ping An Finance Center (MR)",
+          "Request quotation Ping An Finance Center Meeting Room",
           "I want a quote for Ping An Finance Center Meeting Room"
         ],
         "responseType": "form",
@@ -1601,6 +1636,7 @@
         "name": "Action: Book a tour Ping An Finance Center (MR)",
         "trainingPhrases": [
           "Book a tour Ping An Finance Center (MR)",
+          "Book a tour Ping An Finance Center Meeting Room",
           "Schedule a tour Ping An Finance Center Meeting Room"
         ],
         "responseType": "form",
@@ -1617,23 +1653,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Manila. Please choose a centre.",
-        "options": "Lkg Tower (MR)",
+        "options": "Lkg Tower|Lkg Tower Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Lkg Tower",
         "trainingPhrases": [
-          "Lkg Tower (MR)"
+          "Lkg Tower (MR)",
+          "Lkg Tower Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lkg Tower (Manila) - Meeting Room</div><div class='small'>Our meeting rooms at Lkg Tower are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/office-space-for-rent-manila/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lkg Tower (MR), Book a tour Lkg Tower (MR), Start again",
+        "options": "Request Quotation|Request quotation Lkg Tower (MR), Book a Tour|Book a tour Lkg Tower (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Lkg Tower (MR)",
         "trainingPhrases": [
           "Request quotation Lkg Tower (MR)",
+          "Request quotation Lkg Tower Meeting Room",
           "I want a quote for Lkg Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1645,6 +1683,7 @@
         "name": "Action: Book a tour Lkg Tower (MR)",
         "trainingPhrases": [
           "Book a tour Lkg Tower (MR)",
+          "Book a tour Lkg Tower Meeting Room",
           "Schedule a tour Lkg Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1661,23 +1700,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Jakarta. Please choose a centre.",
-        "options": "Sahid Sudirman Center (MR), Axa Tower (MR), Indonesia Stock Exchange Tower 2 (MR), One Pacific Place (MR)",
+        "options": "Sahid Sudirman Center|Sahid Sudirman Center Meeting Room, Axa Tower|Axa Tower Meeting Room, Indonesia Stock Exchange Tower 2|Indonesia Stock Exchange Tower 2 Meeting Room, One Pacific Place|One Pacific Place Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Sahid Sudirman Center",
         "trainingPhrases": [
-          "Sahid Sudirman Center (MR)"
+          "Sahid Sudirman Center (MR)",
+          "Sahid Sudirman Center Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sahid Sudirman Center (Jakarta) - Meeting Room</div><div class='small'>Our meeting rooms at Sahid Sudirman Center are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-sahid-sudirman-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sahid Sudirman Center (MR), Book a tour Sahid Sudirman Center (MR), Start again",
+        "options": "Request Quotation|Request quotation Sahid Sudirman Center (MR), Book a Tour|Book a tour Sahid Sudirman Center (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Sahid Sudirman Center (MR)",
         "trainingPhrases": [
           "Request quotation Sahid Sudirman Center (MR)",
+          "Request quotation Sahid Sudirman Center Meeting Room",
           "I want a quote for Sahid Sudirman Center Meeting Room"
         ],
         "responseType": "form",
@@ -1689,6 +1730,7 @@
         "name": "Action: Book a tour Sahid Sudirman Center (MR)",
         "trainingPhrases": [
           "Book a tour Sahid Sudirman Center (MR)",
+          "Book a tour Sahid Sudirman Center Meeting Room",
           "Schedule a tour Sahid Sudirman Center Meeting Room"
         ],
         "responseType": "form",
@@ -1699,17 +1741,19 @@
       {
         "name": "MR Centre: Axa Tower",
         "trainingPhrases": [
-          "Axa Tower (MR)"
+          "Axa Tower (MR)",
+          "Axa Tower Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axa Tower (Jakarta) - Meeting Room</div><div class='small'>Our meeting rooms at Axa Tower are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-axa/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axa Tower (MR), Book a tour Axa Tower (MR), Start again",
+        "options": "Request Quotation|Request quotation Axa Tower (MR), Book a Tour|Book a tour Axa Tower (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Axa Tower (MR)",
         "trainingPhrases": [
           "Request quotation Axa Tower (MR)",
+          "Request quotation Axa Tower Meeting Room",
           "I want a quote for Axa Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1721,6 +1765,7 @@
         "name": "Action: Book a tour Axa Tower (MR)",
         "trainingPhrases": [
           "Book a tour Axa Tower (MR)",
+          "Book a tour Axa Tower Meeting Room",
           "Schedule a tour Axa Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1731,17 +1776,19 @@
       {
         "name": "MR Centre: Indonesia Stock Exchange Tower 2",
         "trainingPhrases": [
-          "Indonesia Stock Exchange Tower 2 (MR)"
+          "Indonesia Stock Exchange Tower 2 (MR)",
+          "Indonesia Stock Exchange Tower 2 Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Indonesia Stock Exchange Tower 2 (Jakarta) - Meeting Room</div><div class='small'>Our meeting rooms at Indonesia Stock Exchange Tower 2 are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-stock-exchange/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Indonesia Stock Exchange Tower 2 (MR), Book a tour Indonesia Stock Exchange Tower 2 (MR), Start again",
+        "options": "Request Quotation|Request quotation Indonesia Stock Exchange Tower 2 (MR), Book a Tour|Book a tour Indonesia Stock Exchange Tower 2 (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Indonesia Stock Exchange Tower 2 (MR)",
         "trainingPhrases": [
           "Request quotation Indonesia Stock Exchange Tower 2 (MR)",
+          "Request quotation Indonesia Stock Exchange Tower 2 Meeting Room",
           "I want a quote for Indonesia Stock Exchange Tower 2 Meeting Room"
         ],
         "responseType": "form",
@@ -1753,6 +1800,7 @@
         "name": "Action: Book a tour Indonesia Stock Exchange Tower 2 (MR)",
         "trainingPhrases": [
           "Book a tour Indonesia Stock Exchange Tower 2 (MR)",
+          "Book a tour Indonesia Stock Exchange Tower 2 Meeting Room",
           "Schedule a tour Indonesia Stock Exchange Tower 2 Meeting Room"
         ],
         "responseType": "form",
@@ -1763,17 +1811,19 @@
       {
         "name": "MR Centre: One Pacific Place",
         "trainingPhrases": [
-          "One Pacific Place (MR)"
+          "One Pacific Place (MR)",
+          "One Pacific Place Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>One Pacific Place (Jakarta) - Meeting Room</div><div class='small'>Our meeting rooms at One Pacific Place are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-one-pacific-place/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation One Pacific Place (MR), Book a tour One Pacific Place (MR), Start again",
+        "options": "Request Quotation|Request quotation One Pacific Place (MR), Book a Tour|Book a tour One Pacific Place (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation One Pacific Place (MR)",
         "trainingPhrases": [
           "Request quotation One Pacific Place (MR)",
+          "Request quotation One Pacific Place Meeting Room",
           "I want a quote for One Pacific Place Meeting Room"
         ],
         "responseType": "form",
@@ -1785,6 +1835,7 @@
         "name": "Action: Book a tour One Pacific Place (MR)",
         "trainingPhrases": [
           "Book a tour One Pacific Place (MR)",
+          "Book a tour One Pacific Place Meeting Room",
           "Schedule a tour One Pacific Place Meeting Room"
         ],
         "responseType": "form",
@@ -1801,23 +1852,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Singapore. Please choose a centre.",
-        "options": "Centennial Tower (MR)",
+        "options": "Centennial Tower|Centennial Tower Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Centennial Tower",
         "trainingPhrases": [
-          "Centennial Tower (MR)"
+          "Centennial Tower (MR)",
+          "Centennial Tower Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Centennial Tower (Singapore) - Meeting Room</div><div class='small'>Our meeting rooms at Centennial Tower are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/centennial-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Centennial Tower (MR), Book a tour Centennial Tower (MR), Start again",
+        "options": "Request Quotation|Request quotation Centennial Tower (MR), Book a Tour|Book a tour Centennial Tower (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Centennial Tower (MR)",
         "trainingPhrases": [
           "Request quotation Centennial Tower (MR)",
+          "Request quotation Centennial Tower Meeting Room",
           "I want a quote for Centennial Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1829,6 +1882,7 @@
         "name": "Action: Book a tour Centennial Tower (MR)",
         "trainingPhrases": [
           "Book a tour Centennial Tower (MR)",
+          "Book a tour Centennial Tower Meeting Room",
           "Schedule a tour Centennial Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1845,23 +1899,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Seoul. Please choose a centre.",
-        "options": "Kyobo Building (MR), Parnas Tower (MR)",
+        "options": "Kyobo|Kyobo Building Meeting Room, Parnas Tower|Parnas Tower Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Kyobo Building",
         "trainingPhrases": [
-          "Kyobo Building (MR)"
+          "Kyobo Building (MR)",
+          "Kyobo Building Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Kyobo Building (Seoul) - Meeting Room</div><div class='small'>Our meeting rooms at Kyobo Building are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-kyobo-building/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Kyobo Building (MR), Book a tour Kyobo Building (MR), Start again",
+        "options": "Request Quotation|Request quotation Kyobo Building (MR), Book a Tour|Book a tour Kyobo Building (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Kyobo Building (MR)",
         "trainingPhrases": [
           "Request quotation Kyobo Building (MR)",
+          "Request quotation Kyobo Building Meeting Room",
           "I want a quote for Kyobo Building Meeting Room"
         ],
         "responseType": "form",
@@ -1873,6 +1929,7 @@
         "name": "Action: Book a tour Kyobo Building (MR)",
         "trainingPhrases": [
           "Book a tour Kyobo Building (MR)",
+          "Book a tour Kyobo Building Meeting Room",
           "Schedule a tour Kyobo Building Meeting Room"
         ],
         "responseType": "form",
@@ -1883,17 +1940,19 @@
       {
         "name": "MR Centre: Parnas Tower",
         "trainingPhrases": [
-          "Parnas Tower (MR)"
+          "Parnas Tower (MR)",
+          "Parnas Tower Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Parnas Tower (Seoul) - Meeting Room</div><div class='small'>Our meeting rooms at Parnas Tower are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-gangnam-parnas-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Parnas Tower (MR), Book a tour Parnas Tower (MR), Start again",
+        "options": "Request Quotation|Request quotation Parnas Tower (MR), Book a Tour|Book a tour Parnas Tower (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Parnas Tower (MR)",
         "trainingPhrases": [
           "Request quotation Parnas Tower (MR)",
+          "Request quotation Parnas Tower Meeting Room",
           "I want a quote for Parnas Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1905,6 +1964,7 @@
         "name": "Action: Book a tour Parnas Tower (MR)",
         "trainingPhrases": [
           "Book a tour Parnas Tower (MR)",
+          "Book a tour Parnas Tower Meeting Room",
           "Schedule a tour Parnas Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1921,23 +1981,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Bangkok. Please choose a centre.",
-        "options": "Athenee Tower (MR)",
+        "options": "Athenee Tower|Athenee Tower Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Athenee Tower",
         "trainingPhrases": [
-          "Athenee Tower (MR)"
+          "Athenee Tower (MR)",
+          "Athenee Tower Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Athenee Tower (Bangkok) - Meeting Room</div><div class='small'>Our meeting rooms at Athenee Tower are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/bangkok-athenee-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Athenee Tower (MR), Book a tour Athenee Tower (MR), Start again",
+        "options": "Request Quotation|Request quotation Athenee Tower (MR), Book a Tour|Book a tour Athenee Tower (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Athenee Tower (MR)",
         "trainingPhrases": [
           "Request quotation Athenee Tower (MR)",
+          "Request quotation Athenee Tower Meeting Room",
           "I want a quote for Athenee Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1949,6 +2011,7 @@
         "name": "Action: Book a tour Athenee Tower (MR)",
         "trainingPhrases": [
           "Book a tour Athenee Tower (MR)",
+          "Book a tour Athenee Tower Meeting Room",
           "Schedule a tour Athenee Tower Meeting Room"
         ],
         "responseType": "form",
@@ -1965,23 +2028,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Hanoi. Please choose a centre.",
-        "options": "Hanoi Lotte Center (MR)",
+        "options": "Hanoi Lotte Center|Hanoi Lotte Center Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Hanoi Lotte Center",
         "trainingPhrases": [
-          "Hanoi Lotte Center (MR)"
+          "Hanoi Lotte Center (MR)",
+          "Hanoi Lotte Center Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hanoi Lotte Center (Hanoi) - Meeting Room</div><div class='small'>Our meeting rooms at Hanoi Lotte Center are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hanoi-lotte-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hanoi Lotte Center (MR), Book a tour Hanoi Lotte Center (MR), Start again",
+        "options": "Request Quotation|Request quotation Hanoi Lotte Center (MR), Book a Tour|Book a tour Hanoi Lotte Center (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Hanoi Lotte Center (MR)",
         "trainingPhrases": [
           "Request quotation Hanoi Lotte Center (MR)",
+          "Request quotation Hanoi Lotte Center Meeting Room",
           "I want a quote for Hanoi Lotte Center Meeting Room"
         ],
         "responseType": "form",
@@ -1993,6 +2058,7 @@
         "name": "Action: Book a tour Hanoi Lotte Center (MR)",
         "trainingPhrases": [
           "Book a tour Hanoi Lotte Center (MR)",
+          "Book a tour Hanoi Lotte Center Meeting Room",
           "Schedule a tour Hanoi Lotte Center Meeting Room"
         ],
         "responseType": "form",
@@ -2009,23 +2075,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Meeting Room locations in Ho Chi Minh City. Please choose a centre.",
-        "options": "Vietcombank Tower (MR)",
+        "options": "Vietcombank Tower|Vietcombank Tower Meeting Room",
         "metadata": {}
       },
       {
         "name": "MR Centre: Vietcombank Tower",
         "trainingPhrases": [
-          "Vietcombank Tower (MR)"
+          "Vietcombank Tower (MR)",
+          "Vietcombank Tower Meeting Room"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Vietcombank Tower (Ho Chi Minh City) - Meeting Room</div><div class='small'>Our meeting rooms at Vietcombank Tower are available by the hour or day, fully equipped with state-of-the-art AV technology, high-speed Wi-Fi, and whiteboards. Complimentary refreshments are included.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Vietcombank Tower (MR), Book a tour Vietcombank Tower (MR), Start again",
+        "options": "Request Quotation|Request quotation Vietcombank Tower (MR), Book a Tour|Book a tour Vietcombank Tower (MR), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Vietcombank Tower (MR)",
         "trainingPhrases": [
           "Request quotation Vietcombank Tower (MR)",
+          "Request quotation Vietcombank Tower Meeting Room",
           "I want a quote for Vietcombank Tower Meeting Room"
         ],
         "responseType": "form",
@@ -2037,6 +2105,7 @@
         "name": "Action: Book a tour Vietcombank Tower (MR)",
         "trainingPhrases": [
           "Book a tour Vietcombank Tower (MR)",
+          "Book a tour Vietcombank Tower Meeting Room",
           "Schedule a tour Vietcombank Tower Meeting Room"
         ],
         "responseType": "form",
@@ -2053,23 +2122,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Kuala Lumpur. Please choose a centre.",
-        "options": "Axiata Tower (VO), Q Sentral (VO), Manara Maxis 36 (VO), Manara Maxis 26 (VO)",
+        "options": "Axiata Tower|Axiata Tower Virtual Office, Q Sentral|Q Sentral Virtual Office, Manara Maxis 36|Manara Maxis 36 Virtual Office, Manara Maxis 26|Manara Maxis 26 Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Axiata Tower",
         "trainingPhrases": [
-          "Axiata Tower (VO)"
+          "Axiata Tower (VO)",
+          "Axiata Tower Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axiata Tower (Kuala Lumpur) - Virtual Office</div><div class='small'>Our virtual office packages at Axiata Tower provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-axiata-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axiata Tower (VO), Book a tour Axiata Tower (VO), Start again",
+        "options": "Request Quotation|Request quotation Axiata Tower (VO), Book a Tour|Book a tour Axiata Tower (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Axiata Tower (VO)",
         "trainingPhrases": [
           "Request quotation Axiata Tower (VO)",
+          "Request quotation Axiata Tower Virtual Office",
           "I want a quote for Axiata Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2081,6 +2152,7 @@
         "name": "Action: Book a tour Axiata Tower (VO)",
         "trainingPhrases": [
           "Book a tour Axiata Tower (VO)",
+          "Book a tour Axiata Tower Virtual Office",
           "Schedule a tour Axiata Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2091,17 +2163,19 @@
       {
         "name": "VO Centre: Q Sentral",
         "trainingPhrases": [
-          "Q Sentral (VO)"
+          "Q Sentral (VO)",
+          "Q Sentral Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Q Sentral (Kuala Lumpur) - Virtual Office</div><div class='small'>Our virtual office packages at Q Sentral provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-q-sentral/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Q Sentral (VO), Book a tour Q Sentral (VO), Start again",
+        "options": "Request Quotation|Request quotation Q Sentral (VO), Book a Tour|Book a tour Q Sentral (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Q Sentral (VO)",
         "trainingPhrases": [
           "Request quotation Q Sentral (VO)",
+          "Request quotation Q Sentral Virtual Office",
           "I want a quote for Q Sentral Virtual Office"
         ],
         "responseType": "form",
@@ -2113,6 +2187,7 @@
         "name": "Action: Book a tour Q Sentral (VO)",
         "trainingPhrases": [
           "Book a tour Q Sentral (VO)",
+          "Book a tour Q Sentral Virtual Office",
           "Schedule a tour Q Sentral Virtual Office"
         ],
         "responseType": "form",
@@ -2123,17 +2198,19 @@
       {
         "name": "VO Centre: Manara Maxis 36",
         "trainingPhrases": [
-          "Manara Maxis 36 (VO)"
+          "Manara Maxis 36 (VO)",
+          "Manara Maxis 36 Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 36 (Kuala Lumpur) - Virtual Office</div><div class='small'>Our virtual office packages at Manara Maxis 36 provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-36th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 36 (VO), Book a tour Manara Maxis 36 (VO), Start again",
+        "options": "Request Quotation|Request quotation Manara Maxis 36 (VO), Book a Tour|Book a tour Manara Maxis 36 (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Manara Maxis 36 (VO)",
         "trainingPhrases": [
           "Request quotation Manara Maxis 36 (VO)",
+          "Request quotation Manara Maxis 36 Virtual Office",
           "I want a quote for Manara Maxis 36 Virtual Office"
         ],
         "responseType": "form",
@@ -2145,6 +2222,7 @@
         "name": "Action: Book a tour Manara Maxis 36 (VO)",
         "trainingPhrases": [
           "Book a tour Manara Maxis 36 (VO)",
+          "Book a tour Manara Maxis 36 Virtual Office",
           "Schedule a tour Manara Maxis 36 Virtual Office"
         ],
         "responseType": "form",
@@ -2155,17 +2233,19 @@
       {
         "name": "VO Centre: Manara Maxis 26",
         "trainingPhrases": [
-          "Manara Maxis 26 (VO)"
+          "Manara Maxis 26 (VO)",
+          "Manara Maxis 26 Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 26 (Kuala Lumpur) - Virtual Office</div><div class='small'>Our virtual office packages at Manara Maxis 26 provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-26th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 26 (VO), Book a tour Manara Maxis 26 (VO), Start again",
+        "options": "Request Quotation|Request quotation Manara Maxis 26 (VO), Book a Tour|Book a tour Manara Maxis 26 (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Manara Maxis 26 (VO)",
         "trainingPhrases": [
           "Request quotation Manara Maxis 26 (VO)",
+          "Request quotation Manara Maxis 26 Virtual Office",
           "I want a quote for Manara Maxis 26 Virtual Office"
         ],
         "responseType": "form",
@@ -2177,6 +2257,7 @@
         "name": "Action: Book a tour Manara Maxis 26 (VO)",
         "trainingPhrases": [
           "Book a tour Manara Maxis 26 (VO)",
+          "Book a tour Manara Maxis 26 Virtual Office",
           "Schedule a tour Manara Maxis 26 Virtual Office"
         ],
         "responseType": "form",
@@ -2193,23 +2274,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Hong Kong. Please choose a centre.",
-        "options": "Chinachem Tower (VO), K11 Atelier Victoria Dockside (VO)",
+        "options": "Chinachem Tower|Chinachem Tower Virtual Office, K11 Atelier Victoria Dockside|K11 Atelier Victoria Dockside Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Chinachem Tower",
         "trainingPhrases": [
-          "Chinachem Tower (VO)"
+          "Chinachem Tower (VO)",
+          "Chinachem Tower Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Chinachem Tower (Hong Kong) - Virtual Office</div><div class='small'>Our virtual office packages at Chinachem Tower provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/chinachem-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Chinachem Tower (VO), Book a tour Chinachem Tower (VO), Start again",
+        "options": "Request Quotation|Request quotation Chinachem Tower (VO), Book a Tour|Book a tour Chinachem Tower (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Chinachem Tower (VO)",
         "trainingPhrases": [
           "Request quotation Chinachem Tower (VO)",
+          "Request quotation Chinachem Tower Virtual Office",
           "I want a quote for Chinachem Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2221,6 +2304,7 @@
         "name": "Action: Book a tour Chinachem Tower (VO)",
         "trainingPhrases": [
           "Book a tour Chinachem Tower (VO)",
+          "Book a tour Chinachem Tower Virtual Office",
           "Schedule a tour Chinachem Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2231,17 +2315,19 @@
       {
         "name": "VO Centre: K11 Atelier Victoria Dockside",
         "trainingPhrases": [
-          "K11 Atelier Victoria Dockside (VO)"
+          "K11 Atelier Victoria Dockside (VO)",
+          "K11 Atelier Victoria Dockside Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>K11 Atelier Victoria Dockside (Hong Kong) - Virtual Office</div><div class='small'>Our virtual office packages at K11 Atelier Victoria Dockside provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hongkong-k11-atelier/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation K11 Atelier Victoria Dockside (VO), Book a tour K11 Atelier Victoria Dockside (VO), Start again",
+        "options": "Request Quotation|Request quotation K11 Atelier Victoria Dockside (VO), Book a Tour|Book a tour K11 Atelier Victoria Dockside (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation K11 Atelier Victoria Dockside (VO)",
         "trainingPhrases": [
           "Request quotation K11 Atelier Victoria Dockside (VO)",
+          "Request quotation K11 Atelier Victoria Dockside Virtual Office",
           "I want a quote for K11 Atelier Victoria Dockside Virtual Office"
         ],
         "responseType": "form",
@@ -2253,6 +2339,7 @@
         "name": "Action: Book a tour K11 Atelier Victoria Dockside (VO)",
         "trainingPhrases": [
           "Book a tour K11 Atelier Victoria Dockside (VO)",
+          "Book a tour K11 Atelier Victoria Dockside Virtual Office",
           "Schedule a tour K11 Atelier Victoria Dockside Virtual Office"
         ],
         "responseType": "form",
@@ -2269,23 +2356,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Beijing. Please choose a centre.",
-        "options": "Sunshine Financial Center (VO), The Exchange Twin Towers (VO)",
+        "options": "Sunshine Financial Center|Sunshine Financial Center Virtual Office, The Exchange Twin Towers|The Exchange Twin Towers Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Sunshine Financial Center",
         "trainingPhrases": [
-          "Sunshine Financial Center (VO)"
+          "Sunshine Financial Center (VO)",
+          "Sunshine Financial Center Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sunshine Financial Center (Beijing) - Virtual Office</div><div class='small'>Our virtual office packages at Sunshine Financial Center provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/sunshine-financial-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sunshine Financial Center (VO), Book a tour Sunshine Financial Center (VO), Start again",
+        "options": "Request Quotation|Request quotation Sunshine Financial Center (VO), Book a Tour|Book a tour Sunshine Financial Center (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Sunshine Financial Center (VO)",
         "trainingPhrases": [
           "Request quotation Sunshine Financial Center (VO)",
+          "Request quotation Sunshine Financial Center Virtual Office",
           "I want a quote for Sunshine Financial Center Virtual Office"
         ],
         "responseType": "form",
@@ -2297,6 +2386,7 @@
         "name": "Action: Book a tour Sunshine Financial Center (VO)",
         "trainingPhrases": [
           "Book a tour Sunshine Financial Center (VO)",
+          "Book a tour Sunshine Financial Center Virtual Office",
           "Schedule a tour Sunshine Financial Center Virtual Office"
         ],
         "responseType": "form",
@@ -2307,17 +2397,19 @@
       {
         "name": "VO Centre: The Exchange Twin Towers",
         "trainingPhrases": [
-          "The Exchange Twin Towers (VO)"
+          "The Exchange Twin Towers (VO)",
+          "The Exchange Twin Towers Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>The Exchange Twin Towers (Beijing) - Virtual Office</div><div class='small'>Our virtual office packages at The Exchange Twin Towers provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/beijing-the-exchange-twin-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation The Exchange Twin Towers (VO), Book a tour The Exchange Twin Towers (VO), Start again",
+        "options": "Request Quotation|Request quotation The Exchange Twin Towers (VO), Book a Tour|Book a tour The Exchange Twin Towers (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation The Exchange Twin Towers (VO)",
         "trainingPhrases": [
           "Request quotation The Exchange Twin Towers (VO)",
+          "Request quotation The Exchange Twin Towers Virtual Office",
           "I want a quote for The Exchange Twin Towers Virtual Office"
         ],
         "responseType": "form",
@@ -2329,6 +2421,7 @@
         "name": "Action: Book a tour The Exchange Twin Towers (VO)",
         "trainingPhrases": [
           "Book a tour The Exchange Twin Towers (VO)",
+          "Book a tour The Exchange Twin Towers Virtual Office",
           "Schedule a tour The Exchange Twin Towers Virtual Office"
         ],
         "responseType": "form",
@@ -2345,23 +2438,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Shanghai. Please choose a centre.",
-        "options": "Lujiazui Finance Plaza (VO), Shanghai World Financial Center (VO), Hong Kong New World Tower (K11) (VO)",
+        "options": "Lujiazui Finance Plaza|Lujiazui Finance Plaza Virtual Office, Shanghai World Financial Center|Shanghai World Financial Center Virtual Office, Hong Kong New World Tower (K11)|Hong Kong New World Tower (K11) Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Lujiazui Finance Plaza",
         "trainingPhrases": [
-          "Lujiazui Finance Plaza (VO)"
+          "Lujiazui Finance Plaza (VO)",
+          "Lujiazui Finance Plaza Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lujiazui Finance Plaza (Shanghai) - Virtual Office</div><div class='small'>Our virtual office packages at Lujiazui Finance Plaza provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/lujiazui-financial-plaza/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lujiazui Finance Plaza (VO), Book a tour Lujiazui Finance Plaza (VO), Start again",
+        "options": "Request Quotation|Request quotation Lujiazui Finance Plaza (VO), Book a Tour|Book a tour Lujiazui Finance Plaza (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Lujiazui Finance Plaza (VO)",
         "trainingPhrases": [
           "Request quotation Lujiazui Finance Plaza (VO)",
+          "Request quotation Lujiazui Finance Plaza Virtual Office",
           "I want a quote for Lujiazui Finance Plaza Virtual Office"
         ],
         "responseType": "form",
@@ -2373,6 +2468,7 @@
         "name": "Action: Book a tour Lujiazui Finance Plaza (VO)",
         "trainingPhrases": [
           "Book a tour Lujiazui Finance Plaza (VO)",
+          "Book a tour Lujiazui Finance Plaza Virtual Office",
           "Schedule a tour Lujiazui Finance Plaza Virtual Office"
         ],
         "responseType": "form",
@@ -2383,17 +2479,19 @@
       {
         "name": "VO Centre: Shanghai World Financial Center",
         "trainingPhrases": [
-          "Shanghai World Financial Center (VO)"
+          "Shanghai World Financial Center (VO)",
+          "Shanghai World Financial Center Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Shanghai World Financial Center (Shanghai) - Virtual Office</div><div class='small'>Our virtual office packages at Shanghai World Financial Center provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-world-financial-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Shanghai World Financial Center (VO), Book a tour Shanghai World Financial Center (VO), Start again",
+        "options": "Request Quotation|Request quotation Shanghai World Financial Center (VO), Book a Tour|Book a tour Shanghai World Financial Center (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Shanghai World Financial Center (VO)",
         "trainingPhrases": [
           "Request quotation Shanghai World Financial Center (VO)",
+          "Request quotation Shanghai World Financial Center Virtual Office",
           "I want a quote for Shanghai World Financial Center Virtual Office"
         ],
         "responseType": "form",
@@ -2405,6 +2503,7 @@
         "name": "Action: Book a tour Shanghai World Financial Center (VO)",
         "trainingPhrases": [
           "Book a tour Shanghai World Financial Center (VO)",
+          "Book a tour Shanghai World Financial Center Virtual Office",
           "Schedule a tour Shanghai World Financial Center Virtual Office"
         ],
         "responseType": "form",
@@ -2415,17 +2514,19 @@
       {
         "name": "VO Centre: Hong Kong New World Tower (K11)",
         "trainingPhrases": [
-          "Hong Kong New World Tower (K11) (VO)"
+          "Hong Kong New World Tower (K11) (VO)",
+          "Hong Kong New World Tower (K11) Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hong Kong New World Tower (K11) (Shanghai) - Virtual Office</div><div class='small'>Our virtual office packages at Hong Kong New World Tower (K11) provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-puxi-hong-kong-new-world-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hong Kong New World Tower (K11) (VO), Book a tour Hong Kong New World Tower (K11) (VO), Start again",
+        "options": "Request Quotation|Request quotation Hong Kong New World Tower (K11) (VO), Book a Tour|Book a tour Hong Kong New World Tower (K11) (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Hong Kong New World Tower (K11) (VO)",
         "trainingPhrases": [
           "Request quotation Hong Kong New World Tower (K11) (VO)",
+          "Request quotation Hong Kong New World Tower (K11) Virtual Office",
           "I want a quote for Hong Kong New World Tower (K11) Virtual Office"
         ],
         "responseType": "form",
@@ -2437,6 +2538,7 @@
         "name": "Action: Book a tour Hong Kong New World Tower (K11) (VO)",
         "trainingPhrases": [
           "Book a tour Hong Kong New World Tower (K11) (VO)",
+          "Book a tour Hong Kong New World Tower (K11) Virtual Office",
           "Schedule a tour Hong Kong New World Tower (K11) Virtual Office"
         ],
         "responseType": "form",
@@ -2453,23 +2555,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Hangzhou. Please choose a centre.",
-        "options": "Ping An Finance Center (VO)",
+        "options": "Ping An Finance Center|Ping An Finance Center Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Ping An Finance Center",
         "trainingPhrases": [
-          "Ping An Finance Center (VO)"
+          "Ping An Finance Center (VO)",
+          "Ping An Finance Center Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Ping An Finance Center (Hangzhou) - Virtual Office</div><div class='small'>Our virtual office packages at Ping An Finance Center provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ping-an-finance-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Ping An Finance Center (VO), Book a tour Ping An Finance Center (VO), Start again",
+        "options": "Request Quotation|Request quotation Ping An Finance Center (VO), Book a Tour|Book a tour Ping An Finance Center (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Ping An Finance Center (VO)",
         "trainingPhrases": [
           "Request quotation Ping An Finance Center (VO)",
+          "Request quotation Ping An Finance Center Virtual Office",
           "I want a quote for Ping An Finance Center Virtual Office"
         ],
         "responseType": "form",
@@ -2481,6 +2585,7 @@
         "name": "Action: Book a tour Ping An Finance Center (VO)",
         "trainingPhrases": [
           "Book a tour Ping An Finance Center (VO)",
+          "Book a tour Ping An Finance Center Virtual Office",
           "Schedule a tour Ping An Finance Center Virtual Office"
         ],
         "responseType": "form",
@@ -2497,23 +2602,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Manila. Please choose a centre.",
-        "options": "Lkg Tower (VO)",
+        "options": "Lkg Tower|Lkg Tower Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Lkg Tower",
         "trainingPhrases": [
-          "Lkg Tower (VO)"
+          "Lkg Tower (VO)",
+          "Lkg Tower Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lkg Tower (Manila) - Virtual Office</div><div class='small'>Our virtual office packages at Lkg Tower provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/office-space-for-rent-manila/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lkg Tower (VO), Book a tour Lkg Tower (VO), Start again",
+        "options": "Request Quotation|Request quotation Lkg Tower (VO), Book a Tour|Book a tour Lkg Tower (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Lkg Tower (VO)",
         "trainingPhrases": [
           "Request quotation Lkg Tower (VO)",
+          "Request quotation Lkg Tower Virtual Office",
           "I want a quote for Lkg Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2525,6 +2632,7 @@
         "name": "Action: Book a tour Lkg Tower (VO)",
         "trainingPhrases": [
           "Book a tour Lkg Tower (VO)",
+          "Book a tour Lkg Tower Virtual Office",
           "Schedule a tour Lkg Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2541,23 +2649,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Jakarta. Please choose a centre.",
-        "options": "Sahid Sudirman Center (VO), Axa Tower (VO), Indonesia Stock Exchange Tower 2 (VO), One Pacific Place (VO)",
+        "options": "Sahid Sudirman Center|Sahid Sudirman Center Virtual Office, Axa Tower|Axa Tower Virtual Office, Indonesia Stock Exchange Tower 2|Indonesia Stock Exchange Tower 2 Virtual Office, One Pacific Place|One Pacific Place Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Sahid Sudirman Center",
         "trainingPhrases": [
-          "Sahid Sudirman Center (VO)"
+          "Sahid Sudirman Center (VO)",
+          "Sahid Sudirman Center Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sahid Sudirman Center (Jakarta) - Virtual Office</div><div class='small'>Our virtual office packages at Sahid Sudirman Center provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-sahid-sudirman-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sahid Sudirman Center (VO), Book a tour Sahid Sudirman Center (VO), Start again",
+        "options": "Request Quotation|Request quotation Sahid Sudirman Center (VO), Book a Tour|Book a tour Sahid Sudirman Center (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Sahid Sudirman Center (VO)",
         "trainingPhrases": [
           "Request quotation Sahid Sudirman Center (VO)",
+          "Request quotation Sahid Sudirman Center Virtual Office",
           "I want a quote for Sahid Sudirman Center Virtual Office"
         ],
         "responseType": "form",
@@ -2569,6 +2679,7 @@
         "name": "Action: Book a tour Sahid Sudirman Center (VO)",
         "trainingPhrases": [
           "Book a tour Sahid Sudirman Center (VO)",
+          "Book a tour Sahid Sudirman Center Virtual Office",
           "Schedule a tour Sahid Sudirman Center Virtual Office"
         ],
         "responseType": "form",
@@ -2579,17 +2690,19 @@
       {
         "name": "VO Centre: Axa Tower",
         "trainingPhrases": [
-          "Axa Tower (VO)"
+          "Axa Tower (VO)",
+          "Axa Tower Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axa Tower (Jakarta) - Virtual Office</div><div class='small'>Our virtual office packages at Axa Tower provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-axa/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axa Tower (VO), Book a tour Axa Tower (VO), Start again",
+        "options": "Request Quotation|Request quotation Axa Tower (VO), Book a Tour|Book a tour Axa Tower (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Axa Tower (VO)",
         "trainingPhrases": [
           "Request quotation Axa Tower (VO)",
+          "Request quotation Axa Tower Virtual Office",
           "I want a quote for Axa Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2601,6 +2714,7 @@
         "name": "Action: Book a tour Axa Tower (VO)",
         "trainingPhrases": [
           "Book a tour Axa Tower (VO)",
+          "Book a tour Axa Tower Virtual Office",
           "Schedule a tour Axa Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2611,17 +2725,19 @@
       {
         "name": "VO Centre: Indonesia Stock Exchange Tower 2",
         "trainingPhrases": [
-          "Indonesia Stock Exchange Tower 2 (VO)"
+          "Indonesia Stock Exchange Tower 2 (VO)",
+          "Indonesia Stock Exchange Tower 2 Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Indonesia Stock Exchange Tower 2 (Jakarta) - Virtual Office</div><div class='small'>Our virtual office packages at Indonesia Stock Exchange Tower 2 provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-stock-exchange/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Indonesia Stock Exchange Tower 2 (VO), Book a tour Indonesia Stock Exchange Tower 2 (VO), Start again",
+        "options": "Request Quotation|Request quotation Indonesia Stock Exchange Tower 2 (VO), Book a Tour|Book a tour Indonesia Stock Exchange Tower 2 (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Indonesia Stock Exchange Tower 2 (VO)",
         "trainingPhrases": [
           "Request quotation Indonesia Stock Exchange Tower 2 (VO)",
+          "Request quotation Indonesia Stock Exchange Tower 2 Virtual Office",
           "I want a quote for Indonesia Stock Exchange Tower 2 Virtual Office"
         ],
         "responseType": "form",
@@ -2633,6 +2749,7 @@
         "name": "Action: Book a tour Indonesia Stock Exchange Tower 2 (VO)",
         "trainingPhrases": [
           "Book a tour Indonesia Stock Exchange Tower 2 (VO)",
+          "Book a tour Indonesia Stock Exchange Tower 2 Virtual Office",
           "Schedule a tour Indonesia Stock Exchange Tower 2 Virtual Office"
         ],
         "responseType": "form",
@@ -2643,17 +2760,19 @@
       {
         "name": "VO Centre: One Pacific Place",
         "trainingPhrases": [
-          "One Pacific Place (VO)"
+          "One Pacific Place (VO)",
+          "One Pacific Place Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>One Pacific Place (Jakarta) - Virtual Office</div><div class='small'>Our virtual office packages at One Pacific Place provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-one-pacific-place/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation One Pacific Place (VO), Book a tour One Pacific Place (VO), Start again",
+        "options": "Request Quotation|Request quotation One Pacific Place (VO), Book a Tour|Book a tour One Pacific Place (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation One Pacific Place (VO)",
         "trainingPhrases": [
           "Request quotation One Pacific Place (VO)",
+          "Request quotation One Pacific Place Virtual Office",
           "I want a quote for One Pacific Place Virtual Office"
         ],
         "responseType": "form",
@@ -2665,6 +2784,7 @@
         "name": "Action: Book a tour One Pacific Place (VO)",
         "trainingPhrases": [
           "Book a tour One Pacific Place (VO)",
+          "Book a tour One Pacific Place Virtual Office",
           "Schedule a tour One Pacific Place Virtual Office"
         ],
         "responseType": "form",
@@ -2681,23 +2801,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Singapore. Please choose a centre.",
-        "options": "Centennial Tower (VO)",
+        "options": "Centennial Tower|Centennial Tower Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Centennial Tower",
         "trainingPhrases": [
-          "Centennial Tower (VO)"
+          "Centennial Tower (VO)",
+          "Centennial Tower Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Centennial Tower (Singapore) - Virtual Office</div><div class='small'>Our virtual office packages at Centennial Tower provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/centennial-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Centennial Tower (VO), Book a tour Centennial Tower (VO), Start again",
+        "options": "Request Quotation|Request quotation Centennial Tower (VO), Book a Tour|Book a tour Centennial Tower (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Centennial Tower (VO)",
         "trainingPhrases": [
           "Request quotation Centennial Tower (VO)",
+          "Request quotation Centennial Tower Virtual Office",
           "I want a quote for Centennial Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2709,6 +2831,7 @@
         "name": "Action: Book a tour Centennial Tower (VO)",
         "trainingPhrases": [
           "Book a tour Centennial Tower (VO)",
+          "Book a tour Centennial Tower Virtual Office",
           "Schedule a tour Centennial Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2725,23 +2848,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Seoul. Please choose a centre.",
-        "options": "Kyobo Building (VO), Parnas Tower (VO)",
+        "options": "Kyobo|Kyobo Building Virtual Office, Parnas Tower|Parnas Tower Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Kyobo Building",
         "trainingPhrases": [
-          "Kyobo Building (VO)"
+          "Kyobo Building (VO)",
+          "Kyobo Building Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Kyobo Building (Seoul) - Virtual Office</div><div class='small'>Our virtual office packages at Kyobo Building provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-kyobo-building/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Kyobo Building (VO), Book a tour Kyobo Building (VO), Start again",
+        "options": "Request Quotation|Request quotation Kyobo Building (VO), Book a Tour|Book a tour Kyobo Building (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Kyobo Building (VO)",
         "trainingPhrases": [
           "Request quotation Kyobo Building (VO)",
+          "Request quotation Kyobo Building Virtual Office",
           "I want a quote for Kyobo Building Virtual Office"
         ],
         "responseType": "form",
@@ -2753,6 +2878,7 @@
         "name": "Action: Book a tour Kyobo Building (VO)",
         "trainingPhrases": [
           "Book a tour Kyobo Building (VO)",
+          "Book a tour Kyobo Building Virtual Office",
           "Schedule a tour Kyobo Building Virtual Office"
         ],
         "responseType": "form",
@@ -2763,17 +2889,19 @@
       {
         "name": "VO Centre: Parnas Tower",
         "trainingPhrases": [
-          "Parnas Tower (VO)"
+          "Parnas Tower (VO)",
+          "Parnas Tower Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Parnas Tower (Seoul) - Virtual Office</div><div class='small'>Our virtual office packages at Parnas Tower provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-gangnam-parnas-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Parnas Tower (VO), Book a tour Parnas Tower (VO), Start again",
+        "options": "Request Quotation|Request quotation Parnas Tower (VO), Book a Tour|Book a tour Parnas Tower (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Parnas Tower (VO)",
         "trainingPhrases": [
           "Request quotation Parnas Tower (VO)",
+          "Request quotation Parnas Tower Virtual Office",
           "I want a quote for Parnas Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2785,6 +2913,7 @@
         "name": "Action: Book a tour Parnas Tower (VO)",
         "trainingPhrases": [
           "Book a tour Parnas Tower (VO)",
+          "Book a tour Parnas Tower Virtual Office",
           "Schedule a tour Parnas Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2801,23 +2930,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Bangkok. Please choose a centre.",
-        "options": "Athenee Tower (VO)",
+        "options": "Athenee Tower|Athenee Tower Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Athenee Tower",
         "trainingPhrases": [
-          "Athenee Tower (VO)"
+          "Athenee Tower (VO)",
+          "Athenee Tower Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Athenee Tower (Bangkok) - Virtual Office</div><div class='small'>Our virtual office packages at Athenee Tower provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/bangkok-athenee-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Athenee Tower (VO), Book a tour Athenee Tower (VO), Start again",
+        "options": "Request Quotation|Request quotation Athenee Tower (VO), Book a Tour|Book a tour Athenee Tower (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Athenee Tower (VO)",
         "trainingPhrases": [
           "Request quotation Athenee Tower (VO)",
+          "Request quotation Athenee Tower Virtual Office",
           "I want a quote for Athenee Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2829,6 +2960,7 @@
         "name": "Action: Book a tour Athenee Tower (VO)",
         "trainingPhrases": [
           "Book a tour Athenee Tower (VO)",
+          "Book a tour Athenee Tower Virtual Office",
           "Schedule a tour Athenee Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2845,23 +2977,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Hanoi. Please choose a centre.",
-        "options": "Hanoi Lotte Center (VO)",
+        "options": "Hanoi Lotte Center|Hanoi Lotte Center Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Hanoi Lotte Center",
         "trainingPhrases": [
-          "Hanoi Lotte Center (VO)"
+          "Hanoi Lotte Center (VO)",
+          "Hanoi Lotte Center Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hanoi Lotte Center (Hanoi) - Virtual Office</div><div class='small'>Our virtual office packages at Hanoi Lotte Center provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hanoi-lotte-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hanoi Lotte Center (VO), Book a tour Hanoi Lotte Center (VO), Start again",
+        "options": "Request Quotation|Request quotation Hanoi Lotte Center (VO), Book a Tour|Book a tour Hanoi Lotte Center (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Hanoi Lotte Center (VO)",
         "trainingPhrases": [
           "Request quotation Hanoi Lotte Center (VO)",
+          "Request quotation Hanoi Lotte Center Virtual Office",
           "I want a quote for Hanoi Lotte Center Virtual Office"
         ],
         "responseType": "form",
@@ -2873,6 +3007,7 @@
         "name": "Action: Book a tour Hanoi Lotte Center (VO)",
         "trainingPhrases": [
           "Book a tour Hanoi Lotte Center (VO)",
+          "Book a tour Hanoi Lotte Center Virtual Office",
           "Schedule a tour Hanoi Lotte Center Virtual Office"
         ],
         "responseType": "form",
@@ -2889,23 +3024,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Virtual Office locations in Ho Chi Minh City. Please choose a centre.",
-        "options": "Vietcombank Tower (VO)",
+        "options": "Vietcombank Tower|Vietcombank Tower Virtual Office",
         "metadata": {}
       },
       {
         "name": "VO Centre: Vietcombank Tower",
         "trainingPhrases": [
-          "Vietcombank Tower (VO)"
+          "Vietcombank Tower (VO)",
+          "Vietcombank Tower Virtual Office"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Vietcombank Tower (Ho Chi Minh City) - Virtual Office</div><div class='small'>Our virtual office packages at Vietcombank Tower provide a prestigious business address, professional call handling, and mail management services, with optional access to meeting rooms and co-working spaces.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Vietcombank Tower (VO), Book a tour Vietcombank Tower (VO), Start again",
+        "options": "Request Quotation|Request quotation Vietcombank Tower (VO), Book a Tour|Book a tour Vietcombank Tower (VO), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Vietcombank Tower (VO)",
         "trainingPhrases": [
           "Request quotation Vietcombank Tower (VO)",
+          "Request quotation Vietcombank Tower Virtual Office",
           "I want a quote for Vietcombank Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2917,6 +3054,7 @@
         "name": "Action: Book a tour Vietcombank Tower (VO)",
         "trainingPhrases": [
           "Book a tour Vietcombank Tower (VO)",
+          "Book a tour Vietcombank Tower Virtual Office",
           "Schedule a tour Vietcombank Tower Virtual Office"
         ],
         "responseType": "form",
@@ -2933,23 +3071,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Kuala Lumpur. Please choose a centre.",
-        "options": "Axiata Tower (DW), Q Sentral (DW), Manara Maxis 36 (DW), Manara Maxis 26 (DW)",
+        "options": "Axiata Tower|Axiata Tower Dedicated Workstation, Q Sentral|Q Sentral Dedicated Workstation, Manara Maxis 36|Manara Maxis 36 Dedicated Workstation, Manara Maxis 26|Manara Maxis 26 Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Axiata Tower",
         "trainingPhrases": [
-          "Axiata Tower (DW)"
+          "Axiata Tower (DW)",
+          "Axiata Tower Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axiata Tower (Kuala Lumpur) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Axiata Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-axiata-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axiata Tower (DW), Book a tour Axiata Tower (DW), Start again",
+        "options": "Request Quotation|Request quotation Axiata Tower (DW), Book a Tour|Book a tour Axiata Tower (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Axiata Tower (DW)",
         "trainingPhrases": [
           "Request quotation Axiata Tower (DW)",
+          "Request quotation Axiata Tower Dedicated Workstation",
           "I want a quote for Axiata Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -2961,6 +3101,7 @@
         "name": "Action: Book a tour Axiata Tower (DW)",
         "trainingPhrases": [
           "Book a tour Axiata Tower (DW)",
+          "Book a tour Axiata Tower Dedicated Workstation",
           "Schedule a tour Axiata Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -2971,17 +3112,19 @@
       {
         "name": "DW Centre: Q Sentral",
         "trainingPhrases": [
-          "Q Sentral (DW)"
+          "Q Sentral (DW)",
+          "Q Sentral Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Q Sentral (Kuala Lumpur) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Q Sentral give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-q-sentral/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Q Sentral (DW), Book a tour Q Sentral (DW), Start again",
+        "options": "Request Quotation|Request quotation Q Sentral (DW), Book a Tour|Book a tour Q Sentral (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Q Sentral (DW)",
         "trainingPhrases": [
           "Request quotation Q Sentral (DW)",
+          "Request quotation Q Sentral Dedicated Workstation",
           "I want a quote for Q Sentral Dedicated Workstation"
         ],
         "responseType": "form",
@@ -2993,6 +3136,7 @@
         "name": "Action: Book a tour Q Sentral (DW)",
         "trainingPhrases": [
           "Book a tour Q Sentral (DW)",
+          "Book a tour Q Sentral Dedicated Workstation",
           "Schedule a tour Q Sentral Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3003,17 +3147,19 @@
       {
         "name": "DW Centre: Manara Maxis 36",
         "trainingPhrases": [
-          "Manara Maxis 36 (DW)"
+          "Manara Maxis 36 (DW)",
+          "Manara Maxis 36 Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 36 (Kuala Lumpur) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Manara Maxis 36 give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-36th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 36 (DW), Book a tour Manara Maxis 36 (DW), Start again",
+        "options": "Request Quotation|Request quotation Manara Maxis 36 (DW), Book a Tour|Book a tour Manara Maxis 36 (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Manara Maxis 36 (DW)",
         "trainingPhrases": [
           "Request quotation Manara Maxis 36 (DW)",
+          "Request quotation Manara Maxis 36 Dedicated Workstation",
           "I want a quote for Manara Maxis 36 Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3025,6 +3171,7 @@
         "name": "Action: Book a tour Manara Maxis 36 (DW)",
         "trainingPhrases": [
           "Book a tour Manara Maxis 36 (DW)",
+          "Book a tour Manara Maxis 36 Dedicated Workstation",
           "Schedule a tour Manara Maxis 36 Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3035,17 +3182,19 @@
       {
         "name": "DW Centre: Manara Maxis 26",
         "trainingPhrases": [
-          "Manara Maxis 26 (DW)"
+          "Manara Maxis 26 (DW)",
+          "Manara Maxis 26 Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Manara Maxis 26 (Kuala Lumpur) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Manara Maxis 26 give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/kuala-lumpur-maxis-26th/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Manara Maxis 26 (DW), Book a tour Manara Maxis 26 (DW), Start again",
+        "options": "Request Quotation|Request quotation Manara Maxis 26 (DW), Book a Tour|Book a tour Manara Maxis 26 (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Manara Maxis 26 (DW)",
         "trainingPhrases": [
           "Request quotation Manara Maxis 26 (DW)",
+          "Request quotation Manara Maxis 26 Dedicated Workstation",
           "I want a quote for Manara Maxis 26 Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3057,6 +3206,7 @@
         "name": "Action: Book a tour Manara Maxis 26 (DW)",
         "trainingPhrases": [
           "Book a tour Manara Maxis 26 (DW)",
+          "Book a tour Manara Maxis 26 Dedicated Workstation",
           "Schedule a tour Manara Maxis 26 Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3073,23 +3223,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Hong Kong. Please choose a centre.",
-        "options": "Chinachem Tower (DW), K11 Atelier Victoria Dockside (DW)",
+        "options": "Chinachem Tower|Chinachem Tower Dedicated Workstation, K11 Atelier Victoria Dockside|K11 Atelier Victoria Dockside Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Chinachem Tower",
         "trainingPhrases": [
-          "Chinachem Tower (DW)"
+          "Chinachem Tower (DW)",
+          "Chinachem Tower Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Chinachem Tower (Hong Kong) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Chinachem Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/chinachem-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Chinachem Tower (DW), Book a tour Chinachem Tower (DW), Start again",
+        "options": "Request Quotation|Request quotation Chinachem Tower (DW), Book a Tour|Book a tour Chinachem Tower (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Chinachem Tower (DW)",
         "trainingPhrases": [
           "Request quotation Chinachem Tower (DW)",
+          "Request quotation Chinachem Tower Dedicated Workstation",
           "I want a quote for Chinachem Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3101,6 +3253,7 @@
         "name": "Action: Book a tour Chinachem Tower (DW)",
         "trainingPhrases": [
           "Book a tour Chinachem Tower (DW)",
+          "Book a tour Chinachem Tower Dedicated Workstation",
           "Schedule a tour Chinachem Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3111,17 +3264,19 @@
       {
         "name": "DW Centre: K11 Atelier Victoria Dockside",
         "trainingPhrases": [
-          "K11 Atelier Victoria Dockside (DW)"
+          "K11 Atelier Victoria Dockside (DW)",
+          "K11 Atelier Victoria Dockside Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>K11 Atelier Victoria Dockside (Hong Kong) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at K11 Atelier Victoria Dockside give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hongkong-k11-atelier/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation K11 Atelier Victoria Dockside (DW), Book a tour K11 Atelier Victoria Dockside (DW), Start again",
+        "options": "Request Quotation|Request quotation K11 Atelier Victoria Dockside (DW), Book a Tour|Book a tour K11 Atelier Victoria Dockside (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation K11 Atelier Victoria Dockside (DW)",
         "trainingPhrases": [
           "Request quotation K11 Atelier Victoria Dockside (DW)",
+          "Request quotation K11 Atelier Victoria Dockside Dedicated Workstation",
           "I want a quote for K11 Atelier Victoria Dockside Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3133,6 +3288,7 @@
         "name": "Action: Book a tour K11 Atelier Victoria Dockside (DW)",
         "trainingPhrases": [
           "Book a tour K11 Atelier Victoria Dockside (DW)",
+          "Book a tour K11 Atelier Victoria Dockside Dedicated Workstation",
           "Schedule a tour K11 Atelier Victoria Dockside Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3149,23 +3305,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Beijing. Please choose a centre.",
-        "options": "Sunshine Financial Center (DW), The Exchange Twin Towers (DW)",
+        "options": "Sunshine Financial Center|Sunshine Financial Center Dedicated Workstation, The Exchange Twin Towers|The Exchange Twin Towers Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Sunshine Financial Center",
         "trainingPhrases": [
-          "Sunshine Financial Center (DW)"
+          "Sunshine Financial Center (DW)",
+          "Sunshine Financial Center Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sunshine Financial Center (Beijing) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Sunshine Financial Center give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/sunshine-financial-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sunshine Financial Center (DW), Book a tour Sunshine Financial Center (DW), Start again",
+        "options": "Request Quotation|Request quotation Sunshine Financial Center (DW), Book a Tour|Book a tour Sunshine Financial Center (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Sunshine Financial Center (DW)",
         "trainingPhrases": [
           "Request quotation Sunshine Financial Center (DW)",
+          "Request quotation Sunshine Financial Center Dedicated Workstation",
           "I want a quote for Sunshine Financial Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3177,6 +3335,7 @@
         "name": "Action: Book a tour Sunshine Financial Center (DW)",
         "trainingPhrases": [
           "Book a tour Sunshine Financial Center (DW)",
+          "Book a tour Sunshine Financial Center Dedicated Workstation",
           "Schedule a tour Sunshine Financial Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3187,17 +3346,19 @@
       {
         "name": "DW Centre: The Exchange Twin Towers",
         "trainingPhrases": [
-          "The Exchange Twin Towers (DW)"
+          "The Exchange Twin Towers (DW)",
+          "The Exchange Twin Towers Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>The Exchange Twin Towers (Beijing) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at The Exchange Twin Towers give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/beijing-the-exchange-twin-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation The Exchange Twin Towers (DW), Book a tour The Exchange Twin Towers (DW), Start again",
+        "options": "Request Quotation|Request quotation The Exchange Twin Towers (DW), Book a Tour|Book a tour The Exchange Twin Towers (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation The Exchange Twin Towers (DW)",
         "trainingPhrases": [
           "Request quotation The Exchange Twin Towers (DW)",
+          "Request quotation The Exchange Twin Towers Dedicated Workstation",
           "I want a quote for The Exchange Twin Towers Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3209,6 +3370,7 @@
         "name": "Action: Book a tour The Exchange Twin Towers (DW)",
         "trainingPhrases": [
           "Book a tour The Exchange Twin Towers (DW)",
+          "Book a tour The Exchange Twin Towers Dedicated Workstation",
           "Schedule a tour The Exchange Twin Towers Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3225,23 +3387,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Shanghai. Please choose a centre.",
-        "options": "Lujiazui Finance Plaza (DW), Shanghai World Financial Center (DW), Hong Kong New World Tower (K11) (DW)",
+        "options": "Lujiazui Finance Plaza|Lujiazui Finance Plaza Dedicated Workstation, Shanghai World Financial Center|Shanghai World Financial Center Dedicated Workstation, Hong Kong New World Tower (K11)|Hong Kong New World Tower (K11) Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Lujiazui Finance Plaza",
         "trainingPhrases": [
-          "Lujiazui Finance Plaza (DW)"
+          "Lujiazui Finance Plaza (DW)",
+          "Lujiazui Finance Plaza Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lujiazui Finance Plaza (Shanghai) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Lujiazui Finance Plaza give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/lujiazui-financial-plaza/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lujiazui Finance Plaza (DW), Book a tour Lujiazui Finance Plaza (DW), Start again",
+        "options": "Request Quotation|Request quotation Lujiazui Finance Plaza (DW), Book a Tour|Book a tour Lujiazui Finance Plaza (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Lujiazui Finance Plaza (DW)",
         "trainingPhrases": [
           "Request quotation Lujiazui Finance Plaza (DW)",
+          "Request quotation Lujiazui Finance Plaza Dedicated Workstation",
           "I want a quote for Lujiazui Finance Plaza Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3253,6 +3417,7 @@
         "name": "Action: Book a tour Lujiazui Finance Plaza (DW)",
         "trainingPhrases": [
           "Book a tour Lujiazui Finance Plaza (DW)",
+          "Book a tour Lujiazui Finance Plaza Dedicated Workstation",
           "Schedule a tour Lujiazui Finance Plaza Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3263,17 +3428,19 @@
       {
         "name": "DW Centre: Shanghai World Financial Center",
         "trainingPhrases": [
-          "Shanghai World Financial Center (DW)"
+          "Shanghai World Financial Center (DW)",
+          "Shanghai World Financial Center Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Shanghai World Financial Center (Shanghai) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Shanghai World Financial Center give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-world-financial-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Shanghai World Financial Center (DW), Book a tour Shanghai World Financial Center (DW), Start again",
+        "options": "Request Quotation|Request quotation Shanghai World Financial Center (DW), Book a Tour|Book a tour Shanghai World Financial Center (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Shanghai World Financial Center (DW)",
         "trainingPhrases": [
           "Request quotation Shanghai World Financial Center (DW)",
+          "Request quotation Shanghai World Financial Center Dedicated Workstation",
           "I want a quote for Shanghai World Financial Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3285,6 +3452,7 @@
         "name": "Action: Book a tour Shanghai World Financial Center (DW)",
         "trainingPhrases": [
           "Book a tour Shanghai World Financial Center (DW)",
+          "Book a tour Shanghai World Financial Center Dedicated Workstation",
           "Schedule a tour Shanghai World Financial Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3295,17 +3463,19 @@
       {
         "name": "DW Centre: Hong Kong New World Tower (K11)",
         "trainingPhrases": [
-          "Hong Kong New World Tower (K11) (DW)"
+          "Hong Kong New World Tower (K11) (DW)",
+          "Hong Kong New World Tower (K11) Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hong Kong New World Tower (K11) (Shanghai) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Hong Kong New World Tower (K11) give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/shanghai-puxi-hong-kong-new-world-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hong Kong New World Tower (K11) (DW), Book a tour Hong Kong New World Tower (K11) (DW), Start again",
+        "options": "Request Quotation|Request quotation Hong Kong New World Tower (K11) (DW), Book a Tour|Book a tour Hong Kong New World Tower (K11) (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Hong Kong New World Tower (K11) (DW)",
         "trainingPhrases": [
           "Request quotation Hong Kong New World Tower (K11) (DW)",
+          "Request quotation Hong Kong New World Tower (K11) Dedicated Workstation",
           "I want a quote for Hong Kong New World Tower (K11) Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3317,6 +3487,7 @@
         "name": "Action: Book a tour Hong Kong New World Tower (K11) (DW)",
         "trainingPhrases": [
           "Book a tour Hong Kong New World Tower (K11) (DW)",
+          "Book a tour Hong Kong New World Tower (K11) Dedicated Workstation",
           "Schedule a tour Hong Kong New World Tower (K11) Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3333,23 +3504,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Hangzhou. Please choose a centre.",
-        "options": "Ping An Finance Center (DW)",
+        "options": "Ping An Finance Center|Ping An Finance Center Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Ping An Finance Center",
         "trainingPhrases": [
-          "Ping An Finance Center (DW)"
+          "Ping An Finance Center (DW)",
+          "Ping An Finance Center Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Ping An Finance Center (Hangzhou) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Ping An Finance Center give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ping-an-finance-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Ping An Finance Center (DW), Book a tour Ping An Finance Center (DW), Start again",
+        "options": "Request Quotation|Request quotation Ping An Finance Center (DW), Book a Tour|Book a tour Ping An Finance Center (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Ping An Finance Center (DW)",
         "trainingPhrases": [
           "Request quotation Ping An Finance Center (DW)",
+          "Request quotation Ping An Finance Center Dedicated Workstation",
           "I want a quote for Ping An Finance Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3361,6 +3534,7 @@
         "name": "Action: Book a tour Ping An Finance Center (DW)",
         "trainingPhrases": [
           "Book a tour Ping An Finance Center (DW)",
+          "Book a tour Ping An Finance Center Dedicated Workstation",
           "Schedule a tour Ping An Finance Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3377,23 +3551,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Manila. Please choose a centre.",
-        "options": "Lkg Tower (DW)",
+        "options": "Lkg Tower|Lkg Tower Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Lkg Tower",
         "trainingPhrases": [
-          "Lkg Tower (DW)"
+          "Lkg Tower (DW)",
+          "Lkg Tower Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Lkg Tower (Manila) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Lkg Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/office-space-for-rent-manila/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Lkg Tower (DW), Book a tour Lkg Tower (DW), Start again",
+        "options": "Request Quotation|Request quotation Lkg Tower (DW), Book a Tour|Book a tour Lkg Tower (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Lkg Tower (DW)",
         "trainingPhrases": [
           "Request quotation Lkg Tower (DW)",
+          "Request quotation Lkg Tower Dedicated Workstation",
           "I want a quote for Lkg Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3405,6 +3581,7 @@
         "name": "Action: Book a tour Lkg Tower (DW)",
         "trainingPhrases": [
           "Book a tour Lkg Tower (DW)",
+          "Book a tour Lkg Tower Dedicated Workstation",
           "Schedule a tour Lkg Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3421,23 +3598,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Jakarta. Please choose a centre.",
-        "options": "Sahid Sudirman Center (DW), Axa Tower (DW), Indonesia Stock Exchange Tower 2 (DW), One Pacific Place (DW)",
+        "options": "Sahid Sudirman Center|Sahid Sudirman Center Dedicated Workstation, Axa Tower|Axa Tower Dedicated Workstation, Indonesia Stock Exchange Tower 2|Indonesia Stock Exchange Tower 2 Dedicated Workstation, One Pacific Place|One Pacific Place Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Sahid Sudirman Center",
         "trainingPhrases": [
-          "Sahid Sudirman Center (DW)"
+          "Sahid Sudirman Center (DW)",
+          "Sahid Sudirman Center Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Sahid Sudirman Center (Jakarta) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Sahid Sudirman Center give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-sahid-sudirman-centre/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Sahid Sudirman Center (DW), Book a tour Sahid Sudirman Center (DW), Start again",
+        "options": "Request Quotation|Request quotation Sahid Sudirman Center (DW), Book a Tour|Book a tour Sahid Sudirman Center (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Sahid Sudirman Center (DW)",
         "trainingPhrases": [
           "Request quotation Sahid Sudirman Center (DW)",
+          "Request quotation Sahid Sudirman Center Dedicated Workstation",
           "I want a quote for Sahid Sudirman Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3449,6 +3628,7 @@
         "name": "Action: Book a tour Sahid Sudirman Center (DW)",
         "trainingPhrases": [
           "Book a tour Sahid Sudirman Center (DW)",
+          "Book a tour Sahid Sudirman Center Dedicated Workstation",
           "Schedule a tour Sahid Sudirman Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3459,17 +3639,19 @@
       {
         "name": "DW Centre: Axa Tower",
         "trainingPhrases": [
-          "Axa Tower (DW)"
+          "Axa Tower (DW)",
+          "Axa Tower Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Axa Tower (Jakarta) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Axa Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-axa/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Axa Tower (DW), Book a tour Axa Tower (DW), Start again",
+        "options": "Request Quotation|Request quotation Axa Tower (DW), Book a Tour|Book a tour Axa Tower (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Axa Tower (DW)",
         "trainingPhrases": [
           "Request quotation Axa Tower (DW)",
+          "Request quotation Axa Tower Dedicated Workstation",
           "I want a quote for Axa Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3481,6 +3663,7 @@
         "name": "Action: Book a tour Axa Tower (DW)",
         "trainingPhrases": [
           "Book a tour Axa Tower (DW)",
+          "Book a tour Axa Tower Dedicated Workstation",
           "Schedule a tour Axa Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3491,17 +3674,19 @@
       {
         "name": "DW Centre: Indonesia Stock Exchange Tower 2",
         "trainingPhrases": [
-          "Indonesia Stock Exchange Tower 2 (DW)"
+          "Indonesia Stock Exchange Tower 2 (DW)",
+          "Indonesia Stock Exchange Tower 2 Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Indonesia Stock Exchange Tower 2 (Jakarta) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Indonesia Stock Exchange Tower 2 give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-stock-exchange/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Indonesia Stock Exchange Tower 2 (DW), Book a tour Indonesia Stock Exchange Tower 2 (DW), Start again",
+        "options": "Request Quotation|Request quotation Indonesia Stock Exchange Tower 2 (DW), Book a Tour|Book a tour Indonesia Stock Exchange Tower 2 (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Indonesia Stock Exchange Tower 2 (DW)",
         "trainingPhrases": [
           "Request quotation Indonesia Stock Exchange Tower 2 (DW)",
+          "Request quotation Indonesia Stock Exchange Tower 2 Dedicated Workstation",
           "I want a quote for Indonesia Stock Exchange Tower 2 Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3513,6 +3698,7 @@
         "name": "Action: Book a tour Indonesia Stock Exchange Tower 2 (DW)",
         "trainingPhrases": [
           "Book a tour Indonesia Stock Exchange Tower 2 (DW)",
+          "Book a tour Indonesia Stock Exchange Tower 2 Dedicated Workstation",
           "Schedule a tour Indonesia Stock Exchange Tower 2 Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3523,17 +3709,19 @@
       {
         "name": "DW Centre: One Pacific Place",
         "trainingPhrases": [
-          "One Pacific Place (DW)"
+          "One Pacific Place (DW)",
+          "One Pacific Place Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>One Pacific Place (Jakarta) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at One Pacific Place give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-one-pacific-place/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation One Pacific Place (DW), Book a tour One Pacific Place (DW), Start again",
+        "options": "Request Quotation|Request quotation One Pacific Place (DW), Book a Tour|Book a tour One Pacific Place (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation One Pacific Place (DW)",
         "trainingPhrases": [
           "Request quotation One Pacific Place (DW)",
+          "Request quotation One Pacific Place Dedicated Workstation",
           "I want a quote for One Pacific Place Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3545,6 +3733,7 @@
         "name": "Action: Book a tour One Pacific Place (DW)",
         "trainingPhrases": [
           "Book a tour One Pacific Place (DW)",
+          "Book a tour One Pacific Place Dedicated Workstation",
           "Schedule a tour One Pacific Place Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3561,23 +3750,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Singapore. Please choose a centre.",
-        "options": "Centennial Tower (DW)",
+        "options": "Centennial Tower|Centennial Tower Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Centennial Tower",
         "trainingPhrases": [
-          "Centennial Tower (DW)"
+          "Centennial Tower (DW)",
+          "Centennial Tower Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Centennial Tower (Singapore) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Centennial Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/centennial-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Centennial Tower (DW), Book a tour Centennial Tower (DW), Start again",
+        "options": "Request Quotation|Request quotation Centennial Tower (DW), Book a Tour|Book a tour Centennial Tower (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Centennial Tower (DW)",
         "trainingPhrases": [
           "Request quotation Centennial Tower (DW)",
+          "Request quotation Centennial Tower Dedicated Workstation",
           "I want a quote for Centennial Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3589,6 +3780,7 @@
         "name": "Action: Book a tour Centennial Tower (DW)",
         "trainingPhrases": [
           "Book a tour Centennial Tower (DW)",
+          "Book a tour Centennial Tower Dedicated Workstation",
           "Schedule a tour Centennial Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3605,23 +3797,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Seoul. Please choose a centre.",
-        "options": "Kyobo Building (DW), Parnas Tower (DW)",
+        "options": "Kyobo|Kyobo Building Dedicated Workstation, Parnas Tower|Parnas Tower Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Kyobo Building",
         "trainingPhrases": [
-          "Kyobo Building (DW)"
+          "Kyobo Building (DW)",
+          "Kyobo Building Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Kyobo Building (Seoul) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Kyobo Building give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-kyobo-building/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Kyobo Building (DW), Book a tour Kyobo Building (DW), Start again",
+        "options": "Request Quotation|Request quotation Kyobo Building (DW), Book a Tour|Book a tour Kyobo Building (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Kyobo Building (DW)",
         "trainingPhrases": [
           "Request quotation Kyobo Building (DW)",
+          "Request quotation Kyobo Building Dedicated Workstation",
           "I want a quote for Kyobo Building Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3633,6 +3827,7 @@
         "name": "Action: Book a tour Kyobo Building (DW)",
         "trainingPhrases": [
           "Book a tour Kyobo Building (DW)",
+          "Book a tour Kyobo Building Dedicated Workstation",
           "Schedule a tour Kyobo Building Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3643,17 +3838,19 @@
       {
         "name": "DW Centre: Parnas Tower",
         "trainingPhrases": [
-          "Parnas Tower (DW)"
+          "Parnas Tower (DW)",
+          "Parnas Tower Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Parnas Tower (Seoul) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Parnas Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/seoul-gangnam-parnas-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Parnas Tower (DW), Book a tour Parnas Tower (DW), Start again",
+        "options": "Request Quotation|Request quotation Parnas Tower (DW), Book a Tour|Book a tour Parnas Tower (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Parnas Tower (DW)",
         "trainingPhrases": [
           "Request quotation Parnas Tower (DW)",
+          "Request quotation Parnas Tower Dedicated Workstation",
           "I want a quote for Parnas Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3665,6 +3862,7 @@
         "name": "Action: Book a tour Parnas Tower (DW)",
         "trainingPhrases": [
           "Book a tour Parnas Tower (DW)",
+          "Book a tour Parnas Tower Dedicated Workstation",
           "Schedule a tour Parnas Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3681,23 +3879,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Bangkok. Please choose a centre.",
-        "options": "Athenee Tower (DW)",
+        "options": "Athenee Tower|Athenee Tower Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Athenee Tower",
         "trainingPhrases": [
-          "Athenee Tower (DW)"
+          "Athenee Tower (DW)",
+          "Athenee Tower Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Athenee Tower (Bangkok) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Athenee Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/bangkok-athenee-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Athenee Tower (DW), Book a tour Athenee Tower (DW), Start again",
+        "options": "Request Quotation|Request quotation Athenee Tower (DW), Book a Tour|Book a tour Athenee Tower (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Athenee Tower (DW)",
         "trainingPhrases": [
           "Request quotation Athenee Tower (DW)",
+          "Request quotation Athenee Tower Dedicated Workstation",
           "I want a quote for Athenee Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3709,6 +3909,7 @@
         "name": "Action: Book a tour Athenee Tower (DW)",
         "trainingPhrases": [
           "Book a tour Athenee Tower (DW)",
+          "Book a tour Athenee Tower Dedicated Workstation",
           "Schedule a tour Athenee Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3725,23 +3926,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Hanoi. Please choose a centre.",
-        "options": "Hanoi Lotte Center (DW)",
+        "options": "Hanoi Lotte Center|Hanoi Lotte Center Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Hanoi Lotte Center",
         "trainingPhrases": [
-          "Hanoi Lotte Center (DW)"
+          "Hanoi Lotte Center (DW)",
+          "Hanoi Lotte Center Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Hanoi Lotte Center (Hanoi) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Hanoi Lotte Center give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/hanoi-lotte-center/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Hanoi Lotte Center (DW), Book a tour Hanoi Lotte Center (DW), Start again",
+        "options": "Request Quotation|Request quotation Hanoi Lotte Center (DW), Book a Tour|Book a tour Hanoi Lotte Center (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Hanoi Lotte Center (DW)",
         "trainingPhrases": [
           "Request quotation Hanoi Lotte Center (DW)",
+          "Request quotation Hanoi Lotte Center Dedicated Workstation",
           "I want a quote for Hanoi Lotte Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3753,6 +3956,7 @@
         "name": "Action: Book a tour Hanoi Lotte Center (DW)",
         "trainingPhrases": [
           "Book a tour Hanoi Lotte Center (DW)",
+          "Book a tour Hanoi Lotte Center Dedicated Workstation",
           "Schedule a tour Hanoi Lotte Center Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3769,23 +3973,25 @@
         ],
         "responseType": "options",
         "response": "Here are our premium Dedicated Workstation locations in Ho Chi Minh City. Please choose a centre.",
-        "options": "Vietcombank Tower (DW)",
+        "options": "Vietcombank Tower|Vietcombank Tower Dedicated Workstation",
         "metadata": {}
       },
       {
         "name": "DW Centre: Vietcombank Tower",
         "trainingPhrases": [
-          "Vietcombank Tower (DW)"
+          "Vietcombank Tower (DW)",
+          "Vietcombank Tower Dedicated Workstation"
         ],
         "responseType": "options",
         "response": "<div class='card'><div class='card-title'>Vietcombank Tower (Ho Chi Minh City) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Vietcombank Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div>",
-        "options": "Request quotation Vietcombank Tower (DW), Book a tour Vietcombank Tower (DW), Start again",
+        "options": "Request Quotation|Request quotation Vietcombank Tower (DW), Book a Tour|Book a tour Vietcombank Tower (DW), Start again",
         "metadata": {}
       },
       {
         "name": "Action: Request Quotation Vietcombank Tower (DW)",
         "trainingPhrases": [
           "Request quotation Vietcombank Tower (DW)",
+          "Request quotation Vietcombank Tower Dedicated Workstation",
           "I want a quote for Vietcombank Tower Dedicated Workstation"
         ],
         "responseType": "form",
@@ -3797,6 +4003,7 @@
         "name": "Action: Book a tour Vietcombank Tower (DW)",
         "trainingPhrases": [
           "Book a tour Vietcombank Tower (DW)",
+          "Book a tour Vietcombank Tower Dedicated Workstation",
           "Schedule a tour Vietcombank Tower Dedicated Workstation"
         ],
         "responseType": "form",

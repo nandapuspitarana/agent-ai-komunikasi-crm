@@ -202,6 +202,9 @@ export async function POST(req: NextRequest) {
       finalCustomInstructions += `\n\n[Specific Agent Instructions]\n${flowSystemPrompt}`;
     }
 
+    // Tell the LLM how to parse the UI pipe syntax if it reads it from RAG documents
+    finalCustomInstructions += `\n\n[IMPORTANT UI FORMATTING RULE]\nIf you read options or locations from your knowledge base that contain a pipe character (e.g. 'Bangkok|Bangkok Private Office'), DO NOT output the pipe or the value after it. ONLY output the friendly label before the pipe (e.g. 'Bangkok'). Never output 'Label|Value' in your response.`;
+
     // Build full prompt with context (We only need the system prompt, AI proxy handles history natively)
     const systemPrompt = buildSystemPrompt({
       tenantName: tenant.name,
@@ -305,10 +308,16 @@ export async function POST(req: NextRequest) {
       }
 
       // Re-append HTML options from QnA match if any
+      // Supports "Label|Value" format: button shows Label, but sends Value to intent matcher
       if (qnaMatch && qnaMatch.options) {
         const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
         if (opts.length > 0) {
-          aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+          aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => {
+            const pipeIdx = o.indexOf('|');
+            const label = pipeIdx !== -1 ? o.substring(0, pipeIdx).trim() : o;
+            const value = pipeIdx !== -1 ? o.substring(pipeIdx + 1).trim() : o;
+            return `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${value}'}, '*')">${label}</button>`;
+          }).join('') + `</div>`;
         }
       }
 
@@ -320,9 +329,15 @@ export async function POST(req: NextRequest) {
           aiReplyRaw += ' [HANDOFF_REQUESTED]';
         }
         if (qnaMatch.options) {
+          // Supports "Label|Value" format: button shows Label, but sends Value to intent matcher
           const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
           if (opts.length > 0) {
-            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => {
+              const pipeIdx = o.indexOf('|');
+              const label = pipeIdx !== -1 ? o.substring(0, pipeIdx).trim() : o;
+              const value = pipeIdx !== -1 ? o.substring(pipeIdx + 1).trim() : o;
+              return `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${value}'}, '*')">${label}</button>`;
+            }).join('') + `</div>`;
           }
         }
       } else {
