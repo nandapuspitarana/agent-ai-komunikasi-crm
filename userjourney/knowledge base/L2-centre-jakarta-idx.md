@@ -3,11 +3,19 @@
 ## Overview
 CEO SUITE Jakarta IDX is an active centre in Jakarta, Indonesia. Premium business centre in the Indonesia Stock Exchange district, suitable for users seeking a financial-district presence.
 
+**Deskripsi Lokasi:**
+A household name, the Indonesia Stock Exchange, or IDX Building, has maintained an unparalleled reputation among multinational companies over the years. Located in a prime location in Jakarta’s central business district, CEO SUITE’s business center is just moments away from an assortment of fusion and Asian restaurants, international banks, a fitness center and medical facilities.
+
 Controlled centre identity:
 - Country: Indonesia
 - City: Jakarta
 - Centre: Jakarta IDX
 - Address: Controlled address not yet captured in this file.
+- Telepon: +62 (21) 515 7777
+- WhatsApp: +62 8111 50 857
+- Email: sales@ceosuite.com
+- Latitude: -6.22402
+- Longitude: 106.80867
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +35,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

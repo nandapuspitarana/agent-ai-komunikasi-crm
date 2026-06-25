@@ -3,11 +3,24 @@
 ## Overview
 CEO SUITE K11 Atelier Victoria Dockside is an active centre in Hong Kong, Hong Kong. Hong Kong business centre in Tsim Sha Tsui, suitable for users asking for Kowloon, Tsim Sha Tsui or Victoria Dockside.
 
+**Deskripsi Lokasi:**
+Coworking Space & Serviced Office - TST HONG KONG
+CEO SUITE Hong Kong provides serviced office, coworking space and virtual office for entrepreneurs, designers, inventors, technologists, engineers, finance professionals and more.
+ 
+Centrally located in Tsim Sha Tsui, CEO SUITE boasts superb waterfront views of the iconic Victoria Harbour. Our serviced office is proudly housed inside K11 ATELIER: a brand-new 66-storey, 7-star hotel, serviced residence and mixed-use commercial office tower. A revolutionary museum retail concept has been designed to blend elements of Art, People and Nature. The Hong Kong Art Museum, the Garden of Stars and A Symphony of Lights adjoins this new Hong Kong landmark with direct subway access.
+
+CEO SUITE will give your company a prestigious identity and access to a variety of necessary amenities and an excellent support team - whatever you are working on, our team will provide unbeatable customer service.
+
 Controlled centre identity:
 - Country: Hong Kong
 - City: Hong Kong
 - Centre: K11 Atelier Victoria Dockside
 - Address: Level 7, 18 Salisbury Road, Tsim Sha Tsui
+- Telepon: +852 3166 6166
+- WhatsApp: +852 6086 6673
+- Email: sales@hk.ceosuite.com
+- Latitude: 22.29492
+- Longitude: 114.17577
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +40,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

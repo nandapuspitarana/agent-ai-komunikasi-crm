@@ -3,11 +3,20 @@
 ## Overview
 CEO SUITE Menara Maxis (26th Floor) is an active centre in Kuala Lumpur, Malaysia. Kuala Lumpur business centre in KLCC, suitable for users asking for KLCC or Menara Maxis.
 
+**Deskripsi Lokasi:**
+Gagasan perusahaan AS yang memenangkan penghargaan Kevin Roche, John Oinkeloo & Associates, Menara Maxis menggabungkan telekomunikasi canggih dan infrastruktur TI dengan estetika desain modern. Kekuatan ini sangat ideal untuk bisnis yang ingin melontarkan diri ke posisi strategis yang sangat baik di jantung distrik bisnis Kuala Lumpur. 
+
+Mal dan pusat konvensi terbesar di ibukota, Malaysian Philharmonic Orchestra Hall dan Petronas Science Centre, semuanya mudah dijangkau. Menempati lantai 26 dan 36, CEO SUITE menyediakan layanannya di dua lokasi di dalam menara.
+
 Controlled centre identity:
 - Country: Malaysia
 - City: Kuala Lumpur
 - Centre: Menara Maxis (26th Floor)
 - Address: 26th Floor, KLCC, Kuala Lumpur 50088
+- Telepon: +60 (3) 2615 2688
+- Email: sales@my.ceosuite.com
+- Latitude: 3.1763239
+- Longitude: 101.6825337
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +36,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- Premium Coffee & Tea
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- High Speed Internet
+- Fresh Fruit Water
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Office Supplies
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

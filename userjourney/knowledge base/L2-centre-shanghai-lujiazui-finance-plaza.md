@@ -3,11 +3,20 @@
 ## Overview
 CEO SUITE Lujiazui Finance Plaza is an active centre in Shanghai, China. Shanghai business centre in Pudong/Lujiazui, suitable for finance and CBD-location users.
 
+**Deskripsi Lokasi:**
+Shanghai Lujiazui Finance Plaza
+Shanghai Pudong, China
+Lantai mewah dari CEO SUITE di Lantai 16 dilengkapi dengan balkon terbuka yang eksklusif. Terletak dalam area berkembang kelas dunia Lujiazui Free Trade Zone (TDZ) dan Shanghai Pilot Free-Trade Zone (PFTZ), gedung ini mencakup pusat perbelanjaan 11 lantai , kafe, restoran, pusat kebugaran dan banyak bank. Mudah dicapai dengan berjalan kaki dengan dilengkapi kemewahan hotel bintang 5 seperti Four Seasons, Shangri-La, Park Hyatt, Grand Hyatt, dan Ritz-Carlton. Sebuah taman terbuka dengan tempat duduk nyaman yang membuat tempat yang cocok untuk pertemuan yang santai, tempat untuk istirahat santai dan bahkan untuk acara publik.
+
 Controlled centre identity:
 - Country: China
 - City: Shanghai
 - Centre: Lujiazui Finance Plaza
 - Address: 18th Floor, 826 Century Avenue, Pudong, Shanghai 200120
+- Telepon: +86 (21) 2052 0666
+- Email: sales@cn.ceosuite.com
+- Latitude: 31.234564
+- Longitude: 121.507439
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +36,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

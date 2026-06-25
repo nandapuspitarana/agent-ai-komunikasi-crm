@@ -3,11 +3,27 @@
 ## Overview
 CEO SUITE Ping An Finance Center (Tower B) is an active centre in Hangzhou, China. Hangzhou business centre in Shangcheng District, suitable for users asking for Hangzhou or Jiangjin Road.
 
+**Deskripsi Lokasi:**
+OFFICE RENTAL IN HANGZHOU, CHINA
+Located  on the 7th to 9th floors of  the iconic Ping An Finance Center, in the heart of Qianjiang New City CBD, CEO SUITE Hangzhou offers the latest in premium workspace solutions - including private office suites, coworking spaces, video conferencing rooms, meeting and conference facilities, phone booths, and networking lounges - all equipped with cutting-edge IT and telecommunications systems.
+
+Spanning an impressive 6,200 square meters across three interconnected floors with internal stairways, the space is designed to promote seamless collaboration and flexibility. It also features three fully equipped server room - built to support technology companies and clients with data-intensive operational requirements.
+
+This newest location is directly connected to Yuefang Mall and is adjacent to major landmarks such as the Citizen Center, Hangzhou Grand Theatre, and the International Conference Center. Facing south, it offers a serene view of the rippling Qiantang River.
+
+The workspace includes a wide range of thoughtfully designed shared amenities such as meeting rooms, relaxation lounges, quiet zones, tea rooms, printing areas, phone booths, and comfortable breakout spaces - all crafted to create a dynamic, inspiring environment that redefines the traditional office experience.
+
+CEO SUITE also provides meeting room rentals, virtual offices, and tailored serviced office solutions for businesses of all sizes.
+
 Controlled centre identity:
 - Country: China
 - City: Hangzhou
 - Centre: Ping An Finance Center (Tower B)
 - Address: 7th-9th Floor, 159 Jiangjin Road, Shangcheng District, Hangzhou 310020
+- Telepon: +86 21 2052 0666
+- Email: sales@cn.ceosuite.com
+- Latitude: 30.251208
+- Longitude: 120.211809
 
 ## Building Profile
 - CEO SUITE Hangzhou is located on the 7th-9th floors of Tower B, Ping An Finance Center.
@@ -39,9 +55,18 @@ Controlled centre identity:
 - Guardrail: Pricing, promotions, contract terms, office size, exact inventory and start dates are dynamic; check live sales/operations data before confirming.
 
 ## Facilities
-- Confirmed in this centre file: reception, business lounge, pantry, printing, phone booth, networking lounge, meeting and conference facilities, video conferencing rooms, and advanced IT/telecommunications systems.
-- Verify any facility not listed here before promising it to a user.
-- Storage, call handling, mail handling, dedicated admin support and special facility requests may depend on the user's package and centre operations; confirm before answering.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 - Centre business hours / staffed reception: Monday-Friday, 8:30 AM-5:30 PM.

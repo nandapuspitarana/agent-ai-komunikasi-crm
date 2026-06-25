@@ -3,11 +3,20 @@
 ## Overview
 CEO SUITE Vietcombank Tower is an active centre in Ho Chi Minh City, Vietnam. Ho Chi Minh City business centre in District 1, suitable for users asking for District 1 or Vietcombank Tower.
 
+**Deskripsi Lokasi:**
+Vietcombank Tower
+HO CHI MINH CITY, VIETNAM
+Biarkan CEO SUITE menjadi gerbang Anda menuju ekonomi yang berkembang di Vietnam dan suasana pembukaan yang bersemangat dengan pusat bisnis kami di dalam Vietcombank Tower, bangunan Grade A +, dan landmark CBD terkenal. Lokasi yang mudah diakses, berbagai macam gaya hidup terdekat dan layanan yang tak tertandingi membuat CEO SUITE menonjol sebagai pusat bisnis pilihan Ho Chi Minh untuk para eksekutif dan pengusaha yang cerdas.
+
 Controlled centre identity:
 - Country: Vietnam
 - City: Ho Chi Minh City
 - Centre: Vietcombank Tower
 - Address: Level 21, 5 Me Linh Square, District 1, Ho Chi Minh City 70000
+- Telepon: +84 (28) 3827 1988
+- Email: sales@vn.ceosuite.com
+- Latitude: 10.77566
+- Longitude: 106.70553
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +36,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

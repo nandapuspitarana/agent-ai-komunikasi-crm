@@ -3,11 +3,18 @@
 ## Overview
 CEO SUITE Lotte Center (East Tower) is an active centre in Hanoi, Vietnam. Hanoi business centre in Ba Dinh District, suitable for users asking for Hanoi or Lotte Center.
 
+**Deskripsi Lokasi:**
+Built in the middle of bustling Hanoi, where the old city converges with the new, Lotte Center stands tall and proud; its vision to function as a one-stop location for the best of Hanoi, whether it be business needs or leisure. Designed and constructed using sustainable technologies by two award-winning firms, Seattle-based Callison Architecture and London-based Benoy Architects, Lotte Center has a spacious and modern layout with intelligent office spaces that foster an innovative working environment.
+
 Controlled centre identity:
 - Country: Vietnam
 - City: Hanoi
 - Centre: Lotte Center (East Tower)
 - Address: 29th Floor, 54 Lieu Giai Street, Ba Dinh District, Hanoi 100000
+- Telepon: +84 (24) 3267 3999
+- Email: sales@vn.ceosuite.com
+- Latitude: 21.03211
+- Longitude: 105.81256
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +34,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

@@ -3,11 +3,18 @@
 ## Overview
 CEO SUITE The Exchange Twin Towers is an active centre in Beijing, China. Beijing business centre in Chaoyang District, suitable for users asking for Beijing, Jianguomenwai or Chaoyang.
 
+**Deskripsi Lokasi:**
+With its world-class landscape design and high-end IT infrastructure, this major Beijing landmark is designed to meet, and exceed, the demands of the high-profile businesses inside. Some of China’s largest multinational businesses call the Twin Towers home, including The Associated Press, Cathay Pacific, Swiss Re Group and Nike Sports. With CEO SUITE comfortably housed on the 10th floor of the East Tower, it’s easy to join the roster of premier businesses.
+
 Controlled centre identity:
 - Country: China
 - City: Beijing
 - Centre: The Exchange Twin Towers
 - Address: 10th Floor, B-12 Jianguomenwai Avenue, Chaoyang District, Beijing 100022
+- Telepon: +86 (10) 5909 2988
+- Email: salesbj@cn.ceosuite.com
+- Latitude: 39.90623
+- Longitude: 116.44255
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +34,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

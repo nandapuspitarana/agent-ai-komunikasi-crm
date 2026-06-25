@@ -3,11 +3,18 @@
 ## Overview
 CEO SUITE Parnas Tower is an active centre in Seoul, South Korea. Seoul business centre in Gangnam-gu, suitable for users asking for Gangnam or Teheran-ro.
 
+**Deskripsi Lokasi:**
+Landmark terbaru di distrik Gangnam yang terkenal di Seoul, Parnas Tower adalah gedung pertama yang digunakan dengan warna campuran, ramah lingkungan (LEED Gold-certified). Ini adalah bagian dari kompleks World Trade Center / COEX yang menjadi pusat konvensi dengan ruang pameran, Grand InterContinental Parnas yang mewah, dua mal perbelanjaan yang terkenal dan beragam fasilitas untuk gaya hidup dan tujuan bisnis.
+
 Controlled centre identity:
 - Country: South Korea
 - City: Seoul
 - Centre: Parnas Tower
 - Address: 29th Floor, 521 Teheran-ro, Gangnam-gu, Seoul 06164
+- Telepon: +82 (2) 2097 8288
+- Email: sales@kr.ceosuite.com
+- Latitude: 37.5091355
+- Longitude: 127.062252
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +34,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.
