@@ -72,7 +72,23 @@ export async function POST(req: NextRequest) {
     }
 
     // Emit Socket.io events directly to widget and inbox agent dashboards
-    // Supabase Realtime handles this automatically.
+    // Supabase Realtime handles this automatically, but we add Broadcast fallback.
+    try {
+      const { supabase } = await import('@/lib/supabase-client');
+      const channel = supabase.channel(`session_${sessionId}`);
+      await channel.send({
+        type: 'broadcast',
+        event: 'new_message',
+        payload: {
+          id: newMessage.id,
+          senderType: 'agent',
+          content: content,
+          createdAt: newMessage.createdAt.toISOString()
+        }
+      });
+    } catch (err) {
+      console.error('[Broadcast] Failed to emit agent message to widget:', err);
+    }
 
     return NextResponse.json({ success: true, message: newMessage, status: updatedStatus });
   } catch (error) {

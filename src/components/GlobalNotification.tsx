@@ -117,6 +117,21 @@ export default function GlobalNotification({ tenantId }: { tenantId: string }) {
         }
       )
       .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'crm', table: 'crm_agent_ChatSession' },
+        (payload) => {
+          const data = payload.new as any;
+          if (data.tenantId === tenantId) {
+            setActiveSessions(prev => {
+              const next = new Set(prev);
+              next.add(data.id);
+              return next;
+            });
+            showNotification('Chat Baru', 'Pengunjung memulai percakapan.');
+          }
+        }
+      )
+      .on(
         'broadcast',
         { event: 'new_message' },
         (payload) => {
