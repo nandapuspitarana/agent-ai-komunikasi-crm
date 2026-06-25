@@ -123,7 +123,7 @@ export function ChatWindow({
           event: 'INSERT',
           schema: 'crm',
           table: 'crm_agent_Message',
-          filter: `sessionId=eq.${serverSessionId}`,
+          filter: `"sessionId"=eq.${serverSessionId}`,
         },
         (payload) => {
           const newMsg = payload.new as any;
@@ -131,6 +131,23 @@ export function ChatWindow({
           
           if (newMsg.senderType === 'bot') {
             // Options are usually sent in the API response, but for DB inserts we just show the message
+            addMessage(newMsg.content, 'bot');
+            setIsSending(false);
+          } else if (newMsg.senderType === 'agent') {
+            addMessage(newMsg.content, 'agent');
+          } else if (newMsg.senderType === 'system') {
+            addMessage(newMsg.content, 'system');
+          }
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'new_message' },
+        (payload) => {
+          const newMsg = payload.payload as any;
+          if (newMsg.senderType === 'user') return;
+          
+          if (newMsg.senderType === 'bot') {
             addMessage(newMsg.content, 'bot');
             setIsSending(false);
           } else if (newMsg.senderType === 'agent') {

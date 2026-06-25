@@ -3,11 +3,20 @@
 ## Overview
 CEO SUITE Shanghai World Financial Center is an active centre in Shanghai, China. Shanghai business centre in Pudong, suitable for users asking for Shanghai World Financial Center or a prestigious Pudong address.
 
+**Deskripsi Lokasi:**
+Shanghai World Financial Center
+SHANGHAI PUDONG, CHINA
+Dengan lokasi CEO SUITE terbesar di lantai 28, landmark bisnis 101 lantai ini dirancang untuk membangun kota di dalam kota. Hotel terbesar kedua di dunia, Park Hyatt Shanghai yang elegan, menawarkan pemandangan cakrawala yang luas atau Sungai Huangpu dan dilengkapi dengan dek observasi yang spektakuler, spa, pusat media, pusat perbelanjaan, dan 70 lantai yang didedikasikan untuk ruang kantor yang dilengkapi layanan penuh. Di dalam ruang kantor kami, elemen fengshui selalu digunakan untuk mengoptimalkan kesuksesan bisnis.
+
 Controlled centre identity:
 - Country: China
 - City: Shanghai
 - Centre: Shanghai World Financial Center
 - Address: 28th Floor, 100 Century Avenue, Pudong, Shanghai 200120
+- Telepon: +86 (21) 2052 0666
+- Email: sales@cn.ceosuite.com
+- Latitude: 31.2345644
+- Longitude: 121.5052507
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +36,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

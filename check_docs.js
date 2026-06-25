@@ -3,12 +3,14 @@ const prisma = new PrismaClient();
 
 async function checkDocs() {
   const docs = await prisma.knowledgeDocument.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 3
+    orderBy: { createdAt: 'desc' }
   });
   console.log(docs.map(d => ({
+    id: d.id,
+    tenantId: d.tenantId,
     metaName: d.metaName,
     status: d.status,
+    proxyDocId: d.proxyDocId,
     errorMsg: d.errorMsg
   })));
 }

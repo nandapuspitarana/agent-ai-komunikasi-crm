@@ -3,11 +3,18 @@
 ## Overview
 CEO SUITE LKG Tower is an active centre in Manila, Philippines. Manila/Makati business centre on Ayala Avenue, suitable for users asking for Makati or Ayala Avenue.
 
+**Deskripsi Lokasi:**
+Salah satu bangunan tertinggi di Makati Central Business District, LKG Tower 39 lantai yang menonjol dengan façade unik Ayala Avenue. Terletak di antara kantor-kantor yang terkenal bagus, hotel mewah dan tempat tinggal kelas atas, kantor kami untuk disewa di LKG Tower Manila menyediakan jalur akses yang berfungsi tinggi dan basis operasi untuk bisnis dan wirausaha.
+
 Controlled centre identity:
 - Country: Philippines
 - City: Manila
 - Centre: LKG Tower
 - Address: 37th Floor, 6801 Ayala Avenue, Makati City 1226
+- Telepon: +63 (2) 859 2888
+- Email: sales@ph.ceosuite.com
+- Latitude: 14.5595619
+- Longitude: 121.0180439
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +34,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

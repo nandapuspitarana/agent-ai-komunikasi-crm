@@ -3,11 +3,18 @@
 ## Overview
 CEO SUITE Athenee Tower is an active centre in Bangkok, Thailand. Bangkok business centre on Wireless Road, suitable for users asking for Bangkok, Lumpini, Pathumwan or Wireless Road.
 
+**Deskripsi Lokasi:**
+Menghadap ke langit Bangkok yang menakjubkan, dan mudah dicapai dari transportasi utama kota, Menara Athenee menggabungkan pilihan ritel dan hiburan pilihan dengan ruang kantor yang bergengsi. Dengan akses mudah ke Skytrain dan sistem jalan raya kota, bandara-bandara internasional Bangkok selalu mudah dijangkau. Dengan lokasinya yang ideal antara Sukhumvit dan Silom, Anda dan klien Anda tidak akan mendapat masalah dalam melakukan aktifitas bisnis.
+
 Controlled centre identity:
 - Country: Thailand
 - City: Bangkok
 - Centre: Athenee Tower
 - Address: 23rd Floor, 63 Wireless Road, Lumpini, Pathumwan, Bangkok 10330
+- Telepon: +66 (2) 126 8000
+- Email: sales@th.ceosuite.com
+- Latitude: 13.7410941
+- Longitude: 100.548637
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +34,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

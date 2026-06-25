@@ -3,9 +3,13 @@ import Providers from '@/components/Providers';
 import { getDictionary, Locale } from '@/lib/i18n';
 import { I18nProvider } from '@/lib/i18n/I18nContext';
 
-export const metadata = {
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
   title: 'Modern CeosuiteBOT',
   description: 'Omnichannel CRM and Flow Builder',
+  manifest: '/manifest.json',
+  themeColor: '#0ea5e9',
 };
 
 export default async function RootLayout({

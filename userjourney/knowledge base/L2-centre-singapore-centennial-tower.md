@@ -3,11 +3,27 @@
 ## Overview
 CEO SUITE Centennial Tower is an active centre in Singapore, Singapore. Premium Grade A office tower in Singapore Marina Centre, suitable for regional headquarters, multinational companies and client-facing teams.
 
+**Deskripsi Lokasi:**
+CEO SUITE’s newest location is enviably situated on the 21st level of Centennial Tower, Singapore. This luxurious business center is designed with feng-shui principles and boasts unobstructed waterfront views of Marina Bay and lush green skyline from its reception, lounge and boardroom.
+
+Centrally located in the Marina Centre zone of Singapore CBD, Centennial Tower is extremely well connected with Promenade MRT station just a stone’s throw away. Esplanade and Bugis MRT stations are also both within a one-kilometre radius.
+
+Centennial Tower is adjacent to Millenia Tower and conveniently close to Suntec City. Comprehensive amenities range from restaurants, banking services, Suntec convention centre, retail shops and shopping malls such as Millenia Walk, Suntec City Mall and Marina Square, in addition to 5-star hotels such as Conrad Centennial Singapore and Ritz Carlton. 
+
+The tower has an elliptical structure and won the Building and Constriction Authority’s ‘Best Buildable Design Award’ under the Commercial and Office Building Category.
+
+CEO SUITE also offers meeting room and  conference room rental , virtual offices and serviced office rental
+
 Controlled centre identity:
 - Country: Singapore
 - City: Singapore
 - Centre: Centennial Tower
 - Address: Controlled address not yet captured in this file.
+- Telepon: + 65 6829 7000
+- WhatsApp: +65 9182 9667
+- Email: sales@sg.ceosuite.com
+- Latitude: 1.293265
+- Longitude: 103.860142
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +43,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

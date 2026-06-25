@@ -3,11 +3,18 @@
 ## Overview
 CEO SUITE Kyobo Building is an active centre in Seoul, South Korea. Seoul business centre in Jongno-gu, suitable for users asking for Jongno or central Seoul.
 
+**Deskripsi Lokasi:**
+Dikelilingi oleh sejumlah bangunan bisnis dan terhubung ke Stasiun Gwanghwamun jalur kereta bawah tanah 1, 2, dan 5, Kyobo Building terletak di jantung salah satu distrik bisnis utama Seoul. Dirancang oleh perusahaan arsitektur terkenal, Pelli & Associates, Kyobo Building tidak hanya menonjol dalam hal lokasi tetapi juga teknologi yang dimasukkan ke dalam desain dan konstruksinya. Hasilnya adalah bangunan 23 lantai yang elah memenangkan penghargaan, ramah lingkungan, dengan langit-langit yang menyerap suara dan lantai Braille. CEO SUITE dengan bangga bertempat di lantai 15 Kyobo Building.
+
 Controlled centre identity:
 - Country: South Korea
 - City: Seoul
 - Centre: Kyobo Building
 - Address: 15th Floor, 1 Jongno, Jongno-gu, Seoul 03154
+- Telepon: +82 (2) 2010 8888
+- Email: sales@kr.ceosuite.com
+- Latitude: 37.571096
+- Longitude: 126.9777779
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +34,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

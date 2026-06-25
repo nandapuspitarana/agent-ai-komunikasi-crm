@@ -142,7 +142,40 @@ export async function POST(req: NextRequest) {
     }
 
     // Broadcast user message to agent dashboard and other listeners immediately
-    // Supabase Realtime will handle this via postgres_changes automatically.
+    // Supabase Realtime will handle this via postgres_changes automatically (if replication is enabled),
+    // but to guarantee delivery we also fire an explicit Broadcast event.
+    try {
+      const { supabase } = await import('@/lib/supabase-client');
+      const channel = supabase.channel(`global_notifications_${tenantId}`);
+      await channel.send({
+        type: 'broadcast',
+        event: 'new_message',
+        payload: {
+          id: savedUserMsg.id,
+          sessionId: currentSessionId,
+          tenantId: tenantId,
+          senderType: 'user',
+          content: message,
+          createdAt: savedUserMsg.createdAt.toISOString()
+        }
+      });
+      // Also broadcast to inbox channel for older clients
+      const inboxChannel = supabase.channel(`inbox_${tenantId}`);
+      await inboxChannel.send({
+        type: 'broadcast',
+        event: 'new_message',
+        payload: {
+          id: savedUserMsg.id,
+          sessionId: currentSessionId,
+          tenantId: tenantId,
+          senderType: 'user',
+          content: message,
+          createdAt: savedUserMsg.createdAt.toISOString()
+        }
+      });
+    } catch (err) {
+      console.error('[Broadcast] Failed to emit real-time event:', err);
+    }
 
     // === JIKA SESI SUDAH DI-HANDLE OLEH HUMAN AGENT ===
     if (chatSession.status === 'agent') {

@@ -3,11 +3,19 @@
 ## Overview
 CEO SUITE AXA Tower is an active centre in Jakarta, Indonesia. Jakarta business centre in Kuningan, suitable for multinational, diplomatic-zone and professional-services users.
 
+**Deskripsi Lokasi:**
+As part of the multi-use Kuningan City mega-development designed by award-winning DP Architects, the AXA Tower stands tall at the heart of Jakarta’s Golden Triangle. Offering panoramic views of the city and convenient access to business and entertainment hubs, the complex offers luxury shopping, local and international restaurants, residences and a fitness center. Housed on the tower’s 45th floor, CEO SUITE functions as an ideally-located, one-stop business and leisure hub for businesses and entrepreneurs.
+
 Controlled centre identity:
 - Country: Indonesia
 - City: Jakarta
 - Centre: AXA Tower
 - Address: 45th Floor, AXA Tower Jl. Prof. Dr. Satrio Kav. 18 Kuningan City Jakarta 12940
+- Telepon: +62 (21) 3005 3500
+- WhatsApp: +62 8111 50 894
+- Email: sales@ceosuite.com
+- Latitude: -6.224568
+- Longitude: 106.828726
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +35,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.
