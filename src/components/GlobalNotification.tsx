@@ -2,14 +2,13 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase-client';
-import { Bell, BellOff, MessageSquare } from 'lucide-react';
+import { Bell, BellOff } from 'lucide-react';
 
 export default function GlobalNotification({ tenantId }: { tenantId: string }) {
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [activeSessions, setActiveSessions] = useState<Set<string>>(new Set());
   const activeSessionsRef = useRef<Set<string>>(new Set());
   const processedMessageIds = useRef<Set<string>>(new Set());
-  const [toastMessage, setToastMessage] = useState<{title: string, body: string} | null>(null);
 
   // Update ref when state changes so event listeners have latest
   useEffect(() => {
@@ -68,10 +67,6 @@ export default function GlobalNotification({ tenantId }: { tenantId: string }) {
       // Flash document title
       document.title = `(1) ${title}`;
       setTimeout(() => { document.title = originalTitle; }, 3000);
-
-      // In-app toast as fallback/addition
-      setToastMessage({ title, body });
-      setTimeout(() => setToastMessage(null), 5000);
 
       if (Notification.permission === 'granted' && 'Notification' in window) {
         try {
@@ -167,18 +162,6 @@ export default function GlobalNotification({ tenantId }: { tenantId: string }) {
 
   return (
     <>
-      {toastMessage && (
-        <div className="fixed top-20 right-6 z-[100] bg-white border border-brand-light shadow-xl p-4 rounded-xl flex items-start gap-4 animate-in slide-in-from-top-5 min-w-[300px]">
-          <div className="bg-brand-bg p-2 rounded-full text-brand shrink-0 mt-0.5">
-            <MessageSquare size={20} />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-slate-800">{toastMessage.title}</p>
-            <p className="text-xs text-slate-600 mt-1 line-clamp-2">{toastMessage.body}</p>
-          </div>
-        </div>
-      )}
-
       {permission === 'default' && (
         <div className="fixed bottom-4 right-4 z-[100] bg-white border border-slate-200 shadow-lg p-4 rounded-xl flex items-center gap-4 animate-in slide-in-from-bottom-5">
           <div className="bg-amber-100 p-2 rounded-full text-amber-600">
