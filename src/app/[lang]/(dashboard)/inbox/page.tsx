@@ -156,6 +156,39 @@ export default function InboxPage() {
           });
         }
       )
+      .on(
+        'broadcast',
+        { event: 'new_message' },
+        (payload) => {
+          const data = payload.payload as any;
+          setChats(prev => {
+            const existingChat = prev.find(chat => chat.id === data.sessionId);
+            if (!existingChat) return prev; 
+            
+            return prev.map(chat => {
+              if (chat.id === data.sessionId) {
+                const messages = chat.messages || [];
+                if (messages.some(m => m.id === data.id || (m.text === data.content && m.sender === data.senderType))) {
+                  return chat;
+                }
+                
+                return {
+                  ...chat,
+                  messages: [...messages, {
+                    id: data.id || (Date.now().toString() + Math.random()),
+                    text: data.content,
+                    sender: data.senderType,
+                    timestamp: new Date(data.createdAt || Date.now()).toISOString()
+                  }],
+                  preview: data.content,
+                  time: new Date(data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
+              }
+              return chat;
+            });
+          });
+        }
+      )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           console.log('Agent connected to Inbox via Supabase Realtime');
@@ -372,17 +405,29 @@ export default function InboxPage() {
           ) : chats.length === 0 ? (
             <div className="p-4 text-center text-slate-500">{t('inbox', 'noActiveConversations')}</div>
           ) : (
-            chats.map(chat => (
+            chats.map(chat => {
+              const lastMessage = chat.messages?.[chat.messages.length - 1];
+              // Dianggap belum dibalas jika pengirim terakhir adalah user ATAU statusnya butuh agen (queue)
+              const isUnanswered = lastMessage?.sender === 'user' || chat.status === 'queue';
+
+              return (
               <div 
                 key={chat.id} 
                 onClick={() => setSelectedChat(chat.id)}
-                className={`p-4 border-b border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors ${selectedChat === chat.id ? 'bg-brand-bg/50 border-l-4 border-l-brand' : ''}`}
+                className={`p-4 border-b border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors ${selectedChat === chat.id ? 'bg-brand-bg/50 border-l-4 border-l-brand' : ''} ${isUnanswered && selectedChat !== chat.id ? 'bg-blue-50/30' : ''}`}
               >
                 <div className="flex justify-between items-start mb-1">
-                  <span className="font-medium text-sm text-slate-800">{chat.contactId}</span>
-                  <span className="text-xs text-slate-400">{chat.time}</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-medium text-sm ${isUnanswered ? 'text-slate-900 font-bold' : 'text-slate-800'}`}>
+                      {chat.contactId}
+                    </span>
+                    {isUnanswered && selectedChat !== chat.id && (
+                      <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                    )}
+                  </div>
+                  <span className={`text-xs ${isUnanswered ? 'text-blue-600 font-medium' : 'text-slate-400'}`}>{chat.time}</span>
                 </div>
-                <p className="text-xs text-slate-500 truncate">{chat.preview}</p>
+                <p className={`text-xs truncate ${isUnanswered ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>{chat.preview}</p>
                 <div className="flex flex-wrap items-center gap-1.5 mt-2">
                   <span className={`text-[10px] px-2 py-0.5 rounded-full ${chat.channel === 'whatsapp' ? 'bg-green-100 text-green-700 font-medium' : 'bg-purple-100 text-purple-700 font-medium'}`}>
                     {chat.channel}
@@ -407,9 +452,18 @@ export default function InboxPage() {
                       ✓ Done
                     </span>
                   )}
+                  {isUnanswered ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold ml-auto">
+                      Belum Dibalas
+                    </span>
+                  ) : (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 ml-auto">
+                      Sudah Dibalas
+                    </span>
+                  )}
                 </div>
               </div>
-            ))
+            )})
           )}
         </div>
       </div>
