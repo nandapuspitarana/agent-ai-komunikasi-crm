@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     const formattedMessage = humanPrompt.replace('{input}', message);
 
     try {
-      let sources = [];
+      let sources: any[] = [];
       let llmIntent = '';
 
       if (!bypassLLM) {
@@ -98,8 +98,8 @@ export async function POST(req: NextRequest) {
           system_prompt: systemPrompt,
         });
         aiReplyRaw = aiResponse.reply;
-        llmIntent = aiResponse.intent;
-        sources = aiResponse.sources;
+        llmIntent = aiResponse.intent || '';
+        sources = aiResponse.sources || [];
       }
 
       return NextResponse.json({
