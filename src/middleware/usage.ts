@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // In-Memory cache for usage metrics
 const usageCache = new Map<string, { value: number; expiresAt: number }>();

@@ -1,3 +1,5 @@
+const siteConfig = require('./src/config/site.js');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -7,7 +9,16 @@ module.exports = {
     "./src/modules/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        brand: {
+          DEFAULT: siteConfig.theme.primary,
+          hover: siteConfig.theme.primaryHover,
+          light: siteConfig.theme.primaryLight,
+          bg: siteConfig.theme.primaryBg,
+        }
+      }
+    },
   },
   plugins: [],
 };

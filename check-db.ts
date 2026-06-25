@@ -4,9 +4,15 @@ const prisma = new PrismaClient();
 
 async function main() {
   const flows = await prisma.flow.findMany({
-    include: { _count: { select: { intents: true } } }
+    where: { tenantId: 'default-tenant' }
   });
-  console.log('Flows:', JSON.stringify(flows, null, 2));
+  if (flows.length > 0) {
+    const updated = await prisma.tenant.update({
+      where: { id: 'default-tenant' },
+      data: { activeFlowId: flows[1]?.id || flows[0].id }
+    });
+    console.log('Updated tenant with active flow:', updated.activeFlowId);
+  }
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

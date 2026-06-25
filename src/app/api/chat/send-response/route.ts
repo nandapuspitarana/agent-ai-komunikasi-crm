@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { VariableManager } from '@/modules/flow-builder/variables';
-import { PrismaClient } from '@prisma/client';
 import { logChatMessageSent } from '@/lib/audit-logger';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 /**
  * Endpoint to send agent response back to widget via Socket.io

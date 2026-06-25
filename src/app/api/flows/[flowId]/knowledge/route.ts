@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // GET /api/flows/[flowId]/knowledge - list docs for this agent
 export async function GET(
@@ -75,9 +74,14 @@ export async function POST(
       const fileBuffer = await file.arrayBuffer();
       const fileBlob = new Blob([fileBuffer], { type: file.type });
       proxyFormData.append('file', fileBlob, file.name);
-      
+
+      // RAG isolation keys (required by proxy — hard error if missing)
+      proxyFormData.append('flow_id', flowId);              // AI Bot identifier
+      proxyFormData.append('tenant_id', flow.tenantId);    // Tenant identifier
+      proxyFormData.append('bot_name', flow.name || '');   // Human-readable bot label
+
+      // Document metadata
       proxyFormData.append('meta_name', metaName);
-      proxyFormData.append('agent_id', flowId);
       if (tagsRaw) proxyFormData.append('tags', tagsRaw);
       if (description) proxyFormData.append('description', description);
       if (category) proxyFormData.append('category', category);

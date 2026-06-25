@@ -21,7 +21,7 @@ interface UploadTab {
 
 const UPLOAD_TABS: UploadTab[] = [
   { id: 'pdf', label: 'PDF', accept: '.pdf', icon: <FileText size={20} />, description: 'Dokumen PDF, laporan, manual', color: 'text-red-600 bg-red-50 border-red-200' },
-  { id: 'docs', label: 'Word', accept: '.docx,.doc', icon: <File size={20} />, description: 'Dokumen Word (.docx)', color: 'text-blue-600 bg-blue-50 border-blue-200' },
+  { id: 'docs', label: 'Word', accept: '.docx,.doc', icon: <File size={20} />, description: 'Dokumen Word (.docx)', color: 'text-brand bg-brand-bg border-brand/20' },
   { id: 'excel', label: 'Excel', accept: '.xlsx,.xls', icon: <FileSpreadsheet size={20} />, description: 'Spreadsheet Excel', color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
   { id: 'csv', label: 'CSV/Data', accept: '.csv,.tsv,*/*', icon: <FileSpreadsheet size={20} />, description: 'Data tabular (CSV, TSV)', color: 'text-orange-600 bg-orange-50 border-orange-200' },
   { id: 'txt', label: 'Teks Biasa', accept: '.txt,.md,.json,*/*', icon: <FileText size={20} />, description: 'File teks biasa (TXT, MD, dll)', color: 'text-slate-600 bg-slate-50 border-slate-200' },
@@ -30,7 +30,7 @@ const UPLOAD_TABS: UploadTab[] = [
 function getFileIcon(filename: string) {
   const ext = filename?.split('.').pop()?.toLowerCase() || '';
   if (ext === 'pdf') return <FileText size={16} className="text-red-500" />;
-  if (['docx', 'doc'].includes(ext)) return <File size={16} className="text-blue-500" />;
+  if (['docx', 'doc'].includes(ext)) return <File size={16} className="text-brand-light" />;
   if (['xlsx', 'xls'].includes(ext)) return <FileSpreadsheet size={16} className="text-emerald-500" />;
   if (['csv', 'tsv'].includes(ext)) return <FileSpreadsheet size={16} className="text-orange-500" />;
   return <FileText size={16} className="text-slate-500" />;
@@ -194,7 +194,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
   if (!flowId) {
     return (
       <div className="flex flex-col items-center justify-center h-full max-w-lg mx-auto text-center py-20 animate-in fade-in">
-        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 text-blue-500">
+        <div className="w-16 h-16 bg-brand-bg rounded-full flex items-center justify-center mb-4 text-brand-light">
           <Globe size={32} />
         </div>
         <h2 className="text-xl font-bold text-slate-800 mb-2">{t('agentBuilder', 'saveAgentFirst')}</h2>
@@ -227,7 +227,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
             </button>
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover shadow-sm"
             >
               <Upload size={16} /> {t('agentBuilder', 'uploadDocument')}
             </button>
@@ -243,7 +243,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
         {/* List */}
         <div className="flex-1 border border-slate-200 rounded-lg overflow-hidden bg-slate-50/50">
           {loading && documents.length === 0 ? (
-            <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
+            <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-brand-light border-t-transparent rounded-full animate-spin" /></div>
           ) : documents.length === 0 ? (
             <div className="text-center py-16 px-4">
               <FileText size={32} className="mx-auto text-slate-300 mb-3" />
@@ -316,7 +316,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                     key={tab.id}
                     type="button"
                     onClick={() => { setActiveUploadTab(tab.id); setSelectedFile(null); setError(null); setIsDragging(false); }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${activeUploadTab === tab.id ? tab.color + ' ring-2 ring-blue-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${activeUploadTab === tab.id ? tab.color + ' ring-2 ring-brand-light' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                   >
                     {tab.icon} {tab.label}
                   </button>
@@ -335,7 +335,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${isDragging ? 'border-blue-500 bg-blue-100 scale-[1.02]' : selectedFile ? 'border-blue-400 bg-blue-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'}`}
+                className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${isDragging ? 'border-brand-light bg-brand-bg scale-[1.02]' : selectedFile ? 'border-brand/40 bg-brand-bg' : 'border-slate-300 hover:border-brand/40 hover:bg-slate-50'}`}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input type="file" ref={fileInputRef} className="sr-only" accept={currentTab.accept} onChange={(e) => {
@@ -343,7 +343,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                   if (f) handleFile(f);
                 }} />
                 {selectedFile ? (
-                  <p className="font-semibold text-blue-700 text-sm">{selectedFile.name}</p>
+                  <p className="font-semibold text-brand-hover text-sm">{selectedFile.name}</p>
                 ) : (
                   <>
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-2 transition-transform ${isDragging ? 'scale-110 ' + currentTab.color : currentTab.color}`}>{currentTab.icon}</div>
@@ -357,17 +357,17 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">{t('agentBuilder', 'docNameReq')}</label>
-                <input type="text" value={metaName} onChange={e => setMetaName(e.target.value)} required className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input type="text" value={metaName} onChange={e => setMetaName(e.target.value)} required className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand outline-none" />
               </div>
               
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">{t('agentBuilder', 'shortDesc')}</label>
-                <input type="text" value={description} onChange={e => setDescription(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input type="text" value={description} onChange={e => setDescription(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand outline-none" />
               </div>
 
               <div className="pt-3 flex justify-end gap-2 border-t border-slate-100">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm bg-slate-100 text-slate-600 rounded-lg font-medium">{t('common', 'cancel')}</button>
-                <button type="submit" disabled={uploading || !selectedFile} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50">
+                <button type="submit" disabled={uploading || !selectedFile} className="px-4 py-2 text-sm bg-brand text-white rounded-lg font-medium disabled:opacity-50">
                   {uploading ? t('agentBuilder', 'uploading') : t('agentBuilder', 'uploadDocument')}
                 </button>
               </div>
@@ -399,7 +399,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                   {tenantDocs.map(doc => {
                     const isAlreadyAdded = documents.some(d => d.proxyDocId === doc.proxyDocId);
                     return (
-                      <div key={doc.id} className={`p-4 rounded-xl border flex flex-col justify-between ${isAlreadyAdded ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-sm'}`}>
+                      <div key={doc.id} className={`p-4 rounded-xl border flex flex-col justify-between ${isAlreadyAdded ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 hover:border-brand/30 hover:shadow-sm'}`}>
                         <div className="flex items-start gap-3 mb-3">
                           <div className="mt-1">{getFileIcon(doc.filename)}</div>
                           <div>
@@ -412,7 +412,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                           <button
                             onClick={() => handleLinkDocument(doc.id)}
                             disabled={isAlreadyAdded || linking}
-                            className={`px-3 py-1 text-xs font-semibold rounded-lg ${isAlreadyAdded ? 'bg-slate-200 text-slate-500' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                            className={`px-3 py-1 text-xs font-semibold rounded-lg ${isAlreadyAdded ? 'bg-slate-200 text-slate-500' : 'bg-brand-bg text-brand hover:bg-brand-bg'}`}
                           >
                             {isAlreadyAdded ? t('agentBuilder', 'alreadyAdded') : linking ? t('agentBuilder', 'linking') : t('agentBuilder', 'selectDocument')}
                           </button>

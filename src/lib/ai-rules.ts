@@ -92,6 +92,8 @@ export function checkHandoffIntent(message: string): RuleCheckResult {
   };
 }
 
+export type LeadClassification = 'cold' | 'warm' | 'hot_lead' | 'booking' | 'support';
+
 /**
  * Membangun system prompt yang akan dikirim ke AI engine
  * berdasarkan riwayat percakapan dan konfigurasi tenant
@@ -104,6 +106,8 @@ export function buildSystemPrompt(options: {
   language?: string;
   speakingStyle?: string;
   businessNeeds?: string;
+  enableClassification?: boolean;
+  enableExtraction?: boolean;
 }): string {
   const { 
     tenantName = 'kami', 
@@ -112,7 +116,9 @@ export function buildSystemPrompt(options: {
     handoffAgentName,
     language = 'Bahasa Indonesia',
     speakingStyle = 'ramah dan profesional',
-    businessNeeds = ''
+    businessNeeds = '',
+    enableClassification = false,
+    enableExtraction = false
   } = options;
 
   let handoffInstruction = '4. Jika pengguna meminta untuk berbicara dengan manusia/agen, segera tandai percakapan untuk dialihkan.';
@@ -139,11 +145,68 @@ Jika Anda mendeteksi bahwa pengguna ingin berbicara dengan manusia, sertakan tag
 
 ${exampleHandoff}`;
 
-  if (customInstructions) {
-    return `${base}\n\nINSTRUKSI TAMBAHAN:\n${customInstructions}`;
+  let finalPrompt = base;
+
+  if (enableClassification) {
+    finalPrompt += `
+
+CLASSIFICATION TASK:
+At the END of every response, you MUST add exactly ONE classification tag (hidden from the user) representing the user's intent in this conversation:
+[CLASS:cold] - Just browsing, asking general non-specific questions
+[CLASS:warm] - Showing interest in a specific product/service
+[CLASS:hot_lead] - High intent to purchase, asking about price or process
+[CLASS:booking] - Wants to book, schedule, buy, or transact right now
+[CLASS:support] - Existing customer asking for help or having an issue
+Example: "Here is the price list. [CLASS:hot_lead]"`;
   }
 
-  return base;
+  if (enableExtraction) {
+    finalPrompt += `
+
+DATA EXTRACTION TASK:
+If the user mentions their name, email, or phone number in the conversation, you MUST extract it and append a data tag at the VERY END of your response.
+Format: [DATA: name="Nama Lengkap", email="Alamat Email", phone="Nomor Telepon"]
+Only include the fields you found. Do NOT hallucinate data. Do NOT extract literal phrases like "adalah manusia" as a name.
+Example: "Terima kasih Pak Budi, saya catat nomornya. [DATA: name="Budi", phone="081234567"]"`;
+  }
+
+  if (customInstructions) {
+    finalPrompt += `\n\nINSTRUKSI TAMBAHAN:\n${customInstructions}`;
+  }
+
+  return finalPrompt;
+}
+
+/**
+ * Memeriksa apakah respons AI mengandung tag ekstraksi data
+ */
+export function parseDataExtractionTag(aiReply: string): {
+  cleanReply: string;
+  extractedData: Record<string, string>;
+} {
+  const regex = /\[DATA:\s*(.*?)\]/i;
+  const match = aiReply.match(regex);
+  const extractedData: Record<string, string> = {};
+  let cleanReply = aiReply;
+
+  if (match && match[1]) {
+    const dataString = match[1];
+    // Match key="value" or key='value'
+    const kvRegex = /(\w+)=["']([^"']+)["']/g;
+    let kvMatch;
+    while ((kvMatch = kvRegex.exec(dataString)) !== null) {
+      if (kvMatch[1] && kvMatch[2]) {
+        extractedData[kvMatch[1].toLowerCase()] = kvMatch[2];
+      }
+    }
+    // Remove the tag from the reply
+    cleanReply = aiReply.replace(match[0], '').trim();
+  }
+
+  return {
+    cleanReply,
+    extractedData
+  };
 }
 
 /**
@@ -160,5 +223,28 @@ export function parseAIResponseForHandoff(aiReply: string): {
   return {
     cleanReply,
     handoffRequested: hasHandoff,
+  };
+}
+
+/**
+ * Memeriksa apakah respons AI mengandung tag klasifikasi
+ */
+export function parseClassificationTag(aiReply: string): {
+  cleanReply: string;
+  classification: LeadClassification | null;
+} {
+  const match = aiReply.match(/\[CLASS:(cold|warm|hot_lead|booking|support)\]/i);
+  let classification: LeadClassification | null = null;
+  let cleanReply = aiReply;
+
+  if (match && match[1]) {
+    classification = match[1].toLowerCase() as LeadClassification;
+    // Remove the tag from the reply
+    cleanReply = aiReply.replace(match[0], '').trim();
+  }
+
+  return {
+    cleanReply,
+    classification
   };
 }

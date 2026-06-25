@@ -20,22 +20,22 @@ export default function IntegrationPage() {
     }
   }, []);
 
-  const htmlScript = `<!-- Start of SaaS CRM Widget -->
+  const htmlScript = `<!-- Start of CeosuiteBOT Widget -->
 <script>
   window.CRM_AGENT_CONFIG = {
     tenantId: "${tenantId}",
     apiUrl: "${baseUrl}"
   };
 </script>
-<script src="${baseUrl}/widget.js" defer></script>
-<!-- End of SaaS CRM Widget -->`;
+<script src="${baseUrl}/widget.js" async></script>
+<!-- End of CeosuiteBOT Widget -->`;
 
   const wpPluginCode = `<?php
 /**
- * Plugin Name: SaaS CRM Agent Widget
- * Description: Embeds the SaaS CRM AI Agent into your WordPress site.
- * Version: 1.0
- * Author: SaaS CRM
+ * Plugin Name: CeosuiteBOT Agent Widget
+ * Description: Embeds the CeosuiteBOT AI Agent into your WordPress site.
+ * Version: 1.0.0
+ * Author: CeosuiteBOT
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -43,21 +43,24 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 add_action('wp_footer', 'saas_crm_agent_inject_script');
 
 /*********
- * Injects the SaaS CRM widget script into the footer.
+ * Injects the CeosuiteBOT widget script into the footer.
  *********/
 function saas_crm_agent_inject_script() {
-    $tenant_id = "${tenantId}";
-    $api_url = "${baseUrl}";
+    $tenantId = esc_js(get_option('saas_crm_tenant_id', ''));
     
-    echo '<!-- Start of SaaS CRM Widget -->\\n';
+    if (empty($tenantId)) {
+        return; // Don't inject if no tenant ID is set
+    }
+
+    echo '<!-- Start of CeosuiteBOT Widget -->\\n';
     echo '<script>\\n';
     echo '  window.CRM_AGENT_CONFIG = {\\n';
-    echo '    tenantId: "' . esc_js($tenant_id) . '",\\n';
-    echo '    apiUrl: "' . esc_js($api_url) . '"\\n';
+    echo '    tenantId: "' . $tenantId . '",\\n';
+    echo '    apiUrl: "${baseUrl}"\\n';
     echo '  };\\n';
     echo '</script>\\n';
-    echo '<script src="' . esc_url($api_url) . '/widget.js" defer></script>\\n';
-    echo '<!-- End of SaaS CRM Widget -->\\n';
+    echo '<script src="${baseUrl}/widget.js" async></script>\\n';
+    echo '<!-- End of CeosuiteBOT Widget -->\\n';
 }
 ?>`;
 
@@ -115,7 +118,7 @@ function saas_crm_agent_inject_script() {
         {/* HTML Integration */}
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
           <div className="border-b border-slate-100 bg-slate-50 p-4 flex items-center gap-3">
-            <Code className="text-blue-500" size={20} />
+            <Code className="text-brand-light" size={20} />
             <h2 className="font-semibold text-slate-700">{t('integration', 'htmlTitle')}</h2>
           </div>
           <div className="p-6">

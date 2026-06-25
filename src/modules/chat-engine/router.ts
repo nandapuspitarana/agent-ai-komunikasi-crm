@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { FlowInterpreter } from '@/modules/flow-builder/interpreter';
 import { variableManager } from '@/modules/flow-builder/variables';
 import { chatWithAgent } from '@/lib/ai-agent';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 /**
  * Message Router for Chat Engine

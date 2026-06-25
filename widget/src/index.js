@@ -2,6 +2,49 @@ import { h, render } from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
 import SocketManager from './socket';
 
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
+const getOrCreateContactId = () => {
+  let cid = localStorage.getItem('crm_cid');
+  if (!cid) {
+    cid = generateUUID();
+    localStorage.setItem('crm_cid', cid);
+  }
+  return cid;
+};
+
+const detectDeviceType = () => {
+  const ua = navigator.userAgent;
+  if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return 'tablet';
+  if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) return 'mobile';
+  return 'desktop';
+};
+
+const detectBrowser = () => {
+  const ua = navigator.userAgent;
+  if (ua.includes('Firefox/')) return 'Firefox';
+  if (ua.includes('Edg/')) return 'Edge';
+  if (ua.includes('Chrome/') || ua.includes('Chromium/')) return 'Chrome';
+  if (ua.includes('Safari/')) return 'Safari';
+  return 'Unknown';
+};
+
+const detectOS = () => {
+  const ua = navigator.userAgent;
+  if (ua.includes('Win')) return 'Windows';
+  if (ua.includes('Mac')) return 'macOS';
+  if (ua.includes('X11') || ua.includes('UNIX')) return 'UNIX';
+  if (ua.includes('Linux')) return 'Linux';
+  if (/Android/.test(ua)) return 'Android';
+  if (/iP(hone|od|ad)/.test(ua)) return 'iOS';
+  return 'Unknown';
+};
+
 const Widget = () => {
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -11,6 +54,8 @@ const Widget = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [tenantId, setTenantId] = useState(null);
+  const [leadFormConfig, setLeadFormConfig] = useState(null);
+  const [leadFormData, setLeadFormData] = useState({ name: '', email: '', phone: '' });
 
   // Initialize Socket.io connection on component mount
   useEffect(() => {
@@ -30,6 +75,44 @@ const Widget = () => {
 
         setSessionId(config.sessionId);
         setTenantId(config.tenantId);
+
+        const cid = getOrCreateContactId();
+
+        // T011: Passive Data Collection
+        if (config.visitorCollection?.layer1_passive) {
+          fetch('/api/widget/visitor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tenantId: config.tenantId,
+              contactId: cid,
+              referrerUrl: document.referrer || '',
+              pageUrl: window.location.href,
+              deviceType: detectDeviceType(),
+              browserName: detectBrowser(),
+              os: detectOS()
+            })
+          }).catch(console.error);
+        }
+
+        // T012: Geolocation
+        if (config.visitorCollection?.layer1_geolocation && 'geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              fetch('/api/widget/visitor/geo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  tenantId: config.tenantId,
+                  contactId: cid,
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude
+                })
+              }).catch(console.error);
+            },
+            (err) => { /* silently ignore */ }
+          );
+        }
 
         // Initialize Socket.io using SocketManager
         const socketManager = new SocketManager(
@@ -123,27 +206,84 @@ const Widget = () => {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || !isConnected || !socketRef.current) return;
+    if (!inputValue.trim()) return;
 
     const userMessage = { text: inputValue, sender: 'user', timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
+    
+    const sentValue = inputValue;
+    setInputValue('');
 
     try {
-      // Send message via SocketManager
-      await socketRef.current.sendMessage({
-        text: inputValue,
-        type: 'user_message'
+      const cid = getOrCreateContactId();
+      
+      // T013 & T024/T022: Send via HTTP API to process NLP and Lead Form
+      const res = await fetch('/api/widget/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenantId: tenantId,
+          sessionId: sessionId,
+          contactId: cid,
+          message: sentValue
+        })
       });
+      
+      const data = await res.json();
+      
+      if (data.reply) {
+        setMessages(prev => [...prev, {
+          text: data.reply,
+          sender: 'bot',
+          timestamp: new Date()
+        }]);
+      }
+      
+      if (data.triggerLeadForm && data.leadFormConfig) {
+        setLeadFormConfig(data.leadFormConfig);
+      }
+      
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error('Failed to send message via API:', error);
+      // Fallback to socket if API fails
+      if (socketRef.current && isConnected) {
+        try {
+          await socketRef.current.sendMessage({
+            text: sentValue,
+            type: 'user_message'
+          });
+        } catch (socErr) {
+          setMessages(prev => [...prev, { 
+            text: 'Failed to send message. Please try again.', 
+            sender: 'system', 
+            timestamp: new Date() 
+          }]);
+        }
+      }
+    }
+  };
+
+  const submitLeadForm = async () => {
+    try {
+      const cid = getOrCreateContactId();
+      await fetch('/api/widget/visitor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenantId,
+          contactId: cid,
+          ...leadFormData
+        })
+      });
+      setLeadFormConfig(null);
       setMessages(prev => [...prev, { 
-        text: 'Failed to send message. Please try again.', 
+        text: 'Data telah disimpan. Terima kasih!', 
         sender: 'system', 
         timestamp: new Date() 
       }]);
+    } catch (err) {
+      console.error('Lead form submission failed', err);
     }
-
-    setInputValue('');
   };
 
   return (
@@ -210,6 +350,47 @@ const Widget = () => {
                 )}
               </div>
             ))}
+            
+            {leadFormConfig && (
+              <div style={{
+                margin: '12px 0', padding: '16px', backgroundColor: 'white',
+                borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+              }}>
+                <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#1e293b' }}>
+                  {leadFormConfig.title || 'Silakan lengkapi data Anda'}
+                </h4>
+                
+                {leadFormConfig.fields.includes('name') && (
+                  <input type="text" placeholder="Nama Lengkap" 
+                    value={leadFormData.name} onChange={e => setLeadFormData({...leadFormData, name: e.target.value})}
+                    style={{ width: '100%', padding: '8px', marginBottom: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} />
+                )}
+                
+                {leadFormConfig.fields.includes('email') && (
+                  <input type="email" placeholder="Alamat Email" 
+                    value={leadFormData.email} onChange={e => setLeadFormData({...leadFormData, email: e.target.value})}
+                    style={{ width: '100%', padding: '8px', marginBottom: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} />
+                )}
+                
+                {leadFormConfig.fields.includes('phone') && (
+                  <input type="tel" placeholder="Nomor HP/WhatsApp" 
+                    value={leadFormData.phone} onChange={e => setLeadFormData({...leadFormData, phone: e.target.value})}
+                    style={{ width: '100%', padding: '8px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} />
+                )}
+                
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={submitLeadForm} style={{ flex: 1, padding: '8px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                    Kirim
+                  </button>
+                  {leadFormConfig.skippable && (
+                    <button onClick={() => setLeadFormConfig(null)} style={{ flex: 1, padding: '8px', backgroundColor: '#f1f5f9', color: '#64748b', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
+                      Nanti saja
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+            
             <div ref={messagesEndRef} />
           </div>
 

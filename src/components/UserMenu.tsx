@@ -55,7 +55,7 @@ export default function UserMenu({ user, tenant }: UserMenuProps) {
           <p className="font-medium text-slate-700">{user.name || 'User'}</p>
           <p className="text-xs text-slate-500">{tenant?.name || user.email}</p>
         </div>
-        <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
+        <div className="w-10 h-10 bg-brand-bg text-brand-hover rounded-full flex items-center justify-center font-bold text-sm">
           {initials}
         </div>
         <ChevronDown size={16} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />

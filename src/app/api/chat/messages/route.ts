@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
 import { messageRouter } from '@/modules/chat-engine/router';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {

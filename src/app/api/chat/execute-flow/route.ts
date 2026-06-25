@@ -4,7 +4,7 @@ import { FlowInterpreter } from '@/modules/flow-builder/interpreter';
 import { VariableManager } from '@/modules/flow-builder/variables';
 import { PrismaClient, Prisma } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {

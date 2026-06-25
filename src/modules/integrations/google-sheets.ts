@@ -1,8 +1,7 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 const credentialsCache = new Map<string, { credentials: GoogleCredentials; expiresAt: number }>();
 
 

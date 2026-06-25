@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { logPasswordResetCompleted } from '@/lib/audit-logger';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // POST /api/auth/reset-password - Reset password with token
 export async function POST(request: NextRequest) {

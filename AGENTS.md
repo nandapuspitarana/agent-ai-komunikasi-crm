@@ -64,16 +64,21 @@ Pada [socket.ts](file:///c:/Users/nanda/Documents/aiagent/agent-ai-komunikasi-cr
 - **Widget Visitor**: Bergabung ke room `widget:${sessionId}` dan `session:${sessionId}`.
 - **Human Agent**: Ditandai dengan adanya `userId` di query handshake, bergabung ke room `inbox:${tenantId}` dan `tenant:${tenantId}`.
 
-### Alur Pesan Masuk
-1. **Widget POST `/api/widget/message`**:
+### Alur Pesan Masuk & Tracking Pengunjung
+1. **Widget POST `/api/widget/init`**: Mengambil konfigurasi widget & aturan tracking.
+2. **Widget POST `/api/widget/visitor`**: Menyimpan data pasif pengunjung (device, OS, referrer).
+3. **Widget POST `/api/widget/visitor/geo`**: Menyimpan data geolokasi pengunjung (jika diizinkan).
+4. **Widget POST `/api/widget/message`**:
    - Menyimpan pesan pengguna.
+   - Melakukan NLP Extraction dan AI Classification secara asinkron.
    - Mengirim event `widget_message` ke `inbox:${tenantId}` (agar semua dashboard agen melihat pesan real-time).
    - Mengirim event `user_message` ke `session:${sessionId}` (memperbarui chat box agen).
-2. **Balasan AI (Bot Reply)**:
+5. **Dashboard GET `/api/visitors` & `/api/visitors/[id]`**: Menampilkan profil lengkap pengunjung, riwayat sesi, dan lead score.
+6. **Balasan AI (Bot Reply)**:
    - Next.js memanggil FastAPI `/generate`.
    - Hasil balasan disimpan di database.
    - Mengirim event `bot_reply` ke `session:${sessionId}`.
-3. **Pengambilalihan Sesi (Claim Session)**:
+7. **Pengambilalihan Sesi (Claim Session)**:
    - Agen mengklik tombol "**Ambil Percakapan**" (memicu `POST /api/chat/sessions/[sessionId]/claim`) atau langsung mengirim pesan.
    - Status sesi diubah menjadi `"agent"` dan `assignedAgentId` diisi.
    - Sistem mengirim event `agent_joined` ke widget dan memberitahu dashboard agen lainnya via `session_updated`.

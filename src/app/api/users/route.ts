@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import {
   logUserCreated,
@@ -10,7 +9,7 @@ import {
 } from '@/lib/audit-logger';
 import { canAccessAdminPanel } from '@/lib/auth-utils';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // GET /api/users - Get all users
 export async function GET(request: NextRequest) {

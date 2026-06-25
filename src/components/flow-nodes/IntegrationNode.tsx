@@ -84,24 +84,24 @@ export const IntegrationNode = ({ data, isConnecting }: { data: any; isConnectin
 
       {/* Configuration Details */}
       {isExpanded && (
-        <div className="mb-3 p-2 bg-blue-50 rounded border border-blue-200 text-xs space-y-2">
+        <div className="mb-3 p-2 bg-brand-bg rounded border border-brand/20 text-xs space-y-2">
           {integrationType === 'google_sheets' && (
             <>
               <div>
                 <span className="font-semibold text-slate-700">Spreadsheet ID:</span>
-                <div className="text-blue-600 font-mono text-[10px] truncate">{data.spreadsheetId || 'Not configured'}</div>
+                <div className="text-brand font-mono text-[10px] truncate">{data.spreadsheetId || 'Not configured'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Sheet Name:</span>
-                <div className="text-blue-600 font-mono text-[10px]">{data.sheetName || 'Sheet1'}</div>
+                <div className="text-brand font-mono text-[10px]">{data.sheetName || 'Sheet1'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Action:</span>
-                <div className="text-blue-600 font-mono text-[10px]">{data.action || 'append'}</div>
+                <div className="text-brand font-mono text-[10px]">{data.action || 'append'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Columns to Send:</span>
-                <div className="text-blue-600 font-mono text-[10px]">
+                <div className="text-brand font-mono text-[10px]">
                   {Array.isArray(data.columns) ? data.columns.join(', ') : 'user_id, name, email'}
                 </div>
               </div>
@@ -112,15 +112,15 @@ export const IntegrationNode = ({ data, isConnecting }: { data: any; isConnectin
             <>
               <div>
                 <span className="font-semibold text-slate-700">Recipient Variable:</span>
-                <div className="text-blue-600 font-mono text-[10px]">{data.recipientVariable || 'user_phone'}</div>
+                <div className="text-brand font-mono text-[10px]">{data.recipientVariable || 'user_phone'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Message:</span>
-                <div className="text-blue-600 text-[10px]">{data.message || 'Default message'}</div>
+                <div className="text-brand text-[10px]">{data.message || 'Default message'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Wait for Reply:</span>
-                <div className="text-blue-600 text-[10px]">{data.waitForReply ? 'Yes' : 'No'}</div>
+                <div className="text-brand text-[10px]">{data.waitForReply ? 'Yes' : 'No'}</div>
               </div>
             </>
           )}
@@ -129,15 +129,15 @@ export const IntegrationNode = ({ data, isConnecting }: { data: any; isConnectin
             <>
               <div>
                 <span className="font-semibold text-slate-700">URL:</span>
-                <div className="text-blue-600 font-mono text-[10px] truncate">{data.url || 'https://...'}</div>
+                <div className="text-brand font-mono text-[10px] truncate">{data.url || 'https://...'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Method:</span>
-                <div className="text-blue-600 font-mono text-[10px]">{data.method || 'POST'}</div>
+                <div className="text-brand font-mono text-[10px]">{data.method || 'POST'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Timeout:</span>
-                <div className="text-blue-600 font-mono text-[10px]">{data.timeout || '5000'}ms</div>
+                <div className="text-brand font-mono text-[10px]">{data.timeout || '5000'}ms</div>
               </div>
             </>
           )}
@@ -146,11 +146,11 @@ export const IntegrationNode = ({ data, isConnecting }: { data: any; isConnectin
             <>
               <div>
                 <span className="font-semibold text-slate-700">To Email Variable:</span>
-                <div className="text-blue-600 font-mono text-[10px]">{data.toVariable || 'user_email'}</div>
+                <div className="text-brand font-mono text-[10px]">{data.toVariable || 'user_email'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Subject:</span>
-                <div className="text-blue-600 text-[10px]">{data.subject || 'Notification'}</div>
+                <div className="text-brand text-[10px]">{data.subject || 'Notification'}</div>
               </div>
             </>
           )}
@@ -159,19 +159,19 @@ export const IntegrationNode = ({ data, isConnecting }: { data: any; isConnectin
             <>
               <div>
                 <span className="font-semibold text-slate-700">Channel:</span>
-                <div className="text-blue-600 font-mono text-[10px]">{data.channel || '#general'}</div>
+                <div className="text-brand font-mono text-[10px]">{data.channel || '#general'}</div>
               </div>
               <div>
                 <span className="font-semibold text-slate-700">Message:</span>
-                <div className="text-blue-600 text-[10px] line-clamp-2">{data.message || 'Default notification'}</div>
+                <div className="text-brand text-[10px] line-clamp-2">{data.message || 'Default notification'}</div>
               </div>
             </>
           )}
 
           {/* Error Handling */}
-          <div className="border-t border-blue-200 pt-2 mt-2">
+          <div className="border-t border-brand/20 pt-2 mt-2">
             <span className="font-semibold text-slate-700">On Error:</span>
-            <div className="text-blue-600 text-[10px]">{data.onError || 'Continue'}</div>
+            <div className="text-brand text-[10px]">{data.onError || 'Continue'}</div>
           </div>
         </div>
       )}

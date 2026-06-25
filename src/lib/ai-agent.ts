@@ -13,6 +13,7 @@ export interface AgentChatRequest {
   session_id: string;
   user_id?: string;
   tenant_id?: string;
+  flow_id?: string;          // RAG isolation: AI Bot (Flow) UUID — pass tenant.activeFlowId
   system_prompt?: string;
   attachments?: Array<{
     filename: string;

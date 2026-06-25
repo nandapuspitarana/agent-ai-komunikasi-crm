@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -26,6 +25,10 @@ export async function POST(request: Request) {
     }
 
     const flowConfig = tenant.flows[0]?.config as any;
+    
+    // Import manually since we might not have it in context, or simply parse it here
+    const { getVisitorConfig } = require('@/lib/visitor-config');
+    const vConfig = getVisitorConfig(tenant.visitorConfig);
 
     return NextResponse.json({
       status: 'success',
@@ -34,7 +37,14 @@ export async function POST(request: Request) {
         primaryColor: tenant.themeBrandColor || '#2563eb', // Use tenant color
         logo: tenant.themeBrandLogo || null,
         botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
-        initialFlow: tenant.flows[0] || null
+        initialFlow: tenant.flows[0] || null,
+        visitorCollection: {
+          enabled: vConfig.enabled,
+          layer1_passive: vConfig.layer1_passive,
+          layer1_geolocation: vConfig.layer1_geolocation,
+          layer3_leadform: vConfig.layer3_leadform,
+          layer4_classification: vConfig.layer4_classification
+        }
       }
     });
 

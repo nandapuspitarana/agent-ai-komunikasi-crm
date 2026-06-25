@@ -58,7 +58,7 @@ export default function DashboardOverview() {
   const chatStatus = {
     resolved: { count: dashboardData?.stats.resolvedChats || 0, color: 'bg-green-500' },
     pending: { count: dashboardData?.stats.pendingChats || 0, color: 'bg-amber-500' },
-    inProgress: { count: dashboardData?.stats.inProgressChats || 0, color: 'bg-blue-500' }
+    inProgress: { count: dashboardData?.stats.inProgressChats || 0, color: 'bg-brand-light' }
   };
   const totalChats = (dashboardData?.stats.totalChats || 0) > 0 ? dashboardData!.stats.totalChats : 1; // Prevent division by zero
 
@@ -151,7 +151,7 @@ export default function DashboardOverview() {
         <div className="space-y-6 animate-in fade-in duration-300">
           {isLoading ? (
             <div className="flex justify-center items-center h-64 text-slate-400">
-              <Loader2 className="animate-spin w-8 h-8 mr-3 text-blue-500" /> {t('dashboard', 'loadingStats')}
+              <Loader2 className="animate-spin w-8 h-8 mr-3 text-brand-light" /> {t('dashboard', 'loadingStats')}
             </div>
           ) : (
             <>
@@ -161,7 +161,7 @@ export default function DashboardOverview() {
               return (
                 <div key={stat.name} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-brand-bg text-brand flex items-center justify-center">
                       <Icon size={20} />
                     </div>
                     <div className={`flex items-center gap-1 text-sm font-medium ${stat.isPositive ? 'text-green-600' : 'text-red-600'}`}>
@@ -219,7 +219,7 @@ export default function DashboardOverview() {
         <div className="space-y-6 animate-in fade-in duration-300">
           {isLoading ? (
             <div className="flex justify-center items-center h-64 text-slate-400">
-              <Loader2 className="animate-spin w-8 h-8 mr-3 text-blue-500" /> {t('dashboard', 'loadingRating')}
+              <Loader2 className="animate-spin w-8 h-8 mr-3 text-brand-light" /> {t('dashboard', 'loadingRating')}
             </div>
           ) : (
             <>
@@ -254,14 +254,14 @@ export default function DashboardOverview() {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 lg:col-span-2 overflow-hidden flex flex-col">
               <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-slate-900">{t('dashboard', 'agentLeaderboard')}</h2>
-                <Medal size={20} className="text-blue-500" />
+                <Medal size={20} className="text-brand-light" />
               </div>
               <div className="p-6 flex-1 overflow-auto">
                 <div className="space-y-4">
                   {agentLeaderboard.map((agent, idx) => (
                     <div key={agent.id} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
                       <div className="w-8 text-center font-bold text-slate-400">#{idx + 1}</div>
-                      <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-full bg-brand-bg text-brand-hover flex items-center justify-center font-bold">
                         {agent.avatar}
                       </div>
                       <div className="flex-1">
@@ -282,7 +282,7 @@ export default function DashboardOverview() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <h2 className="text-lg font-bold text-slate-900">{t('dashboard', 'recentRatings')}</h2>
-              <button className="text-sm font-medium text-blue-600 hover:text-blue-700">{t('dashboard', 'viewAll')}</button>
+              <button className="text-sm font-medium text-brand hover:text-brand-hover">{t('dashboard', 'viewAll')}</button>
             </div>
             <div className="divide-y divide-slate-100">
               {recentRatings.length > 0 ? recentRatings.map((rating) => (
@@ -322,9 +322,9 @@ export default function DashboardOverview() {
             {aiStats.map((stat) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.name} className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-2xl shadow-sm border border-blue-100 flex flex-col">
+                <div key={stat.name} className="bg-gradient-to-br from-brand-bg to-blue-50 p-6 rounded-2xl shadow-sm border border-brand/20 flex flex-col">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-white text-brand flex items-center justify-center shadow-sm">
                       <Icon size={20} />
                     </div>
                     <div className={`flex items-center gap-1 text-sm font-medium ${stat.isPositive ? 'text-green-600' : 'text-red-600'}`}>
@@ -344,9 +344,9 @@ export default function DashboardOverview() {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 lg:col-span-2 overflow-hidden flex flex-col">
               <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Settings size={20} className="text-blue-500" /> {t('dashboard', 'customAiBuilder')}
+                  <Settings size={20} className="text-brand-light" /> {t('dashboard', 'customAiBuilder')}
                 </h2>
-                <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+                <button className="flex items-center gap-2 bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-hover">
                   <Plus size={16} /> {t('dashboard', 'createAgent')}
                 </button>
               </div>
@@ -356,11 +356,11 @@ export default function DashboardOverview() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">{t('dashboard', 'agentName')}</label>
-                      <input type="text" placeholder="e.g., Technical Support Bot" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                      <input type="text" placeholder="e.g., Technical Support Bot" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand outline-none" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">{t('dashboard', 'handoffLogic')}</label>
-                      <select className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                      <select className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand outline-none bg-white">
                         <option>{t('dashboard', 'aiResolves')}</option>
                         <option>{t('dashboard', 'humanBusinessHours')}</option>
                         <option>{t('dashboard', 'strictlyAi')}</option>
@@ -371,7 +371,7 @@ export default function DashboardOverview() {
                   {/* System Prompt */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">{t('dashboard', 'systemPrompt')}</label>
-                    <textarea rows={3} placeholder="You are a helpful customer support agent for..." className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                    <textarea rows={3} placeholder="You are a helpful customer support agent for..." className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand outline-none resize-none"></textarea>
                   </div>
 
                   {/* Knowledge Base */}
@@ -379,7 +379,7 @@ export default function DashboardOverview() {
                     <label className="block text-sm font-medium text-slate-700 mb-2">{t('dashboard', 'kbContext')}</label>
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-1 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 cursor-pointer transition-colors">
-                        <UploadCloud size={24} className="mb-2 text-blue-500" />
+                        <UploadCloud size={24} className="mb-2 text-brand-light" />
                         <span className="text-sm">{t('dashboard', 'uploadPdfTxt')}</span>
                       </div>
                       <div className="flex-1 border border-slate-200 rounded-xl p-4 flex flex-col justify-center">
@@ -399,7 +399,7 @@ export default function DashboardOverview() {
                         <input type="text" placeholder={t('dashboard', 'question')} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm outline-none" />
                         <input type="text" placeholder={t('dashboard', 'answer')} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm outline-none" />
                       </div>
-                      <button type="button" className="text-sm text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1 mt-2">
+                      <button type="button" className="text-sm text-brand font-medium hover:text-brand-hover flex items-center gap-1 mt-2">
                         <Plus size={14} /> {t('dashboard', 'addAnother')}
                       </button>
                     </div>
@@ -428,7 +428,7 @@ export default function DashboardOverview() {
                   <div key={reply.id} className="p-4 hover:bg-slate-50 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md">{reply.agent}</span>
+                        <span className="text-xs font-bold px-2 py-0.5 bg-brand-bg text-brand-hover rounded-md">{reply.agent}</span>
                         <span className="text-xs text-slate-500">to {reply.user}</span>
                       </div>
                       <span className="text-xs text-slate-400">{reply.time}</span>
@@ -514,7 +514,7 @@ export default function DashboardOverview() {
                     </p>
                   </li>
                   <li className="flex items-start gap-3 bg-white/10 p-3 rounded-lg border border-white/5">
-                    <span className="w-6 h-6 rounded-full bg-blue-400/20 text-blue-400 flex items-center justify-center shrink-0 font-bold text-xs">2</span>
+                    <span className="w-6 h-6 rounded-full bg-brand/20 text-brand-light flex items-center justify-center shrink-0 font-bold text-xs">2</span>
                     <p className="text-sm text-slate-200 leading-relaxed">
                       <strong>Negative sentiment on Integrations:</strong> Users struggle with WhatsApp API keys. Updating the "Knowledge Base" document for the SupportBot could resolve 40% of these queries instantly.
                     </p>
@@ -526,7 +526,7 @@ export default function DashboardOverview() {
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <h2 className="text-lg font-bold text-slate-900 mb-4">{t('dashboard', 'emergingTopics')}</h2>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">"Shopify Plugin" <span className="text-xs text-blue-400 ml-1">+45%</span></span>
+                  <span className="px-3 py-1.5 bg-brand-bg text-brand-hover rounded-lg text-sm font-medium border border-brand/20">"Shopify Plugin" <span className="text-xs text-brand-light ml-1">+45%</span></span>
                   <span className="px-3 py-1.5 bg-slate-50 text-slate-700 rounded-lg text-sm font-medium border border-slate-200">"Multi-agent handoff"</span>
                   <span className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-100">"Slow widget load" <span className="text-xs text-red-400 ml-1">+12%</span></span>
                   <span className="px-3 py-1.5 bg-slate-50 text-slate-700 rounded-lg text-sm font-medium border border-slate-200">"Custom CSS"</span>

@@ -1,3 +1,10 @@
+version: '3.8'
+
+networks:
+  default:
+    name: crm_shared_network
+    external: true
+
 services:
   web:
     build:
@@ -7,8 +14,7 @@ services:
     container_name: crm-web
     ports:
       - "8201:8201"
-
     env_file:
       - .env
     restart: always
-
+    command: ["sh", "-c", "npx prisma db push --accept-data-loss && npm run start"]

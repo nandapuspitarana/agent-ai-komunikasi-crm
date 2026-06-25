@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { logPasswordChanged } from '@/lib/audit-logger';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // POST /api/users/[id]/change-password - Change user password
 export async function POST(

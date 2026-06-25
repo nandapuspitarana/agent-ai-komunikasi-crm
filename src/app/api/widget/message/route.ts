@@ -1,13 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { chatWithAgent } from '@/lib/ai-agent';
 import {
   checkHandoffIntent,
   buildSystemPrompt,
   parseAIResponseForHandoff,
+  parseClassificationTag,
+  parseDataExtractionTag
 } from '@/lib/ai-rules';
+import { getVisitorConfig } from '@/lib/visitor-config';
+import { extractVisitorData } from '@/lib/visitor-extractor';
+import { updateVisitorFromExtraction, upsertVisitorProfile, updateVisitorClassification, shouldTriggerLeadForm } from '@/lib/visitor-service';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+function corsResponse(data: any, init?: ResponseInit) {
+  return NextResponse.json(data, {
+    ...init,
+    headers: {
+      ...init?.headers,
+      ...corsHeaders,
+    },
+  });
+}
+
 
 /**
  * POST /api/widget/message
@@ -33,7 +54,7 @@ export async function POST(req: NextRequest) {
     const { sessionId, tenantId, message, contactId, channel = 'widget' } = body;
 
     if (!tenantId || !message) {
-      return NextResponse.json(
+      return corsResponse(
         { error: 'Missing required fields: tenantId, message' },
         { status: 400 }
       );
@@ -55,8 +76,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!tenant) {
-      return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
+      return corsResponse({ error: 'Tenant not found' }, { status: 404 });
     }
+
+    const visitorConfig = getVisitorConfig(tenant.visitorConfig);
 
     // Find or create chat session
     let chatSession = sessionId
@@ -75,6 +98,7 @@ export async function POST(req: NextRequest) {
     }
 
     const currentSessionId = chatSession.id;
+    const resolvedContactId = contactId || chatSession.contactId;
 
     // Save incoming user message
     const savedUserMsg = await prisma.message.create({
@@ -85,6 +109,38 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Ensure VisitorProfile exists (useful for internal testing /widget-ui where init doesn't run)
+    if (visitorConfig.enabled && resolvedContactId) {
+      await upsertVisitorProfile(tenantId, resolvedContactId, {
+        referrerUrl: 'Chat Init',
+        pageUrl: 'Widget UI Preview'
+      }).catch(err => console.error('[Visitor Tracking] Upsert error:', err));
+    }
+
+    // Phase 3: Layer 2 - NLP Extraction (Fire and forget, wrap in try/catch to be non-blocking)
+    if (visitorConfig.enabled && visitorConfig.layer2_nlp && resolvedContactId) {
+      try {
+        const extractedData = extractVisitorData(message, visitorConfig);
+        if (Object.keys(extractedData).length > 0) {
+          // Fire and forget update
+          updateVisitorFromExtraction(tenantId, resolvedContactId, extractedData).catch(err => {
+            console.error('[Visitor Tracking] Background extraction error:', err);
+          });
+        }
+        
+        // Also update last seen and message count
+        prisma.visitorProfile.update({
+          where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
+          data: { 
+            lastSeenAt: new Date(),
+            messageCount: { increment: 1 }
+          }
+        }).catch(() => {}); // Ignore errors
+      } catch (err) {
+        console.error('[Visitor Tracking] Extraction error:', err);
+      }
+    }
+
     // Broadcast user message to agent dashboard and other listeners immediately
     // Supabase Realtime will handle this via postgres_changes automatically.
 
@@ -92,7 +148,7 @@ export async function POST(req: NextRequest) {
     if (chatSession.status === 'agent') {
       // Forward ke dashboard agent via Socket.io
       // Supabase Realtime handles this automatically.
-      return NextResponse.json({
+      return corsResponse({
         sessionId: currentSessionId,
         status: 'agent',
         reply: null, // Agent akan membalas sendiri dari dashboard
@@ -127,7 +183,7 @@ export async function POST(req: NextRequest) {
       // Notify agent dashboard
       // Supabase Realtime handles this automatically.
 
-      return NextResponse.json({
+      return corsResponse({
         sessionId: currentSessionId,
         status: 'queue',
         reply: handoffMessage,
@@ -146,6 +202,9 @@ export async function POST(req: NextRequest) {
       finalCustomInstructions += `\n\n[Specific Agent Instructions]\n${flowSystemPrompt}`;
     }
 
+    // Tell the LLM how to parse the UI pipe syntax if it reads it from RAG documents
+    finalCustomInstructions += `\n\n[IMPORTANT UI FORMATTING RULE]\nIf you read options or locations from your knowledge base that contain a pipe character (e.g. 'Bangkok|Bangkok Private Office'), DO NOT output the pipe or the value after it. ONLY output the friendly label before the pipe (e.g. 'Bangkok'). Never output 'Label|Value' in your response.`;
+
     // Build full prompt with context (We only need the system prompt, AI proxy handles history natively)
     const systemPrompt = buildSystemPrompt({
       tenantName: tenant.name,
@@ -155,6 +214,8 @@ export async function POST(req: NextRequest) {
       language: flowConfig.language,
       speakingStyle: flowConfig.speakingStyle,
       businessNeeds: flowConfig.businessNeeds,
+      enableClassification: visitorConfig.enabled && visitorConfig.layer4_classification,
+      enableExtraction: visitorConfig.enabled && visitorConfig.layer2_nlp,
     });
 
     let formattedMessage = message;
@@ -206,38 +267,60 @@ export async function POST(req: NextRequest) {
       }
 
       let dynamicSystemPrompt = systemPrompt;
+      let bypassLLM = false;
+
       if (qnaMatch) {
-        let referenceResponse = qnaMatch.response;
-        if (qnaMatch.responseType === 'handoff' && !referenceResponse.includes('[HANDOFF_REQUESTED]')) {
-          referenceResponse += ' [HANDOFF_REQUESTED]';
-        }
-        dynamicSystemPrompt += `\n\n[USER INTENT MATCHED]\nThe user's request matches the intent '${qnaMatch.name}'. Use the following pre-defined response as the core factual reference for your answer: "${referenceResponse}". Rewrite it to be conversational, natural, and directly address the user's message while maintaining the exact same facts, prices, and questions.`;
-      }
-
-      // Step 3: Call AI Engine (Session, RAG, etc)
-      try {
-        const aiResponse = await chatWithAgent({
-          message: formattedMessage, // Send the formatted message if human prompt exists
-          session_id: currentSessionId,
-          user_id: chatSession.contactId,
-          tenant_id: tenantId,
-          system_prompt: dynamicSystemPrompt,
-          document_ids: documentIds,
-        });
-
-        aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
-
-        // Re-append HTML options from QnA match if any
-        if (qnaMatch && qnaMatch.options) {
-          const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
-          if (opts.length > 0) {
-            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+        if (['form', 'options', 'card'].includes(qnaMatch.responseType)) {
+          // Bypass LLM for rich UI responses to prevent HTML stripping
+          bypassLLM = true;
+          aiReplyRaw = qnaMatch.response;
+          if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
+            aiReplyRaw += ' [HANDOFF_REQUESTED]';
           }
+        } else {
+          // For simple text, let LLM rewrite it conversationally
+          let referenceResponse = qnaMatch.response;
+          if (qnaMatch.responseType === 'handoff' && !referenceResponse.includes('[HANDOFF_REQUESTED]')) {
+            referenceResponse += ' [HANDOFF_REQUESTED]';
+          }
+          dynamicSystemPrompt += `\n\n[USER INTENT MATCHED]\nThe user's request matches the intent '${qnaMatch.name}'. Use the following pre-defined response as the core factual reference for your answer: "${referenceResponse}". Rewrite it to be conversational, natural, and directly address the user's message while maintaining the exact same facts, prices, and questions.`;
         }
-      } catch (aiError) {
-        console.error('[Widget Message] AI Engine error:', aiError);
-        aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
       }
+
+      if (!bypassLLM) {
+        // Step 3: Call AI Engine (Session, RAG, etc)
+        try {
+          const aiResponse = await chatWithAgent({
+            message: formattedMessage, // Send the formatted message if human prompt exists
+            session_id: currentSessionId,
+            user_id: chatSession.contactId,
+            tenant_id: tenantId,
+            flow_id: tenant.activeFlowId || undefined,  // RAG isolation: scope to active AI Bot
+            system_prompt: dynamicSystemPrompt,
+            document_ids: documentIds,
+          });
+
+          aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
+        } catch (aiError) {
+          console.error('[Widget Message] AI Engine error:', aiError);
+          aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
+        }
+      }
+
+      // Re-append HTML options from QnA match if any
+      // Supports "Label|Value" format: button shows Label, but sends Value to intent matcher
+      if (qnaMatch && qnaMatch.options) {
+        const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
+        if (opts.length > 0) {
+          aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => {
+            const pipeIdx = o.indexOf('|');
+            const label = pipeIdx !== -1 ? o.substring(0, pipeIdx).trim() : o;
+            const value = pipeIdx !== -1 ? o.substring(pipeIdx + 1).trim() : o;
+            return `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${value}'}, '*')">${label}</button>`;
+          }).join('') + `</div>`;
+        }
+      }
+
     } else {
       // If AI Agent is not enabled, directly fallback to static message (much faster!)
       if (qnaMatch) {
@@ -246,9 +329,15 @@ export async function POST(req: NextRequest) {
           aiReplyRaw += ' [HANDOFF_REQUESTED]';
         }
         if (qnaMatch.options) {
+          // Supports "Label|Value" format: button shows Label, but sends Value to intent matcher
           const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
           if (opts.length > 0) {
-            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => `<button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${o}'}, '*')">${o}</button>`).join('') + `</div>`;
+            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => {
+              const pipeIdx = o.indexOf('|');
+              const label = pipeIdx !== -1 ? o.substring(0, pipeIdx).trim() : o;
+              const value = pipeIdx !== -1 ? o.substring(pipeIdx + 1).trim() : o;
+              return `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${value}'}, '*')">${label}</button>`;
+            }).join('') + `</div>`;
           }
         }
       } else {
@@ -256,8 +345,47 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Step 4: Parse AI response for handoff flag
-    const { cleanReply, handoffRequested } = parseAIResponseForHandoff(aiReplyRaw);
+    // Step 4: Parse AI response for handoff flag, classification, and data extraction
+    const { cleanReply: parsedExtraction, extractedData } = parseDataExtractionTag(aiReplyRaw);
+    const { cleanReply: parsedClassification, classification } = parseClassificationTag(parsedExtraction);
+    const { cleanReply, handoffRequested } = parseAIResponseForHandoff(parsedClassification);
+
+    let triggerLeadForm = false;
+    let leadFormConfig = null;
+
+    if (Object.keys(extractedData).length > 0 && resolvedContactId) {
+      updateVisitorFromExtraction(tenantId, resolvedContactId, extractedData).catch(err => {
+        console.error('[Visitor Tracking] Background AI data extraction update error:', err);
+      });
+    }
+
+    if (classification && resolvedContactId) {
+      // Background classification update
+      updateVisitorClassification(tenantId, resolvedContactId, classification, visitorConfig).catch(err => {
+        console.error('[Visitor Tracking] Background classification update error:', err);
+      });
+
+      // Layer 3 - Contextual Lead Form (check synchronously since we need to return it in response)
+      try {
+        const shouldTrigger = await shouldTriggerLeadForm(tenantId, resolvedContactId, classification, visitorConfig);
+        if (shouldTrigger) {
+          triggerLeadForm = true;
+          leadFormConfig = {
+            fields: visitorConfig.leadFormFields,
+            title: visitorConfig.leadFormTitle,
+            skippable: visitorConfig.leadFormSkippable
+          };
+          
+          // Mark as shown so it doesn't trigger again
+          await prisma.visitorProfile.update({
+            where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
+            data: { leadFormShown: true }
+          });
+        }
+      } catch (err) {
+        console.error('[Visitor Tracking] Lead form trigger error:', err);
+      }
+    }
 
     if (handoffRequested) {
       // Update session status
@@ -282,17 +410,26 @@ export async function POST(req: NextRequest) {
 
     // Step 6: Supabase Realtime automatically broadcasts changes
 
-    return NextResponse.json({
+    return corsResponse({
       sessionId: currentSessionId,
       status: handoffOccurred ? 'queue' : 'bot',
       reply: cleanReply,
       handoffOccurred,
+      triggerLeadForm,
+      ...(triggerLeadForm && { leadFormConfig })
     });
   } catch (error) {
     console.error('[Widget Message API] Error:', error);
-    return NextResponse.json(
+    return corsResponse(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
 }

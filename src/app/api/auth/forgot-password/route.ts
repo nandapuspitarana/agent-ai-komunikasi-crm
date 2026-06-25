@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { logPasswordResetRequested } from '@/lib/audit-logger';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // POST /api/auth/forgot-password - Request password reset
 export async function POST(request: NextRequest) {

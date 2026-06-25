@@ -3,10 +3,10 @@
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   MessageSquare, Settings, LayoutDashboard, Bot, Library,
-  ChevronRight
+  ChevronRight, UserSearch
 } from 'lucide-react';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -15,6 +15,7 @@ import { useTranslation } from '@/lib/i18n/I18nContext';
 const NAV_ITEMS = [
   { href: '/dashboard', labelKey: 'overview', icon: LayoutDashboard },
   { href: '/inbox', labelKey: 'inbox', icon: MessageSquare },
+  { href: '/visitors', labelKey: 'visitors', icon: UserSearch },
   { href: '/agent', labelKey: 'agent', icon: Bot },
   { href: '/integration', labelKey: 'integration', icon: Library },
   { href: '/settings', labelKey: 'settings', icon: Settings },
@@ -29,6 +30,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useTranslation();
+  const [hotLeadCount, setHotLeadCount] = useState<number>(0);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -36,11 +38,24 @@ export default function DashboardLayout({
     }
   }, [status, router]);
 
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetch('/api/visitors?classification=hot_lead&limit=1')
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data && data.stats) {
+            setHotLeadCount(data.stats.hot_leads);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [status]);
+
   if (status === 'loading') {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-50">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-slate-200 border-t-brand rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading...</p>
         </div>
       </div>
@@ -58,7 +73,7 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <div className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
         <div className="p-4 bg-slate-950 flex items-center gap-2 text-white">
-          <LayoutDashboard size={24} className="text-blue-500" />
+          <LayoutDashboard size={24} className="text-brand-light" />
           <span className="font-bold text-lg">{t('sidebar', 'saasCrm')}</span>
         </div>
 
@@ -69,15 +84,23 @@ export default function DashboardLayout({
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group relative ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-sm'
+                    ? 'bg-brand text-white shadow-sm'
                     : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`}
               >
                 <Icon size={18} className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'} />
                 <span className="text-sm font-medium">{t('sidebar', labelKey)}</span>
-                {isActive && <ChevronRight size={14} className="ml-auto opacity-70" />}
+                
+                {href === '/visitors' && hotLeadCount > 0 && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                    {hotLeadCount > 99 ? '99+' : hotLeadCount}
+                  </span>
+                )}
+                
+                {isActive && href !== '/visitors' && <ChevronRight size={14} className="ml-auto opacity-70" />}
+                {isActive && href === '/visitors' && hotLeadCount === 0 && <ChevronRight size={14} className="ml-auto opacity-70" />}
               </Link>
             );
           })}

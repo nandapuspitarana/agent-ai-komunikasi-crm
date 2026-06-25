@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
 import { canAccessAdminPanel } from '@/lib/auth-utils';
 import { logAIAgentCreated, logAIAgentUpdated, logAIAgentDeleted } from '@/lib/audit-logger';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // GET /api/flows - Get all flows for tenant
 export async function GET(request: NextRequest) {
@@ -136,6 +135,10 @@ export async function POST(request: NextRequest) {
         include: { intents: true }
       });
 
+      if (!flow) {
+        return NextResponse.json({ error: 'Flow not found or could not be updated' }, { status: 404 });
+      }
+
       if (session?.user?.id) {
         await logAIAgentUpdated(session.user.id, { id }, flow);
       }
@@ -177,6 +180,10 @@ export async function POST(request: NextRequest) {
         where: { id: newFlow.id },
         include: { intents: true }
       });
+
+      if (!flowWithIntents) {
+        return NextResponse.json({ error: 'Failed to retrieve created flow' }, { status: 500 });
+      }
 
       if (session?.user?.id) {
         await logAIAgentCreated(session.user.id, flowWithIntents);

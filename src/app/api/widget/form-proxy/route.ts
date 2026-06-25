@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { updateVisitorFromExtraction } from '@/lib/visitor-service';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,6 +32,34 @@ export async function POST(req: NextRequest) {
             content
           }
         });
+
+        // Extract and update visitor profile
+        if (tenantId) {
+          const session = await prisma.chatSession.findUnique({
+            where: { id: sessionId },
+            select: { contactId: true }
+          });
+          
+          if (session && session.contactId) {
+            const extractionData: any = {};
+            
+            // Look for common field names in payload (case insensitive)
+            for (const [key, value] of Object.entries(payload)) {
+              const lowerKey = key.toLowerCase();
+              if (lowerKey.includes('name') || lowerKey === 'nama') {
+                extractionData.name = value;
+              } else if (lowerKey.includes('email')) {
+                extractionData.email = value;
+              } else if (lowerKey.includes('phone') || lowerKey.includes('telepon') || lowerKey.includes('whatsapp') || lowerKey === 'no. hp') {
+                extractionData.phone = value;
+              }
+            }
+            
+            if (Object.keys(extractionData).length > 0) {
+              await updateVisitorFromExtraction(tenantId, session.contactId, extractionData);
+            }
+          }
+        }
 
         // Broadcast to inbox
         // Supabase Realtime handles this automatically.

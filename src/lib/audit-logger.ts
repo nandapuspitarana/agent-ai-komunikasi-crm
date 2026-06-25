@@ -1,6 +1,6 @@
 import { PrismaClient, AuditAction } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 interface AuditLogData {
   action: AuditAction;
@@ -301,7 +301,7 @@ export async function logAIAgentCreated(
     userId,
     performedById: userId,
     entityType: 'Flow',
-    entityId: agentData.id,
+    entityId: agentData?.id || 'unknown',
     changes: { new: agentData },
     ipAddress,
     userAgent,
@@ -323,7 +323,7 @@ export async function logAIAgentUpdated(
     userId,
     performedById: userId,
     entityType: 'Flow',
-    entityId: newData.id,
+    entityId: newData?.id || oldData?.id || 'unknown',
     changes: { old: oldData, new: newData },
     ipAddress,
     userAgent,
@@ -344,7 +344,7 @@ export async function logAIAgentDeleted(
     userId,
     performedById: userId,
     entityType: 'Flow',
-    entityId: agentData.id,
+    entityId: agentData?.id || 'unknown',
     changes: { old: agentData },
     ipAddress,
     userAgent,

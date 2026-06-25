@@ -33,7 +33,7 @@ const UPLOAD_TABS: UploadTab[] = [
     accept: '.docx,.doc',
     icon: <File size={20} />,
     description: 'Word documents (.docx, .doc)',
-    color: 'text-blue-600 bg-blue-50 border-blue-200',
+    color: 'text-brand bg-brand-bg border-brand/20',
   },
   {
     id: 'excel',
@@ -64,7 +64,7 @@ const UPLOAD_TABS: UploadTab[] = [
 function getFileIcon(filename: string) {
   const ext = filename?.split('.').pop()?.toLowerCase() || '';
   if (ext === 'pdf') return <FileText size={18} className="text-red-500" />;
-  if (['docx', 'doc'].includes(ext)) return <File size={18} className="text-blue-500" />;
+  if (['docx', 'doc'].includes(ext)) return <File size={18} className="text-brand-light" />;
   if (['xlsx', 'xls'].includes(ext)) return <FileSpreadsheet size={18} className="text-emerald-500" />;
   if (ext === 'csv') return <FileSpreadsheet size={18} className="text-orange-500" />;
   return <FileText size={18} className="text-slate-500" />;
@@ -74,8 +74,8 @@ function getFileTypeBadge(filename: string) {
   const ext = filename?.split('.').pop()?.toUpperCase() || 'FILE';
   const colorMap: Record<string, string> = {
     PDF: 'bg-red-100 text-red-700',
-    DOCX: 'bg-blue-100 text-blue-700',
-    DOC: 'bg-blue-100 text-blue-700',
+    DOCX: 'bg-brand-bg text-brand-hover',
+    DOC: 'bg-brand-bg text-brand-hover',
     XLSX: 'bg-emerald-100 text-emerald-700',
     XLS: 'bg-emerald-100 text-emerald-700',
     CSV: 'bg-orange-100 text-orange-700',
@@ -281,11 +281,11 @@ export default function KnowledgeBasePage() {
             className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
             title="Refresh"
           >
-            <RefreshCw size={18} className={loading ? 'animate-spin text-blue-500' : ''} />
+            <RefreshCw size={18} className={loading ? 'animate-spin text-brand-light' : ''} />
           </button>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90 transition-opacity shadow-sm text-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand to-brand-hover text-white font-medium rounded-lg hover:opacity-90 transition-opacity shadow-sm text-sm"
           >
             <Upload size={16} />
             Upload Document
@@ -297,8 +297,8 @@ export default function KnowledgeBasePage() {
       {documents.length > 0 && (
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <FileText size={20} className="text-blue-600" />
+            <div className="w-10 h-10 bg-brand-bg rounded-lg flex items-center justify-center">
+              <FileText size={20} className="text-brand" />
             </div>
             <div>
               <div className="text-2xl font-bold text-slate-900">{documents.length}</div>
@@ -355,7 +355,7 @@ export default function KnowledgeBasePage() {
             placeholder="Search name or tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+            className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand outline-none text-sm"
           />
         </div>
         <div className="flex gap-1.5 flex-wrap">
@@ -365,7 +365,7 @@ export default function KnowledgeBasePage() {
               onClick={() => setFilterType(type)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filterType === type
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-brand text-white'
                   : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -379,13 +379,13 @@ export default function KnowledgeBasePage() {
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
         {loading ? (
           <div className="text-center py-16">
-            <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-4" />
+            <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-brand rounded-full animate-spin mb-4" />
             <p className="text-slate-500 text-sm">Loading documents...</p>
           </div>
         ) : documents.length === 0 ? (
           <div className="text-center py-16 px-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <FileText size={32} className="text-blue-500" />
+            <div className="w-16 h-16 bg-gradient-to-br from-brand-bg to-brand-light rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <FileText size={32} className="text-brand-light" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">No documents yet</h3>
             <p className="text-slate-500 text-sm mb-6 max-w-md mx-auto">
@@ -399,7 +399,7 @@ export default function KnowledgeBasePage() {
             ) : (
               <button
                 onClick={() => setShowModal(true)}
-                className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90 text-sm shadow-sm"
+                className="px-5 py-2.5 bg-gradient-to-r from-brand to-brand-hover text-white font-medium rounded-lg hover:opacity-90 text-sm shadow-sm"
               >
                 Upload First Document
               </button>
@@ -530,7 +530,7 @@ export default function KnowledgeBasePage() {
                       if (fileInputRef.current) fileInputRef.current.value = '';
                     }}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                      activeUploadTab === tab.id ? tab.color + ' ring-2 ring-offset-1 ring-blue-400' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                      activeUploadTab === tab.id ? tab.color + ' ring-2 ring-offset-1 ring-brand-light' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                     }`}
                   >
                     {tab.icon}
@@ -552,8 +552,8 @@ export default function KnowledgeBasePage() {
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer ${
                   selectedFile
-                    ? 'border-blue-400 bg-blue-50'
-                    : 'border-slate-300 bg-slate-50 hover:border-blue-400 hover:bg-blue-50/50'
+                    ? 'border-brand/40 bg-brand-bg'
+                    : 'border-slate-300 bg-slate-50 hover:border-brand/40 hover:bg-brand-bg/50'
                 }`}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -568,13 +568,13 @@ export default function KnowledgeBasePage() {
                   <div className="flex items-center justify-center gap-3">
                     {getFileIcon(selectedFile.name)}
                     <div className="text-left">
-                      <p className="font-semibold text-blue-700 text-sm">{selectedFile.name}</p>
-                      <p className="text-xs text-blue-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                      <p className="font-semibold text-brand-hover text-sm">{selectedFile.name}</p>
+                      <p className="text-xs text-brand-light">{(selectedFile.size / 1024).toFixed(1)} KB</p>
                     </div>
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setSelectedFile(null); if(fileInputRef.current) fileInputRef.current.value=''; }}
-                      className="ml-auto p-1 hover:bg-blue-100 rounded text-blue-400"
+                      className="ml-auto p-1 hover:bg-brand-bg rounded text-brand-light"
                     >
                       <X size={16} />
                     </button>
@@ -601,7 +601,7 @@ export default function KnowledgeBasePage() {
                   value={metaName}
                   onChange={(e) => setMetaName(e.target.value)}
                   placeholder="e.g. Employee Leave Policy 2026"
-                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand text-sm"
                   required
                 />
                 <p className="text-xs text-slate-400 mt-1">The name recognized by the AI when answering questions</p>
@@ -615,7 +615,7 @@ export default function KnowledgeBasePage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand text-sm bg-white"
                 >
                   <option value="">-- Select category --</option>
                   <option value="HR">HR / Human Resources</option>
@@ -639,7 +639,7 @@ export default function KnowledgeBasePage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Briefly describe the contents of this document..."
                   rows={2}
-                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand text-sm resize-none"
                 />
               </div>
 
@@ -655,7 +655,7 @@ export default function KnowledgeBasePage() {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagKeyDown}
                     placeholder="Add tag, press Enter"
-                    className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand text-sm"
                   />
                   <button
                     type="button"
@@ -668,9 +668,9 @@ export default function KnowledgeBasePage() {
                 {tagList.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {tagList.map((tag, idx) => (
-                      <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                      <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-bg text-brand-hover text-xs rounded-full font-medium">
                         {tag}
-                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-blue-900">
+                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-brand">
                           <X size={12} />
                         </button>
                       </span>
@@ -693,7 +693,7 @@ export default function KnowledgeBasePage() {
                 <button
                   type="submit"
                   disabled={uploading || !selectedFile}
-                  className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-2 shadow-sm"
+                  className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-brand to-brand-hover rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-2 shadow-sm"
                 >
                   {uploading ? (
                     <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>

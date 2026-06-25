@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
 
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                className="inline-flex items-center gap-2 text-brand hover:text-brand-hover font-medium"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Login
@@ -102,8 +102,8 @@ export default function ForgotPasswordPage() {
         </Link>
 
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Mail className="w-6 h-6 text-blue-600" />
+          <div className="w-12 h-12 bg-brand-bg rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail className="w-6 h-6 text-brand" />
           </div>
           <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             Forgot Password?
@@ -139,7 +139,7 @@ export default function ForgotPasswordPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all"
+                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent sm:text-sm transition-all"
                   placeholder="you@example.com"
                 />
               </div>
@@ -148,7 +148,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-brand hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>

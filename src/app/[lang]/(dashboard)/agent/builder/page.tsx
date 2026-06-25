@@ -44,11 +44,11 @@ const AnswerNode = ({ data }: { data: any }) => {
   const options = Array.isArray(data.options) && data.options.length > 0 ? data.options : ['Option 1', 'Option 2'];
 
   return (
-    <div className="px-4 py-3 shadow-md rounded-xl bg-white border border-l-4 border-blue-500 min-w-[240px] max-w-[280px]">
-      <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 bg-blue-500 border-2 border-white" />
+    <div className="px-4 py-3 shadow-md rounded-xl bg-white border border-l-4 border-brand-light min-w-[240px] max-w-[280px]">
+      <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 bg-brand-light border-2 border-white" />
 
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5 text-blue-600">
+        <div className="flex items-center gap-1.5 text-brand">
           <Bot size={14} />
           <span className="font-bold text-[10px] uppercase tracking-wider">Agent Answer</span>
         </div>
@@ -66,7 +66,7 @@ const AnswerNode = ({ data }: { data: any }) => {
       {answerType === 'options' && (
         <div className="flex flex-col gap-1.5 mt-3">
           {options.map((opt: string, i: number) => (
-            <div key={i} className="text-[11px] bg-blue-50 text-blue-600 border border-blue-200 py-1.5 px-2 rounded-md text-center shadow-sm">
+            <div key={i} className="text-[11px] bg-brand-bg text-brand border border-brand/20 py-1.5 px-2 rounded-md text-center shadow-sm">
               {opt}
             </div>
           ))}
@@ -77,7 +77,7 @@ const AnswerNode = ({ data }: { data: any }) => {
         <div className="flex flex-col gap-1.5 mt-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200 shadow-inner">
           <input disabled placeholder="Full Name" className="text-[11px] px-2 py-1.5 rounded border border-slate-200 bg-white w-full" />
           <input disabled placeholder="Phone Number" className="text-[11px] px-2 py-1.5 rounded border border-slate-200 bg-white w-full" />
-          <button disabled className="text-[11px] bg-blue-600 text-white py-1.5 rounded mt-1 font-medium shadow-sm">Submit Form</button>
+          <button disabled className="text-[11px] bg-brand text-white py-1.5 rounded mt-1 font-medium shadow-sm">Submit Form</button>
         </div>
       )}
 
@@ -88,7 +88,7 @@ const AnswerNode = ({ data }: { data: any }) => {
           </div>
           <div className="p-2.5 bg-slate-50">
             <div className="text-xs font-semibold text-slate-800 leading-tight">{data.cardTitle || 'Link Card Title'}</div>
-            <div className="text-[10px] text-blue-600 mt-1.5 font-medium">View Website &rarr;</div>
+            <div className="text-[10px] text-brand mt-1.5 font-medium">View Website &rarr;</div>
           </div>
         </div>
       )}
@@ -112,12 +112,22 @@ const nodeTypes = {
   answer: AnswerNode,
 };
 
+const generateUUID = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 function AgentBuilderContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const flowIdParam = searchParams?.get('id') || null;
 
-  const [activeTab, setActiveTab] = useState('faq');
+  const [activeTab, setActiveTab] = useState('settings');
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(flowIdParam);
 
   const [agentConfig, setAgentConfig] = useState({
@@ -152,7 +162,40 @@ function AgentBuilderContent() {
   const [intents, setIntents] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // --- Flow State derived from Intents ---
+  // --- Array-based UI state for Options (buttons) and Form fields ---
+  const [buttonRows, setButtonRows] = useState<{label: string; value: string}[]>([{label: '', value: ''}]);
+  const [formFieldRows, setFormFieldRows] = useState<{label: string; placeholder: string; type: string; required: boolean}[]>([{label: '', placeholder: '', type: 'text', required: false}]);
+
+  // Sync buttonRows <-> activeIntentData.options when switching intents
+  useEffect(() => {
+    if (!activeIntentId) return;
+    const intent = intents.find(i => i.id === activeIntentId);
+    if (!intent) return;
+    if (intent.answerType === 'options' && intent.options) {
+      const parsed = intent.options.split(',').map((o: string) => {
+        const t = o.trim();
+        const pipeIdx = t.indexOf('|');
+        return pipeIdx !== -1
+          ? { label: t.substring(0, pipeIdx).trim(), value: t.substring(pipeIdx + 1).trim() }
+          : { label: t, value: t };
+      }).filter((r: any) => r.label);
+      setButtonRows(parsed.length > 0 ? parsed : [{label: '', value: ''}]);
+    } else {
+      setButtonRows([{label: '', value: ''}]);
+    }
+    setFormFieldRows([{label: '', placeholder: '', type: 'text', required: false}]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeIntentId]);
+
+  // Helper: serialize buttonRows back to the options string and save
+  const syncButtonRowsToIntent = (rows: {label: string; value: string}[]) => {
+    const str = rows
+      .filter(r => r.label.trim())
+      .map(r => r.value.trim() && r.value.trim() !== r.label.trim() ? `${r.label}|${r.value}` : r.label)
+      .join(', ');
+    updateActiveIntent('options', str);
+  };
+
   const nodeTypes = useMemo(() => ({ 
     question: QuestionNode, 
     answer: AnswerNode,
@@ -468,7 +511,7 @@ function AgentBuilderContent() {
   
   useEffect(() => {
     // Generate a valid UUID for the python backend on mount
-    setPreviewSessionId(crypto.randomUUID());
+    setPreviewSessionId(generateUUID());
   }, []);
 
   const [chatMessages, setChatMessages] = useState<{ role: 'assistant' | 'user', text: string, type?: string, options?: string }[]>([
@@ -642,7 +685,7 @@ function AgentBuilderContent() {
           <button
             onClick={handleSaveFlow}
             disabled={isSaving}
-            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all shadow-sm ${isSaving ? 'bg-slate-100 text-slate-600 cursor-wait' : 'bg-blue-600 text-white hover:bg-blue-700'
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all shadow-sm ${isSaving ? 'bg-slate-100 text-slate-600 cursor-wait' : 'bg-brand text-white hover:bg-brand-hover'
               }`}
           >
             <Save size={16} className={isSaving ? 'animate-pulse' : ''} /> {isSaving ? 'Saving...' : 'Save Changes'}
@@ -656,14 +699,14 @@ function AgentBuilderContent() {
         <div className="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col p-4 shadow-[2px_0_8px_-4px_rgba(0,0,0,0.1)] z-10">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">Configuration</p>
           <nav className="space-y-1">
-            <button onClick={() => { setActiveTab('settings'); setActiveIntentId(null); }} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}>
-              <Settings size={18} className={activeTab === 'settings' ? 'text-blue-600' : 'text-slate-400'} /> Setting Agent
+            <button onClick={() => { setActiveTab('settings'); setActiveIntentId(null); }} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-brand-bg text-brand-hover' : 'text-slate-600 hover:bg-slate-100'}`}>
+              <Settings size={18} className={activeTab === 'settings' ? 'text-brand' : 'text-slate-400'} /> Setting Agent
             </button>
-            <button onClick={() => { setActiveTab('knowledge'); setActiveIntentId(null); }} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'knowledge' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}>
-              <Globe size={18} className={activeTab === 'knowledge' ? 'text-blue-600' : 'text-slate-400'} /> Base Knowledge
+            <button onClick={() => { setActiveTab('knowledge'); setActiveIntentId(null); }} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'knowledge' ? 'bg-brand-bg text-brand-hover' : 'text-slate-600 hover:bg-slate-100'}`}>
+              <Globe size={18} className={activeTab === 'knowledge' ? 'text-brand' : 'text-slate-400'} /> Base Knowledge
             </button>
-            <button onClick={() => setActiveTab('faq')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'faq' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}>
-              <HelpCircle size={18} className={activeTab === 'faq' ? 'text-blue-600' : 'text-slate-400'} /> Intents & QnA
+            <button onClick={() => setActiveTab('faq')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'faq' ? 'bg-brand-bg text-brand-hover' : 'text-slate-600 hover:bg-slate-100'}`}>
+              <HelpCircle size={18} className={activeTab === 'faq' ? 'text-brand' : 'text-slate-400'} /> Intents & QnA
             </button>
           </nav>
         </div>
@@ -682,9 +725,9 @@ function AgentBuilderContent() {
                     <label className="block text-sm font-medium text-slate-700 mb-1">Agent Name</label>
                     <input 
                       type="text" 
-                      value={agentConfig.name}
+                      value={agentConfig.name || ''}
                       onChange={(e) => setAgentConfig({...agentConfig, name: e.target.value})}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light"
                     />
                   </div>
                   <div>
@@ -692,7 +735,7 @@ function AgentBuilderContent() {
                     <textarea 
                       value={agentConfig.description || ''}
                       onChange={(e) => setAgentConfig({...agentConfig, description: e.target.value})}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light"
                       rows={2}
                     />
                   </div>
@@ -718,7 +761,7 @@ function AgentBuilderContent() {
                         <textarea 
                           value={agentConfig.systemPrompt || ''}
                           onChange={(e) => setAgentConfig({...agentConfig, systemPrompt: e.target.value})}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm bg-slate-50"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light font-mono text-sm bg-slate-50"
                           rows={6}
                           placeholder="You are a helpful sales assistant..."
                         />
@@ -733,7 +776,7 @@ function AgentBuilderContent() {
                           type="text" 
                           value={agentConfig.humanPrompt || ''}
                           onChange={(e) => setAgentConfig({...agentConfig, humanPrompt: e.target.value})}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm bg-slate-50"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light font-mono text-sm bg-slate-50"
                           placeholder="User says: {input}"
                         />
                       </div>
@@ -749,7 +792,7 @@ function AgentBuilderContent() {
                         <textarea 
                           value={agentConfig.defaultResponse || ''}
                           onChange={(e) => setAgentConfig({...agentConfig, defaultResponse: e.target.value})}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light"
                           rows={3}
                           placeholder="Sorry, I don't understand. I will forward this to our agent. [HANDOFF_REQUESTED]"
                         />
@@ -759,7 +802,7 @@ function AgentBuilderContent() {
                         <select 
                           value={agentConfig.defaultResponseType || 'text'}
                           onChange={(e) => setAgentConfig({...agentConfig, defaultResponseType: e.target.value})}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light bg-white"
                         >
                           <option value="text">Text Only</option>
                           <option value="options">Options / Buttons</option>
@@ -772,7 +815,7 @@ function AgentBuilderContent() {
                             type="text" 
                             value={agentConfig.defaultResponseOptions || ''}
                             onChange={(e) => setAgentConfig({...agentConfig, defaultResponseOptions: e.target.value})}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light"
                             placeholder="e.g. Bicara dengan Agen, Menu Utama"
                           />
                         </div>
@@ -807,7 +850,7 @@ function AgentBuilderContent() {
                       <input
                         type="text"
                         className="text-2xl font-bold text-slate-900 bg-transparent border-none outline-none w-full placeholder-slate-300"
-                        value={activeIntentData?.name}
+                        value={activeIntentData?.name ?? ''}
                         onChange={e => updateActiveIntent('name', e.target.value)}
                         placeholder="Intent Name"
                       />
@@ -844,125 +887,368 @@ function AgentBuilderContent() {
                       </div>
 
                       {/* Right: Response Configuration */}
-                      <div className="space-y-6">
+                      <div className="space-y-5">
                         <div className="space-y-4">
                           <div className="flex items-center gap-2">
-                            <Bot size={18} className="text-blue-500" />
+                            <Bot size={18} className="text-brand-light" />
                             <h3 className="font-semibold text-slate-800">Agent Response</h3>
                           </div>
 
+                          {/* Response Type */}
                           <div>
                             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Response Type</label>
                             <select
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-white"
-                              value={activeIntentData?.answerType}
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
+                              value={activeIntentData?.answerType ?? 'text'}
                               onChange={e => updateActiveIntent('answerType', e.target.value)}
                             >
-                              <option value="text">Text Only</option>
-                              <option value="options">Options / Buttons</option>
-                              <option value="form">Input Form</option>
-                              <option value="card">Card Link</option>
-                              <option value="handoff">Text & Handoff to Human Agent</option>
+                              <option value="text">💬 Text Only</option>
+                              <option value="options">🔘 Text + Quick Reply Buttons</option>
+                              <option value="card">🃏 Info Card (with link)</option>
+                              <option value="form">📋 Contact Form</option>
+                              <option value="handoff">🙋 Text + Handoff to Agent</option>
                             </select>
                           </div>
 
-                          <div>
-                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Message Content</label>
-                            <textarea
-                              rows={3}
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-slate-50"
-                              value={activeIntentData?.answer}
-                              onChange={e => updateActiveIntent('answer', e.target.value)}
-                              placeholder="Type the agent's message..."
-                            />
-                          </div>
+                          {/* ── CARD BUILDER ── */}
+                          {activeIntentData?.answerType === 'card' ? (
+                            <div className="space-y-4">
+                              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <span className="text-base">🃏</span>
+                                  <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">Card Builder</p>
+                                </div>
+                                <div className="space-y-3">
+                                  <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Card Title <span className="text-red-400">*</span></label>
+                                    <input
+                                      id="cb_title"
+                                      type="text"
+                                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-400 outline-none text-sm bg-white"
+                                      placeholder="e.g. Axiata Tower (Kuala Lumpur) - Private Office"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Description <span className="text-red-400">*</span></label>
+                                    <textarea
+                                      id="cb_desc"
+                                      rows={3}
+                                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-400 outline-none text-sm bg-white resize-none"
+                                      placeholder="e.g. Our private offices are available on flexible hourly to monthly options..."
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Link URL <span className="text-slate-400 font-normal">(optional)</span></label>
+                                    <input
+                                      id="cb_url"
+                                      type="url"
+                                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-400 outline-none text-sm bg-white"
+                                      placeholder="https://www.ceosuite.com/locations/..."
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1">CTA / Footer Note <span className="text-slate-400 font-normal">(optional)</span></label>
+                                    <input
+                                      id="cb_cta"
+                                      type="text"
+                                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-400 outline-none text-sm bg-white"
+                                      placeholder="e.g. Next, you can continue with the recommended action or ask a question."
+                                      defaultValue="Next, you can continue with the recommended action or ask a question."
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      const title = (document.getElementById('cb_title') as HTMLInputElement)?.value.trim();
+                                      const desc = (document.getElementById('cb_desc') as HTMLTextAreaElement)?.value.trim();
+                                      const url = (document.getElementById('cb_url') as HTMLInputElement)?.value.trim();
+                                      const cta = (document.getElementById('cb_cta') as HTMLInputElement)?.value.trim();
+                                      if (!title || !desc) { alert('Please fill in at least Card Title and Description.'); return; }
+                                      const descHtml = desc.replace(/\n/g, '<br/>');
+                                      const linkHtml = url ? `<br/><br/>Explore this space in detail here: ${url}` : '';
+                                      const ctaHtml = cta ? `<div class='cta-note'>${cta}</div>` : '';
+                                      const html = `<div class='card'><div class='card-title'>${title}</div><div class='small'>${descHtml}${linkHtml}</div></div>${ctaHtml}`;
+                                      updateActiveIntent('answer', html);
+                                    }}
+                                    className="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                  >
+                                    <span>✨</span> Generate Card HTML
+                                  </button>
+                                </div>
+                              </div>
 
-                          {activeIntentData?.answerType === 'options' && (
-                            <div>
-                              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Options (Comma separated)</label>
-                              <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-slate-50"
-                                value={activeIntentData?.options}
-                                onChange={e => updateActiveIntent('options', e.target.value)}
-                                placeholder="e.g. Komplain, Cek Status, Lainnya"
-                              />
+                              {/* Generated HTML preview + raw editor */}
+                              <div>
+                                <div className="flex items-center justify-between mb-1">
+                                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Generated HTML <span className="text-slate-400 font-normal normal-case">(editable)</span></label>
+                                  {activeIntentData?.answer && (
+                                    <button
+                                      onClick={() => updateActiveIntent('answer', '')}
+                                      className="text-[10px] text-red-400 hover:text-red-600 transition-colors"
+                                    >Clear</button>
+                                  )}
+                                </div>
+                                <textarea
+                                  rows={4}
+                                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-300 outline-none text-xs bg-slate-800 text-green-300 font-mono resize-none"
+                                  value={activeIntentData?.answer ?? ''}
+                                  onChange={e => updateActiveIntent('answer', e.target.value)}
+                                  placeholder="HTML will appear here after clicking 'Generate Card HTML'..."
+                                />
+                                {activeIntentData?.answer && (
+                                  <div className="mt-2">
+                                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Preview</p>
+                                    <div
+                                      className="p-3 border border-slate-200 rounded-xl bg-white text-sm"
+                                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(activeIntentData.answer) }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          )}
-                          {activeIntentData?.answerType === 'card' && (
-                            <div>
-                              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Card Title</label>
-                              <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-slate-50"
-                                value={activeIntentData?.cardTitle}
-                                onChange={e => updateActiveIntent('cardTitle', e.target.value)}
-                                placeholder="e.g. Promo Spesial"
-                              />
+                          ) : activeIntentData?.answerType === 'form' ? (
+                            /* ── FORM BUILDER ── */
+                            <div className="space-y-4">
+                              <div className="bg-brand-bg/60 p-4 rounded-xl border border-brand/20">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-base">📋</span>
+                                    <p className="text-xs font-bold text-brand uppercase tracking-wider">Form Builder</p>
+                                  </div>
+                                  <button
+                                    onClick={() => setFormFieldRows([...formFieldRows, {label: '', placeholder: '', type: 'text', required: false}])}
+                                    className="flex items-center gap-1 text-xs font-semibold text-brand hover:text-brand-hover px-2 py-1 rounded-lg hover:bg-brand-bg/80 border border-brand/30 transition-colors"
+                                  >
+                                    <Plus size={13} /> Add Field
+                                  </button>
+                                </div>
+                                <div className="space-y-3">
+                                  <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Intro Message</label>
+                                    <input
+                                      type="text"
+                                      className="w-full px-3 py-2 border border-brand/20 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
+                                      placeholder="e.g. Please fill in the form below:"
+                                      id="formBuilderIntro"
+                                    />
+                                  </div>
+
+                                  {/* Field rows */}
+                                  <div className="space-y-2">
+                                    {/* Column headers */}
+                                    <div className="grid grid-cols-[1fr_1fr_100px_auto_auto] gap-2 items-center">
+                                      <span className="text-[10px] font-bold text-brand/70 uppercase tracking-wider">Label</span>
+                                      <span className="text-[10px] font-bold text-brand/70 uppercase tracking-wider">Placeholder</span>
+                                      <span className="text-[10px] font-bold text-brand/70 uppercase tracking-wider">Type</span>
+                                      <span className="text-[10px] font-bold text-brand/70 uppercase tracking-wider">Req</span>
+                                      <span />
+                                    </div>
+                                    {formFieldRows.map((field, i) => (
+                                      <div key={i} className="grid grid-cols-[1fr_1fr_100px_auto_auto] gap-2 items-center">
+                                        <input
+                                          type="text"
+                                          className="px-2.5 py-1.5 border border-brand/20 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white w-full"
+                                          value={field.label}
+                                          onChange={e => setFormFieldRows(formFieldRows.map((f, j) => j === i ? {...f, label: e.target.value} : f))}
+                                          placeholder="Name"
+                                        />
+                                        <input
+                                          type="text"
+                                          className="px-2.5 py-1.5 border border-brand/20 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white w-full"
+                                          value={field.placeholder}
+                                          onChange={e => setFormFieldRows(formFieldRows.map((f, j) => j === i ? {...f, placeholder: e.target.value} : f))}
+                                          placeholder="e.g. John Doe"
+                                        />
+                                        <select
+                                          className="px-2 py-1.5 border border-brand/20 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white w-full"
+                                          value={field.type}
+                                          onChange={e => setFormFieldRows(formFieldRows.map((f, j) => j === i ? {...f, type: e.target.value} : f))}
+                                        >
+                                          <option value="text">Text</option>
+                                          <option value="email">Email</option>
+                                          <option value="tel">Phone</option>
+                                          <option value="number">Number</option>
+                                          <option value="date">Date</option>
+                                          <option value="textarea">Textarea</option>
+                                        </select>
+                                        <label className="flex items-center justify-center cursor-pointer">
+                                          <input
+                                            type="checkbox"
+                                            className="w-4 h-4 rounded border-brand/30 text-brand focus:ring-brand-light"
+                                            checked={field.required}
+                                            onChange={e => setFormFieldRows(formFieldRows.map((f, j) => j === i ? {...f, required: e.target.checked} : f))}
+                                          />
+                                        </label>
+                                        <button
+                                          onClick={() => {
+                                            const next = formFieldRows.filter((_, j) => j !== i);
+                                            setFormFieldRows(next.length > 0 ? next : [{label: '', placeholder: '', type: 'text', required: false}]);
+                                          }}
+                                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                          title="Remove field"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-xs font-semibold text-slate-600 mb-1">Webhook POST URL <span className="text-slate-400 font-normal">(optional)</span></label>
+                                    <input
+                                      type="text"
+                                      className="w-full px-3 py-2 border border-brand/20 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
+                                      placeholder="https://n8n.example.com/webhook/..."
+                                      id="formBuilderWebhook"
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      const intro = (document.getElementById('formBuilderIntro') as HTMLInputElement).value.trim();
+                                      const webhookUrl = (document.getElementById('formBuilderWebhook') as HTMLInputElement).value.trim();
+                                      const validFields = formFieldRows.filter(f => f.label.trim());
+                                      if (!validFields.length) { alert('Please add at least one field.'); return; }
+                                      let onSubmitCode = "event.preventDefault();";
+                                      if (webhookUrl) {
+                                        onSubmitCode += ` var btn=this.querySelector('button[type=submit]'); if(btn){btn.disabled=true;btn.textContent='Sending...';} var fd=new FormData(this); var d=Object.fromEntries(fd); fetch('${webhookUrl}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(()=>{alert('Data berhasil dikirim!'); this.reset(); if(btn){btn.disabled=false;btn.textContent='Submit';}}).catch(e=>{console.error(e); alert('Gagal mengirim data'); if(btn){btn.disabled=false;btn.textContent='Submit';}});`;
+                                      }
+                                      let html = `<form class='form-card' onsubmit="${onSubmitCode}">`;
+                                      validFields.forEach(field => {
+                                        const nameAttr = field.label.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+                                        const req = field.required ? 'required' : '';
+                                        const ph = field.placeholder || `Enter ${field.label}`;
+                                        html += `<label class='form-card_label'>${field.label}${field.required ? ' <span class="required">*</span>' : ''}</label>`;
+                                        if (field.type === 'tel') {
+                                          html += `<input type='tel' name='${nameAttr}' placeholder='${ph}' class='form-card_input' pattern='[0-9]+' title='Please enter only numbers' oninput='this.value = this.value.replace(/[^0-9]/g, "")' ${req}/>`;
+                                        } else if (field.type === 'textarea') {
+                                          html += `<textarea name='${nameAttr}' placeholder='${ph}' class='form-card_input' ${req}></textarea>`;
+                                        } else {
+                                          html += `<input type='${field.type}' name='${nameAttr}' placeholder='${ph}' class='form-card_input' ${req}/>`;
+                                        }
+                                      });
+                                      html += `<button type='submit' class='submit-btn'>Submit</button></form>`;
+                                      updateActiveIntent('answer', (intro || 'Silakan lengkapi form berikut:') + html);
+                                    }}
+                                    className="w-full py-2 bg-brand hover:bg-brand-hover text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                  >
+                                    <span>📋</span> Generate Form HTML
+                                  </button>
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Generated HTML <span className="text-slate-400 font-normal normal-case">(editable)</span></label>
+                                <textarea
+                                  rows={4}
+                                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-xs bg-slate-800 text-green-300 font-mono resize-none"
+                                  value={activeIntentData?.answer ?? ''}
+                                  onChange={e => updateActiveIntent('answer', e.target.value)}
+                                  placeholder="HTML will appear here after clicking Generate..."
+                                />
+                              </div>
                             </div>
-                          )}
-                          {activeIntentData?.answerType === 'form' && (
-                            <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-4">
-                              <label className="block text-xs font-semibold text-blue-800 uppercase tracking-wider mb-2">Form Builder Generator</label>
-                              <p className="text-xs text-blue-600 mb-3">Define fields separated by commas. Example: <code className="bg-white px-1 py-0.5 rounded">Name:text:req, Email:email:req, Phone:tel:req</code></p>
-                              <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-white mb-3"
-                                placeholder="Name:text:req, Email:email:req, Phone:tel:req"
-                                id="formBuilderInput"
-                              />
-                              <label className="block text-xs font-semibold text-blue-800 uppercase tracking-wider mb-2">Webhook POST URL (Optional)</label>
-                              <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-white mb-3"
-                                placeholder="http://localhost:5678/webhook/..."
-                                id="formBuilderWebhook"
-                              />
-                              <button 
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  const input = (document.getElementById('formBuilderInput') as HTMLInputElement).value;
-                                  const webhookUrl = (document.getElementById('formBuilderWebhook') as HTMLInputElement).value.trim();
-                                  if (!input) return;
-                                  
-                                  let onSubmitCode = "event.preventDefault();";
-                                  if (webhookUrl) {
-                                    onSubmitCode += ` var btn=this.querySelector('button'); if(btn){btn.disabled=true;btn.textContent='Sending...';} var fd=new FormData(this); var d=Object.fromEntries(fd); fetch('${webhookUrl}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(()=>{alert('Data berhasil dikirim!'); this.reset(); if(btn){btn.disabled=false;btn.textContent='Submit';}}).catch(e=>{console.error(e); alert('Gagal mengirim data'); if(btn){btn.disabled=false;btn.textContent='Submit';}});`;
-                                  }
-                                  
-                                  const fields = input.split(',').map(s => s.trim()).filter(Boolean);
-                                  let html = `<form class='form-card' onsubmit="${onSubmitCode}">`;
-                                  
-                                  fields.forEach(f => {
-                                    const parts = f.split(':');
-                                    const label = parts[0] || 'Field';
-                                    const type = parts[1] || 'text';
-                                    const req = parts[2] && parts[2].startsWith('req') ? 'required' : '';
-                                    const nameAttr = label.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
-                                    
-                                    html += `<label class='form-card_label'>${label} ${req ? '<span class="required">*</span>' : ''}</label>`;
-                                    
-                                    if (type === 'tel' || type === 'phone') {
-                                      html += `<input type='tel' name='${nameAttr}' placeholder='e.g. 6512345678' class='form-card_input' pattern='[0-9]+' title='Please enter only numbers' oninput='this.value = this.value.replace(/[^0-9]/g, \"\")' ${req}/>`;
-                                    } else if (type === 'textarea') {
-                                      html += `<textarea name='${nameAttr}' placeholder='Enter ${label}' class='form-card_input' ${req}></textarea>`;
-                                    } else {
-                                      html += `<input type='${type}' name='${nameAttr}' placeholder='Enter ${label}' class='form-card_input' ${req}/>`;
-                                    }
-                                  });
-                                  
-                                  html += `<button type='submit' class='submit-btn'>Submit</button></form>`;
-                                  
-                                  const currentMsg = activeIntentData?.answer || '';
-                                  const msgPrefix = currentMsg.includes('<form') ? currentMsg.split('<form')[0] : (currentMsg ? currentMsg + '<br/>' : 'Silakan lengkapi form berikut:');
-                                  
-                                  updateActiveIntent('answer', msgPrefix + html);
-                                  alert('Form HTML with Webhook integration generated into Message Content!');
-                                }}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors"
-                              >
-                                Generate Form HTML
-                              </button>
+                          ) : (
+                            /* ── TEXT / OPTIONS / HANDOFF ── */
+                            <div className="space-y-4">
+                              <div>
+                                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Message Content</label>
+                                <textarea
+                                  rows={activeIntentData?.answerType === 'options' ? 2 : 4}
+                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-slate-50 resize-none"
+                                  value={activeIntentData?.answer ?? ''}
+                                  onChange={e => updateActiveIntent('answer', e.target.value)}
+                                  placeholder={activeIntentData?.answerType === 'handoff' ? "e.g. Please wait, I'm connecting you to our agent... [HANDOFF_REQUESTED]" : "Type the agent's message here..."}
+                                />
+                                {activeIntentData?.answerType === 'handoff' && (
+                                  <p className="text-[10px] text-slate-400 mt-1">Tip: Include <code className="bg-slate-100 px-1 rounded">[HANDOFF_REQUESTED]</code> at the end to trigger the agent handoff.</p>
+                                )}
+                              </div>
+
+                              {activeIntentData?.answerType === 'options' && (
+                                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-base">🔘</span>
+                                      <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Quick Reply Buttons</p>
+                                    </div>
+                                    <button
+                                      onClick={() => {
+                                        const next = [...buttonRows, {label: '', value: ''}];
+                                        setButtonRows(next);
+                                      }}
+                                      className="flex items-center gap-1 text-xs font-semibold text-brand hover:text-brand-hover px-2 py-1 rounded-lg hover:bg-brand-bg transition-colors"
+                                    >
+                                      <Plus size={13} /> Add Button
+                                    </button>
+                                  </div>
+
+                                  {/* Column headers */}
+                                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Button Label <span className="font-normal text-slate-300">(shown)</span></span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sent Value <span className="font-normal text-slate-300">(to bot)</span></span>
+                                    <span />
+                                  </div>
+
+                                  {/* Button rows */}
+                                  <div className="space-y-2">
+                                    {buttonRows.map((row, i) => (
+                                      <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                                        <input
+                                          type="text"
+                                          className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
+                                          value={row.label}
+                                          onChange={e => {
+                                            const next = buttonRows.map((r, j) => j === i ? {...r, label: e.target.value} : r);
+                                            setButtonRows(next);
+                                            syncButtonRowsToIntent(next);
+                                          }}
+                                          placeholder="e.g. Bangkok PO"
+                                        />
+                                        <input
+                                          type="text"
+                                          className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
+                                          value={row.value}
+                                          onChange={e => {
+                                            const next = buttonRows.map((r, j) => j === i ? {...r, value: e.target.value} : r);
+                                            setButtonRows(next);
+                                            syncButtonRowsToIntent(next);
+                                          }}
+                                          placeholder={row.label || 'e.g. Bangkok Private Office'}
+                                        />
+                                        <button
+                                          onClick={() => {
+                                            const next = buttonRows.filter((_, j) => j !== i);
+                                            const safe = next.length > 0 ? next : [{label: '', value: ''}];
+                                            setButtonRows(safe);
+                                            syncButtonRowsToIntent(safe);
+                                          }}
+                                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                          title="Remove"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+
+                                  {/* Live preview */}
+                                  {buttonRows.some(r => r.label.trim()) && (
+                                    <div className="pt-2 border-t border-slate-200">
+                                      <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1.5">Preview</p>
+                                      <div className="flex flex-wrap gap-1.5">
+                                        {buttonRows.filter(r => r.label.trim()).map((r, i) => (
+                                          <span key={i} className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-brand/30 text-brand rounded-full text-xs font-medium shadow-sm">
+                                            {r.label}
+                                            {r.value.trim() && r.value.trim() !== r.label.trim() && (
+                                              <span className="text-slate-300 text-[9px]">→ {r.value}</span>
+                                            )}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -977,7 +1263,7 @@ function AgentBuilderContent() {
                           <textarea
                             rows={4}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 outline-none text-sm bg-slate-800 text-green-400 font-mono"
-                            value={activeIntentData?.customPayload}
+                            value={activeIntentData?.customPayload ?? ''}
                             onChange={e => updateActiveIntent('customPayload', e.target.value)}
                             placeholder='{\n  "action": "your_action_name"\n}'
                           />
@@ -994,10 +1280,10 @@ function AgentBuilderContent() {
                         <p className="text-slate-500 text-sm mt-1">Manage multiple intents. Group questions into one response logic.</p>
                       </div>
                       <div className="flex bg-slate-100 p-1 rounded-lg">
-                        <button onClick={() => setFaqView('list')} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${faqView === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                        <button onClick={() => setFaqView('list')} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${faqView === 'list' ? 'bg-white text-brand shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                           <List size={16} /> List
                         </button>
-                        <button onClick={() => setFaqView('flow')} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${faqView === 'flow' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                        <button onClick={() => setFaqView('flow')} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${faqView === 'flow' ? 'bg-white text-brand shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                           <GitMerge size={16} /> Flow
                         </button>
                       </div>
@@ -1058,9 +1344,9 @@ function AgentBuilderContent() {
                         </div>
 
                         {/* WELCOME MESSAGE / SAPAAN (NEW PLACEMENT) */}
-                        <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-6">
+                        <div className="bg-brand-bg/50 border border-brand/20 rounded-xl p-5 mb-6">
                           <div className="flex items-center gap-2 mb-3">
-                            <MessageSquare size={18} className="text-blue-600" />
+                            <MessageSquare size={18} className="text-brand" />
                             <h3 className="font-semibold text-slate-800">Welcome Message / Greeting</h3>
                           </div>
                           <p className="text-xs text-slate-500 mb-4">{t('agentBuilder', 'welcomePlaceholder')}</p>
@@ -1070,7 +1356,7 @@ function AgentBuilderContent() {
                               <textarea 
                                 value={agentConfig.welcomeMessage || ''}
                                 onChange={(e) => setAgentConfig({...agentConfig, welcomeMessage: e.target.value})}
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light text-sm"
                                 rows={2}
                                 placeholder="Hello! How can I help you today?"
                               />
@@ -1081,7 +1367,7 @@ function AgentBuilderContent() {
                                 <select 
                                   value={agentConfig.welcomeMessageType || 'text'}
                                   onChange={(e) => setAgentConfig({...agentConfig, welcomeMessageType: e.target.value})}
-                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light bg-white text-sm"
                                 >
                                   <option value="text">Text Only</option>
                                   <option value="options">Text with Options (Buttons)</option>
@@ -1096,7 +1382,7 @@ function AgentBuilderContent() {
                                     value={agentConfig.welcomeMessageOptions || ''}
                                     onChange={(e) => setAgentConfig({...agentConfig, welcomeMessageOptions: e.target.value})}
                                     placeholder="e.g. Help me choose, Pricing, Book a tour"
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light text-sm"
                                   />
                                 </div>
                               )}
@@ -1158,13 +1444,13 @@ function AgentBuilderContent() {
                               placeholder="Search intents by name, phrase, or response..." 
                               value={searchQuery}
                               onChange={(e) => setSearchQuery(e.target.value)}
-                              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-sm bg-white"
+                              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
                             />
                             <div className="absolute left-3 top-2.5 text-slate-400">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             </div>
                           </div>
-                          <button onClick={addIntent} className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors shrink-0">
+                          <button onClick={addIntent} className="flex items-center justify-center gap-2 px-4 py-2 bg-brand-bg text-brand rounded-lg text-sm font-medium hover:bg-brand-bg transition-colors shrink-0">
                             <Plus size={16} /> Add Intent
                           </button>
                         </div>
@@ -1180,16 +1466,16 @@ function AgentBuilderContent() {
                           <div
                             key={intent.id}
                             onClick={() => setActiveIntentId(intent.id)}
-                            className="flex items-center justify-between p-4 border border-slate-200 bg-white hover:border-blue-300 hover:shadow-md cursor-pointer rounded-xl transition-all group"
+                            className="flex items-center justify-between p-4 border border-slate-200 bg-white hover:border-brand/30 hover:shadow-md cursor-pointer rounded-xl transition-all group"
                           >
                             <div className="flex-1">
                               <h4 className="font-semibold text-slate-800 text-sm mb-1">{intent.name}</h4>
                               <p className="text-xs text-slate-500 line-clamp-1">
-                                <span className="font-medium text-orange-500">{intent.trainingPhrases.length} phrases</span> &bull; Responds with <span className="uppercase text-blue-500">{intent.answerType}</span>
+                                <span className="font-medium text-orange-500">{intent.trainingPhrases.length} phrases</span> &bull; Responds with <span className="uppercase text-brand-light">{intent.answerType}</span>
                               </p>
                             </div>
                             <div className="flex items-center gap-3">
-                              <div className="text-slate-300 group-hover:text-blue-500 transition-colors">
+                              <div className="text-slate-300 group-hover:text-brand-light transition-colors">
                                 <ChevronRight size={20} />
                               </div>
                               <button
@@ -1248,7 +1534,7 @@ function AgentBuilderContent() {
                   onSendMessage={handleSendMessage}
                   onRestartChat={() => {
                     setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }]);
-                    setPreviewSessionId(crypto.randomUUID());
+                    setPreviewSessionId(generateUUID());
                   }}
                   hideHeaderMoreOptions={true}
                 />
