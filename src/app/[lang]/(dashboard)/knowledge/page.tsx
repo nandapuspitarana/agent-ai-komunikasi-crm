@@ -105,9 +105,10 @@ export default function KnowledgeBasePage() {
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [tagList, setTagList] = useState<string[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{current: number, total: number} | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -135,11 +136,11 @@ export default function KnowledgeBasePage() {
   const currentTab = UPLOAD_TABS.find(t => t.id === activeUploadTab)!;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      if (!metaName) {
-        setMetaName(file.name.replace(/\.[^/.]+$/, ''));
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setSelectedFiles(prev => [...prev, ...files]);
+      if (!metaName && files.length === 1) {
+        setMetaName(files[0].name.replace(/\.[^/.]+$/, ''));
       }
     }
   };
@@ -165,45 +166,67 @@ export default function KnowledgeBasePage() {
 
   const handleFileUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) return;
-    if (!metaName.trim()) {
+    if (selectedFiles.length === 0) return;
+    
+    if (selectedFiles.length === 1 && !metaName.trim()) {
       setError('Meta Name is required');
       return;
     }
 
     setUploading(true);
     setError(null);
+    setUploadProgress({ current: 0, total: selectedFiles.length });
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('meta_name', metaName);
-    if (tagList.length > 0) formData.append('tags', tagList.join(','));
-    if (description.trim()) formData.append('description', description);
-    if (category.trim()) formData.append('category', category);
+    let successCount = 0;
 
-    try {
-      const res = await fetch('/api/agent/documents/upload', {
-        method: 'POST',
-        body: formData,
-      });
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      setUploadProgress({ current: i + 1, total: selectedFiles.length });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to upload document');
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const nameToUse = selectedFiles.length === 1 ? metaName : file.name.replace(/\.[^/.]+$/, '');
+      formData.append('meta_name', nameToUse);
+      
+      if (tagList.length > 0) formData.append('tags', tagList.join(','));
+      if (description.trim()) formData.append('description', description);
+      if (category.trim()) formData.append('category', category);
+
+      try {
+        const res = await fetch('/api/agent/documents/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          console.error(`Failed to upload ${file.name}:`, data.error);
+        } else {
+          successCount++;
+        }
+      } catch (err: any) {
+        console.error(`Error uploading ${file.name}:`, err);
       }
+    }
 
+    setUploading(false);
+    setUploadProgress(null);
+    
+    if (successCount === 0) {
+      setError('Failed to upload all documents');
+    } else {
       closeModal();
       await fetchDocuments();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred while uploading the document');
-    } finally {
-      setUploading(false);
+      if (successCount < selectedFiles.length) {
+         alert(`Uploaded ${successCount} of ${selectedFiles.length} files successfully.`);
+      }
     }
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setMetaName('');
     setTags('');
     setDescription('');
@@ -211,6 +234,7 @@ export default function KnowledgeBasePage() {
     setTagList([]);
     setTagInput('');
     setError(null);
+    setUploadProgress(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -526,7 +550,7 @@ export default function KnowledgeBasePage() {
                     type="button"
                     onClick={() => {
                       setActiveUploadTab(tab.id);
-                      setSelectedFile(null);
+                      setSelectedFiles([]);
                       if (fileInputRef.current) fileInputRef.current.value = '';
                     }}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
@@ -551,7 +575,7 @@ export default function KnowledgeBasePage() {
               {/* File Drop Area */}
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer ${
-                  selectedFile
+                  selectedFiles.length > 0
                     ? 'border-brand/40 bg-brand-bg'
                     : 'border-slate-300 bg-slate-50 hover:border-brand/40 hover:bg-brand-bg/50'
                 }`}
@@ -559,32 +583,45 @@ export default function KnowledgeBasePage() {
               >
                 <input
                   type="file"
+                  multiple
                   ref={fileInputRef}
                   onChange={handleFileSelect}
                   className="sr-only"
                   accept={currentTab.accept}
                 />
-                {selectedFile ? (
-                  <div className="flex items-center justify-center gap-3">
-                    {getFileIcon(selectedFile.name)}
-                    <div className="text-left">
-                      <p className="font-semibold text-brand-hover text-sm">{selectedFile.name}</p>
-                      <p className="text-xs text-brand-light">{(selectedFile.size / 1024).toFixed(1)} KB</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); setSelectedFile(null); if(fileInputRef.current) fileInputRef.current.value=''; }}
-                      className="ml-auto p-1 hover:bg-brand-bg rounded text-brand-light"
-                    >
-                      <X size={16} />
-                    </button>
+                {selectedFiles.length > 0 ? (
+                  <div className="flex flex-col gap-2 max-h-40 overflow-y-auto w-full">
+                    {selectedFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded border border-slate-200">
+                        <div className="flex items-center gap-3">
+                           {getFileIcon(file.name)}
+                           <div className="text-left">
+                             <p className="font-semibold text-slate-700 text-sm truncate max-w-[200px]" title={file.name}>{file.name}</p>
+                             <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
+                           </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            const newFiles = [...selectedFiles];
+                            newFiles.splice(idx, 1);
+                            setSelectedFiles(newFiles); 
+                            if (fileInputRef.current) fileInputRef.current.value=''; 
+                          }}
+                          className="p-1 hover:bg-slate-100 rounded text-slate-400"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <>
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2 ${currentTab.color}`}>
                       {currentTab.icon}
                     </div>
-                    <p className="text-sm font-medium text-slate-700">Click to select {currentTab.label} file</p>
+                    <p className="text-sm font-medium text-slate-700">Click to select {currentTab.label} file(s)</p>
                     <p className="text-xs text-slate-400 mt-1">{currentTab.description}</p>
                     <p className="text-xs text-slate-400">Max 10MB | Format: {currentTab.accept}</p>
                   </>
@@ -592,20 +629,22 @@ export default function KnowledgeBasePage() {
               </div>
 
               {/* Meta Name */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Document Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={metaName}
-                  onChange={(e) => setMetaName(e.target.value)}
-                  placeholder="e.g. Employee Leave Policy 2026"
-                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand text-sm"
-                  required
-                />
-                <p className="text-xs text-slate-400 mt-1">The name recognized by the AI when answering questions</p>
-              </div>
+              {selectedFiles.length <= 1 && (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                    Document Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={metaName}
+                    onChange={(e) => setMetaName(e.target.value)}
+                    placeholder="e.g. Employee Leave Policy 2026"
+                    className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand text-sm"
+                    required={selectedFiles.length === 1}
+                  />
+                  <p className="text-xs text-slate-400 mt-1">The name recognized by the AI when answering questions</p>
+                </div>
+              )}
 
               {/* Category */}
               <div>
@@ -692,11 +731,11 @@ export default function KnowledgeBasePage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={uploading || !selectedFile}
+                  disabled={uploading || selectedFiles.length === 0}
                   className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-brand to-brand-hover rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-2 shadow-sm"
                 >
                   {uploading ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> {uploadProgress ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : 'Processing...'}</>
                   ) : (
                     <><Upload size={16} /> Upload & Process</>
                   )}

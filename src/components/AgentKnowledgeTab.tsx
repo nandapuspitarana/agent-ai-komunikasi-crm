@@ -53,8 +53,9 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
   const [activeUploadTab, setActiveUploadTab] = useState<DocType>('pdf');
   const [metaName, setMetaName] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{current: number, total: number} | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchDocuments = async () => {
@@ -107,10 +108,12 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
     if (flowId) fetchDocuments();
   }, [flowId]);
 
-  const handleFile = (file: File) => {
-    setSelectedFile(file);
-    if (!metaName) {
-      setMetaName(file.name.replace(/\.[^/.]+$/, ''));
+  const handleFiles = (files: File[]) => {
+    if (files.length > 0) {
+      setSelectedFiles(prev => [...prev, ...files]);
+      if (!metaName && files.length === 1) {
+        setMetaName(files[0].name.replace(/\.[^/.]+$/, ''));
+      }
     }
   };
 
@@ -127,56 +130,77 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      // Basic validation for accepted type
-      const currentTab = UPLOAD_TABS.find(t => t.id === activeUploadTab)!;
-      const acceptList = currentTab.accept.split(',');
+    const files = Array.from(e.dataTransfer.files || []);
+    const currentTab = UPLOAD_TABS.find(t => t.id === activeUploadTab)!;
+    const acceptList = currentTab.accept.split(',');
+    
+    const validFiles = files.filter(file => {
       const hasExtension = file.name.includes('.');
       const fileExt = hasExtension ? '.' + file.name.split('.').pop()?.toLowerCase() : '';
-      
-      // Allow if accept list includes '*/*' OR matches the extension, OR the file has no extension (and tab supports generic like CSV/Txt)
-      if (acceptList.includes('*/*') || (hasExtension && acceptList.includes(fileExt)) || !hasExtension) {
-         handleFile(file);
-      } else {
-         setError(`File tidak didukung. Harap upload format: ${currentTab.accept}`);
-      }
+      return acceptList.includes('*/*') || (hasExtension && acceptList.includes(fileExt)) || !hasExtension;
+    });
+
+    if (validFiles.length > 0) {
+       handleFiles(validFiles);
+    }
+    if (validFiles.length < files.length) {
+       setError(`Beberapa file tidak didukung. Harap upload format: ${currentTab.accept}`);
     }
   };
 
   const handleFileUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!flowId) return;
-    if (!selectedFile || !metaName) return;
+    if (selectedFiles.length === 0) return;
+    if (selectedFiles.length === 1 && !metaName) return;
 
     setUploading(true);
     setError(null);
+    setUploadProgress({ current: 0, total: selectedFiles.length });
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('meta_name', metaName);
-    if (description) formData.append('description', description);
+    let successCount = 0;
 
-    try {
-      const res = await fetch(`/api/flows/${flowId}/knowledge`, {
-        method: 'POST',
-        body: formData,
-      });
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      setUploadProgress({ current: i + 1, total: selectedFiles.length });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Upload gagal');
+      const formData = new FormData();
+      formData.append('file', file);
+      const nameToUse = selectedFiles.length === 1 ? metaName : file.name.replace(/\.[^/.]+$/, '');
+      formData.append('meta_name', nameToUse);
+      if (description) formData.append('description', description);
+
+      try {
+        const res = await fetch(`/api/flows/${flowId}/knowledge`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          console.error(`Upload gagal ${file.name}:`, data.error);
+        } else {
+          successCount++;
+        }
+      } catch (err: any) {
+         console.error(`Upload error ${file.name}:`, err);
       }
+    }
 
+    setUploading(false);
+    setUploadProgress(null);
+
+    if (successCount === 0) {
+      setError('Upload gagal untuk semua dokumen');
+    } else {
       setShowModal(false);
-      setSelectedFile(null);
+      setSelectedFiles([]);
       setMetaName('');
       setDescription('');
       fetchDocuments();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setUploading(false);
+      if (successCount < selectedFiles.length) {
+         alert(`Berhasil mengunggah ${successCount} dari ${selectedFiles.length} dokumen.`);
+      }
     }
   };
 
@@ -315,7 +339,7 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => { setActiveUploadTab(tab.id); setSelectedFile(null); setError(null); setIsDragging(false); }}
+                    onClick={() => { setActiveUploadTab(tab.id); setSelectedFiles([]); setError(null); setIsDragging(false); }}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${activeUploadTab === tab.id ? tab.color + ' ring-2 ring-brand-light' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                   >
                     {tab.icon} {tab.label}
@@ -335,15 +359,39 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${isDragging ? 'border-brand-light bg-brand-bg scale-[1.02]' : selectedFile ? 'border-brand/40 bg-brand-bg' : 'border-slate-300 hover:border-brand/40 hover:bg-slate-50'}`}
+                className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${isDragging ? 'border-brand-light bg-brand-bg scale-[1.02]' : selectedFiles.length > 0 ? 'border-brand/40 bg-brand-bg' : 'border-slate-300 hover:border-brand/40 hover:bg-slate-50'}`}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <input type="file" ref={fileInputRef} className="sr-only" accept={currentTab.accept} onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleFile(f);
+                <input type="file" multiple ref={fileInputRef} className="sr-only" accept={currentTab.accept} onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  if (files.length > 0) handleFiles(files);
                 }} />
-                {selectedFile ? (
-                  <p className="font-semibold text-brand-hover text-sm">{selectedFile.name}</p>
+                
+                {selectedFiles.length > 0 ? (
+                  <div className="flex flex-col gap-2 max-h-40 overflow-y-auto w-full">
+                    {selectedFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded border border-slate-200">
+                        <div className="flex items-center gap-2">
+                           <div className="text-left">
+                             <p className="font-semibold text-brand-hover text-sm truncate max-w-[180px]" title={file.name}>{file.name}</p>
+                           </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            const newFiles = [...selectedFiles];
+                            newFiles.splice(idx, 1);
+                            setSelectedFiles(newFiles); 
+                            if (fileInputRef.current) fileInputRef.current.value=''; 
+                          }}
+                          className="p-1 hover:bg-slate-100 rounded text-slate-400"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <>
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-2 transition-transform ${isDragging ? 'scale-110 ' + currentTab.color : currentTab.color}`}>{currentTab.icon}</div>
@@ -355,10 +403,12 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
                 )}
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{t('agentBuilder', 'docNameReq')}</label>
-                <input type="text" value={metaName} onChange={e => setMetaName(e.target.value)} required className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand outline-none" />
-              </div>
+              {selectedFiles.length <= 1 && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('agentBuilder', 'docNameReq')}</label>
+                  <input type="text" value={metaName} onChange={e => setMetaName(e.target.value)} required={selectedFiles.length === 1} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand outline-none" />
+                </div>
+              )}
               
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">{t('agentBuilder', 'shortDesc')}</label>
@@ -367,8 +417,8 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
 
               <div className="pt-3 flex justify-end gap-2 border-t border-slate-100">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm bg-slate-100 text-slate-600 rounded-lg font-medium">{t('common', 'cancel')}</button>
-                <button type="submit" disabled={uploading || !selectedFile} className="px-4 py-2 text-sm bg-brand text-white rounded-lg font-medium disabled:opacity-50">
-                  {uploading ? t('agentBuilder', 'uploading') : t('agentBuilder', 'uploadDocument')}
+                <button type="submit" disabled={uploading || selectedFiles.length === 0} className="px-4 py-2 text-sm bg-brand text-white rounded-lg font-medium disabled:opacity-50">
+                  {uploading ? (uploadProgress ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : t('agentBuilder', 'uploading')) : t('agentBuilder', 'uploadDocument')}
                 </button>
               </div>
             </form>
