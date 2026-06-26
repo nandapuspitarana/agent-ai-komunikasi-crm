@@ -133,11 +133,11 @@ export function ChatWindow({
           event: 'INSERT',
           schema: 'crm',
           table: 'crm_agent_Message',
-          filter: `"sessionId"=eq.${serverSessionId}`,
         },
         (payload) => {
           console.log('[Widget] RECEIVED postgres_changes EVENT!', payload);
           const newMsg = payload.new as any;
+          if (newMsg.sessionId !== serverSessionId) return;
           if (newMsg.senderType === 'user') return;
           
           if (newMsg.senderType === 'bot') {
@@ -174,10 +174,11 @@ export function ChatWindow({
           event: 'UPDATE',
           schema: 'crm',
           table: 'crm_agent_ChatSession',
-          filter: `id=eq.${serverSessionId}`,
         },
         (payload) => {
           const updatedSession = payload.new as any;
+          if (updatedSession.id !== serverSessionId) return;
+          
           if (updatedSession.status === 'agent') {
             setSessionStatus('agent');
           } else if (updatedSession.status === 'closed') {
