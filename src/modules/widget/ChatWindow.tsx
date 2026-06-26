@@ -123,6 +123,7 @@ export function ChatWindow({
   useEffect(() => {
     if (!serverSessionId) return;
 
+    console.log('[Widget] Subscribing to channel:', `session_${serverSessionId}`);
     const channel = supabase.channel(`session_${serverSessionId}`);
 
     channel
@@ -135,11 +136,11 @@ export function ChatWindow({
           filter: `"sessionId"=eq.${serverSessionId}`,
         },
         (payload) => {
+          console.log('[Widget] RECEIVED postgres_changes EVENT!', payload);
           const newMsg = payload.new as any;
           if (newMsg.senderType === 'user') return;
           
           if (newMsg.senderType === 'bot') {
-            // Options are usually sent in the API response, but for DB inserts we just show the message
             addMessage(newMsg.content, 'bot');
             setIsSending(false);
           } else if (newMsg.senderType === 'agent') {
@@ -153,6 +154,7 @@ export function ChatWindow({
         'broadcast',
         { event: 'new_message' },
         (payload) => {
+          console.log('[Widget] RECEIVED broadcast EVENT!', payload);
           const newMsg = payload.payload as any;
           if (newMsg.senderType === 'user') return;
           
@@ -186,7 +188,9 @@ export function ChatWindow({
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        console.log('[Widget] Channel status changed:', status, err);
+      });
 
     return () => {
       supabase.removeChannel(channel);
