@@ -72,38 +72,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Emit Socket.io events directly to widget and inbox agent dashboards
-    // Supabase Realtime handles this automatically, but we add Broadcast fallback.
-    try {
-      const { supabase } = await import('@/lib/supabase-client');
-      const channel = supabase.channel(`session_${sessionId}`);
-      
-      // Must subscribe before sending broadcast in Supabase JS v2
-      await new Promise<void>((resolve, reject) => {
-        channel.subscribe((status, err) => {
-          if (status === 'SUBSCRIBED') {
-            resolve();
-          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            reject(err || new Error(`Status: ${status}`));
-          }
-        });
-      });
-
-      await channel.send({
-        type: 'broadcast',
-        event: 'new_message',
-        payload: {
-          id: newMessage.id,
-          senderType: 'agent',
-          content: content,
-          createdAt: newMessage.createdAt.toISOString()
-        }
-      });
-      
-      // Clean up connection
-      supabase.removeChannel(channel);
-    } catch (err) {
-      console.error('[Broadcast] Failed to emit agent message to widget:', err);
-    }
+    // Supabase Realtime handles this automatically via postgres_changes.
+    // We removed the explicit Broadcast fallback because it blocks the API response
+    // if the WebSocket ACK is delayed.
 
     return NextResponse.json({ success: true, message: newMessage, status: updatedStatus });
   } catch (error) {
