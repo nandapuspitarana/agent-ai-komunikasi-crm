@@ -76,6 +76,18 @@ export async function POST(req: NextRequest) {
     try {
       const { supabase } = await import('@/lib/supabase-client');
       const channel = supabase.channel(`session_${sessionId}`);
+      
+      // Must subscribe before sending broadcast in Supabase JS v2
+      await new Promise<void>((resolve, reject) => {
+        channel.subscribe((status, err) => {
+          if (status === 'SUBSCRIBED') {
+            resolve();
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            reject(err || new Error(`Status: ${status}`));
+          }
+        });
+      });
+
       await channel.send({
         type: 'broadcast',
         event: 'new_message',
@@ -86,6 +98,9 @@ export async function POST(req: NextRequest) {
           createdAt: newMessage.createdAt.toISOString()
         }
       });
+      
+      // Clean up connection
+      supabase.removeChannel(channel);
     } catch (err) {
       console.error('[Broadcast] Failed to emit agent message to widget:', err);
     }

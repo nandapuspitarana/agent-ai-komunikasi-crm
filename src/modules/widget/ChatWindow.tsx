@@ -40,6 +40,15 @@ export function ChatWindow({
   
   const tenantId = getTenantId();
 
+  // When embedded externally (e.g. WordPress), API calls must use absolute URL
+  const getApiBase = () => {
+    if (typeof window !== 'undefined' && (window as any).CRM_AGENT_CONFIG?.apiUrl) {
+      return (window as any).CRM_AGENT_CONFIG.apiUrl.replace(/\/$/, '');
+    }
+    return ''; // same-origin (when loaded from CRM itself)
+  };
+  const apiBase = getApiBase();
+
   const addMessage = useCallback((text: string, sender: ChatMessageData['sender'], avatar?: string, options?: string[]) => {
     setMessages(prev => {
       const isDuplicate = prev.slice(-3).some(m => 
@@ -59,7 +68,7 @@ export function ChatWindow({
   });
 
   useEffect(() => {
-    fetch(`/api/widget/config?tenantId=${tenantId}`)
+    fetch(`${apiBase}/api/widget/config?tenantId=${tenantId}`)
       .then(res => res.json())
       .then(data => {
         if (!data.error) {
@@ -87,7 +96,7 @@ export function ChatWindow({
               (position) => {
                 const { latitude, longitude } = position.coords;
                 // Send to backend silently
-                fetch('/api/widget/visitor/geo', {
+                fetch(`${apiBase}/api/widget/visitor/geo`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -195,7 +204,7 @@ export function ChatWindow({
     setInputValue('');
 
     try {
-      const response = await fetch('/api/widget/message', {
+      const response = await fetch(`${apiBase}/api/widget/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -259,7 +268,7 @@ export function ChatWindow({
         try {
           const loadingMsg = event.data.loadingMessage || t('chatWidget', 'submittingForm', 'Submitting your details...');
           addMessage(loadingMsg, 'system');
-          const res = await fetch('/api/widget/form-proxy', {
+          const res = await fetch(`${apiBase}/api/widget/form-proxy`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -296,7 +305,7 @@ export function ChatWindow({
     if (!serverSessionId || rating === 0) return;
     setIsSending(true);
     try {
-      const res = await fetch(`/api/chat/sessions/${serverSessionId}/review`, {
+      const res = await fetch(`${apiBase}/api/chat/sessions/${serverSessionId}/review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rating, review: reviewText }),
