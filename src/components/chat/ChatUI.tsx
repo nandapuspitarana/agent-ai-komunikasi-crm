@@ -363,7 +363,7 @@ export function ChatUI({
                   ? t('chatWidget', 'writeMessageAgent')
                   : t('chatWidget', 'writeMessage')
               }
-              className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full px-5 py-3 text-sm outline-none transition-all placeholder-slate-400"
+              className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full pl-5 pr-12 py-3 text-sm outline-none transition-all placeholder-slate-400"
               style={{ '--tw-ring-color': config.primaryColor } as React.CSSProperties}
             />
             <button 

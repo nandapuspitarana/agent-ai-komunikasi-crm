@@ -14,7 +14,7 @@ import { useTranslation } from '@/lib/i18n/I18nContext';
 
 export default function DashboardOverview() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'overview' | 'rating' | 'ai-agent' | 'insight'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'rating' | 'ai-agent' | 'insight' | 'ai-cost'>('overview');
   const [isLoading, setIsLoading] = useState(true);
   
   const [dashboardData, setDashboardData] = useState<{
@@ -27,6 +27,8 @@ export default function DashboardOverview() {
     insights: any
   } | null>(null);
 
+  const [aiCostData, setAiCostData] = useState<any>(null);
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -34,6 +36,12 @@ export default function DashboardOverview() {
         if (res.ok) {
           const data = await res.json();
           setDashboardData(data);
+        }
+        
+        const costRes = await fetch('/api/dashboard/ai-cost?days=7');
+        if (costRes.ok) {
+          const costData = await costRes.json();
+          setAiCostData(costData);
         }
       } catch (error) {
         console.error('Failed to fetch dashboard stats:', error);
@@ -142,6 +150,16 @@ export default function DashboardOverview() {
             }`}
           >
             <Lightbulb size={16} /> {t('dashboard', 'tabInsight')}
+          </button>
+          <button 
+            onClick={() => setActiveTab('ai-cost')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+              activeTab === 'ai-cost' 
+                ? 'bg-white text-slate-900 shadow-sm' 
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <BarChart size={16} /> AI Cost & Evals
           </button>
         </div>
       </div>
@@ -537,6 +555,224 @@ export default function DashboardOverview() {
           </div>
         </div>
       )}
+      {/* AI COST TAB */}
+      {activeTab === 'ai-cost' && (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          {isLoading || !aiCostData ? (
+            <div className="flex justify-center items-center h-64 text-slate-400">
+              <Loader2 className="animate-spin w-8 h-8 mr-3 text-brand-light" /> Loading Observability Data...
+            </div>
+          ) : (
+            <>
+              {/* Cards Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+                  <h3 className="text-slate-500 text-sm font-medium mb-1">Total Tokens Used</h3>
+                  <p className="text-2xl font-bold text-slate-900">{aiCostData.cost_summary.total_tokens.toLocaleString()}</p>
+                  <div className="text-xs text-slate-400 mt-2">
+                    In: {aiCostData.cost_summary.total_input_tokens.toLocaleString()} | Out: {aiCostData.cost_summary.total_output_tokens.toLocaleString()}
+                  </div>
+                </div>
+                
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+                  <h3 className="text-slate-500 text-sm font-medium mb-1">Estimated Cost</h3>
+                  <p className="text-2xl font-bold text-emerald-600">${aiCostData.cost_summary.estimated_cost_usd.toFixed(2)}</p>
+                  <div className="text-xs text-slate-400 mt-2">Based on OpenAI pricing</div>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+                  <h3 className="text-slate-500 text-sm font-medium mb-1">Total AI Requests</h3>
+                  <p className="text-2xl font-bold text-slate-900">{aiCostData.request_stats.total_requests.toLocaleString()}</p>
+                  <div className="text-xs text-slate-400 mt-2">Last 7 days</div>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+                  <h3 className="text-slate-500 text-sm font-medium mb-1">Avg Response Time</h3>
+                  <p className="text-2xl font-bold text-slate-900">{aiCostData.request_stats.avg_latency_ms} <span className="text-sm text-slate-500">ms</span></p>
+                  <div className="text-xs text-slate-400 mt-2">p95: {aiCostData.request_stats.p95_latency_ms} ms</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Cost by Model */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-1">
+                  <h2 className="text-lg font-bold text-slate-900 mb-6">Cost by Model</h2>
+                  <div className="space-y-4">
+                    {aiCostData.cost_summary.by_model.map((m: any) => (
+                      <div key={m.model} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-semibold text-slate-800">{m.model}</span>
+                          <span className="font-bold text-emerald-600">${m.cost_usd.toFixed(4)}</span>
+                        </div>
+                        <div className="text-xs text-slate-500 flex justify-between">
+                          <span>In: {m.input_tokens.toLocaleString()}</span>
+                          <span>Out: {m.output_tokens.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {aiCostData.cost_summary.by_model.length === 0 && (
+                      <div className="text-sm text-slate-400 text-center py-4">No data available</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* AI Quality & Evals */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-2">
+                  <h2 className="text-lg font-bold text-slate-900 mb-6">AI Quality Evaluation (LLM-as-a-Judge)</h2>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="p-4 bg-blue-50 rounded-xl text-center">
+                      <div className="text-xs font-bold text-blue-600 mb-1 uppercase tracking-wider">Pass Rate</div>
+                      <div className="text-2xl font-black text-blue-900">{Math.round(aiCostData.eval_summary.pass_rate * 100)}%</div>
+                    </div>
+                    <div className="p-4 bg-emerald-50 rounded-xl text-center">
+                      <div className="text-xs font-bold text-emerald-600 mb-1 uppercase tracking-wider">Avg Score</div>
+                      <div className="text-2xl font-black text-emerald-900">{(aiCostData.eval_summary.avg_score * 100).toFixed(1)}/100</div>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-xl text-center">
+                      <div className="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Evaluated</div>
+                      <div className="text-2xl font-black text-slate-800">{aiCostData.eval_summary.total_evaluated}</div>
+                    </div>
+                    <div className="p-4 bg-red-50 rounded-xl text-center">
+                      <div className="text-xs font-bold text-red-600 mb-1 uppercase tracking-wider">Failed</div>
+                      <div className="text-2xl font-black text-red-900">{aiCostData.eval_summary.fail_count}</div>
+                    </div>
+                  </div>
+
+                  <h3 className="text-sm font-bold text-slate-700 mb-3">Score by Dimension</h3>
+                  <div className="space-y-3">
+                    {['faithfulness', 'relevance', 'coherence'].map((dim) => {
+                      const val = aiCostData.eval_summary.by_dimension[dim] * 100;
+                      return (
+                        <div key={dim} className="flex items-center gap-3">
+                          <div className="w-24 text-sm font-medium text-slate-600 capitalize">{dim}</div>
+                          <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-brand" style={{ width: `${val}%` }}></div>
+                          </div>
+                          <div className="w-12 text-right text-sm font-bold text-slate-700">{val.toFixed(0)}%</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* RAG & Request Stats */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <h2 className="text-lg font-bold text-slate-900 mb-4">RAG Performance</h2>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-3 border border-slate-100 rounded-lg">
+                      <span className="text-sm font-medium text-slate-600">Total RAG Queries</span>
+                      <span className="font-bold text-slate-900">{aiCostData.rag_stats.total_rag_queries}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 border border-slate-100 rounded-lg">
+                      <span className="text-sm font-medium text-slate-600">Avg Chunks Retrieved</span>
+                      <span className="font-bold text-slate-900">{aiCostData.rag_stats.avg_chunks_retrieved}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 border border-slate-100 rounded-lg">
+                      <span className="text-sm font-medium text-slate-600">Avg Similarity Score</span>
+                      <span className="font-bold text-slate-900">{aiCostData.rag_stats.avg_similarity.toFixed(2)}</span>
+                    </div>
+                    
+                    <div className="pt-4">
+                      <h3 className="text-sm font-bold text-slate-700 mb-3">Backend Usage</h3>
+                      <div className="flex gap-2">
+                        {Object.entries(aiCostData.rag_stats.by_backend).map(([be, count]: [string, any]) => (
+                          <div key={be} className="flex-1 p-3 bg-slate-50 rounded-lg text-center border border-slate-100">
+                            <div className="text-xs text-slate-500 uppercase">{be}</div>
+                            <div className="text-lg font-bold text-brand">{count}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <h2 className="text-lg font-bold text-slate-900 mb-4">Request Types</h2>
+                  <div className="space-y-3">
+                    {Object.entries(aiCostData.request_stats.by_type).sort((a: any, b: any) => b[1] - a[1]).map(([type, count]: [string, any]) => {
+                      const total = aiCostData.request_stats.total_requests || 1;
+                      const pct = (count / total) * 100;
+                      return (
+                        <div key={type} className="flex items-center gap-3">
+                          <div className="w-24 text-sm font-medium text-slate-600">{type}</div>
+                          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-slate-800" style={{ width: `${pct}%` }}></div>
+                          </div>
+                          <div className="w-10 text-right text-sm font-bold text-slate-900">{count}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Traces Table */}
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="p-6 border-b border-slate-100">
+                  <h2 className="text-lg font-bold text-slate-900">Recent AI Traces</h2>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500 font-bold border-b border-slate-200">
+                        <th className="p-4">Time</th>
+                        <th className="p-4 w-1/3">User Message</th>
+                        <th className="p-4">Intent</th>
+                        <th className="p-4">Model</th>
+                        <th className="p-4 text-right">Tokens</th>
+                        <th className="p-4 text-right">Latency</th>
+                        <th className="p-4 text-center">Eval</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-sm">
+                      {aiCostData.recent_traces.map((trace: any) => (
+                        <tr key={trace.id} className="hover:bg-slate-50/50">
+                          <td className="p-4 text-slate-500 whitespace-nowrap">
+                            {new Date(trace.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </td>
+                          <td className="p-4 text-slate-800 truncate max-w-[200px]" title={trace.user_message}>
+                            {trace.user_message || <span className="text-slate-400 italic">No message</span>}
+                          </td>
+                          <td className="p-4">
+                            <span className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">
+                              {trace.intent_classified || 'N/A'}
+                            </span>
+                          </td>
+                          <td className="p-4 text-slate-600">{trace.model_name || '-'}</td>
+                          <td className="p-4 text-right font-medium text-slate-700">
+                            {(trace.input_tokens || 0) + (trace.output_tokens || 0)}
+                          </td>
+                          <td className="p-4 text-right text-slate-600">
+                            {trace.latency_ms ? `${trace.latency_ms}ms` : '-'}
+                          </td>
+                          <td className="p-4 text-center">
+                            {trace.eval_label ? (
+                              <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                                trace.eval_label === 'pass' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                              }`}>
+                                {trace.eval_label.toUpperCase()}
+                              </span>
+                            ) : '-'}
+                          </td>
+                        </tr>
+                      ))}
+                      {aiCostData.recent_traces.length === 0 && (
+                        <tr>
+                          <td colSpan={7} className="p-8 text-center text-slate-400">No traces available yet.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }

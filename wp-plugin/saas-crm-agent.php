@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 add_action('wp_footer', 'saas_crm_agent_inject_script');
 function saas_crm_agent_inject_script() {
     $tenant_id = "default-tenant";
-    $api_url = "http://localhost:8201";
+    $api_url = "https://cb242.ceosuite.com";
     
     ?>
     <!-- Start of SaaS CRM Widget -->

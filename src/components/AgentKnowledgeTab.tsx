@@ -58,6 +58,10 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
   const [uploadProgress, setUploadProgress] = useState<{current: number, total: number} | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const fetchDocuments = async () => {
     if (!flowId) return;
     setLoading(true);
@@ -228,6 +232,8 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
   }
 
   const currentTab = UPLOAD_TABS.find(t => t.id === activeUploadTab)!;
+  const totalPages = Math.ceil(documents.length / itemsPerPage);
+  const paginatedDocs = documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-10 w-full h-full flex flex-col">
@@ -265,61 +271,91 @@ export default function AgentKnowledgeTab({ flowId }: { flowId: string | null })
         )}
 
         {/* List */}
-        <div className="flex-1 border border-slate-200 rounded-lg overflow-hidden bg-slate-50/50">
+        <div className="flex-1 border border-slate-200 rounded-lg overflow-x-auto bg-slate-50/50 flex flex-col">
           {loading && documents.length === 0 ? (
             <div className="flex justify-center py-12"><div className="w-6 h-6 border-2 border-brand-light border-t-transparent rounded-full animate-spin" /></div>
           ) : documents.length === 0 ? (
-            <div className="text-center py-16 px-4">
+            <div className="text-center py-16 px-4 flex-1 flex flex-col justify-center">
               <FileText size={32} className="mx-auto text-slate-300 mb-3" />
               <p className="text-slate-500 text-sm">{t('agentBuilder', 'noDocuments')}</p>
             </div>
           ) : (
-            <table className="w-full text-sm text-left">
-              <thead className="bg-white border-b border-slate-200 text-xs uppercase text-slate-500">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">{t('agentBuilder', 'documentName')}</th>
-                  <th className="px-4 py-3 font-semibold">{t('agentBuilder', 'status')}</th>
-                  <th className="px-4 py-3 font-semibold text-center">{t('agentBuilder', 'chunks')}</th>
-                  <th className="px-4 py-3 font-semibold text-right">{t('agentBuilder', 'actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
-                {documents.map(doc => (
-                  <tr key={doc.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3">
-                      <div className="flex items-start gap-2">
-                        <div className="mt-0.5">{getFileIcon(doc.filename)}</div>
-                        <div>
-                          <p className="font-semibold text-slate-800">{doc.metaName}</p>
-                          <p className="text-xs text-slate-400">{doc.filename}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      {doc.status === 'ready' ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">
-                          <CheckCircle size={10} /> {t('agentBuilder', 'ready')}
-                        </span>
-                      ) : doc.status === 'failed' ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700" title={doc.errorMsg}>
-                          <AlertTriangle size={10} /> {t('agentBuilder', 'failed')}
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700">
-                          <Clock size={10} className="animate-pulse" /> {t('agentBuilder', 'processing')}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center text-slate-600 font-medium">{doc.chunkCount}</td>
-                    <td className="px-4 py-3 text-right">
-                      <button onClick={() => handleDelete(doc.id, doc.metaName)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded">
-                        <Trash2 size={16} />
-                      </button>
-                    </td>
+            <>
+              <table className="w-full text-sm text-left">
+                <thead className="bg-white border-b border-slate-200 text-xs uppercase text-slate-500">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">{t('agentBuilder', 'documentName')}</th>
+                    <th className="px-4 py-3 font-semibold">{t('agentBuilder', 'status')}</th>
+                    <th className="px-4 py-3 font-semibold text-center">{t('agentBuilder', 'chunks')}</th>
+                    <th className="px-4 py-3 font-semibold text-right">{t('agentBuilder', 'actions')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {paginatedDocs.map(doc => (
+                    <tr key={doc.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-3">
+                        <div className="flex items-start gap-2">
+                          <div className="mt-0.5">{getFileIcon(doc.filename)}</div>
+                          <div>
+                            <p className="font-semibold text-slate-800">{doc.metaName}</p>
+                            <p className="text-xs text-slate-400">{doc.filename}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        {doc.status === 'ready' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">
+                            <CheckCircle size={10} /> {t('agentBuilder', 'ready')}
+                          </span>
+                        ) : doc.status === 'failed' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700" title={doc.errorMsg}>
+                            <AlertTriangle size={10} /> {t('agentBuilder', 'failed')}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700">
+                            <Clock size={10} className="animate-pulse" /> {t('agentBuilder', 'processing')}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-center text-slate-600 font-medium">{doc.chunkCount}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button onClick={() => handleDelete(doc.id, doc.metaName)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded">
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="px-4 py-3 border-t border-slate-200 flex items-center justify-between bg-white mt-auto">
+                  <span className="text-xs text-slate-500">
+                    Showing <span className="font-medium text-slate-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-slate-900">{Math.min(currentPage * itemsPerPage, documents.length)}</span> of <span className="font-medium text-slate-900">{documents.length}</span>
+                  </span>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="px-2 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Prev
+                    </button>
+                    <div className="flex items-center px-2 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-300 rounded">
+                      {currentPage} / {totalPages}
+                    </div>
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-2 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
