@@ -14,6 +14,8 @@ import { ConditionNode } from '@/components/flow-nodes/ConditionNode';
 import AgentKnowledgeTab from '@/components/AgentKnowledgeTab';
 import ImageUpload from '@/components/ImageUpload';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ChatUI, ChatMessageData } from '@/components/chat/ChatUI';
 
 // --- Custom Nodes for React Flow ---
@@ -101,8 +103,6 @@ const AnswerNode = ({ data }: { data: any }) => {
     </div>
   );
 };
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 
 const nodeTypes = {
   message: MessageNode,
@@ -514,8 +514,8 @@ function AgentBuilderContent() {
     setPreviewSessionId(generateUUID());
   }, []);
 
-  const [chatMessages, setChatMessages] = useState<{ role: 'assistant' | 'user', text: string, type?: string, options?: string }[]>([
-    { role: 'assistant', text: agentConfig.welcomeMessage, type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }
+  const [chatMessages, setChatMessages] = useState<{ role: 'assistant' | 'user', text: string, type?: string, options?: string, timestamp?: string }[]>([
+    { role: 'assistant', text: agentConfig.welcomeMessage, type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions, timestamp: new Date().toISOString() }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -523,7 +523,7 @@ function AgentBuilderContent() {
   useEffect(() => {
     if (chatMessages.length <= 1) {
       setChatMessages([
-        { role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }
+        { role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions, timestamp: new Date().toISOString() }
       ]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -537,7 +537,7 @@ function AgentBuilderContent() {
 
     if (!userInput.trim() || !currentFlowId) return;
 
-    const newMessages = [...chatMessages, { role: 'user' as const, text: userInput }];
+    const newMessages = [...chatMessages, { role: 'user' as const, text: userInput, timestamp: new Date().toISOString() }];
     setChatMessages(newMessages);
     setChatInput('');
     setIsTyping(true);
@@ -597,14 +597,16 @@ function AgentBuilderContent() {
         role: 'assistant',
         text: data.reply,
         type: data.type,
-        options: data.options
+        options: data.options,
+        timestamp: new Date().toISOString()
       }]);
     } catch (error: any) {
       setChatMessages([...newMessages, {
         role: 'assistant',
         text: agentConfig.defaultResponse || `Sorry, the AI system cannot reply right now because: ${error.message}. Please ensure your question matches the existing Intent/QnA list.`,
         type: agentConfig.defaultResponseType || 'text',
-        options: agentConfig.defaultResponseOptions || ''
+        options: agentConfig.defaultResponseOptions || '',
+        timestamp: new Date().toISOString()
       }]);
     } finally {
       setIsTyping(false);
@@ -1517,7 +1519,8 @@ function AgentBuilderContent() {
                     id: idx,
                     text: msg.text,
                     sender: msg.role === 'user' ? 'user' : 'bot',
-                    options: msg.options ? msg.options.split(',').map((o: string) => o.trim()) : undefined
+                    options: msg.options ? msg.options.split(',').map((o: string) => o.trim()) : undefined,
+                    createdAt: msg.timestamp || new Date().toISOString()
                   }))}
                   isTyping={isTyping}
                   status="bot"
@@ -1533,7 +1536,7 @@ function AgentBuilderContent() {
                   onInputChange={setChatInput}
                   onSendMessage={handleSendMessage}
                   onRestartChat={() => {
-                    setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }]);
+                    setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions, timestamp: new Date().toISOString() }]);
                     setPreviewSessionId(generateUUID());
                   }}
                   hideHeaderMoreOptions={true}

@@ -13,6 +13,7 @@ export interface ChatMessageData {
   sender: MessageSender;
   avatar?: string;
   options?: string[];
+  createdAt?: string | Date;
 }
 
 export interface ChatUIConfig {
@@ -250,6 +251,11 @@ export function ChatUI({
                       />
                     )}
                   </div>
+                  {msg.createdAt && (
+                    <div className={`text-[10px] mt-1 text-right ${isUser ? 'text-white/80' : 'text-slate-400'}`}>
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  )}
                 </div>
               </div>
               

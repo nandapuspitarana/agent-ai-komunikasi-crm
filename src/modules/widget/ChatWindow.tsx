@@ -49,13 +49,20 @@ export function ChatWindow({
   };
   const apiBase = getApiBase();
 
-  const addMessage = useCallback((text: string, sender: ChatMessageData['sender'], avatar?: string, options?: string[]) => {
+  const addMessage = useCallback((text: string, sender: ChatMessageData['sender'], avatar?: string, options?: string[], createdAt?: string | Date) => {
     setMessages(prev => {
       const isDuplicate = prev.slice(-3).some(m => 
         m.sender === sender && m.text.trim() === text.trim()
       );
       if (isDuplicate) return prev;
-      return [...prev, { id: Date.now() + Math.random(), text, sender, avatar, options }];
+      return [...prev, { 
+        id: Date.now() + Math.random(), 
+        text, 
+        sender, 
+        avatar, 
+        options,
+        createdAt: createdAt || new Date().toISOString()
+      }];
     });
   }, []);
 
@@ -141,12 +148,12 @@ export function ChatWindow({
           if (newMsg.senderType === 'user') return;
           
           if (newMsg.senderType === 'bot') {
-            addMessage(newMsg.content, 'bot');
+            addMessage(newMsg.content, 'bot', undefined, undefined, newMsg.createdAt);
             setIsSending(false);
           } else if (newMsg.senderType === 'agent') {
-            addMessage(newMsg.content, 'agent');
+            addMessage(newMsg.content, 'agent', undefined, undefined, newMsg.createdAt);
           } else if (newMsg.senderType === 'system') {
-            addMessage(newMsg.content, 'system');
+            addMessage(newMsg.content, 'system', undefined, undefined, newMsg.createdAt);
           }
         }
       )
@@ -159,12 +166,12 @@ export function ChatWindow({
           if (newMsg.senderType === 'user') return;
           
           if (newMsg.senderType === 'bot') {
-            addMessage(newMsg.content, 'bot');
+            addMessage(newMsg.content, 'bot', undefined, undefined, newMsg.createdAt);
             setIsSending(false);
           } else if (newMsg.senderType === 'agent') {
-            addMessage(newMsg.content, 'agent');
+            addMessage(newMsg.content, 'agent', undefined, undefined, newMsg.createdAt);
           } else if (newMsg.senderType === 'system') {
-            addMessage(newMsg.content, 'system');
+            addMessage(newMsg.content, 'system', undefined, undefined, newMsg.createdAt);
           }
         }
       )
