@@ -21,4 +21,28 @@ class AiChatTheme {
     this.cardBorderColor = const Color(0xFFE2E8F0), // Slate 200
     this.bubbleRadius = 16.0,
   });
+
+  /// Factory constructor for CEO Suite Executive branding.
+  factory AiChatTheme.ceoSuiteExecutive({bool isDark = false}) {
+    if (isDark) {
+      return const AiChatTheme(
+        primaryColor: Color(0xFFFF6B75),
+        userBubbleColor: Color(0xFF801517),
+        userTextColor: Colors.white,
+        botBubbleColor: Color(0xFF28282A),
+        botTextColor: Color(0xFFF2F2F2),
+        backgroundColor: Color(0xFF111113),
+        cardBorderColor: Color(0xFF2C2C2E),
+      );
+    }
+    return const AiChatTheme(
+      primaryColor: Color(0xFF801517),
+      userBubbleColor: Color(0xFF801517),
+      userTextColor: Colors.white,
+      botBubbleColor: Color(0xFFF1F5F9),
+      botTextColor: Color(0xFF1E293B),
+      backgroundColor: Color(0xFFF7F4F0),
+      cardBorderColor: Color(0xFFE7DED8),
+    );
+  }
 }

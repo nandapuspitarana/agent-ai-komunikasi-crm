@@ -19,15 +19,16 @@ class AiChatController extends ChangeNotifier {
   bool _isHandoff = false;
   String? _errorMessage;
   late String _sessionId;
-  String? contactId;
+  final String? contactId;
 
   AiChatController({
-    required this.apiClient,
+    AiAgentApiClient? apiClient,
     required this.config,
     this.contactId,
     String? initialSessionId,
-  })  : rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
-        _sessionId = initialSessionId ?? 'session_${DateTime.now().millisecondsSinceEpoch}';
+  })  : apiClient = apiClient ?? AiAgentApiClient(config: config),
+        rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
+        _sessionId = initialSessionId ?? 'session_${DateTime.now().microsecondsSinceEpoch}';
 
   List<ChatMessage> get messages => List.unmodifiable(_messages);
   bool get isInitialized => _isInitialized;
@@ -147,13 +148,13 @@ class AiChatController extends ChangeNotifier {
   }
 
   /// Resets conversation and session.
-  void restartChat() {
+  Future<void> restartChat() async {
     _sessionId = 'session_${DateTime.now().microsecondsSinceEpoch}';
     _isHandoff = false;
     _isInitialized = false;
     _messages.clear();
     _errorMessage = null;
     rateLimiter.reset();
-    initialize();
+    await initialize();
   }
 }

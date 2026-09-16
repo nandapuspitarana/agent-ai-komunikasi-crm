@@ -12,6 +12,7 @@ class AiChatView extends StatefulWidget {
   final String? title;
   final VoidCallback? onClose;
   final ValueChanged<String>? onLaunchUrl;
+  final bool showAppBar;
 
   const AiChatView({
     super.key,
@@ -20,6 +21,7 @@ class AiChatView extends StatefulWidget {
     this.title,
     this.onClose,
     this.onLaunchUrl,
+    this.showAppBar = true,
   });
 
   @override
@@ -84,72 +86,7 @@ class _AiChatViewState extends State<AiChatView> {
         : null;
     final activeOptions = lastBotMessage?.options ?? const <QuickReplyOption>[];
 
-    return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        elevation: 0.5,
-        backgroundColor: Colors.white,
-        titleSpacing: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF1E293B)),
-          onPressed: () {
-            if (widget.onClose != null) {
-              widget.onClose!();
-            } else {
-              Navigator.of(context).maybePop();
-            }
-          },
-        ),
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: theme.primaryColor,
-              child: const Icon(Icons.smart_toy_rounded, size: 18, color: Colors.white),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.title ?? controller.config.botName,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
-                  ),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF22C55E), // Green 500
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Text(
-                      'Online 24/7 Support',
-                      style: TextStyle(fontSize: 10.5, color: Color(0xFF64748B)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Color(0xFF64748B), size: 20),
-            tooltip: 'Restart Conversation',
-            onPressed: () => controller.restartChat(),
-          ),
-        ],
-      ),
-      body: Column(
+    final bodyContent = Column(
         children: [
           // Human handoff banner if active
           if (controller.isHandoff) const HandoffBanner(),
@@ -166,7 +103,7 @@ class _AiChatViewState extends State<AiChatView> {
                   Expanded(
                     child: Text(
                       controller.errorMessage!,
-                      style: TextStyle(fontSize: 11, color: Colors.amber.shade900),
+                      style: TextStyle(fontSize: 12, color: Colors.amber.shade900),
                     ),
                   ),
                 ],
@@ -289,7 +226,81 @@ class _AiChatViewState extends State<AiChatView> {
             ),
           ),
         ],
+      );
+
+    if (!widget.showAppBar) {
+      return Container(
+        color: theme.backgroundColor,
+        child: bodyContent,
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      appBar: AppBar(
+        elevation: 0.5,
+        backgroundColor: Colors.white,
+        titleSpacing: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF1E293B)),
+          onPressed: () {
+            if (widget.onClose != null) {
+              widget.onClose!();
+            } else {
+              Navigator.of(context).maybePop();
+            }
+          },
+        ),
+        title: Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: theme.primaryColor,
+              child: const Icon(Icons.smart_toy_rounded, size: 18, color: Colors.white),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.title ?? controller.config.botName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF22C55E),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Online 24/7 Support',
+                      style: TextStyle(fontSize: 10.5, color: Color(0xFF64748B)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded, color: Color(0xFF64748B), size: 20),
+            tooltip: 'Restart Conversation',
+            onPressed: () => controller.restartChat(),
+          ),
+        ],
       ),
+      body: bodyContent,
     );
   }
 }
