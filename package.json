@@ -9,7 +9,14 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma db push --force-reset && npm run db:seed"
+    "db:reset": "prisma db push --force-reset && npm run db:seed",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:login": "playwright test tests/e2e/login.spec.ts --headed",
+    "test:e2e:chat": "playwright test tests/e2e/quick-chat.spec.ts --headed",
+    "test:e2e:ai": "playwright test tests/e2e/ai-chat.spec.ts --headed",
+    "test:e2e:crud": "playwright test tests/e2e/crud-bot.spec.ts --headed",
+    "test:report": "playwright show-report tests/e2e/playwright-report"
   },
   "keywords": [],
   "author": "",
@@ -36,6 +43,7 @@
     "react-dom": "^19.2.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/dompurify": "^3.0.5",
     "@types/node": "^25.9.2",

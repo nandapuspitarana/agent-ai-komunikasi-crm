@@ -97,6 +97,10 @@ export default function KnowledgeBasePage() {
   const [proxyStatus, setProxyStatus] = useState<'ok' | 'offline' | 'error' | 'loading'>('loading');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<DocType>('all');
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -111,6 +115,11 @@ export default function KnowledgeBasePage() {
   const [uploadProgress, setUploadProgress] = useState<{current: number, total: number} | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset pagination when filter/search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterType]);
 
   const fetchDocuments = async () => {
     setLoading(true);
@@ -268,6 +277,12 @@ export default function KnowledgeBasePage() {
 
     return matchSearch && typeMatch;
   });
+
+  const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
+  const paginatedDocuments = filteredDocuments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const statusCounts = {
     ready: documents.filter(d => d.status === 'ready').length,
@@ -434,95 +449,127 @@ export default function KnowledgeBasePage() {
             No documents match the filter "{searchQuery || filterType}"
           </div>
         ) : (
-          <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Document</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Tags</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Status</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-center">Chunks</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Date</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredDocuments.map((doc) => (
-                <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">{getFileIcon(doc.filename)}</div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-900 truncate max-w-[160px]" title={doc.metadata?.name || doc.filename}>
-                            {doc.metadata?.name || doc.filename}
-                          </span>
-                          {getFileTypeBadge(doc.filename)}
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Document</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Tags</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Status</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-center">Chunks</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Date</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {paginatedDocuments.map((doc) => (
+                    <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-5 py-4">
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5">{getFileIcon(doc.filename)}</div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-900 truncate max-w-[160px]" title={doc.metadata?.name || doc.filename}>
+                                {doc.metadata?.name || doc.filename}
+                              </span>
+                              {getFileTypeBadge(doc.filename)}
+                            </div>
+                            <span className="text-xs text-slate-400 truncate max-w-[200px] block" title={doc.filename}>
+                              {doc.filename}
+                            </span>
+                            {doc.metadata?.description && (
+                              <span className="text-xs text-slate-400 italic truncate max-w-[200px] block">
+                                {doc.metadata.description}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <span className="text-xs text-slate-400 truncate max-w-[200px] block" title={doc.filename}>
-                          {doc.filename}
-                        </span>
-                        {doc.metadata?.description && (
-                          <span className="text-xs text-slate-400 italic truncate max-w-[200px] block">
-                            {doc.metadata.description}
+                      </td>
+                      <td className="px-5 py-4">
+                        {doc.metadata?.category && (
+                          <span className="inline-block mb-1.5 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded font-medium">
+                            {doc.metadata.category}
                           </span>
                         )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    {doc.metadata?.category && (
-                      <span className="inline-block mb-1.5 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded font-medium">
-                        {doc.metadata.category}
-                      </span>
-                    )}
-                    {doc.metadata?.tags && doc.metadata.tags.length > 0 ? (
-                      <div className="flex flex-wrap gap-1 max-w-[180px]">
-                        {doc.metadata.tags.map((tag: string, idx: number) => (
-                          <span key={idx} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-600">
-                            <Tag size={10} />{tag}
+                        {doc.metadata?.tags && doc.metadata.tags.length > 0 ? (
+                          <div className="flex flex-wrap gap-1 max-w-[180px]">
+                            {doc.metadata.tags.map((tag: string, idx: number) => (
+                              <span key={idx} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-600">
+                                <Tag size={10} />{tag}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-slate-300 text-xs italic">-</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-4">
+                        {doc.status === 'ready' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                            <CheckCircle size={12} /> Ready
                           </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-slate-300 text-xs italic">-</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4">
-                    {doc.status === 'ready' ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                        <CheckCircle size={12} /> Ready
-                      </span>
-                    ) : doc.status === 'failed' ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700" title={doc.error_message}>
-                        <AlertCircle size={12} /> Failed
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                        <Clock size={12} className="animate-pulse" /> Processing
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4 text-center text-slate-600 font-medium">
-                    {doc.chunk_count ?? '-'}
-                  </td>
-                  <td className="px-5 py-4 text-slate-500 text-xs whitespace-nowrap">
-                    {doc.created_at ? new Date(doc.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric', month: 'short', year: 'numeric'
-                    }) : '-'}
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    <button
-                      onClick={() => handleDelete(doc.id, doc.metadata?.name || doc.filename)}
-                      className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete document"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        ) : doc.status === 'failed' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700" title={doc.error_message}>
+                            <AlertCircle size={12} /> Failed
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                            <Clock size={12} className="animate-pulse" /> Processing
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-4 text-center text-slate-600 font-medium">
+                        {doc.chunk_count ?? '-'}
+                      </td>
+                      <td className="px-5 py-4 text-slate-500 text-xs whitespace-nowrap">
+                        {doc.created_at ? new Date(doc.created_at).toLocaleDateString('id-ID', {
+                          day: 'numeric', month: 'short', year: 'numeric'
+                        }) : '-'}
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <button
+                          onClick={() => handleDelete(doc.id, doc.metadata?.name || doc.filename)}
+                          className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete document"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="px-5 py-4 border-t border-slate-200 flex items-center justify-between bg-slate-50">
+                <span className="text-sm text-slate-500">
+                  Showing <span className="font-medium text-slate-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-slate-900">{Math.min(currentPage * itemsPerPage, filteredDocuments.length)}</span> of <span className="font-medium text-slate-900">{filteredDocuments.length}</span> documents
+                </span>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <div className="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg">
+                    {currentPage} / {totalPages}
+                  </div>
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

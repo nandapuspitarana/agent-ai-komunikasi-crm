@@ -13,6 +13,7 @@ export interface ChatMessageData {
   sender: MessageSender;
   avatar?: string;
   options?: string[];
+  createdAt?: string | Date;
 }
 
 export interface ChatUIConfig {
@@ -250,6 +251,11 @@ export function ChatUI({
                       />
                     )}
                   </div>
+                  {msg.createdAt && (
+                    <div className={`text-[10px] mt-1 text-right ${isUser ? 'text-white/80' : 'text-slate-400'}`}>
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -363,7 +369,7 @@ export function ChatUI({
                   ? t('chatWidget', 'writeMessageAgent')
                   : t('chatWidget', 'writeMessage')
               }
-              className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full px-5 py-3 text-sm outline-none transition-all placeholder-slate-400"
+              className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full pl-5 pr-12 py-3 text-sm outline-none transition-all placeholder-slate-400"
               style={{ '--tw-ring-color': config.primaryColor } as React.CSSProperties}
             />
             <button 
