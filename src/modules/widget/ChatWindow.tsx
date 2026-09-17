@@ -40,13 +40,29 @@ export function ChatWindow({
   
   const tenantId = getTenantId();
 
-  const addMessage = useCallback((text: string, sender: ChatMessageData['sender'], avatar?: string, options?: string[]) => {
+  // When embedded externally (e.g. WordPress), API calls must use absolute URL
+  const getApiBase = () => {
+    if (typeof window !== 'undefined' && (window as any).CRM_AGENT_CONFIG?.apiUrl) {
+      return (window as any).CRM_AGENT_CONFIG.apiUrl.replace(/\/$/, '');
+    }
+    return ''; // same-origin (when loaded from CRM itself)
+  };
+  const apiBase = getApiBase();
+
+  const addMessage = useCallback((text: string, sender: ChatMessageData['sender'], avatar?: string, options?: string[], createdAt?: string | Date) => {
     setMessages(prev => {
       const isDuplicate = prev.slice(-3).some(m => 
         m.sender === sender && m.text.trim() === text.trim()
       );
       if (isDuplicate) return prev;
-      return [...prev, { id: Date.now() + Math.random(), text, sender, avatar, options }];
+      return [...prev, { 
+        id: Date.now() + Math.random(), 
+        text, 
+        sender, 
+        avatar, 
+        options,
+        createdAt: createdAt || new Date().toISOString()
+      }];
     });
   }, []);
 
@@ -59,7 +75,7 @@ export function ChatWindow({
   });
 
   useEffect(() => {
-    fetch(`/api/widget/config?tenantId=${tenantId}`)
+    fetch(`${apiBase}/api/widget/config?tenantId=${tenantId}`)
       .then(res => res.json())
       .then(data => {
         if (!data.error) {
@@ -87,7 +103,7 @@ export function ChatWindow({
               (position) => {
                 const { latitude, longitude } = position.coords;
                 // Send to backend silently
-                fetch('/api/widget/visitor/geo', {
+                fetch(`${apiBase}/api/widget/visitor/geo`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -114,6 +130,7 @@ export function ChatWindow({
   useEffect(() => {
     if (!serverSessionId) return;
 
+    console.log('[Widget] Subscribing to channel:', `session_${serverSessionId}`);
     const channel = supabase.channel(`session_${serverSessionId}`);
 
     channel
@@ -123,20 +140,38 @@ export function ChatWindow({
           event: 'INSERT',
           schema: 'crm',
           table: 'crm_agent_Message',
-          filter: `sessionId=eq.${serverSessionId}`,
         },
         (payload) => {
+          console.log('[Widget] RECEIVED postgres_changes EVENT!', payload);
           const newMsg = payload.new as any;
+          if (newMsg.sessionId !== serverSessionId) return;
           if (newMsg.senderType === 'user') return;
           
           if (newMsg.senderType === 'bot') {
-            // Options are usually sent in the API response, but for DB inserts we just show the message
-            addMessage(newMsg.content, 'bot');
+            addMessage(newMsg.content, 'bot', undefined, undefined, newMsg.createdAt);
             setIsSending(false);
           } else if (newMsg.senderType === 'agent') {
-            addMessage(newMsg.content, 'agent');
+            addMessage(newMsg.content, 'agent', undefined, undefined, newMsg.createdAt);
           } else if (newMsg.senderType === 'system') {
-            addMessage(newMsg.content, 'system');
+            addMessage(newMsg.content, 'system', undefined, undefined, newMsg.createdAt);
+          }
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'new_message' },
+        (payload) => {
+          console.log('[Widget] RECEIVED broadcast EVENT!', payload);
+          const newMsg = payload.payload as any;
+          if (newMsg.senderType === 'user') return;
+          
+          if (newMsg.senderType === 'bot') {
+            addMessage(newMsg.content, 'bot', undefined, undefined, newMsg.createdAt);
+            setIsSending(false);
+          } else if (newMsg.senderType === 'agent') {
+            addMessage(newMsg.content, 'agent', undefined, undefined, newMsg.createdAt);
+          } else if (newMsg.senderType === 'system') {
+            addMessage(newMsg.content, 'system', undefined, undefined, newMsg.createdAt);
           }
         }
       )
@@ -146,10 +181,11 @@ export function ChatWindow({
           event: 'UPDATE',
           schema: 'crm',
           table: 'crm_agent_ChatSession',
-          filter: `id=eq.${serverSessionId}`,
         },
         (payload) => {
           const updatedSession = payload.new as any;
+          if (updatedSession.id !== serverSessionId) return;
+          
           if (updatedSession.status === 'agent') {
             setSessionStatus('agent');
           } else if (updatedSession.status === 'closed') {
@@ -160,7 +196,9 @@ export function ChatWindow({
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        console.log('[Widget] Channel status changed:', status, err);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -178,7 +216,7 @@ export function ChatWindow({
     setInputValue('');
 
     try {
-      const response = await fetch('/api/widget/message', {
+      const response = await fetch(`${apiBase}/api/widget/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -242,7 +280,7 @@ export function ChatWindow({
         try {
           const loadingMsg = event.data.loadingMessage || t('chatWidget', 'submittingForm', 'Submitting your details...');
           addMessage(loadingMsg, 'system');
-          const res = await fetch('/api/widget/form-proxy', {
+          const res = await fetch(`${apiBase}/api/widget/form-proxy`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -279,7 +317,7 @@ export function ChatWindow({
     if (!serverSessionId || rating === 0) return;
     setIsSending(true);
     try {
-      const res = await fetch(`/api/chat/sessions/${serverSessionId}/review`, {
+      const res = await fetch(`${apiBase}/api/chat/sessions/${serverSessionId}/review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rating, review: reviewText }),

@@ -3,11 +3,18 @@
 ## Overview
 CEO SUITE Hong Kong New World Tower (K11) is an active centre in Shanghai, China. Shanghai business centre on Huaihai Zhong Road, suitable for users asking for central Shanghai or K11.
 
+**Deskripsi Lokasi:**
+Dengan ruang kantor CEO SUITE di lantai 47, menara dengan lantai 61 yang inovatif ini menampilkan pemandangan yang menakjubkan di sepanjang Sungai Huangpu. Sebagai pusat bisnis dan hiburan, menara ini dirancang sebagai tempat di mana seni, kemanusiaan, budaya dan bisnis bertemu. Dengan desain art deco dan infrastruktur TI yang canggih, menara ini diakui sebagai salah satu dari 10 Bangunan Utama Baru di China. Kantor-kantor memancarkan aura keanggunan dan keunggulan yang ideal untuk setiap bisnis yang ingin membangun citra perusahaan yang mengesankan.
+
 Controlled centre identity:
 - Country: China
 - City: Shanghai
 - Centre: Hong Kong New World Tower (K11)
 - Address: 47th Floor, 300 Huaihai Zhong Road, Shanghai 200021
+- Telepon: +86 (21) 5116 2888
+- Email: sales@cn.ceosuite.com
+- Latitude: 31.223821
+- Longitude: 121.4712488,17
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +34,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

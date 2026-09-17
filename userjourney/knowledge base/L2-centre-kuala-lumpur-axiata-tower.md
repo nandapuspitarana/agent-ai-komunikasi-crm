@@ -3,11 +3,18 @@
 ## Overview
 CEO SUITE Axiata Tower is an active centre in Kuala Lumpur, Malaysia. Kuala Lumpur business centre in KL Sentral, suitable for users asking for KL Sentral transport connectivity.
 
+**Deskripsi Lokasi:**
+Mempersonalisasikan Malaysia yang berpikiran maju, Axiata Tower dikenal dengan infrastruktur TI-nya yang luar biasa untuk solusi bisnis yang inovatif dan merupakan gedung swasta pertama di KL Sentralto yang mendapat sertifikasi Multimedia Super Corridor. Juga memenangkan Penghargaan Bangunan Korporat 2010 untuk pengembangan kantor, gerai makan internasional dan bank, serta fasilitas olahraga dan rekreasi. Dengan CEO SUITE yang menempati lantai ke-27 menara, seluruh gagasan Anda tentang cara bisnis yang harus dilakukan akan berubah .
+
 Controlled centre identity:
 - Country: Malaysia
 - City: Kuala Lumpur
 - Centre: Axiata Tower
 - Address: 27th Floor, Jalan Stesen Sentral 5, KL Sentral, Kuala Lumpur 50470
+- Telepon: +60 (3) 2776 6888
+- Email: sales@my.ceosuite.com
+- Latitude: 3.1338790
+- Longitude: 101.6848090
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +34,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

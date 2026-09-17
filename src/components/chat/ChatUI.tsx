@@ -13,6 +13,7 @@ export interface ChatMessageData {
   sender: MessageSender;
   avatar?: string;
   options?: string[];
+  createdAt?: string | Date;
 }
 
 export interface ChatUIConfig {
@@ -250,23 +251,34 @@ export function ChatUI({
                       />
                     )}
                   </div>
+                  {msg.createdAt && (
+                    <div className={`text-[10px] mt-1 text-right ${isUser ? 'text-white/80' : 'text-slate-400'}`}>
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  )}
                 </div>
               </div>
               
               {/* Render options if available */}
               {!isUser && msg.options && msg.options.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2 ml-8 pl-1">
-                  {msg.options.map((option, idx) => (
+                  {msg.options.map((optionRaw, idx) => {
+                    const pipeIdx = optionRaw.indexOf('|');
+                    const label = pipeIdx !== -1 ? optionRaw.substring(0, pipeIdx).trim() : optionRaw.trim();
+                    const value = pipeIdx !== -1 ? optionRaw.substring(pipeIdx + 1).trim() : optionRaw.trim();
+                    return (
                     <button
                       key={idx}
-                      onClick={() => onSendMessage(option)}
+                      onClick={() => onSendMessage(value)}
                       disabled={isTyping || status === 'closed'}
                       className="px-3 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-brand/30 transition-colors shadow-sm disabled:opacity-50"
                       style={{ borderColor: config.primaryColor + '40', color: config.primaryColor }}
+                      title={pipeIdx !== -1 ? `Sends: ${value}` : undefined}
                     >
-                      {option}
+                      {label}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -357,7 +369,7 @@ export function ChatUI({
                   ? t('chatWidget', 'writeMessageAgent')
                   : t('chatWidget', 'writeMessage')
               }
-              className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full px-5 py-3 text-sm outline-none transition-all placeholder-slate-400"
+              className="flex-1 bg-slate-100 border-none focus:ring-2 rounded-full pl-5 pr-12 py-3 text-sm outline-none transition-all placeholder-slate-400"
               style={{ '--tw-ring-color': config.primaryColor } as React.CSSProperties}
             />
             <button 

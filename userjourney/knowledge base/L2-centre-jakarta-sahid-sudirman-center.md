@@ -3,11 +3,20 @@
 ## Overview
 CEO SUITE Sahid Sudirman Center is an active centre in Jakarta, Indonesia. Jakarta business centre on Jl. Jend. Sudirman, suitable for users seeking a central Sudirman business address.
 
+**Deskripsi Lokasi:**
+Sahid Sudirman Center
+CENTRAL JAKARTA, INDONESIA
+Salah satu gedung tertinggi di Jakarta, dengan 59 lantai yang membentuk Sahid Sudirman Center mempunyai nilai tersendiri, menawarkan pemandangan cakrawala Jakarta yang fantastis. Interior yang dirancang secara luas oleh CEO SUITE terhubung langsung dengan tingkat basement pusat, hotel bintang 5 Sahid Jaya dan apartemen Sahid Sudirman. Kantor kami di Sahid Sudirman Center dapat memberikan bisnis Anda alamat yang didambakan di kawasan pusat keuangan Jakarta.
+
 Controlled centre identity:
 - Country: Indonesia
 - City: Jakarta
 - Centre: Sahid Sudirman Center
 - Address: 56th Floor, Sahid Sudirman Center Jl. Jend. Sudirman No. 86 Jakarta 10220
+- Telepon: +62 (21) 80631888
+- Email: sales@ceosuite.com
+- Latitude: -6.2108790
+- Longitude: 106.8185880
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +36,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

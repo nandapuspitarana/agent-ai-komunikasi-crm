@@ -72,7 +72,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Emit Socket.io events directly to widget and inbox agent dashboards
-    // Supabase Realtime handles this automatically.
+    // Supabase Realtime handles this automatically via postgres_changes.
+    // We removed the explicit Broadcast fallback because it blocks the API response
+    // if the WebSocket ACK is delayed.
 
     return NextResponse.json({ success: true, message: newMessage, status: updatedStatus });
   } catch (error) {

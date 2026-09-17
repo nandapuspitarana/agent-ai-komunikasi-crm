@@ -3,17 +3,19 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Save, FileText, Link as LinkIcon, Settings, Globe, HelpCircle, Plus, Trash2, ArrowLeft, Send, Bot, User, RotateCcw, GitMerge, List, MessageSquare, LayoutList, FormInput, ExternalLink, Cpu, ChevronRight, Code, Download, Upload } from 'lucide-react';
+import { Save, FileText, Link as LinkIcon, Settings, Globe, HelpCircle, Plus, Trash2, ArrowLeft, Send, Bot, User, RotateCcw, GitMerge, List, MessageSquare, LayoutList, FormInput, ExternalLink, Cpu, ChevronRight, ChevronLeft, Code, Download, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, BackgroundVariant, addEdge, Handle, Position, applyNodeChanges, NodeChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { MessageNode } from '@/components/flow-nodes/MessageNode';
 import { InputNode } from '@/components/flow-nodes/InputNode';
-import DOMPurify from 'dompurify';
 import { ConditionNode } from '@/components/flow-nodes/ConditionNode';
 import AgentKnowledgeTab from '@/components/AgentKnowledgeTab';
 import ImageUpload from '@/components/ImageUpload';
+import SplitPaneFaq from '@/components/agent/SplitPaneFaq';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ChatUI, ChatMessageData } from '@/components/chat/ChatUI';
 
 // --- Custom Nodes for React Flow ---
@@ -101,8 +103,6 @@ const AnswerNode = ({ data }: { data: any }) => {
     </div>
   );
 };
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 
 const nodeTypes = {
   message: MessageNode,
@@ -129,6 +129,7 @@ function AgentBuilderContent() {
 
   const [activeTab, setActiveTab] = useState('settings');
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(flowIdParam);
+  const [showChatPreview, setShowChatPreview] = useState(true);
 
   const [agentConfig, setAgentConfig] = useState({
     name: 'Sales Assistant',
@@ -162,7 +163,40 @@ function AgentBuilderContent() {
   const [intents, setIntents] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // --- Flow State derived from Intents ---
+  // --- Array-based UI state for Options (buttons) and Form fields ---
+  const [buttonRows, setButtonRows] = useState<{label: string; value: string}[]>([{label: '', value: ''}]);
+  const [formFieldRows, setFormFieldRows] = useState<{label: string; placeholder: string; type: string; required: boolean}[]>([{label: '', placeholder: '', type: 'text', required: false}]);
+
+  // Sync buttonRows <-> activeIntentData.options when switching intents
+  useEffect(() => {
+    if (!activeIntentId) return;
+    const intent = intents.find(i => i.id === activeIntentId);
+    if (!intent) return;
+    if (intent.answerType === 'options' && intent.options) {
+      const parsed = intent.options.split(',').map((o: string) => {
+        const t = o.trim();
+        const pipeIdx = t.indexOf('|');
+        return pipeIdx !== -1
+          ? { label: t.substring(0, pipeIdx).trim(), value: t.substring(pipeIdx + 1).trim() }
+          : { label: t, value: t };
+      }).filter((r: any) => r.label);
+      setButtonRows(parsed.length > 0 ? parsed : [{label: '', value: ''}]);
+    } else {
+      setButtonRows([{label: '', value: ''}]);
+    }
+    setFormFieldRows([{label: '', placeholder: '', type: 'text', required: false}]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeIntentId]);
+
+  // Helper: serialize buttonRows back to the options string and save
+  const syncButtonRowsToIntent = (rows: {label: string; value: string}[]) => {
+    const str = rows
+      .filter(r => r.label.trim())
+      .map(r => r.value.trim() && r.value.trim() !== r.label.trim() ? `${r.label}|${r.value}` : r.label)
+      .join(', ');
+    updateActiveIntent('options', str);
+  };
+
   const nodeTypes = useMemo(() => ({ 
     question: QuestionNode, 
     answer: AnswerNode,
@@ -481,8 +515,8 @@ function AgentBuilderContent() {
     setPreviewSessionId(generateUUID());
   }, []);
 
-  const [chatMessages, setChatMessages] = useState<{ role: 'assistant' | 'user', text: string, type?: string, options?: string }[]>([
-    { role: 'assistant', text: agentConfig.welcomeMessage, type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }
+  const [chatMessages, setChatMessages] = useState<{ role: 'assistant' | 'user', text: string, type?: string, options?: string, timestamp?: string }[]>([
+    { role: 'assistant', text: agentConfig.welcomeMessage, type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions, timestamp: new Date().toISOString() }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -490,7 +524,7 @@ function AgentBuilderContent() {
   useEffect(() => {
     if (chatMessages.length <= 1) {
       setChatMessages([
-        { role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }
+        { role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions, timestamp: new Date().toISOString() }
       ]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -504,7 +538,7 @@ function AgentBuilderContent() {
 
     if (!userInput.trim() || !currentFlowId) return;
 
-    const newMessages = [...chatMessages, { role: 'user' as const, text: userInput }];
+    const newMessages = [...chatMessages, { role: 'user' as const, text: userInput, timestamp: new Date().toISOString() }];
     setChatMessages(newMessages);
     setChatInput('');
     setIsTyping(true);
@@ -564,14 +598,16 @@ function AgentBuilderContent() {
         role: 'assistant',
         text: data.reply,
         type: data.type,
-        options: data.options
+        options: data.options,
+        timestamp: new Date().toISOString()
       }]);
     } catch (error: any) {
       setChatMessages([...newMessages, {
         role: 'assistant',
         text: agentConfig.defaultResponse || `Sorry, the AI system cannot reply right now because: ${error.message}. Please ensure your question matches the existing Intent/QnA list.`,
         type: agentConfig.defaultResponseType || 'text',
-        options: agentConfig.defaultResponseOptions || ''
+        options: agentConfig.defaultResponseOptions || '',
+        timestamp: new Date().toISOString()
       }]);
     } finally {
       setIsTyping(false);
@@ -801,470 +837,100 @@ function AgentBuilderContent() {
 
             {/* TAB: FAQ / INTENTS */}
             {activeTab === 'faq' && (
-              <div className="h-full flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-300 w-full">
-
-                {activeIntentId ? (
-                  /* --- INTENT DETAIL VIEW --- */
-                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex-1 flex flex-col min-h-[600px] relative">
-                    <button
-                      onClick={() => setActiveIntentId(null)}
-                      className="absolute top-6 left-6 flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors"
-                    >
-                      <ArrowLeft size={16} /> Back to List
-                    </button>
-
-                    <div className="mt-8 mb-6">
-                      <input
-                        type="text"
-                        className="text-2xl font-bold text-slate-900 bg-transparent border-none outline-none w-full placeholder-slate-300"
-                        value={activeIntentData?.name ?? ''}
-                        onChange={e => updateActiveIntent('name', e.target.value)}
-                        placeholder="Intent Name"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1">
-                      {/* Left: Training Phrases */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                          <User size={18} className="text-orange-500" />
-                          <h3 className="font-semibold text-slate-800">Training Phrases</h3>
-                        </div>
-                        <p className="text-xs text-slate-500 mb-4">Add multiple phrases or questions that should trigger this intent. Different questions will map to the same answer.</p>
-
-                        <div className="space-y-2">
-                          {activeIntentData?.trainingPhrases.map((phrase: any, i: number) => (
-                            <div key={i} className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none text-sm bg-slate-50"
-                                value={phrase}
-                                onChange={e => handlePhraseChange(i, e.target.value)}
-                                placeholder="Add user expression..."
-                              />
-                              <button onClick={() => removePhrase(i)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          ))}
-                          <button onClick={addPhrase} className="flex items-center gap-2 text-sm text-orange-600 font-medium hover:text-orange-700 mt-2 px-2 py-1 rounded hover:bg-orange-50">
-                            <Plus size={16} /> Add Phrase
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Right: Response Configuration */}
-                      <div className="space-y-6">
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2">
-                            <Bot size={18} className="text-brand-light" />
-                            <h3 className="font-semibold text-slate-800">Agent Response</h3>
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Response Type</label>
-                            <select
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
-                              value={activeIntentData?.answerType ?? 'text'}
-                              onChange={e => updateActiveIntent('answerType', e.target.value)}
-                            >
-                              <option value="text">Text Only</option>
-                              <option value="options">Options / Buttons</option>
-                              <option value="form">Input Form</option>
-                              <option value="card">Card Link</option>
-                              <option value="handoff">Text & Handoff to Human Agent</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Message Content</label>
-                            <textarea
-                              rows={3}
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-slate-50"
-                              value={activeIntentData?.answer ?? ''}
-                              onChange={e => updateActiveIntent('answer', e.target.value)}
-                              placeholder="Type the agent's message..."
-                            />
-                          </div>
-
-                          {activeIntentData?.answerType === 'options' && (
-                            <div>
-                              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Options (Comma separated)</label>
-                              <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-slate-50"
-                                value={activeIntentData?.options ?? ''}
-                                onChange={e => updateActiveIntent('options', e.target.value)}
-                                placeholder="e.g. Komplain, Cek Status, Lainnya"
-                              />
-                            </div>
-                          )}
-                          {activeIntentData?.answerType === 'card' && (
-                            <div>
-                              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Card Title</label>
-                              <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-slate-50"
-                                value={activeIntentData?.cardTitle ?? ''}
-                                onChange={e => updateActiveIntent('cardTitle', e.target.value)}
-                                placeholder="e.g. Promo Spesial"
-                              />
-                            </div>
-                          )}
-                          {activeIntentData?.answerType === 'form' && (
-                            <div className="bg-brand-bg/50 p-4 rounded-xl border border-brand/20 mt-4">
-                              <label className="block text-xs font-semibold text-brand uppercase tracking-wider mb-2">Form Builder Generator</label>
-                              <p className="text-xs text-brand mb-3">Define fields separated by commas. Example: <code className="bg-white px-1 py-0.5 rounded">Name:text:req, Email:email:req, Phone:tel:req</code></p>
-                              <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-brand/20 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white mb-3"
-                                placeholder="Name:text:req, Email:email:req, Phone:tel:req"
-                                id="formBuilderInput"
-                              />
-                              <label className="block text-xs font-semibold text-brand uppercase tracking-wider mb-2">Webhook POST URL (Optional)</label>
-                              <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-brand/20 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white mb-3"
-                                placeholder="http://localhost:5678/webhook/..."
-                                id="formBuilderWebhook"
-                              />
-                              <button 
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  const input = (document.getElementById('formBuilderInput') as HTMLInputElement).value;
-                                  const webhookUrl = (document.getElementById('formBuilderWebhook') as HTMLInputElement).value.trim();
-                                  if (!input) return;
-                                  
-                                  let onSubmitCode = "event.preventDefault();";
-                                  if (webhookUrl) {
-                                    onSubmitCode += ` var btn=this.querySelector('button'); if(btn){btn.disabled=true;btn.textContent='Sending...';} var fd=new FormData(this); var d=Object.fromEntries(fd); fetch('${webhookUrl}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(()=>{alert('Data berhasil dikirim!'); this.reset(); if(btn){btn.disabled=false;btn.textContent='Submit';}}).catch(e=>{console.error(e); alert('Gagal mengirim data'); if(btn){btn.disabled=false;btn.textContent='Submit';}});`;
-                                  }
-                                  
-                                  const fields = input.split(',').map(s => s.trim()).filter(Boolean);
-                                  let html = `<form class='form-card' onsubmit="${onSubmitCode}">`;
-                                  
-                                  fields.forEach(f => {
-                                    const parts = f.split(':');
-                                    const label = parts[0] || 'Field';
-                                    const type = parts[1] || 'text';
-                                    const req = parts[2] && parts[2].startsWith('req') ? 'required' : '';
-                                    const nameAttr = label.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
-                                    
-                                    html += `<label class='form-card_label'>${label} ${req ? '<span class="required">*</span>' : ''}</label>`;
-                                    
-                                    if (type === 'tel' || type === 'phone') {
-                                      html += `<input type='tel' name='${nameAttr}' placeholder='e.g. 6512345678' class='form-card_input' pattern='[0-9]+' title='Please enter only numbers' oninput='this.value = this.value.replace(/[^0-9]/g, \"\")' ${req}/>`;
-                                    } else if (type === 'textarea') {
-                                      html += `<textarea name='${nameAttr}' placeholder='Enter ${label}' class='form-card_input' ${req}></textarea>`;
-                                    } else {
-                                      html += `<input type='${type}' name='${nameAttr}' placeholder='Enter ${label}' class='form-card_input' ${req}/>`;
-                                    }
-                                  });
-                                  
-                                  html += `<button type='submit' class='submit-btn'>Submit</button></form>`;
-                                  
-                                  const currentMsg = activeIntentData?.answer || '';
-                                  const msgPrefix = currentMsg.includes('<form') ? currentMsg.split('<form')[0] : (currentMsg ? currentMsg + '<br/>' : 'Silakan lengkapi form berikut:');
-                                  
-                                  updateActiveIntent('answer', msgPrefix + html);
-                                  alert('Form HTML with Webhook integration generated into Message Content!');
-                                }}
-                                className="px-4 py-2 bg-brand text-white rounded-lg text-xs font-bold hover:bg-brand-hover transition-colors"
-                              >
-                                Generate Form HTML
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Custom Payload */}
-                        <div className="pt-4 border-t border-slate-100">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Code size={18} className="text-slate-500" />
-                            <h3 className="font-semibold text-slate-800">Custom Payload (JSON)</h3>
-                          </div>
-                          <p className="text-xs text-slate-500 mb-2">Optional JSON payload for rich client integrations or backend actions.</p>
-                          <textarea
-                            rows={4}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 outline-none text-sm bg-slate-800 text-green-400 font-mono"
-                            value={activeIntentData?.customPayload ?? ''}
-                            onChange={e => updateActiveIntent('customPayload', e.target.value)}
-                            placeholder='{\n  "action": "your_action_name"\n}'
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* --- INTENTS LIST & FLOW VIEW --- */
-                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex-1 flex flex-col min-h-[600px]">
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <p className="text-slate-700 font-medium text-base">Intents & Dialogue Map</p>
-                        <p className="text-slate-500 text-sm mt-1">Manage multiple intents. Group questions into one response logic.</p>
-                      </div>
-                      <div className="flex bg-slate-100 p-1 rounded-lg">
-                        <button onClick={() => setFaqView('list')} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${faqView === 'list' ? 'bg-white text-brand shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-                          <List size={16} /> List
-                        </button>
-                        <button onClick={() => setFaqView('flow')} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${faqView === 'flow' ? 'bg-white text-brand shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-                          <GitMerge size={16} /> Flow
-                        </button>
-                      </div>
-                    </div>
-
-                    {faqView === 'list' ? (
-                      <div className="space-y-3 overflow-y-auto w-full">
-                        {/* AI PERSONA (NEW SETTINGS) */}
-                        <div className="bg-purple-50/50 border border-purple-100 rounded-xl p-5 mb-6">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Bot size={18} className="text-purple-600" />
-                            <h3 className="font-semibold text-slate-800">AI Persona & Business Needs</h3>
-                          </div>
-                          <p className="text-xs text-slate-500 mb-4">Set up how your AI agent speaks and understands your business context.</p>
-                          
-                          <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                              <label className="block text-xs font-medium text-slate-700 mb-1">Main Language</label>
-                              <select 
-                                value={agentConfig.language || 'Bahasa Indonesia'}
-                                onChange={(e) => setAgentConfig({...agentConfig, language: e.target.value})}
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm"
-                              >
-                                <option value="Bahasa Indonesia">Indonesian</option>
-                                <option value="English">English</option>
-                                <option value="Bahasa Indonesia campur English (Jaksel)">Mixed (Indonesian & English)</option>
-                                <option value="Jawa">Javanese</option>
-                                <option value="Mandarin">Chinese (Mandarin)</option>
-                                <option value="Korean">Korean</option>
-                                <option value="Thai">Thai</option>
-                              </select>
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-slate-700 mb-1">Speaking Style</label>
-                              <select 
-                                value={agentConfig.speakingStyle || 'ramah dan profesional'}
-                                onChange={(e) => setAgentConfig({...agentConfig, speakingStyle: e.target.value})}
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm"
-                              >
-                                <option value="ramah dan profesional">Friendly & Professional</option>
-                                <option value="sangat santai dan asik layaknya teman">Casual & Fun</option>
-                                <option value="sangat formal dan baku">Formal & Standard</option>
-                                <option value="penuh antusiasme dan ceria">Enthusiastic & Cheerful</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">Business Needs / Context (Optional)</label>
-                            <textarea 
-                              value={agentConfig.businessNeeds || ''}
-                              onChange={(e) => setAgentConfig({...agentConfig, businessNeeds: e.target.value})}
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
-                              rows={3}
-                              placeholder="Example: We are a beauty clinic focusing on anti-aging treatments. Provide advice in a convincing tone."
-                            />
-                            <p className="text-[10px] text-slate-400 mt-1">{t('agentBuilder', 'contextPlaceholder')}</p>
-                          </div>
-                        </div>
-
-                        {/* WELCOME MESSAGE / SAPAAN (NEW PLACEMENT) */}
-                        <div className="bg-brand-bg/50 border border-brand/20 rounded-xl p-5 mb-6">
-                          <div className="flex items-center gap-2 mb-3">
-                            <MessageSquare size={18} className="text-brand" />
-                            <h3 className="font-semibold text-slate-800">Welcome Message / Greeting</h3>
-                          </div>
-                          <p className="text-xs text-slate-500 mb-4">{t('agentBuilder', 'welcomePlaceholder')}</p>
-                          
-                          <div className="space-y-4">
-                            <div>
-                              <textarea 
-                                value={agentConfig.welcomeMessage || ''}
-                                onChange={(e) => setAgentConfig({...agentConfig, welcomeMessage: e.target.value})}
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light text-sm"
-                                rows={2}
-                                placeholder="Hello! How can I help you today?"
-                              />
-                            </div>
-                            <div className="flex gap-4">
-                              <div className="w-1/3">
-                                <label className="block text-xs font-medium text-slate-700 mb-1">Message Type</label>
-                                <select 
-                                  value={agentConfig.welcomeMessageType || 'text'}
-                                  onChange={(e) => setAgentConfig({...agentConfig, welcomeMessageType: e.target.value})}
-                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light bg-white text-sm"
-                                >
-                                  <option value="text">Text Only</option>
-                                  <option value="options">Text with Options (Buttons)</option>
-                                  <option value="form">Form (Lead Capture)</option>
-                                </select>
-                              </div>
-                              {agentConfig.welcomeMessageType === 'options' && (
-                                <div className="flex-1">
-                                  <label className="block text-xs font-medium text-slate-700 mb-1">Options (comma separated)</label>
-                                  <input 
-                                    type="text" 
-                                    value={agentConfig.welcomeMessageOptions || ''}
-                                    onChange={(e) => setAgentConfig({...agentConfig, welcomeMessageOptions: e.target.value})}
-                                    placeholder="e.g. Help me choose, Pricing, Book a tour"
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand-light text-sm"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* DEFAULT RESPONSE (NEW PLACEMENT) */}
-                        <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-5 mb-6">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Bot size={18} className="text-orange-600" />
-                            <h3 className="font-semibold text-slate-800">Default Fallback Response</h3>
-                          </div>
-                          <p className="text-xs text-slate-500 mb-4">{t('agentBuilder', 'unknownPlaceholder')} (does not match any Intent/QnA).</p>
-                          
-                          <div className="space-y-4">
-                            <div>
-                                <textarea 
-                                  value={agentConfig.defaultResponse || ''}
-                                  onChange={(e) => setAgentConfig({...agentConfig, defaultResponse: e.target.value})}
-                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                                  rows={2}
-                                  placeholder="Sorry, I don't understand your question..."
-                                />
-                              </div>
-                            <div className="flex gap-4">
-                              <div className="w-1/3">
-                                <label className="block text-xs font-medium text-slate-700 mb-1">Message Type</label>
-                                <select 
-                                  value={agentConfig.defaultResponseType || 'text'}
-                                  onChange={(e) => setAgentConfig({...agentConfig, defaultResponseType: e.target.value})}
-                                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
-                                >
-                                  <option value="text">Text Only</option>
-                                  <option value="options">Text with Options (Buttons)</option>
-                                  <option value="form">Form (Lead Capture)</option>
-                                </select>
-                              </div>
-                              {agentConfig.defaultResponseType === 'options' && (
-                                <div className="flex-1">
-                                  <label className="block text-xs font-medium text-slate-700 mb-1">Options (comma separated)</label>
-                                  <input 
-                                    type="text" 
-                                    value={agentConfig.defaultResponseOptions || ''}
-                                    onChange={(e) => setAgentConfig({...agentConfig, defaultResponseOptions: e.target.value})}
-                                    placeholder="e.g. Kembali ke Menu Utama, Bicara dengan Agen"
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                          <div className="relative flex-1">
-                            <input 
-                              type="text" 
-                              placeholder="Search intents by name, phrase, or response..." 
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-light outline-none text-sm bg-white"
-                            />
-                            <div className="absolute left-3 top-2.5 text-slate-400">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            </div>
-                          </div>
-                          <button onClick={addIntent} className="flex items-center justify-center gap-2 px-4 py-2 bg-brand-bg text-brand rounded-lg text-sm font-medium hover:bg-brand-bg transition-colors shrink-0">
-                            <Plus size={16} /> Add Intent
-                          </button>
-                        </div>
-
-                        {intents
-                          .filter(intent => 
-                            !searchQuery || 
-                            intent.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            intent.trainingPhrases?.some((p: string) => p.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                            intent.answer?.toLowerCase().includes(searchQuery.toLowerCase())
-                          )
-                          .map((intent) => (
-                          <div
-                            key={intent.id}
-                            onClick={() => setActiveIntentId(intent.id)}
-                            className="flex items-center justify-between p-4 border border-slate-200 bg-white hover:border-brand/30 hover:shadow-md cursor-pointer rounded-xl transition-all group"
-                          >
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-slate-800 text-sm mb-1">{intent.name}</h4>
-                              <p className="text-xs text-slate-500 line-clamp-1">
-                                <span className="font-medium text-orange-500">{intent.trainingPhrases.length} phrases</span> &bull; Responds with <span className="uppercase text-brand-light">{intent.answerType}</span>
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="text-slate-300 group-hover:text-brand-light transition-colors">
-                                <ChevronRight size={20} />
-                              </div>
-                              <button
-                                onClick={(e) => removeIntent(intent.id, e)}
-                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden relative">
-                        <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} onNodesChange={onNodesChange} fitView className="w-full h-full">
-                          <Background variant={BackgroundVariant.Dots} gap={16} size={1.5} color="#cbd5e1" />
-                          <Controls className="bg-white border border-slate-200 shadow-sm fill-slate-700" />
-                        </ReactFlow>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <SplitPaneFaq
+                faqView={faqView}
+                setFaqView={setFaqView}
+                agentConfig={agentConfig}
+                setAgentConfig={setAgentConfig}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                intents={intents}
+                activeIntentId={activeIntentId}
+                setActiveIntentId={setActiveIntentId}
+                onAddIntent={addIntent}
+                onRemoveIntent={removeIntent}
+                onUpdateActiveIntent={updateActiveIntent}
+                handlePhraseChange={handlePhraseChange}
+                addPhrase={addPhrase}
+                removePhrase={removePhrase}
+                buttonRows={buttonRows}
+                setButtonRows={setButtonRows}
+                formFieldRows={formFieldRows}
+                setFormFieldRows={setFormFieldRows}
+                syncButtonRowsToIntent={syncButtonRowsToIntent}
+                nodes={nodes}
+                edges={edges}
+                nodeTypes={nodeTypes}
+                onNodesChange={onNodesChange}
+              />
             )}
           </div>
         </div>
 
         {/* Right Column: Chat Preview Panel */}
-        <div className="w-[360px] bg-white border-l border-slate-200 flex-shrink-0 flex flex-col shadow-[-4px_0_15px_-5px_rgba(0,0,0,0.05)] z-10 overflow-hidden flex-col">
-          <div className="flex-1 overflow-y-auto space-y-4">
-            {/* Test Panel removed to avoid Redis errors in environments without Redis */}
+        <div
+          className={`${
+            showChatPreview ? 'w-[360px]' : 'w-12'
+          } bg-white border-l border-slate-200 flex-shrink-0 flex flex-col shadow-[-4px_0_15px_-5px_rgba(0,0,0,0.05)] z-10 transition-all duration-300 relative`}
+        >
+          {/* Toggle button */}
+          <button
+            type="button"
+            onClick={() => setShowChatPreview(!showChatPreview)}
+            className="absolute -left-3.5 top-5 z-20 w-7 h-7 bg-white border border-slate-300 rounded-full shadow-md flex items-center justify-center text-slate-500 hover:text-slate-800 hover:scale-105 transition-all"
+            title={showChatPreview ? 'Collapse Preview' : 'Expand Preview'}
+          >
+            {showChatPreview ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </button>
 
-            {/* Chat Preview */}
-            <div className="p-4 pt-6">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Chat Preview</h3>
-              <div className="rounded-xl border border-slate-200 overflow-hidden h-[450px] flex flex-col">
-                <ChatUI
-                  messages={chatMessages.map((msg, idx) => ({
-                    id: idx,
-                    text: msg.text,
-                    sender: msg.role === 'user' ? 'user' : 'bot',
-                    options: msg.options ? msg.options.split(',').map((o: string) => o.trim()) : undefined
-                  }))}
-                  isTyping={isTyping}
-                  status="bot"
-                  isConnected={true}
-                  config={{
-                    name: agentConfig.name || 'AI Assistant',
-                    tenantName: tenantConfig.name || 'Your Brand',
-                    primaryColor: tenantConfig.themeBrandColor || '#801517',
-                    botAvatarUrl: agentConfig.botAvatarUrl,
-                    logo: tenantConfig.logoUrl
-                  }}
-                  inputValue={chatInput}
-                  onInputChange={setChatInput}
-                  onSendMessage={handleSendMessage}
-                  onRestartChat={() => {
-                    setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions }]);
-                    setPreviewSessionId(generateUUID());
-                  }}
-                  hideHeaderMoreOptions={true}
-                />
+          {showChatPreview ? (
+            <div className="flex-1 overflow-y-auto space-y-4">
+              {/* Chat Preview */}
+              <div className="p-4 pt-6">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Chat Preview</h3>
+                <div className="rounded-xl border border-slate-200 overflow-hidden h-[450px] flex flex-col">
+                  <ChatUI
+                    messages={chatMessages.map((msg, idx) => ({
+                      id: idx,
+                      text: msg.text,
+                      sender: msg.role === 'user' ? 'user' : 'bot',
+                      options: msg.options ? msg.options.split(',').map((o: string) => o.trim()) : undefined,
+                      createdAt: msg.timestamp || new Date().toISOString()
+                    }))}
+                    isTyping={isTyping}
+                    status="bot"
+                    isConnected={true}
+                    config={{
+                      name: agentConfig.name || 'AI Assistant',
+                      tenantName: tenantConfig.name || 'Your Brand',
+                      primaryColor: tenantConfig.themeBrandColor || '#801517',
+                      botAvatarUrl: agentConfig.botAvatarUrl,
+                      logo: tenantConfig.logoUrl
+                    }}
+                    inputValue={chatInput}
+                    onInputChange={setChatInput}
+                    onSendMessage={handleSendMessage}
+                    onRestartChat={() => {
+                      setChatMessages([{ role: 'assistant', text: agentConfig.welcomeMessage || '', type: agentConfig.welcomeMessageType, options: agentConfig.welcomeMessageOptions, timestamp: new Date().toISOString() }]);
+                      setPreviewSessionId(generateUUID());
+                    }}
+                    hideHeaderMoreOptions={true}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div
+              className="flex-1 flex flex-col items-center pt-14 cursor-pointer hover:bg-slate-50 transition-colors select-none"
+              onClick={() => setShowChatPreview(true)}
+              title="Click to expand Chat Preview"
+            >
+              <MessageSquare size={16} className="text-slate-400 mb-3" />
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest [writing-mode:vertical-lr] rotate-180">
+                Chat Preview
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

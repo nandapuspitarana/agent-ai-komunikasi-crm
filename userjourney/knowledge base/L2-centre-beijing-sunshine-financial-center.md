@@ -3,11 +3,23 @@
 ## Overview
 CEO SUITE Sunshine Financial Center is an active centre in Beijing, China. Beijing business centre in Chaoyang District, suitable for users asking for Beijing or Chaoyang.
 
+**Deskripsi Lokasi:**
+Enviably located on the 31st floor of Sunshine Financial Center, an international award-winning development in Beijing’s Central Business District, CEO SUITE offers the very latest in private office suites, co-working space, instant offices, video conferencing rooms, conference and meeting facilities, casual meeting booths, phone booths and networking lounges, all equipped with cutting-edge IT and telecom systems.
+The newest CEO SUITE location overlooks CBD Central Park and makes a powerful first impression with panoramic 270° views of the city skyline. This is in addition to an elegantly designed reception lobby, modern and luxurious business lounges, conference and boardrooms. 
+
+Located on East Third Ring Road and Guanghua Road, adjacent to Guomao’s China World Trade Center and the iconic CCTV Tower, the 42-storey new development offers excellent connectivity with four subway intersections. Comprehensive amenities range from 5-star hotels such a Park Hyatt and China World Hotel to cafes, restaurants, fitness centre and high-end retail shops.
+
+Aside from being the first development within CBD Beijing to be awarded the LEED-NC Gold certification, Sunshine Financial Center is equipped with state-of-the-art tech, including 5G via its own satellite antenna, a triple air filtration system that achieves more than 95% air purification efficiency, smart conference technology inside its multi-functional event venue, and a one-of-a-kind Thyssen ‘’Twin Car Elevator’’ System.
+
 Controlled centre identity:
 - Country: China
 - City: Beijing
 - Centre: Sunshine Financial Center
 - Address: 31st Floor, No. 33 Jinghui Avenue, Chaoyang District, Beijing 100020
+- Telepon: +86 (10) 8660 8888
+- Email: salesbj@cn.ceosuite.com
+- Latitude: 39.910830
+- Longitude: 116.457171
 
 ## Building Profile
 Use approved centre source documents or live operations data for the building grade, tower profile, floor configuration and landlord/building-management details. Do not infer Grade A, premium, green-building or landmark status unless it appears in approved source material.
@@ -27,7 +39,18 @@ Potential workspace products to verify for this centre:
 - Meeting Room: check live availability, room capacity and centre facilities.
 
 ## Facilities
-Confirm facilities from approved centre data before promising them. Common facilities to verify include reception, business lounge, pantry, printing, phone booth, breakout area, mail handling, call handling, storage and administrative support.
+Confirm facilities from approved centre data before promising them. Verified facilities at this location include:
+- 24/7 Building  Access
+- Professional & Social Events
+- Community  Managers
+- Front Desk  Service
+- Fresh Fruit Water
+- Office Supplies
+- Business-Class  Printers
+- Daily Cleaning
+- Unique Common Areas
+- Super-Fast Internet
+- Micro-Roasted Coffee
 
 ## Access Hours
 Do not promise 24/7 access or after-hours access unless confirmed by the client's package, building policy and approved centre rules. State that reception and access hours may vary by centre, membership type and building security policy.

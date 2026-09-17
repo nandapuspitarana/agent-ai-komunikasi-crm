@@ -16,7 +16,7 @@ Write-Host "  Next.js port: $CrmPort  |  Node.js 20+" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
 
-# ── 1. Check Node.js ─────────────────────────────────────────────────────────
+# -- 1. Check Node.js ----------------------------------------------------------
 try {
     $nodeVersion = node --version 2>&1
     Write-Host "[OK] Node.js $nodeVersion" -ForegroundColor Green
@@ -26,7 +26,7 @@ try {
     exit 1
 }
 
-# ── 2. Check Docker ──────────────────────────────────────────────────────────
+# -- 2. Check Docker -----------------------------------------------------------
 try {
     docker info >$null 2>&1
     Write-Host "[OK] Docker berjalan." -ForegroundColor Green
@@ -36,20 +36,20 @@ try {
     exit 1
 }
 
-# ── 3. Setup .env ─────────────────────────────────────────────────────────────
+# -- 3. Setup .env -------------------------------------------------------------
 if (-not (Test-Path ".env")) {
     if (Test-Path ".env.example") {
         Copy-Item ".env.example" ".env"
         Write-Host ""
-        Write-Host "╔══════════════════════════════════════════════════════════╗" -ForegroundColor Yellow
-        Write-Host "║  PERHATIAN: File .env baru dibuat dari .env.example     ║" -ForegroundColor Yellow
-        Write-Host "║                                                          ║" -ForegroundColor Yellow
-        Write-Host "║  Silakan periksa nilai berikut di .env:                 ║" -ForegroundColor Yellow
-        Write-Host "║    DATABASE_URL    = postgresql://user:pass@...         ║" -ForegroundColor Yellow
-        Write-Host "║    AUTH_SECRET     = secret min 32 karakter             ║" -ForegroundColor Yellow
-        Write-Host "║    NEXTAUTH_URL    = http://localhost:8201               ║" -ForegroundColor Yellow
-        Write-Host "║    AGENT_PROXY_URL = http://127.0.0.1:8200              ║" -ForegroundColor Yellow
-        Write-Host "╚══════════════════════════════════════════════════════════╝" -ForegroundColor Yellow
+        Write-Host "+----------------------------------------------------------+" -ForegroundColor Yellow
+        Write-Host "|  PERHATIAN: File .env baru dibuat dari .env.example      |" -ForegroundColor Yellow
+        Write-Host "|                                                          |" -ForegroundColor Yellow
+        Write-Host "|  Silakan periksa nilai berikut di .env:                  |" -ForegroundColor Yellow
+        Write-Host "|    DATABASE_URL    = postgresql://user:pass@...          |" -ForegroundColor Yellow
+        Write-Host "|    AUTH_SECRET     = secret min 32 karakter              |" -ForegroundColor Yellow
+        Write-Host "|    NEXTAUTH_URL    = http://localhost:8201               |" -ForegroundColor Yellow
+        Write-Host "|    AGENT_PROXY_URL = http://127.0.0.1:8200               |" -ForegroundColor Yellow
+        Write-Host "+----------------------------------------------------------+" -ForegroundColor Yellow
         Write-Host ""
         Write-Host "  Tekan Enter untuk melanjutkan setelah mengisi .env..." -ForegroundColor Cyan
         Read-Host
@@ -61,7 +61,7 @@ if (-not (Test-Path ".env")) {
     Write-Host "[OK]  File .env sudah ada." -ForegroundColor Green
 }
 
-# ── 4. Start Docker services (Postgres + Redis) ───────────────────────────────
+# -- 4. Start Docker services (Postgres + Redis) -------------------------------
 Write-Host "[INFO] Menjalankan Postgres + Redis via Docker Compose..." -ForegroundColor Yellow
 docker compose up -d postgres redis
 if ($LASTEXITCODE -ne 0) {
@@ -70,7 +70,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "[OK]  Postgres (port 5444) dan Redis (port 5448) berjalan." -ForegroundColor Green
 
-# ── 5. Tunggu Postgres siap ──────────────────────────────────────────────────
+# -- 5. Tunggu Postgres siap ---------------------------------------------------
 Write-Host "[INFO] Menunggu Postgres siap..." -ForegroundColor Yellow
 $retries = 15
 for ($i = 1; $i -le $retries; $i++) {
@@ -86,7 +86,7 @@ for ($i = 1; $i -le $retries; $i++) {
     Start-Sleep -Seconds 1
 }
 
-# ── 6. Install Node dependencies ─────────────────────────────────────────────
+# -- 6. Install Node dependencies ----------------------------------------------
 if (-not (Test-Path "node_modules")) {
     Write-Host "[INFO] Menginstall Node.js dependencies..." -ForegroundColor Yellow
     npm install
@@ -99,7 +99,7 @@ if (-not (Test-Path "node_modules")) {
     Write-Host "[OK]  node_modules sudah ada (skip npm install)." -ForegroundColor Green
 }
 
-# ── 7. Push Prisma schema ─────────────────────────────────────────────────────
+# -- 7. Push Prisma schema ------------------------------------------------------
 Write-Host "[INFO] Menerapkan Prisma schema ke database..." -ForegroundColor Yellow
 npm run db:push
 if ($LASTEXITCODE -ne 0) {
@@ -108,7 +108,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "[OK]  Schema berhasil diterapkan." -ForegroundColor Green
 
-# ── 8. Seed database (hanya jika tabel kosong) ───────────────────────────────
+# -- 8. Seed database (hanya jika tabel kosong) --------------------------------
 Write-Host "[INFO] Menjalankan seed data..." -ForegroundColor Yellow
 npm run db:seed
 if ($LASTEXITCODE -ne 0) {
@@ -117,7 +117,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "[OK]  Seed selesai." -ForegroundColor Green
 }
 
-# ── 9. Start Next.js dev server ───────────────────────────────────────────────
+# -- 9. Start Next.js dev server ------------------------------------------------
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "  Menjalankan Next.js CRM Dev Server..." -ForegroundColor Cyan

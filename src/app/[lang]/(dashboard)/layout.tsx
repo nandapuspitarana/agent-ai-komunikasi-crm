@@ -21,6 +21,8 @@ const NAV_ITEMS = [
   { href: '/settings', labelKey: 'settings', icon: Settings },
 ];
 
+import GlobalNotification from '@/components/GlobalNotification';
+
 export default function DashboardLayout({
   children,
 }: {
@@ -67,9 +69,11 @@ export default function DashboardLayout({
   }
 
   const tenant = (session?.user as any)?.tenant;
+  const tenantId = (session?.user as any)?.tenantId;
 
   return (
     <div className="flex h-screen bg-slate-50">
+      {tenantId && <GlobalNotification tenantId={tenantId} />}
       {/* Sidebar */}
       <div className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
         <div className="p-4 bg-slate-950 flex items-center gap-2 text-white">

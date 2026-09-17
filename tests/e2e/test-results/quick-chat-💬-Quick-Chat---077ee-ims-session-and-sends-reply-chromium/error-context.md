@@ -1,0 +1,803 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: quick-chat.spec.ts >> 💬 Quick Chat - Manual Agent Reply >> 06 - Agent claims session and sends reply
+- Location: tests\e2e\quick-chat.spec.ts:80:7
+
+# Error details
+
+```
+TimeoutError: page.fill: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('#email')
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - img [ref=e5]
+      - generic [ref=e8]:
+        - paragraph [ref=e9]: Aktifkan Notifikasi
+        - paragraph [ref=e10]: Agar Anda tidak ketinggalan chat masuk.
+      - button "Izinkan" [ref=e11]
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - img [ref=e14]
+        - generic [ref=e19]: CeosuiteBOT
+      - navigation [ref=e20]:
+        - link "Overview" [ref=e21] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e22]
+          - generic [ref=e27]: Overview
+        - link "Omni-Inbox" [ref=e28] [cursor=pointer]:
+          - /url: /inbox
+          - img [ref=e29]
+          - generic [ref=e31]: Omni-Inbox
+        - link "Visitors" [ref=e32] [cursor=pointer]:
+          - /url: /visitors
+          - img [ref=e33]
+          - generic [ref=e38]: Visitors
+        - link "AI Agent" [ref=e39] [cursor=pointer]:
+          - /url: /agent
+          - img [ref=e40]
+          - generic [ref=e43]: AI Agent
+        - link "Integration" [ref=e44] [cursor=pointer]:
+          - /url: /integration
+          - img [ref=e45]
+          - generic [ref=e47]: Integration
+        - link "Settings" [ref=e48] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e49]
+          - generic [ref=e52]: Settings
+      - generic [ref=e53]: v1.0.0
+    - generic [ref=e54]:
+      - banner [ref=e55]:
+        - generic [ref=e56]: Overview
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - img [ref=e59]
+            - combobox [ref=e62] [cursor=pointer]:
+              - option "English" [selected]
+              - option "Bahasa Indonesia"
+              - option "中文 (Chinese)"
+              - option "한국어 (Korean)"
+              - option "ไทย (Thai)"
+            - generic:
+              - img
+          - button "Business Partner partner@zetacrm.com BP" [ref=e64]:
+            - generic [ref=e65]:
+              - paragraph [ref=e66]: Business Partner
+              - paragraph [ref=e67]: partner@zetacrm.com
+            - generic [ref=e68]: BP
+            - img [ref=e69]
+      - main [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - heading "Omni-Inbox" [level=2] [ref=e75]
+              - paragraph [ref=e76]: 65 active conversations
+            - generic [ref=e77]:
+              - generic [ref=e78] [cursor=pointer]:
+                - generic [ref=e79]:
+                  - generic [ref=e81]: widget_1782700096456_jk7wrkq2j
+                  - generic [ref=e82]: "09.28"
+                - paragraph [ref=e83]: Agen Business Partner bergabung ke percakapan.
+                - generic [ref=e84]:
+                  - generic [ref=e85]: widget
+                  - generic [ref=e86]: 👤 Handled
+                  - generic [ref=e87]: Sudah Dibalas
+              - generic [ref=e88] [cursor=pointer]:
+                - generic [ref=e89]:
+                  - generic [ref=e91]: widget_1782696910730_0zpdz0zb6
+                  - generic [ref=e92]: "08.35"
+                - paragraph [ref=e93]: asdf
+                - generic [ref=e94]:
+                  - generic [ref=e95]: widget
+                  - generic [ref=e96]: 👤 Handled
+                  - generic [ref=e97]: Sudah Dibalas
+              - generic [ref=e98] [cursor=pointer]:
+                - generic [ref=e99]:
+                  - generic [ref=e101]: widget_1782695498444_lvoko1qlh
+                  - generic [ref=e102]: "08.34"
+                - paragraph [ref=e103]: "Here are our premium Meeting Room locations in Jakarta. Please choose a centre.<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Sahid Sudirman Center Meeting Room'}, '*')\">Sahid Sudirman Center</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Axa Tower Meeting Room'}, '*')\">Axa Tower</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Indonesia Stock Exchange Tower 2 Meeting Room'}, '*')\">Indonesia Stock Exchange Tower 2</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'One Pacific Place Meeting Room'}, '*')\">One Pacific Place</button></div>"
+                - generic [ref=e104]:
+                  - generic [ref=e105]: widget
+                  - generic [ref=e106]: 🤖 AI Bot
+                  - generic [ref=e107]: Sudah Dibalas
+              - generic [ref=e108] [cursor=pointer]:
+                - generic [ref=e109]:
+                  - generic [ref=e111]: widget_1782468956207_r2msdvota
+                  - generic [ref=e112]: "17.16"
+                - paragraph [ref=e113]: Agen Business Partner bergabung ke percakapan.
+                - generic [ref=e114]:
+                  - generic [ref=e115]: widget
+                  - generic [ref=e116]: 👤 Handled
+                  - generic [ref=e117]: Sudah Dibalas
+              - generic [ref=e118] [cursor=pointer]:
+                - generic [ref=e119]:
+                  - generic [ref=e121]: widget_1782466332475_n2ap6avoa
+                  - generic [ref=e122]: "16.32"
+                - paragraph [ref=e123]: hi
+                - generic [ref=e124]:
+                  - generic [ref=e125]: widget
+                  - generic [ref=e126]: 👤 Handled
+                  - generic [ref=e127]: Sudah Dibalas
+              - generic [ref=e128] [cursor=pointer]:
+                - generic [ref=e129]:
+                  - generic [ref=e131]: widget_1782465792509_yig0bro50
+                  - generic [ref=e132]: "16.23"
+                - paragraph [ref=e133]: Agen Business Partner bergabung ke percakapan.
+                - generic [ref=e134]:
+                  - generic [ref=e135]: widget
+                  - generic [ref=e136]: 👤 Handled
+                  - generic [ref=e137]: Sudah Dibalas
+              - generic [ref=e138] [cursor=pointer]:
+                - generic [ref=e139]:
+                  - generic [ref=e141]: widget_1782465732917_vqzi605oz
+                  - generic [ref=e142]: "16.22"
+                - paragraph [ref=e143]: hai
+                - generic [ref=e144]:
+                  - generic [ref=e145]: widget
+                  - generic [ref=e146]: 👤 Handled
+                  - generic [ref=e147]: Sudah Dibalas
+              - generic [ref=e148] [cursor=pointer]:
+                - generic [ref=e149]:
+                  - generic [ref=e151]: widget_1782465151534_5ddoxrn3e
+                  - generic [ref=e152]: "16.12"
+                - paragraph [ref=e153]: halo
+                - generic [ref=e154]:
+                  - generic [ref=e155]: widget
+                  - generic [ref=e156]: 👤 Handled
+                  - generic [ref=e157]: Sudah Dibalas
+              - generic [ref=e158] [cursor=pointer]:
+                - generic [ref=e159]:
+                  - generic [ref=e161]: widget_1782465015057_re5zdcn2r
+                  - generic [ref=e162]: "16.10"
+                - paragraph [ref=e163]: asdfsdf
+                - generic [ref=e164]:
+                  - generic [ref=e165]: widget
+                  - generic [ref=e166]: 👤 Handled
+                  - generic [ref=e167]: Sudah Dibalas
+              - generic [ref=e168] [cursor=pointer]:
+                - generic [ref=e169]:
+                  - generic [ref=e171]: widget_1782464858556_8x1ch3iaa
+                  - generic [ref=e172]: "16.07"
+                - paragraph [ref=e173]: hai
+                - generic [ref=e174]:
+                  - generic [ref=e175]: widget
+                  - generic [ref=e176]: 👤 Handled
+                  - generic [ref=e177]: Sudah Dibalas
+              - generic [ref=e178] [cursor=pointer]:
+                - generic [ref=e179]:
+                  - generic [ref=e181]: widget_1782464453037_q9bmp57am
+                  - generic [ref=e182]: "16.01"
+                - paragraph [ref=e183]: Agen Business Partner bergabung ke percakapan.
+                - generic [ref=e184]:
+                  - generic [ref=e185]: widget
+                  - generic [ref=e186]: 👤 Handled
+                  - generic [ref=e187]: Sudah Dibalas
+              - generic [ref=e188] [cursor=pointer]:
+                - generic [ref=e189]:
+                  - generic [ref=e191]: widget_1782464342398_xtyymcbmp
+                  - generic [ref=e192]: "15.59"
+                - paragraph [ref=e193]: hai
+                - generic [ref=e194]:
+                  - generic [ref=e195]: widget
+                  - generic [ref=e196]: 👤 Handled
+                  - generic [ref=e197]: Sudah Dibalas
+              - generic [ref=e198] [cursor=pointer]:
+                - generic [ref=e199]:
+                  - generic [ref=e201]: widget_1782463400729_7uslp5akc
+                  - generic [ref=e202]: "15.43"
+                - paragraph [ref=e203]: asdf
+                - generic [ref=e204]:
+                  - generic [ref=e205]: widget
+                  - generic [ref=e206]: 👤 Handled
+                  - generic [ref=e207]: Sudah Dibalas
+              - generic [ref=e208] [cursor=pointer]:
+                - generic [ref=e209]:
+                  - generic [ref=e211]: widget_1782463312762_mtbu4v3mh
+                  - generic [ref=e212]: "15.41"
+                - paragraph [ref=e213]: hi
+                - generic [ref=e214]:
+                  - generic [ref=e215]: widget
+                  - generic [ref=e216]: 👤 Handled
+                  - generic [ref=e217]: Sudah Dibalas
+              - generic [ref=e218] [cursor=pointer]:
+                - generic [ref=e219]:
+                  - generic [ref=e221]: widget_1782448235706_ydscrpqtk
+                  - generic [ref=e222]: "11.30"
+                - paragraph [ref=e223]: test
+                - generic [ref=e224]:
+                  - generic [ref=e225]: widget
+                  - generic [ref=e226]: 👤 Handled
+                  - generic [ref=e227]: Sudah Dibalas
+              - generic [ref=e228] [cursor=pointer]:
+                - generic [ref=e229]:
+                  - generic [ref=e231]: widget_1782448210238_bnxiie8x9
+                  - generic [ref=e232]: "11.30"
+                - paragraph [ref=e233]: Agen Business Partner bergabung ke percakapan.
+                - generic [ref=e234]:
+                  - generic [ref=e235]: widget
+                  - generic [ref=e236]: 👤 Handled
+                  - generic [ref=e237]: Sudah Dibalas
+              - generic [ref=e238] [cursor=pointer]:
+                - generic [ref=e239]:
+                  - generic [ref=e241]: widget_1782447344300_kpur97nrw
+                  - generic [ref=e242]: "11.15"
+                - paragraph [ref=e243]: test
+                - generic [ref=e244]:
+                  - generic [ref=e245]: widget
+                  - generic [ref=e246]: 👤 Handled
+                  - generic [ref=e247]: Sudah Dibalas
+              - generic [ref=e248] [cursor=pointer]:
+                - generic [ref=e249]:
+                  - generic [ref=e251]: widget_1782447116075_erd3b1vml
+                  - generic [ref=e252]: "11.12"
+                - paragraph [ref=e253]: hai
+                - generic [ref=e254]:
+                  - generic [ref=e255]: widget
+                  - generic [ref=e256]: 👤 Handled
+                  - generic [ref=e257]: Sudah Dibalas
+              - generic [ref=e258] [cursor=pointer]:
+                - generic [ref=e259]:
+                  - generic [ref=e261]: widget_1782437813006_evi7wsedb
+                  - generic [ref=e262]: "08.36"
+                - paragraph [ref=e263]: HAI
+                - generic [ref=e264]:
+                  - generic [ref=e265]: widget
+                  - generic [ref=e266]: 👤 Handled
+                  - generic [ref=e267]: Sudah Dibalas
+              - generic [ref=e268] [cursor=pointer]:
+                - generic [ref=e269]:
+                  - generic [ref=e271]: widget_1782437765722_ogbvv8y23
+                  - generic [ref=e272]: "08.36"
+                - paragraph [ref=e273]: Agen Business Partner bergabung ke percakapan.
+                - generic [ref=e274]:
+                  - generic [ref=e275]: widget
+                  - generic [ref=e276]: 👤 Handled
+                  - generic [ref=e277]: Sudah Dibalas
+              - generic [ref=e278] [cursor=pointer]:
+                - generic [ref=e279]:
+                  - generic [ref=e281]: widget_1782387008986_momi4chn1
+                  - generic [ref=e282]: "18.30"
+                - paragraph [ref=e283]: "Private Office Best for teams that need a private, ready-to-use office with flexible terms. Which city are you interested in?<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok Private Office'}, '*')\">Bangkok</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing Private Office'}, '*')\">Beijing</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou Private Office'}, '*')\">Hangzhou</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi Private Office'}, '*')\">Hanoi</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City Private Office'}, '*')\">Ho Chi Minh City</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong Private Office'}, '*')\">Hong Kong</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta Private Office'}, '*')\">Jakarta</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur Private Office'}, '*')\">Kuala Lumpur</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila Private Office'}, '*')\">Manila</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul Private Office'}, '*')\">Seoul</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai Private Office'}, '*')\">Shanghai</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore Private Office'}, '*')\">Singapore</button></div>"
+                - generic [ref=e284]:
+                  - generic [ref=e285]: widget
+                  - generic [ref=e286]: 🤖 AI Bot
+                  - generic [ref=e287]: Sudah Dibalas
+              - generic [ref=e288] [cursor=pointer]:
+                - generic [ref=e289]:
+                  - generic [ref=e291]: widget_1782386635514_0rx6y2osl
+                  - generic [ref=e293]: "18.24"
+                - paragraph [ref=e294]: Coworking
+                - generic [ref=e295]:
+                  - generic [ref=e296]: widget
+                  - generic [ref=e297]: 👤 Handled
+                  - generic [ref=e298]: Belum Dibalas
+              - generic [ref=e299] [cursor=pointer]:
+                - generic [ref=e300]:
+                  - generic [ref=e302]: widget_1782385796994_305afmzob
+                  - generic [ref=e303]: "18.10"
+                - paragraph [ref=e304]: Agen Business Partner bergabung ke percakapan.
+                - generic [ref=e305]:
+                  - generic [ref=e306]: widget
+                  - generic [ref=e307]: 👤 Handled
+                  - generic [ref=e308]: Sudah Dibalas
+              - generic [ref=e309] [cursor=pointer]:
+                - generic [ref=e310]:
+                  - generic [ref=e312]: widget_1782381087602_x0y9blh31
+                  - generic [ref=e313]: "16.51"
+                - paragraph [ref=e314]: "<div class='card'><div class='card-title'>Athenee Tower (Bangkok) - Private Office</div><div class='small'>Our private offices at Athenee Tower are available to book on flexible hourly to monthly fixed-term options. Pricing includes premium furniture, high-speed internet, dedicated phone lines, complimentary refreshments, and access to our exclusive business lounges.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/bangkok-athenee-tower/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div><div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Request quotation Athenee Tower Private Office'}, '*')\">Request Quotation</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Book a tour Athenee Tower Private Office'}, '*')\">Book a Tour</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Start again'}, '*')\">Start again</button></div>"
+                - generic [ref=e315]:
+                  - generic [ref=e316]: widget
+                  - generic [ref=e317]: 🤖 AI Bot
+                  - generic [ref=e318]: Sudah Dibalas
+              - generic [ref=e319] [cursor=pointer]:
+                - generic [ref=e320]:
+                  - generic [ref=e322]: widget_1782373874822_7itwm8ei2
+                  - generic [ref=e323]: "14.51"
+                - paragraph [ref=e324]: "Day Office Private office space available on a daily basis. Which city are you interested in?<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok Private Office'}, '*')\">Bangkok</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing Private Office'}, '*')\">Beijing</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou Private Office'}, '*')\">Hangzhou</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi Private Office'}, '*')\">Hanoi</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City Private Office'}, '*')\">Ho Chi Minh City</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong Private Office'}, '*')\">Hong Kong</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta Private Office'}, '*')\">Jakarta</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur Private Office'}, '*')\">Kuala Lumpur</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila Private Office'}, '*')\">Manila</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul Private Office'}, '*')\">Seoul</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai Private Office'}, '*')\">Shanghai</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore Private Office'}, '*')\">Singapore</button></div>"
+                - generic [ref=e325]:
+                  - generic [ref=e326]: widget
+                  - generic [ref=e327]: 🤖 AI Bot
+                  - generic [ref=e328]: Sudah Dibalas
+              - generic [ref=e329] [cursor=pointer]:
+                - generic [ref=e330]:
+                  - generic [ref=e332]: widget_1782372926160_lstad840u
+                  - generic [ref=e333]: "14.35"
+                - paragraph [ref=e334]: "Here are our premium Private Office locations in Bangkok. Please choose a centre.<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Athenee Tower Private Office'}, '*')\">Athenee Tower</button></div>"
+                - generic [ref=e335]:
+                  - generic [ref=e336]: widget
+                  - generic [ref=e337]: 🤖 AI Bot
+                  - generic [ref=e338]: Sudah Dibalas
+              - generic [ref=e339] [cursor=pointer]:
+                - generic [ref=e340]:
+                  - generic [ref=e342]: widget_1782372602258_476wk8owx
+                  - generic [ref=e343]: "14.30"
+                - paragraph [ref=e344]: "Here are our premium Private Office locations in Beijing. Please choose a centre.<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Sunshine Financial Center Private Office'}, '*')\">Sunshine Financial Center</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'The Exchange Twin Towers Private Office'}, '*')\">The Exchange Twin Towers</button></div>"
+                - generic [ref=e345]:
+                  - generic [ref=e346]: widget
+                  - generic [ref=e347]: 🤖 AI Bot
+                  - generic [ref=e348]: Sudah Dibalas
+              - generic [ref=e349] [cursor=pointer]:
+                - generic [ref=e350]:
+                  - generic [ref=e352]: widget_1782372340320_5g0rnxmg1
+                  - generic [ref=e353]: "14.25"
+                - paragraph [ref=e354]: "Private Office Best for teams that need a private, ready-to-use office with flexible terms. Which city are you interested in?<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok Private Office'}, '*')\">Bangkok</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing Private Office'}, '*')\">Beijing</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou Private Office'}, '*')\">Hangzhou</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi Private Office'}, '*')\">Hanoi</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City Private Office'}, '*')\">Ho Chi Minh City</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong Private Office'}, '*')\">Hong Kong</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta Private Office'}, '*')\">Jakarta</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur Private Office'}, '*')\">Kuala Lumpur</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila Private Office'}, '*')\">Manila</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul Private Office'}, '*')\">Seoul</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai Private Office'}, '*')\">Shanghai</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore Private Office'}, '*')\">Singapore</button></div>"
+                - generic [ref=e355]:
+                  - generic [ref=e356]: widget
+                  - generic [ref=e357]: 🤖 AI Bot
+                  - generic [ref=e358]: Sudah Dibalas
+              - generic [ref=e359] [cursor=pointer]:
+                - generic [ref=e360]:
+                  - generic [ref=e362]: widget_1782372136897_crxvq76ck
+                  - generic [ref=e363]: "14.22"
+                - paragraph [ref=e364]: Hello! How can I assist you today?
+                - generic [ref=e365]:
+                  - generic [ref=e366]: widget
+                  - generic [ref=e367]: 🤖 AI Bot
+                  - generic [ref=e368]: Sudah Dibalas
+              - generic [ref=e369] [cursor=pointer]:
+                - generic [ref=e370]:
+                  - generic [ref=e372]: widget_1782371985345_ff0qco1z3
+                  - generic [ref=e373]: "14.20"
+                - paragraph [ref=e374]: Could you please provide your email address? This will help me assist you better in finding a private room. Thank you!
+                - generic [ref=e375]:
+                  - generic [ref=e376]: widget
+                  - generic [ref=e377]: 🤖 AI Bot
+                  - generic [ref=e378]: Sudah Dibalas
+              - generic [ref=e379] [cursor=pointer]:
+                - generic [ref=e380]:
+                  - generic [ref=e382]: widget_1782352577147_wp677r59y
+                  - generic [ref=e383]: "08.56"
+                - paragraph [ref=e384]: "Meeting Room Fully equipped meeting rooms for your professional gatherings. Which city are you interested in?<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok Meeting Room'}, '*')\">Bangkok</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing Meeting Room'}, '*')\">Beijing</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou Meeting Room'}, '*')\">Hangzhou</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi Meeting Room'}, '*')\">Hanoi</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City Meeting Room'}, '*')\">Ho Chi Minh City</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong Meeting Room'}, '*')\">Hong Kong</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta Meeting Room'}, '*')\">Jakarta</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur Meeting Room'}, '*')\">Kuala Lumpur</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila Meeting Room'}, '*')\">Manila</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul Meeting Room'}, '*')\">Seoul</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai Meeting Room'}, '*')\">Shanghai</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore Meeting Room'}, '*')\">Singapore</button></div>"
+                - generic [ref=e385]:
+                  - generic [ref=e386]: widget
+                  - generic [ref=e387]: 🤖 AI Bot
+                  - generic [ref=e388]: Sudah Dibalas
+              - generic [ref=e389] [cursor=pointer]:
+                - generic [ref=e390]:
+                  - generic [ref=e392]: widget_1782352401675_amy3oxy3i
+                  - generic [ref=e393]: "08.53"
+                - paragraph [ref=e394]: hai
+                - generic [ref=e395]:
+                  - generic [ref=e396]: widget
+                  - generic [ref=e397]: 👤 Handled
+                  - generic [ref=e398]: Sudah Dibalas
+              - generic [ref=e399] [cursor=pointer]:
+                - generic [ref=e400]:
+                  - generic [ref=e402]: widget_1782221966200_76dufyowe
+                  - generic [ref=e403]: "21.13"
+                - paragraph [ref=e404]: "Here are our premium Private Office locations in Bangkok. Please choose a centre.<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Athenee Tower Private Office'}, '*')\">Athenee Tower Private Office</button></div>"
+                - generic [ref=e405]:
+                  - generic [ref=e406]: widget
+                  - generic [ref=e407]: 🤖 AI Bot
+                  - generic [ref=e408]: Sudah Dibalas
+              - generic [ref=e409] [cursor=pointer]:
+                - generic [ref=e410]:
+                  - generic [ref=e412]: widget_1782203947108_h8xry6asm
+                  - generic [ref=e413]: "15.40"
+                - paragraph [ref=e414]: I'm sorry, but I don't have access to location data to determine your distance from AXA Tower in Jakarta. I recommend using a map application for accurate distance information. If you have any questions about our services at CEO SUITE, feel free to ask!
+                - generic [ref=e415]:
+                  - generic [ref=e416]: widget
+                  - generic [ref=e417]: 🤖 AI Bot
+                  - generic [ref=e418]: Sudah Dibalas
+              - generic [ref=e419] [cursor=pointer]:
+                - generic [ref=e420]:
+                  - generic [ref=e422]: widget_1782190484397_6aov30n85
+                  - generic [ref=e424]: "11.54"
+                - paragraph [ref=e425]: "📝 [Form Submitted] - Name: nanda - Email: nandapuspitarana@gmail.com - Phone: 6289670005828 - Size: 10 - date: 2026-06-23"
+                - generic [ref=e426]:
+                  - generic [ref=e427]: widget
+                  - generic [ref=e428]: 🤖 AI Bot
+                  - generic [ref=e429]: Belum Dibalas
+              - generic [ref=e430] [cursor=pointer]:
+                - generic [ref=e431]:
+                  - generic [ref=e433]: widget_1782189919643_2unrhstd9
+                  - generic [ref=e435]: "11.45"
+                - paragraph [ref=e436]: "📝 [Form Submitted] - Name: nanda prana - Email: nandapuspitarana@gmail.com - Phone: 6289670005828 - Size: 12 - date: 2026-06-23"
+                - generic [ref=e437]:
+                  - generic [ref=e438]: widget
+                  - generic [ref=e439]: 🤖 AI Bot
+                  - generic [ref=e440]: Belum Dibalas
+              - generic [ref=e441] [cursor=pointer]:
+                - generic [ref=e442]:
+                  - generic [ref=e444]: widget_1782179798321_k689wavmd
+                  - generic [ref=e445]: "08.56"
+                - paragraph [ref=e446]: "Our team will review Private Office availability for Athenee Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Athenee+Tower&city=Bangkok&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>"
+                - generic [ref=e447]:
+                  - generic [ref=e448]: widget
+                  - generic [ref=e449]: 🤖 AI Bot
+                  - generic [ref=e450]: Sudah Dibalas
+              - generic [ref=e451] [cursor=pointer]:
+                - generic [ref=e452]:
+                  - generic [ref=e454]: widget_1782179474152_sdzoz93xp
+                  - generic [ref=e455]: "08.51"
+                - paragraph [ref=e456]: Halo! Ada yang bisa saya bantu hari ini?
+                - generic [ref=e457]:
+                  - generic [ref=e458]: widget
+                  - generic [ref=e459]: 🤖 AI Bot
+                  - generic [ref=e460]: Sudah Dibalas
+              - generic [ref=e461] [cursor=pointer]:
+                - generic [ref=e462]:
+                  - generic [ref=e464]: widget_1782124046715_4zqqwgdcn
+                  - generic [ref=e465]: "17.27"
+                - paragraph [ref=e466]: "Our team will review Private Office availability for Athenee Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Athenee+Tower&city=Bangkok&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>"
+                - generic [ref=e467]:
+                  - generic [ref=e468]: widget
+                  - generic [ref=e469]: 🤖 AI Bot
+                  - generic [ref=e470]: Sudah Dibalas
+              - generic [ref=e471] [cursor=pointer]:
+                - generic [ref=e472]:
+                  - generic [ref=e474]: widget_1782123901135_78i7bwvvj
+                  - generic [ref=e475]: "17.27"
+                - paragraph [ref=e476]: "Private Office Best for teams that need a private, ready-to-use office with flexible terms. Which city are you interested in?<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok Private Office'}, '*')\">Bangkok Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing Private Office'}, '*')\">Beijing Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou Private Office'}, '*')\">Hangzhou Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi Private Office'}, '*')\">Hanoi Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City Private Office'}, '*')\">Ho Chi Minh City Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong Private Office'}, '*')\">Hong Kong Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta Private Office'}, '*')\">Jakarta Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur Private Office'}, '*')\">Kuala Lumpur Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila Private Office'}, '*')\">Manila Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul Private Office'}, '*')\">Seoul Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai Private Office'}, '*')\">Shanghai Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore Private Office'}, '*')\">Singapore Private Office</button></div>"
+                - generic [ref=e477]:
+                  - generic [ref=e478]: widget
+                  - generic [ref=e479]: 🤖 AI Bot
+                  - generic [ref=e480]: Sudah Dibalas
+              - generic [ref=e481] [cursor=pointer]:
+                - generic [ref=e482]:
+                  - generic [ref=e484]: widget_1782115789288_xgiemsmtz
+                  - generic [ref=e486]: "15.09"
+                - paragraph [ref=e487]: Baik, saya akan segera menghubungkan Anda dengan agen kami bernama Customer Support Agent. Mohon tunggu sebentar ya! 😊
+                - generic [ref=e488]:
+                  - generic [ref=e489]: widget
+                  - generic [ref=e490]: ⏳ Handoff
+                  - generic [ref=e491]: Belum Dibalas
+              - generic [ref=e492] [cursor=pointer]:
+                - generic [ref=e493]:
+                  - generic [ref=e495]: widget_1782091884782_02jq5jmo4
+                  - generic [ref=e496]: "08.31"
+                - paragraph [ref=e497]: "The starting price for a Private Office at Athenee Tower in Bangkok is THB 6,500 per person per month. [Source: KB - Pricing Table]"
+                - generic [ref=e498]:
+                  - generic [ref=e499]: widget
+                  - generic [ref=e500]: 🤖 AI Bot
+                  - generic [ref=e501]: Sudah Dibalas
+              - generic [ref=e502] [cursor=pointer]:
+                - generic [ref=e503]:
+                  - generic [ref=e505]: widget_1781861237825_368wlfspr
+                  - generic [ref=e506]: "16.49"
+                - paragraph [ref=e507]: "<div class='card'><div class='card-title'>Axa Tower (Jakarta) - Dedicated Workstation</div><div class='small'>Our dedicated workstations at Axa Tower give you a fixed, secure desk in a shared environment. Includes lockable storage, high-speed internet, and access to premium amenities.<br/><br/>Explore this space in detail here: https://www.ceosuite.com/locations/jakarta-axa/</div></div><div class='cta-note'>Next, you can continue with the recommended action or ask a question.</div><div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Request quotation Axa Tower (DW)'}, '*')\">Request quotation Axa Tower (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Book a tour Axa Tower (DW)'}, '*')\">Book a tour Axa Tower (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Start again'}, '*')\">Start again</button></div>"
+                - generic [ref=e508]:
+                  - generic [ref=e509]: widget
+                  - generic [ref=e510]: 🤖 AI Bot
+                  - generic [ref=e511]: Sudah Dibalas
+              - generic [ref=e512] [cursor=pointer]:
+                - generic [ref=e513]:
+                  - generic [ref=e515]: widget_1781859748101_edrenyg28
+                  - generic [ref=e516]: "16.02"
+                - paragraph [ref=e517]: Agen Business Partner bergabung ke percakapan.
+                - generic [ref=e518]:
+                  - generic [ref=e519]: widget
+                  - generic [ref=e520]: 👤 Handled
+                  - generic [ref=e521]: Sudah Dibalas
+              - generic [ref=e522] [cursor=pointer]:
+                - generic [ref=e523]:
+                  - generic [ref=e525]: widget_1781856238772_v2olaijmp
+                  - generic [ref=e526]: "15.04"
+                - paragraph [ref=e527]: "Our team will review Private Office availability for Athenee Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Athenee+Tower&city=Bangkok&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>"
+                - generic [ref=e528]:
+                  - generic [ref=e529]: widget
+                  - generic [ref=e530]: 🤖 AI Bot
+                  - generic [ref=e531]: Sudah Dibalas
+              - generic [ref=e532] [cursor=pointer]:
+                - generic [ref=e533]:
+                  - generic [ref=e535]: widget_1781854578946_z0x76349n
+                  - generic [ref=e537]: "15.03"
+                - paragraph [ref=e538]: Hello! How can I assist you today?
+                - generic [ref=e539]:
+                  - generic [ref=e540]: widget
+                  - generic [ref=e541]: ⏳ Handoff
+                  - generic [ref=e542]: Belum Dibalas
+              - generic [ref=e543] [cursor=pointer]:
+                - generic [ref=e544]:
+                  - generic [ref=e546]: widget_1781855884802_uve66yt4r
+                  - generic [ref=e547]: "14.58"
+                - paragraph [ref=e548]: "Our team will review Private Office availability for Athenee Tower. Please provide your details.<div class='form-card'><label class='form-card_label'>Name</label><input type='text' placeholder='Name' class='form-card_input'/><label class='form-card_label'>Email</label><input type='email' placeholder='Email' class='form-card_input'/><label class='form-card_label'>Contact Number</label><input type='tel' placeholder='Phone' class='form-card_input'/><div class='form-grid'><div><label class='form-card_label'>Team Size</label><input type='number' placeholder='Size' class='form-card_input'/></div><div><label class='form-card_label'>Move-in Date</label><input type='date' class='form-card_input'/></div></div><button type='button' class='submit-btn' onclick=\"const c=this.closest('.form-card');const i=c.querySelectorAll('input');let d={};i.forEach(el=>d[el.placeholder||el.type]=el.value);window.postMessage({type:'widget_form_submit',url:'https://n8n-7-7.ceosuite.com/webhook/639da863-643a-4f6d-8237-750e4eaac76e?venue=Athenee+Tower&city=Bangkok&product=Private+Office',payload:d}, '*');\">Request Quotation</button></div>"
+                - generic [ref=e549]:
+                  - generic [ref=e550]: widget
+                  - generic [ref=e551]: 🤖 AI Bot
+                  - generic [ref=e552]: Sudah Dibalas
+              - generic [ref=e553] [cursor=pointer]:
+                - generic [ref=e554]:
+                  - generic [ref=e556]: widget_1781855826744_6xg9le5fq
+                  - generic [ref=e557]: "14.57"
+                - paragraph [ref=e558]: "Sure! Here are our premium Private Office locations in Bangkok. Please choose a centre that suits your needs. If you need more information about each location, feel free to ask!<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Athenee Tower Private Office'}, '*')\">Athenee Tower Private Office</button></div>"
+                - generic [ref=e559]:
+                  - generic [ref=e560]: widget
+                  - generic [ref=e561]: 🤖 AI Bot
+                  - generic [ref=e562]: Sudah Dibalas
+              - generic [ref=e563] [cursor=pointer]:
+                - generic [ref=e564]:
+                  - generic [ref=e566]: widget_1781855545818_b21vs2z35
+                  - generic [ref=e567]: "14.52"
+                - paragraph [ref=e568]: I don't have enough information in my knowledge base to answer that.
+                - generic [ref=e569]:
+                  - generic [ref=e570]: widget
+                  - generic [ref=e571]: 🤖 AI Bot
+                  - generic [ref=e572]: Sudah Dibalas
+              - generic [ref=e573] [cursor=pointer]:
+                - generic [ref=e574]:
+                  - generic [ref=e576]: widget_1781855334497_srlvt2hll
+                  - generic [ref=e577]: "14.48"
+                - paragraph [ref=e578]: I can help you schedule a tour for the Private Office at Athenee Tower. Please provide the date and time you prefer, along with your name and email address. Once I have that information, I can assist you further!
+                - generic [ref=e579]:
+                  - generic [ref=e580]: widget
+                  - generic [ref=e581]: 🤖 AI Bot
+                  - generic [ref=e582]: Sudah Dibalas
+              - generic [ref=e583] [cursor=pointer]:
+                - generic [ref=e584]:
+                  - generic [ref=e586]: widget_1781855320325_lg9keuqia
+                  - generic [ref=e587]: "14.48"
+                - paragraph [ref=e588]: I can help you schedule a tour for the Private Office at Athenee Tower. Please provide the date and time you'd like for the tour, along with your name and email address. Once I have that information, I can assist you further!
+                - generic [ref=e589]:
+                  - generic [ref=e590]: widget
+                  - generic [ref=e591]: 🤖 AI Bot
+                  - generic [ref=e592]: Sudah Dibalas
+              - generic [ref=e593] [cursor=pointer]:
+                - generic [ref=e594]:
+                  - generic [ref=e596]: widget_1781855255343_vbl9alnf6
+                  - generic [ref=e597]: "14.47"
+                - paragraph [ref=e598]: "Maaf, sistem AI kami sedang tidak tersedia. Silakan coba beberapa saat lagi, atau ketik \"bicara dengan agen\" untuk berbicara langsung dengan tim kami. 🙏<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Request quotation Athenee Tower Private Office'}, '*')\">Request quotation Athenee Tower Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Book a tour Athenee Tower Private Office'}, '*')\">Book a tour Athenee Tower Private Office</button><button class=\"px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Start again'}, '*')\">Start again</button></div>"
+                - generic [ref=e599]:
+                  - generic [ref=e600]: widget
+                  - generic [ref=e601]: 🤖 AI Bot
+                  - generic [ref=e602]: Sudah Dibalas
+              - generic [ref=e603] [cursor=pointer]:
+                - generic [ref=e604]:
+                  - generic [ref=e606]: widget_1781854547714_5cs221gl4
+                  - generic [ref=e607]: "14.35"
+                - paragraph [ref=e608]: Halo! Ada yang bisa saya bantu hari ini?
+                - generic [ref=e609]:
+                  - generic [ref=e610]: widget
+                  - generic [ref=e611]: 🤖 AI Bot
+                  - generic [ref=e612]: Sudah Dibalas
+              - generic [ref=e613] [cursor=pointer]:
+                - generic [ref=e614]:
+                  - generic [ref=e616]: widget_1781854468310_o7xc695ih
+                  - generic [ref=e617]: "14.34"
+                - paragraph [ref=e618]: Saya di sini untuk membantu Anda. Jika ada yang bisa saya bantu, silakan beri tahu saya.
+                - generic [ref=e619]:
+                  - generic [ref=e620]: widget
+                  - generic [ref=e621]: 🤖 AI Bot
+                  - generic [ref=e622]: Sudah Dibalas
+              - generic [ref=e623] [cursor=pointer]:
+                - generic [ref=e624]:
+                  - generic [ref=e626]: widget_1781843104046_l78d10gp7
+                  - generic [ref=e627]: "11.35"
+                - paragraph [ref=e628]: I can help you schedule a tour for a Private Office at Athenee Tower. Please provide the date and time you'd like for the tour, along with your name and email address. Once I have that information, I can assist you further!
+                - generic [ref=e629]:
+                  - generic [ref=e630]: widget
+                  - generic [ref=e631]: 🤖 AI Bot
+                  - generic [ref=e632]: Sudah Dibalas
+              - generic [ref=e633] [cursor=pointer]:
+                - generic [ref=e634]:
+                  - generic [ref=e636]: widget_1781843532637_xduoqmmaz
+                  - generic [ref=e637]: "11.32"
+                - paragraph [ref=e638]: I can help you schedule a tour for a Private Office at the Kyobo Building. Please provide the date and time you prefer, along with your name and email. Once I have that information, I can assist you further!
+                - generic [ref=e639]:
+                  - generic [ref=e640]: widget
+                  - generic [ref=e641]: 🤖 AI Bot
+                  - generic [ref=e642]: Sudah Dibalas
+              - generic [ref=e643] [cursor=pointer]:
+                - generic [ref=e644]:
+                  - generic [ref=e646]: widget_1781842368134_1w1ack410
+                  - generic [ref=e647]: "11.12"
+                - paragraph [ref=e648]: "Our Private Offices are ideal for teams that require a private, ready-to-use workspace with flexible terms. Which city are you interested in?<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok (PO)'}, '*')\">Bangkok (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing (PO)'}, '*')\">Beijing (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou (PO)'}, '*')\">Hangzhou (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi (PO)'}, '*')\">Hanoi (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City (PO)'}, '*')\">Ho Chi Minh City (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong (PO)'}, '*')\">Hong Kong (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta (PO)'}, '*')\">Jakarta (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur (PO)'}, '*')\">Kuala Lumpur (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila (PO)'}, '*')\">Manila (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul (PO)'}, '*')\">Seoul (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai (PO)'}, '*')\">Shanghai (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore (PO)'}, '*')\">Singapore (PO)</button></div>"
+                - generic [ref=e649]:
+                  - generic [ref=e650]: widget
+                  - generic [ref=e651]: 🤖 AI Bot
+                  - generic [ref=e652]: Sudah Dibalas
+              - generic [ref=e653] [cursor=pointer]:
+                - generic [ref=e654]:
+                  - generic [ref=e656]: widget_1781841914270_i0spg6al0
+                  - generic [ref=e657]: "11.05"
+                - paragraph [ref=e658]: "Maaf, sistem AI kami sedang tidak tersedia. Silakan coba beberapa saat lagi, atau ketik \"bicara dengan agen\" untuk berbicara langsung dengan tim kami. 🙏<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok (PO)'}, '*')\">Bangkok (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing (PO)'}, '*')\">Beijing (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou (PO)'}, '*')\">Hangzhou (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi (PO)'}, '*')\">Hanoi (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City (PO)'}, '*')\">Ho Chi Minh City (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong (PO)'}, '*')\">Hong Kong (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta (PO)'}, '*')\">Jakarta (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur (PO)'}, '*')\">Kuala Lumpur (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila (PO)'}, '*')\">Manila (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul (PO)'}, '*')\">Seoul (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai (PO)'}, '*')\">Shanghai (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore (PO)'}, '*')\">Singapore (PO)</button></div>"
+                - generic [ref=e659]:
+                  - generic [ref=e660]: widget
+                  - generic [ref=e661]: 🤖 AI Bot
+                  - generic [ref=e662]: Sudah Dibalas
+              - generic [ref=e663] [cursor=pointer]:
+                - generic [ref=e664]:
+                  - generic [ref=e666]: widget_1781834606346_ktx2l05gz
+                  - generic [ref=e667]: "09.03"
+                - paragraph [ref=e668]: "A Dedicated Workstation offers you your own personal desk in a shared premium environment. Which city are you interested in?<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok (DW)'}, '*')\">Bangkok (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing (DW)'}, '*')\">Beijing (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou (DW)'}, '*')\">Hangzhou (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi (DW)'}, '*')\">Hanoi (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City (DW)'}, '*')\">Ho Chi Minh City (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong (DW)'}, '*')\">Hong Kong (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta (DW)'}, '*')\">Jakarta (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur (DW)'}, '*')\">Kuala Lumpur (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila (DW)'}, '*')\">Manila (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul (DW)'}, '*')\">Seoul (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai (DW)'}, '*')\">Shanghai (DW)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore (DW)'}, '*')\">Singapore (DW)</button></div>"
+                - generic [ref=e669]:
+                  - generic [ref=e670]: widget
+                  - generic [ref=e671]: 🤖 AI Bot
+                  - generic [ref=e672]: Sudah Dibalas
+              - generic [ref=e673] [cursor=pointer]:
+                - generic [ref=e674]:
+                  - generic [ref=e676]: widget_1781834576247_fd8p9bo7v
+                  - generic [ref=e677]: "09.03"
+                - paragraph [ref=e678]: "Maaf, sistem AI kami sedang tidak tersedia. Silakan coba beberapa saat lagi, atau ketik \"bicara dengan agen\" untuk berbicara langsung dengan tim kami. 🙏<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok (PO)'}, '*')\">Bangkok (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing (PO)'}, '*')\">Beijing (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou (PO)'}, '*')\">Hangzhou (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi (PO)'}, '*')\">Hanoi (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City (PO)'}, '*')\">Ho Chi Minh City (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong (PO)'}, '*')\">Hong Kong (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta (PO)'}, '*')\">Jakarta (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur (PO)'}, '*')\">Kuala Lumpur (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila (PO)'}, '*')\">Manila (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul (PO)'}, '*')\">Seoul (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai (PO)'}, '*')\">Shanghai (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore (PO)'}, '*')\">Singapore (PO)</button></div>"
+                - generic [ref=e679]:
+                  - generic [ref=e680]: widget
+                  - generic [ref=e681]: 🤖 AI Bot
+                  - generic [ref=e682]: Sudah Dibalas
+              - generic [ref=e683] [cursor=pointer]:
+                - generic [ref=e684]:
+                  - generic [ref=e686]: widget_1781834523925_tkp0r0xsl
+                  - generic [ref=e687]: "09.02"
+                - paragraph [ref=e688]: Maaf, sistem AI kami sedang tidak tersedia. Silakan coba beberapa saat lagi, atau ketik "bicara dengan agen" untuk berbicara langsung dengan tim kami. 🙏
+                - generic [ref=e689]:
+                  - generic [ref=e690]: widget
+                  - generic [ref=e691]: 🤖 AI Bot
+                  - generic [ref=e692]: Sudah Dibalas
+              - generic [ref=e693] [cursor=pointer]:
+                - generic [ref=e694]:
+                  - generic [ref=e696]: widget_1781834506873_jkuo5c9xt
+                  - generic [ref=e697]: "09.01"
+                - paragraph [ref=e698]: "Maaf, sistem AI kami sedang tidak tersedia. Silakan coba beberapa saat lagi, atau ketik \"bicara dengan agen\" untuk berbicara langsung dengan tim kami. 🙏<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Bangkok (PO)'}, '*')\">Bangkok (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Beijing (PO)'}, '*')\">Beijing (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hangzhou (PO)'}, '*')\">Hangzhou (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hanoi (PO)'}, '*')\">Hanoi (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Ho Chi Minh City (PO)'}, '*')\">Ho Chi Minh City (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Hong Kong (PO)'}, '*')\">Hong Kong (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Jakarta (PO)'}, '*')\">Jakarta (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Kuala Lumpur (PO)'}, '*')\">Kuala Lumpur (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Manila (PO)'}, '*')\">Manila (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Seoul (PO)'}, '*')\">Seoul (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Shanghai (PO)'}, '*')\">Shanghai (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Singapore (PO)'}, '*')\">Singapore (PO)</button></div>"
+                - generic [ref=e699]:
+                  - generic [ref=e700]: widget
+                  - generic [ref=e701]: 🤖 AI Bot
+                  - generic [ref=e702]: Sudah Dibalas
+              - generic [ref=e703] [cursor=pointer]:
+                - generic [ref=e704]:
+                  - generic [ref=e706]: widget_1781833520675_4khgy2anw
+                  - generic [ref=e707]: "08.45"
+                - paragraph [ref=e708]: "Maaf, sistem AI kami sedang tidak tersedia. Silakan coba beberapa saat lagi, atau ketik \"bicara dengan agen\" untuk berbicara langsung dengan tim kami. 🙏<div class=\"flex flex-wrap gap-2 mt-3\"><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Request quotation Athenee Tower (PO)'}, '*')\">Request quotation Athenee Tower (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Book a tour Athenee Tower (PO)'}, '*')\">Book a tour Athenee Tower (PO)</button><button class=\"px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors\" onclick=\"window.postMessage({type: 'widget_quick_reply', text: 'Start again'}, '*')\">Start again</button></div>"
+                - generic [ref=e709]:
+                  - generic [ref=e710]: widget
+                  - generic [ref=e711]: 🤖 AI Bot
+                  - generic [ref=e712]: Sudah Dibalas
+              - generic [ref=e713] [cursor=pointer]:
+                - generic [ref=e714]:
+                  - generic [ref=e716]: widget_1781755342829_wnsgxipqw
+                  - generic [ref=e717]: "11.02"
+                - paragraph [ref=e718]: Selamat pagi! Ada yang bisa saya bantu hari ini?
+                - generic [ref=e719]:
+                  - generic [ref=e720]: widget
+                  - generic [ref=e721]: 🤖 AI Bot
+                  - generic [ref=e722]: Sudah Dibalas
+              - generic [ref=e723] [cursor=pointer]:
+                - generic [ref=e724]:
+                  - generic [ref=e726]: widget_1781754313231
+                  - generic [ref=e727]: "10.45"
+                - paragraph [ref=e728]: Agen Customer Support Agent bergabung ke percakapan.
+                - generic [ref=e729]:
+                  - generic [ref=e730]: widget
+                  - generic [ref=e731]: 👤 Handled
+                  - generic [ref=e732]: Sudah Dibalas
+          - generic [ref=e733]:
+            - generic [ref=e734]:
+              - generic [ref=e735]:
+                - img [ref=e737]
+                - generic [ref=e740]:
+                  - heading "widget_1782700096456_jk7wrkq2j" [level=3] [ref=e741]
+                  - generic [ref=e742]:
+                    - paragraph [ref=e743]: Active
+                    - generic [ref=e745]: "Handled by: Business Partner"
+              - generic [ref=e746]:
+                - combobox [ref=e747] [cursor=pointer]:
+                  - option "Transfer to..." [disabled]
+                  - option "Business Partner" [selected]
+                  - option "Customer Support Agent"
+                - button "Close Conversation" [ref=e748]
+            - generic [ref=e749]:
+              - generic [ref=e751]:
+                - generic [ref=e752]: Day Office
+                - paragraph [ref=e753]: 09:28 AM
+              - generic [ref=e755]:
+                - generic [ref=e756]:
+                  - text: Day Office Private office space available on a daily basis. Which city are you interested in?
+                  - generic [ref=e757]:
+                    - button "Bangkok" [ref=e758]
+                    - button "Beijing" [ref=e759]
+                    - button "Hangzhou" [ref=e760]
+                    - button "Hanoi" [ref=e761]
+                    - button "Ho Chi Minh City" [ref=e762]
+                    - button "Hong Kong" [ref=e763]
+                    - button "Jakarta" [ref=e764]
+                    - button "Kuala Lumpur" [ref=e765]
+                    - button "Manila" [ref=e766]
+                    - button "Seoul" [ref=e767]
+                    - button "Shanghai" [ref=e768]
+                    - button "Singapore" [ref=e769]
+                - paragraph [ref=e770]: 09:28 AM
+              - generic [ref=e772]:
+                - generic [ref=e773]: asdf
+                - paragraph [ref=e774]: 09:28 AM
+              - generic [ref=e776]:
+                - generic [ref=e777]: Agen Business Partner bergabung ke percakapan.
+                - paragraph [ref=e778]: 09:28 AM
+            - generic [ref=e780]:
+              - textbox "Type a message or / for templates..." [ref=e781]
+              - button "Canned Responses" [ref=e782]:
+                - img [ref=e783]
+              - button [ref=e785]:
+                - img [ref=e786]
+          - generic [ref=e789]:
+            - generic [ref=e790]:
+              - heading "Info Prospek" [level=3] [ref=e791]
+              - button [ref=e792]:
+                - img [ref=e793]
+            - generic [ref=e796]:
+              - generic [ref=e797]:
+                - generic [ref=e798]: "?"
+                - paragraph [ref=e799]: Prospek Anonim
+              - generic [ref=e800]:
+                - paragraph [ref=e801]: Status Prospek
+                - generic [ref=e802]:
+                  - generic [ref=e803]: 🧊 Cold
+                  - generic [ref=e804]: 0 pts
+              - generic [ref=e806]:
+                - paragraph [ref=e807]: Riwayat Interaksi
+                - generic [ref=e808]:
+                  - generic [ref=e809]:
+                    - paragraph [ref=e810]: "1"
+                    - paragraph [ref=e811]: Sesi
+                  - generic [ref=e812]:
+                    - paragraph [ref=e813]: "1"
+                    - paragraph [ref=e814]: Pesan
+                - paragraph [ref=e815]: "Terakhir aktif: 29/6/2026, 09.28.19"
+  - button "Open Next.js Dev Tools" [ref=e821] [cursor=pointer]:
+    - img [ref=e822]
+  - alert [ref=e825]
+```
+
+# Test source
+
+```ts
+  1  | import { Page } from '@playwright/test';
+  2  | import * as path from 'path';
+  3  | import * as fs from 'fs';
+  4  | 
+  5  | export const CREDENTIALS = {
+  6  |   email: 'partner@zetacrm.com',
+  7  |   password: 'password123',
+  8  | };
+  9  | 
+  10 | export const SCREENSHOTS_DIR = path.join(__dirname, 'screenshots');
+  11 | 
+  12 | /**
+  13 |  * Ensure screenshots directory exists
+  14 |  */
+  15 | export function ensureScreenshotsDir() {
+  16 |   if (!fs.existsSync(SCREENSHOTS_DIR)) {
+  17 |     fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
+  18 |   }
+  19 | }
+  20 | 
+  21 | /**
+  22 |  * Take a labeled screenshot and save to screenshots directory
+  23 |  */
+  24 | export async function takeScreenshot(page: Page, filename: string): Promise<string> {
+  25 |   ensureScreenshotsDir();
+  26 |   const filePath = path.join(SCREENSHOTS_DIR, filename);
+  27 |   await page.screenshot({ path: filePath, fullPage: false });
+  28 |   console.log(`📸 Screenshot saved: ${filename}`);
+  29 |   return filePath;
+  30 | }
+  31 | 
+  32 | /**
+  33 |  * Login helper: navigate to login page and authenticate
+  34 |  */
+  35 | export async function loginAs(page: Page, email = CREDENTIALS.email, password = CREDENTIALS.password) {
+  36 |   await page.goto('/en/login', { waitUntil: 'networkidle' });
+> 37 |   await page.fill('#email', email);
+     |              ^ TimeoutError: page.fill: Timeout 15000ms exceeded.
+  38 |   await page.fill('#password', password);
+  39 |   await page.click('button[type="submit"]');
+  40 |   // Wait for redirect to inbox or dashboard
+  41 |   await page.waitForURL(/\/(inbox|dashboard|en\/(inbox|dashboard))/, { timeout: 30000 });
+  42 | }
+  43 | 
+  44 | /**
+  45 |  * Get tenant ID from widget config for test usage
+  46 |  */
+  47 | export const TEST_TENANT_ID = 'demo-tenant-1234';
+  48 | 
+```

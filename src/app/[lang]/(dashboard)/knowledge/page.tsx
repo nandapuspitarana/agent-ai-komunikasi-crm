@@ -97,6 +97,10 @@ export default function KnowledgeBasePage() {
   const [proxyStatus, setProxyStatus] = useState<'ok' | 'offline' | 'error' | 'loading'>('loading');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<DocType>('all');
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -105,11 +109,17 @@ export default function KnowledgeBasePage() {
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [tagList, setTagList] = useState<string[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{current: number, total: number} | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset pagination when filter/search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterType]);
 
   const fetchDocuments = async () => {
     setLoading(true);
@@ -135,11 +145,11 @@ export default function KnowledgeBasePage() {
   const currentTab = UPLOAD_TABS.find(t => t.id === activeUploadTab)!;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      if (!metaName) {
-        setMetaName(file.name.replace(/\.[^/.]+$/, ''));
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setSelectedFiles(prev => [...prev, ...files]);
+      if (!metaName && files.length === 1) {
+        setMetaName(files[0].name.replace(/\.[^/.]+$/, ''));
       }
     }
   };
@@ -165,45 +175,67 @@ export default function KnowledgeBasePage() {
 
   const handleFileUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) return;
-    if (!metaName.trim()) {
+    if (selectedFiles.length === 0) return;
+    
+    if (selectedFiles.length === 1 && !metaName.trim()) {
       setError('Meta Name is required');
       return;
     }
 
     setUploading(true);
     setError(null);
+    setUploadProgress({ current: 0, total: selectedFiles.length });
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('meta_name', metaName);
-    if (tagList.length > 0) formData.append('tags', tagList.join(','));
-    if (description.trim()) formData.append('description', description);
-    if (category.trim()) formData.append('category', category);
+    let successCount = 0;
 
-    try {
-      const res = await fetch('/api/agent/documents/upload', {
-        method: 'POST',
-        body: formData,
-      });
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      setUploadProgress({ current: i + 1, total: selectedFiles.length });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to upload document');
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const nameToUse = selectedFiles.length === 1 ? metaName : file.name.replace(/\.[^/.]+$/, '');
+      formData.append('meta_name', nameToUse);
+      
+      if (tagList.length > 0) formData.append('tags', tagList.join(','));
+      if (description.trim()) formData.append('description', description);
+      if (category.trim()) formData.append('category', category);
+
+      try {
+        const res = await fetch('/api/agent/documents/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          console.error(`Failed to upload ${file.name}:`, data.error);
+        } else {
+          successCount++;
+        }
+      } catch (err: any) {
+        console.error(`Error uploading ${file.name}:`, err);
       }
+    }
 
+    setUploading(false);
+    setUploadProgress(null);
+    
+    if (successCount === 0) {
+      setError('Failed to upload all documents');
+    } else {
       closeModal();
       await fetchDocuments();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred while uploading the document');
-    } finally {
-      setUploading(false);
+      if (successCount < selectedFiles.length) {
+         alert(`Uploaded ${successCount} of ${selectedFiles.length} files successfully.`);
+      }
     }
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setMetaName('');
     setTags('');
     setDescription('');
@@ -211,6 +243,7 @@ export default function KnowledgeBasePage() {
     setTagList([]);
     setTagInput('');
     setError(null);
+    setUploadProgress(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -244,6 +277,12 @@ export default function KnowledgeBasePage() {
 
     return matchSearch && typeMatch;
   });
+
+  const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
+  const paginatedDocuments = filteredDocuments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const statusCounts = {
     ready: documents.filter(d => d.status === 'ready').length,
@@ -410,95 +449,127 @@ export default function KnowledgeBasePage() {
             No documents match the filter "{searchQuery || filterType}"
           </div>
         ) : (
-          <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Document</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Tags</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Status</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-center">Chunks</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Date</th>
-                <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredDocuments.map((doc) => (
-                <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">{getFileIcon(doc.filename)}</div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-900 truncate max-w-[160px]" title={doc.metadata?.name || doc.filename}>
-                            {doc.metadata?.name || doc.filename}
-                          </span>
-                          {getFileTypeBadge(doc.filename)}
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Document</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Tags</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Status</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-center">Chunks</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide">Date</th>
+                    <th className="px-5 py-3 font-semibold text-slate-600 text-xs uppercase tracking-wide text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {paginatedDocuments.map((doc) => (
+                    <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-5 py-4">
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5">{getFileIcon(doc.filename)}</div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-900 truncate max-w-[160px]" title={doc.metadata?.name || doc.filename}>
+                                {doc.metadata?.name || doc.filename}
+                              </span>
+                              {getFileTypeBadge(doc.filename)}
+                            </div>
+                            <span className="text-xs text-slate-400 truncate max-w-[200px] block" title={doc.filename}>
+                              {doc.filename}
+                            </span>
+                            {doc.metadata?.description && (
+                              <span className="text-xs text-slate-400 italic truncate max-w-[200px] block">
+                                {doc.metadata.description}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <span className="text-xs text-slate-400 truncate max-w-[200px] block" title={doc.filename}>
-                          {doc.filename}
-                        </span>
-                        {doc.metadata?.description && (
-                          <span className="text-xs text-slate-400 italic truncate max-w-[200px] block">
-                            {doc.metadata.description}
+                      </td>
+                      <td className="px-5 py-4">
+                        {doc.metadata?.category && (
+                          <span className="inline-block mb-1.5 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded font-medium">
+                            {doc.metadata.category}
                           </span>
                         )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    {doc.metadata?.category && (
-                      <span className="inline-block mb-1.5 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded font-medium">
-                        {doc.metadata.category}
-                      </span>
-                    )}
-                    {doc.metadata?.tags && doc.metadata.tags.length > 0 ? (
-                      <div className="flex flex-wrap gap-1 max-w-[180px]">
-                        {doc.metadata.tags.map((tag: string, idx: number) => (
-                          <span key={idx} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-600">
-                            <Tag size={10} />{tag}
+                        {doc.metadata?.tags && doc.metadata.tags.length > 0 ? (
+                          <div className="flex flex-wrap gap-1 max-w-[180px]">
+                            {doc.metadata.tags.map((tag: string, idx: number) => (
+                              <span key={idx} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-600">
+                                <Tag size={10} />{tag}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-slate-300 text-xs italic">-</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-4">
+                        {doc.status === 'ready' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                            <CheckCircle size={12} /> Ready
                           </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-slate-300 text-xs italic">-</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4">
-                    {doc.status === 'ready' ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                        <CheckCircle size={12} /> Ready
-                      </span>
-                    ) : doc.status === 'failed' ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700" title={doc.error_message}>
-                        <AlertCircle size={12} /> Failed
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                        <Clock size={12} className="animate-pulse" /> Processing
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4 text-center text-slate-600 font-medium">
-                    {doc.chunk_count ?? '-'}
-                  </td>
-                  <td className="px-5 py-4 text-slate-500 text-xs whitespace-nowrap">
-                    {doc.created_at ? new Date(doc.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric', month: 'short', year: 'numeric'
-                    }) : '-'}
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    <button
-                      onClick={() => handleDelete(doc.id, doc.metadata?.name || doc.filename)}
-                      className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete document"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        ) : doc.status === 'failed' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700" title={doc.error_message}>
+                            <AlertCircle size={12} /> Failed
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                            <Clock size={12} className="animate-pulse" /> Processing
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-4 text-center text-slate-600 font-medium">
+                        {doc.chunk_count ?? '-'}
+                      </td>
+                      <td className="px-5 py-4 text-slate-500 text-xs whitespace-nowrap">
+                        {doc.created_at ? new Date(doc.created_at).toLocaleDateString('id-ID', {
+                          day: 'numeric', month: 'short', year: 'numeric'
+                        }) : '-'}
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <button
+                          onClick={() => handleDelete(doc.id, doc.metadata?.name || doc.filename)}
+                          className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete document"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="px-5 py-4 border-t border-slate-200 flex items-center justify-between bg-slate-50">
+                <span className="text-sm text-slate-500">
+                  Showing <span className="font-medium text-slate-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-slate-900">{Math.min(currentPage * itemsPerPage, filteredDocuments.length)}</span> of <span className="font-medium text-slate-900">{filteredDocuments.length}</span> documents
+                </span>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <div className="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg">
+                    {currentPage} / {totalPages}
+                  </div>
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -526,7 +597,7 @@ export default function KnowledgeBasePage() {
                     type="button"
                     onClick={() => {
                       setActiveUploadTab(tab.id);
-                      setSelectedFile(null);
+                      setSelectedFiles([]);
                       if (fileInputRef.current) fileInputRef.current.value = '';
                     }}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
@@ -551,7 +622,7 @@ export default function KnowledgeBasePage() {
               {/* File Drop Area */}
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer ${
-                  selectedFile
+                  selectedFiles.length > 0
                     ? 'border-brand/40 bg-brand-bg'
                     : 'border-slate-300 bg-slate-50 hover:border-brand/40 hover:bg-brand-bg/50'
                 }`}
@@ -559,32 +630,45 @@ export default function KnowledgeBasePage() {
               >
                 <input
                   type="file"
+                  multiple
                   ref={fileInputRef}
                   onChange={handleFileSelect}
                   className="sr-only"
                   accept={currentTab.accept}
                 />
-                {selectedFile ? (
-                  <div className="flex items-center justify-center gap-3">
-                    {getFileIcon(selectedFile.name)}
-                    <div className="text-left">
-                      <p className="font-semibold text-brand-hover text-sm">{selectedFile.name}</p>
-                      <p className="text-xs text-brand-light">{(selectedFile.size / 1024).toFixed(1)} KB</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); setSelectedFile(null); if(fileInputRef.current) fileInputRef.current.value=''; }}
-                      className="ml-auto p-1 hover:bg-brand-bg rounded text-brand-light"
-                    >
-                      <X size={16} />
-                    </button>
+                {selectedFiles.length > 0 ? (
+                  <div className="flex flex-col gap-2 max-h-40 overflow-y-auto w-full">
+                    {selectedFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center justify-between gap-3 p-2 bg-white rounded border border-slate-200">
+                        <div className="flex items-center gap-3">
+                           {getFileIcon(file.name)}
+                           <div className="text-left">
+                             <p className="font-semibold text-slate-700 text-sm truncate max-w-[200px]" title={file.name}>{file.name}</p>
+                             <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
+                           </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            const newFiles = [...selectedFiles];
+                            newFiles.splice(idx, 1);
+                            setSelectedFiles(newFiles); 
+                            if (fileInputRef.current) fileInputRef.current.value=''; 
+                          }}
+                          className="p-1 hover:bg-slate-100 rounded text-slate-400"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <>
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2 ${currentTab.color}`}>
                       {currentTab.icon}
                     </div>
-                    <p className="text-sm font-medium text-slate-700">Click to select {currentTab.label} file</p>
+                    <p className="text-sm font-medium text-slate-700">Click to select {currentTab.label} file(s)</p>
                     <p className="text-xs text-slate-400 mt-1">{currentTab.description}</p>
                     <p className="text-xs text-slate-400">Max 10MB | Format: {currentTab.accept}</p>
                   </>
@@ -592,20 +676,22 @@ export default function KnowledgeBasePage() {
               </div>
 
               {/* Meta Name */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Document Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={metaName}
-                  onChange={(e) => setMetaName(e.target.value)}
-                  placeholder="e.g. Employee Leave Policy 2026"
-                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand text-sm"
-                  required
-                />
-                <p className="text-xs text-slate-400 mt-1">The name recognized by the AI when answering questions</p>
-              </div>
+              {selectedFiles.length <= 1 && (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                    Document Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={metaName}
+                    onChange={(e) => setMetaName(e.target.value)}
+                    placeholder="e.g. Employee Leave Policy 2026"
+                    className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand text-sm"
+                    required={selectedFiles.length === 1}
+                  />
+                  <p className="text-xs text-slate-400 mt-1">The name recognized by the AI when answering questions</p>
+                </div>
+              )}
 
               {/* Category */}
               <div>
@@ -692,11 +778,11 @@ export default function KnowledgeBasePage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={uploading || !selectedFile}
+                  disabled={uploading || selectedFiles.length === 0}
                   className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-brand to-brand-hover rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-2 shadow-sm"
                 >
                   {uploading ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> {uploadProgress ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : 'Processing...'}</>
                   ) : (
                     <><Upload size={16} /> Upload & Process</>
                   )}

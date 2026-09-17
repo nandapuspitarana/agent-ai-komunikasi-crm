@@ -204,8 +204,8 @@ model Message {
 
 model KnowledgeDocument {
   id          String   @id @default(uuid())
-  flowId      String
-  flow        Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  flowId      String?
+  flow        Flow?    @relation(fields: [flowId], references: [id], onDelete: Cascade)
   tenantId    String
   metaName    String
   description String?
