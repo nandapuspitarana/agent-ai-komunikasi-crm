@@ -44,5 +44,10 @@ class QuickReplyOption {
     return QuickReplyOption(label: str, value: str);
   }
 
+  factory QuickReplyOption.fromJson(Map<String, dynamic> json) => QuickReplyOption(
+        label: json['label'] as String? ?? '',
+        value: json['value'] as String? ?? '',
+      );
+
   Map<String, dynamic> toJson() => {'label': label, 'value': value};
 }

@@ -29,11 +29,25 @@ class AiChatController extends ChangeNotifier {
     required this.config,
     this.contactId,
     String? initialSessionId,
+    List<ChatMessage>? initialMessages,
   })  : apiClient = apiClient ?? AiAgentApiClient(config: config),
         rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
-        _sessionId = initialSessionId ?? 'session_${DateTime.now().microsecondsSinceEpoch}';
+        _sessionId = initialSessionId ?? 'session_${DateTime.now().microsecondsSinceEpoch}',
+        _messages = initialMessages != null ? List.from(initialMessages) : [],
+        _isInitialized = initialMessages != null && initialMessages.isNotEmpty;
 
   List<ChatMessage> get messages => List.unmodifiable(_messages);
+
+  /// Restores previously persisted messages into controller state.
+  void restoreMessages(List<ChatMessage> messages, {String? sessionId}) {
+    if (messages.isEmpty) return;
+    _messages = List.from(messages);
+    if (sessionId != null && sessionId.isNotEmpty) {
+      _sessionId = sessionId;
+    }
+    _isInitialized = true;
+    notifyListeners();
+  }
   bool get isInitialized => _isInitialized;
   bool get isTyping => _isTyping;
   bool get isHandoff => _isHandoff;

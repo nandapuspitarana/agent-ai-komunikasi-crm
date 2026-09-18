@@ -130,6 +130,35 @@ class ChatMessage {
     );
   }
 
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      id: json['id'] as String? ?? 'msg_${DateTime.now().millisecondsSinceEpoch}',
+      sender: MessageSender.values.firstWhere(
+        (s) => s.name == json['sender'],
+        orElse: () => MessageSender.bot,
+      ),
+      senderName: json['senderName'] as String?,
+      text: json['text'] as String? ?? '',
+      type: ResponseType.fromString(json['type'] as String?),
+      options: (json['options'] as List<dynamic>?)
+              ?.map((o) => QuickReplyOption.fromJson(Map<String, dynamic>.from(o as Map)))
+              .toList() ??
+          const [],
+      card: json['card'] != null
+          ? CardPayload.fromJson(Map<String, dynamic>.from(json['card'] as Map))
+          : null,
+      form: json['form'] != null
+          ? FormPayload.fromJson(Map<String, dynamic>.from(json['form'] as Map))
+          : null,
+      timestamp: json['timestamp'] != null
+          ? DateTime.tryParse(json['timestamp'] as String) ?? DateTime.now()
+          : DateTime.now(),
+      status: MessageStatus.sent,
+      isHandoff: json['isHandoff'] == true,
+      sessionId: json['sessionId'] as String?,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'sender': sender.name,
