@@ -133,5 +133,30 @@ void main() {
       expect(find.byType(HandoffBanner), findsOneWidget);
       expect(find.textContaining('Percakapan telah dialihkan'), findsOneWidget);
     });
+
+    testWidgets('TEST-AI-W05: Dark mode input text styling and contrast in AiChatView', (tester) async {
+      when(() => mockApiClient.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {'config': {'welcomeMessage': 'Welcome to Executive Dark Lounge'}},
+      );
+
+      final darkTheme = AiChatTheme.ceoSuiteExecutive(isDark: true);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: AiChatView(controller: controller, theme: darkTheme),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.style?.color, equals(const Color(0xFFF2F2F2)));
+      expect(textField.decoration?.hintStyle?.color, equals(const Color(0xFF8E8E93)));
+
+      // Enter text and verify text renders clearly
+      await tester.enterText(find.byType(TextField), 'Testing dark mode input visibility');
+      await tester.pump();
+      expect(find.text('Testing dark mode input visibility'), findsOneWidget);
+    });
   });
 }

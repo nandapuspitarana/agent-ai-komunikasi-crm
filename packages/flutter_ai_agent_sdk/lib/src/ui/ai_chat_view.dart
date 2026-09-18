@@ -80,6 +80,15 @@ class _AiChatViewState extends State<AiChatView> {
     final controller = widget.controller;
     final theme = widget.theme;
 
+    // Detect dark mode from theme or ambient context
+    final isDark = theme.isDark || Theme.of(context).brightness == Brightness.dark;
+
+    final inputBg = theme.inputBackgroundColor ?? (isDark ? const Color(0xFF18181A) : Colors.white);
+    final inputFill = theme.inputFillColor ?? (isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9));
+    final inputTextColor = theme.inputTextColor ?? (isDark ? const Color(0xFFF2F2F2) : const Color(0xFF0F172A));
+    final inputHintColor = theme.inputHintColor ?? (isDark ? const Color(0xFF8E8E93) : const Color(0xFF94A3B8));
+    final inputBorderColor = isDark ? theme.cardBorderColor : Colors.grey.shade200;
+
     // Extract quick reply options from the last bot message
     final lastBotMessage = controller.messages.isNotEmpty && controller.messages.last.sender.isBot
         ? controller.messages.last
@@ -89,21 +98,28 @@ class _AiChatViewState extends State<AiChatView> {
     final bodyContent = Column(
         children: [
           // Human handoff banner if active
-          if (controller.isHandoff) const HandoffBanner(),
+          if (controller.isHandoff) HandoffBanner(isDark: isDark),
 
           // Error notification banner if any
           if (controller.errorMessage != null)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              color: Colors.amber.shade50,
+              color: isDark ? const Color(0xFF332008) : Colors.amber.shade50,
               child: Row(
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 16, color: Colors.amber.shade900),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 16,
+                    color: isDark ? Colors.amber.shade300 : Colors.amber.shade900,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       controller.errorMessage!,
-                      style: TextStyle(fontSize: 12, color: Colors.amber.shade900),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
+                      ),
                     ),
                   ),
                 ],
@@ -137,10 +153,14 @@ class _AiChatViewState extends State<AiChatView> {
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               Text(
                                 'Assistant is typing...',
-                                style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontStyle: FontStyle.italic),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
                             ],
                           ),
@@ -170,55 +190,76 @@ class _AiChatViewState extends State<AiChatView> {
               onOptionSelected: (opt) => controller.selectOption(opt),
             ),
 
-          // Input Bar
+          // Input Bar (Mobile responsive with dark mode support)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey.shade200)),
+              color: inputBg,
+              border: Border(top: BorderSide(color: inputBorderColor, width: 0.8)),
             ),
             child: SafeArea(
+              top: false,
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9), // Slate 100
+                        color: inputFill,
                         borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: isDark ? theme.cardBorderColor : Colors.transparent,
+                          width: 0.8,
+                        ),
                       ),
                       child: TextField(
                         controller: _inputController,
                         textInputAction: TextInputAction.send,
+                        keyboardType: TextInputType.multiline,
+                        minLines: 1,
+                        maxLines: 4,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: inputTextColor,
+                          height: 1.3,
+                        ),
+                        cursorColor: theme.primaryColor,
                         onSubmitted: (_) => _handleSend(),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Ketik pesan Anda di sini...',
-                          hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                          hintStyle: TextStyle(
+                            fontSize: 13,
+                            color: inputHintColor,
+                          ),
                           border: InputBorder.none,
                           isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  InkWell(
-                    onTap: _handleSend,
-                    borderRadius: BorderRadius.circular(24),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.primaryColor.withOpacity(0.3),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: InkWell(
+                      onTap: _handleSend,
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.primaryColor.withOpacity(0.35),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
                       ),
-                      child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
                     ),
                   ),
                 ],
@@ -239,10 +280,14 @@ class _AiChatViewState extends State<AiChatView> {
       backgroundColor: theme.backgroundColor,
       appBar: AppBar(
         elevation: 0.5,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.resolvedAppBarBackgroundColor,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF1E293B)),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 18,
+            color: theme.resolvedAppBarTextColor,
+          ),
           onPressed: () {
             if (widget.onClose != null) {
               widget.onClose!();
@@ -265,10 +310,10 @@ class _AiChatViewState extends State<AiChatView> {
               children: [
                 Text(
                   widget.title ?? controller.config.botName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: theme.resolvedAppBarTextColor,
                   ),
                 ),
                 Row(
@@ -282,9 +327,12 @@ class _AiChatViewState extends State<AiChatView> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
+                    Text(
                       'Online 24/7 Support',
-                      style: TextStyle(fontSize: 10.5, color: Color(0xFF64748B)),
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
                     ),
                   ],
                 ),
@@ -294,7 +342,11 @@ class _AiChatViewState extends State<AiChatView> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Color(0xFF64748B), size: 20),
+            icon: Icon(
+              Icons.refresh_rounded,
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              size: 20,
+            ),
             tooltip: 'Restart Conversation',
             onPressed: () => controller.restartChat(),
           ),
@@ -304,3 +356,4 @@ class _AiChatViewState extends State<AiChatView> {
     );
   }
 }
+

@@ -16,15 +16,23 @@ class InfoCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = theme.isDark || Theme.of(context).brightness == Brightness.dark;
+    final cardBg = theme.cardBackgroundColor ?? (isDark ? const Color(0xFF1E1E20) : Colors.white);
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final descColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155);
+    final bannerBg = isDark ? const Color(0xFF2B2317) : Colors.amber.shade50;
+    final bannerTextColor = isDark ? Colors.amber.shade300 : Colors.amber.shade900;
+    final bannerIconColor = isDark ? Colors.amber.shade400 : Colors.amber.shade800;
+
     return Container(
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.cardBorderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(isDark ? 0.25 : 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -39,18 +47,18 @@ class InfoCardView extends StatelessWidget {
             Container(
               height: 48,
               width: double.infinity,
-              color: Colors.amber.shade50,
+              color: bannerBg,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(
                 children: [
-                  Icon(Icons.apartment_rounded, color: Colors.amber.shade800, size: 20),
+                  Icon(Icons.apartment_rounded, color: bannerIconColor, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     'Featured Information',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: Colors.amber.shade900,
+                      color: bannerTextColor,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -65,18 +73,18 @@ class InfoCardView extends StatelessWidget {
                 children: [
                   Text(
                     card.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: titleColor,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     card.description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF334155),
+                      color: descColor,
                       height: 1.4,
                     ),
                   ),
