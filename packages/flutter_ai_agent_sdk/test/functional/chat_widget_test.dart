@@ -158,5 +158,47 @@ void main() {
       await tester.pump();
       expect(find.text('Testing dark mode input visibility'), findsOneWidget);
     });
+
+    testWidgets('TEST-AI-W06: Agent takeover displays agent name and support icon', (tester) async {
+      when(() => mockApiClient.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {
+          'config': {
+            'name': 'CEO Suite Jakarta',
+            'welcomeMessage': 'Welcome to CEO Suite!',
+          }
+        },
+      );
+      when(() => mockApiClient.sendMessage(
+            sessionId: any(named: 'sessionId'),
+            message: any(named: 'message'),
+            contactId: any(named: 'contactId'),
+          )).thenAnswer(
+        (_) async => ChatMessage(
+          id: 'agent_msg_1',
+          sender: MessageSender.agent,
+          senderName: 'Sarah Jenkins',
+          text: 'Halo! Saya Sarah dari Tim Customer Care.',
+          isHandoff: true,
+          timestamp: DateTime.now(),
+        ),
+      );
+
+      await tester.pumpWidget(createTestWidget(AiChatView(controller: controller)));
+      await tester.pumpAndSettle();
+
+      // Initially displays tenant name and bot name
+      expect(find.text('CEO Suite Jakarta'), findsOneWidget);
+      expect(find.text('Online  CEO Suite Assistant'), findsOneWidget);
+
+      // Send message that triggers agent reply
+      await tester.enterText(find.byType(TextField), 'Bisa bicara dengan orang?');
+      await tester.tap(find.byIcon(Icons.send_rounded));
+      await tester.pumpAndSettle();
+
+      // After agent takeover, displays agent's name in AppBar and ChatBubble
+      expect(find.text('Online  Sarah Jenkins'), findsOneWidget);
+      expect(find.text('Sarah Jenkins'), findsOneWidget);
+      expect(find.byIcon(Icons.support_agent_rounded), findsWidgets);
+    });
   });
 }

@@ -300,8 +300,12 @@ class _AiChatViewState extends State<AiChatView> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: theme.primaryColor,
-              child: const Icon(Icons.smart_toy_rounded, size: 18, color: Colors.white),
+              backgroundColor: controller.isHandoff ? const Color(0xFF2563EB) : theme.primaryColor,
+              child: Icon(
+                controller.isHandoff ? Icons.support_agent_rounded : Icons.smart_toy_rounded,
+                size: 18,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 10),
             Column(
@@ -309,7 +313,7 @@ class _AiChatViewState extends State<AiChatView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.title ?? controller.config.botName,
+                  widget.title ?? controller.tenantName ?? controller.config.botName,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -321,14 +325,16 @@ class _AiChatViewState extends State<AiChatView> {
                     Container(
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF22C55E),
+                      decoration: BoxDecoration(
+                        color: controller.isHandoff ? const Color(0xFF3B82F6) : const Color(0xFF22C55E),
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Online 24/7 Support',
+                      controller.isHandoff
+                          ? 'Online  ${controller.currentAgentName ?? "Human Agent"}'
+                          : (controller.tenantName != null ? 'Online  ${controller.config.botName}' : 'Online 24/7 Support'),
                       style: TextStyle(
                         fontSize: 10.5,
                         color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),

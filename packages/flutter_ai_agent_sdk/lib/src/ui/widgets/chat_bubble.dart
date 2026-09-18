@@ -31,8 +31,14 @@ class ChatBubble extends StatelessWidget {
           if (!isUser) ...[
             CircleAvatar(
               radius: 14,
-              backgroundColor: theme.primaryColor.withOpacity(0.12),
-              child: Icon(Icons.smart_toy_rounded, size: 16, color: theme.primaryColor),
+              backgroundColor: message.sender.isAgent
+                  ? const Color(0xFF3B82F6).withOpacity(0.15)
+                  : theme.primaryColor.withOpacity(0.12),
+              child: Icon(
+                message.sender.isAgent ? Icons.support_agent_rounded : Icons.smart_toy_rounded,
+                size: 16,
+                color: message.sender.isAgent ? const Color(0xFF3B82F6) : theme.primaryColor,
+              ),
             ),
             const SizedBox(width: 8),
           ],
@@ -61,6 +67,20 @@ class ChatBubble extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
+                  // Sender name tag when a human agent takes over
+                  if (!isUser && message.sender.isAgent && message.senderName != null && message.senderName!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        message.senderName!,
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2563EB),
+                        ),
+                      ),
+                    ),
+
                   // Text Content
                   SelectableText(
                     message.text,

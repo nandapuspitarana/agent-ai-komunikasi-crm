@@ -22,6 +22,7 @@ enum MessageStatus {
 class ChatMessage {
   final String id;
   final MessageSender sender;
+  final String? senderName;
   final ResponseType type;
   final String text;
   final List<QuickReplyOption> options;
@@ -34,6 +35,7 @@ class ChatMessage {
   const ChatMessage({
     required this.id,
     required this.sender,
+    this.senderName,
     required this.text,
     this.type = ResponseType.text,
     this.options = const [],
@@ -51,6 +53,7 @@ class ChatMessage {
     String? responseType,
     dynamic rawOptions,
     bool handoffOccurred = false,
+    String? senderName,
   }) {
     ResponseType parsedType = ResponseType.fromString(responseType);
 
@@ -87,6 +90,7 @@ class ChatMessage {
     return ChatMessage(
       id: id,
       sender: isHandoff ? MessageSender.agent : MessageSender.bot,
+      senderName: senderName,
       text: cleanText,
       type: parsedType,
       options: options,
@@ -103,10 +107,12 @@ class ChatMessage {
     String? text,
     MessageStatus? status,
     bool? isHandoff,
+    String? senderName,
   }) {
     return ChatMessage(
       id: id,
       sender: sender,
+      senderName: senderName ?? this.senderName,
       text: text ?? this.text,
       type: type,
       options: options,
@@ -121,6 +127,7 @@ class ChatMessage {
   Map<String, dynamic> toJson() => {
         'id': id,
         'sender': sender.name,
+        'senderName': senderName,
         'type': type.name,
         'text': text,
         'options': options.map((o) => o.toJson()).toList(),
