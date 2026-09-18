@@ -17,6 +17,9 @@ class AiChatController extends ChangeNotifier {
   bool _isInitialized = false;
   bool _isTyping = false;
   bool _isHandoff = false;
+  String? _tenantName;
+  String? _botName;
+  String? _currentAgentName;
   String? _errorMessage;
   late String _sessionId;
   final String? contactId;
@@ -34,6 +37,22 @@ class AiChatController extends ChangeNotifier {
   bool get isInitialized => _isInitialized;
   bool get isTyping => _isTyping;
   bool get isHandoff => _isHandoff;
+  String? get tenantName => _tenantName ?? config.tenantName;
+  String get botName => _botName ?? config.botName;
+  String? get currentAgentName => _currentAgentName;
+
+  /// Dynamic responder name:
+  /// - When in handoff mode: returns the human agent's name (or 'Live Support' fallback).
+  /// - When in bot mode: returns the dynamic bot name (e.g. 'Claire' or resolved from CRM server).
+  String get activeResponderName {
+    if (_isHandoff) {
+      return (_currentAgentName != null && _currentAgentName!.isNotEmpty)
+          ? _currentAgentName!
+          : 'Live Support';
+    }
+    return botName;
+  }
+
   String? get errorMessage => _errorMessage;
   String get sessionId => _sessionId;
 
@@ -45,6 +64,20 @@ class AiChatController extends ChangeNotifier {
       final initData = await apiClient.initWidget(contactId: contactId);
       final tenantConfig = initData['config'] as Map<String, dynamic>? ?? {};
 
+      // Resolve tenant name dynamically from CRM init data if present
+      final fetchedTenantName = tenantConfig['tenantName']?.toString() ?? tenantConfig['name']?.toString();
+      if (fetchedTenantName != null && fetchedTenantName.isNotEmpty) {
+        _tenantName = fetchedTenantName;
+      }
+
+      // Resolve bot name dynamically from CRM init data if present
+      final fetchedBotName = tenantConfig['botName']?.toString() ??
+          tenantConfig['agentName']?.toString() ??
+          (tenantConfig['initialFlow'] is Map ? tenantConfig['initialFlow']['name']?.toString() : null);
+      if (fetchedBotName != null && fetchedBotName.isNotEmpty) {
+        _botName = fetchedBotName;
+      }
+
       final welcomeText = customWelcomeMessage ??
           tenantConfig['welcomeMessage']?.toString() ??
           'Hello! How can I assist you with CEO Suite services today?';
@@ -55,6 +88,7 @@ class AiChatController extends ChangeNotifier {
         ChatMessage(
           id: 'welcome_${DateTime.now().millisecondsSinceEpoch}',
           sender: MessageSender.bot,
+          senderName: botName,
           text: welcomeText,
           type: optionsRaw != null ? ResponseType.options : ResponseType.text,
           options: QuickReplyOption.parseList(optionsRaw),
@@ -70,6 +104,7 @@ class AiChatController extends ChangeNotifier {
         ChatMessage(
           id: 'welcome_fallback',
           sender: MessageSender.bot,
+          senderName: botName,
           text: customWelcomeMessage ?? 'Welcome to CEO Suite Portal! How can we assist you today?',
           timestamp: DateTime.now(),
         ),
@@ -122,11 +157,20 @@ class AiChatController extends ChangeNotifier {
         _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.sent);
       }
 
-      // Add bot reply
+      // Add bot or agent reply
       _messages.add(botReply);
 
-      if (botReply.isHandoff) {
+      if (botReply.isHandoff || botReply.sender.isAgent) {
         _isHandoff = true;
+      }
+
+      // Dynamically update responder name from response (bot or human agent)
+      if (botReply.senderName != null && botReply.senderName!.isNotEmpty) {
+        if (_isHandoff || botReply.sender.isAgent) {
+          _currentAgentName = botReply.senderName;
+        } else {
+          _botName = botReply.senderName;
+        }
       }
     } catch (e) {
       // Mark user message with error
@@ -151,6 +195,8 @@ class AiChatController extends ChangeNotifier {
   Future<void> restartChat() async {
     _sessionId = 'session_${DateTime.now().microsecondsSinceEpoch}';
     _isHandoff = false;
+    _currentAgentName = null;
+    _botName = null;
     _isInitialized = false;
     _messages.clear();
     _errorMessage = null;

@@ -119,5 +119,44 @@ void main() {
       expect(controller.sessionId, isNot(equals(initialSessionId)));
       expect(controller.isHandoff, isFalse);
     });
+
+    test('TEST-AI-U16: should dynamically resolve tenantName, botName, and activeResponderName', () async {
+      when(() => mockApiClient.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {
+          'config': {
+            'tenantName': 'CEO Suite Regional HQ',
+            'botName': 'Claire',
+            'welcomeMessage': 'Halo dari Claire!',
+          }
+        },
+      );
+
+      await controller.initialize();
+
+      expect(controller.tenantName, equals('CEO Suite Regional HQ'));
+      expect(controller.botName, equals('Claire'));
+      expect(controller.activeResponderName, equals('Claire'));
+      expect(controller.messages.first.senderName, equals('Claire'));
+
+      // Now simulate agent takeover via sendMessage
+      when(() => mockApiClient.sendMessage(
+            sessionId: any(named: 'sessionId'),
+            message: any(named: 'message'),
+            contactId: any(named: 'contactId'),
+          )).thenAnswer((_) async => ChatMessage(
+            id: 'agent_1',
+            sender: MessageSender.agent,
+            senderName: 'David Lee',
+            text: 'Saya ambil alih percakapan ini.',
+            isHandoff: true,
+            timestamp: DateTime.now(),
+          ));
+
+      await controller.sendMessage('Tolong hubungkan ke manusia');
+
+      expect(controller.isHandoff, isTrue);
+      expect(controller.currentAgentName, equals('David Lee'));
+      expect(controller.activeResponderName, equals('David Lee'));
+    });
   });
 }
