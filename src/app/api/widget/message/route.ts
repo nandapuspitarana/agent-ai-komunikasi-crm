@@ -412,11 +412,15 @@ export async function POST(req: NextRequest) {
 
     // Step 6: Supabase Realtime automatically broadcasts changes
 
+    const dynamicBotName = flowConfig?.name || tenant.activeFlow?.name || 'Claire';
+
     return corsResponse({
       sessionId: currentSessionId,
       status: handoffOccurred ? 'queue' : 'bot',
       reply: cleanReply,
       handoffOccurred,
+      senderName: handoffOccurred ? undefined : dynamicBotName,
+      botName: dynamicBotName,
       triggerLeadForm,
       ...(triggerLeadForm && { leadFormConfig })
     });

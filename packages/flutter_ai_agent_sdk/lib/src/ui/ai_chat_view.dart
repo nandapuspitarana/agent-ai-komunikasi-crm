@@ -313,7 +313,7 @@ class _AiChatViewState extends State<AiChatView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.title ?? controller.tenantName ?? controller.config.botName,
+                  widget.title ?? controller.tenantName ?? controller.botName,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -334,7 +334,7 @@ class _AiChatViewState extends State<AiChatView> {
                     Text(
                       controller.isHandoff
                           ? 'Online  ${controller.currentAgentName ?? "Human Agent"}'
-                          : (controller.tenantName != null ? 'Online  ${controller.config.botName}' : 'Online 24/7 Support'),
+                          : (controller.tenantName != null ? 'Online  ${controller.botName}' : 'Online 24/7 Support'),
                       style: TextStyle(
                         fontSize: 10.5,
                         color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),

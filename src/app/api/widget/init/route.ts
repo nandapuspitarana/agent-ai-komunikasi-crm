@@ -13,6 +13,7 @@ export async function POST(request: Request) {
     const tenant = await prisma.tenant.findUnique({
       where: { id: tenantId },
       include: {
+        activeFlow: true,
         flows: {
           take: 1,
           orderBy: { updatedAt: 'desc' }
@@ -24,7 +25,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
     }
 
-    const flowConfig = tenant.flows[0]?.config as any;
+    const flow = tenant.activeFlow || tenant.flows[0];
+    const flowConfig = (flow?.config || {}) as any;
+    const dynamicBotName = flowConfig?.name || flow?.name || 'Claire';
     
     // Import manually since we might not have it in context, or simply parse it here
     const { getVisitorConfig } = require('@/lib/visitor-config');
@@ -34,10 +37,12 @@ export async function POST(request: Request) {
       status: 'success',
       config: {
         name: tenant.name,
+        tenantName: tenant.name,
+        botName: dynamicBotName,
         primaryColor: tenant.themeBrandColor || '#2563eb', // Use tenant color
         logo: tenant.themeBrandLogo || null,
         botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
-        initialFlow: tenant.flows[0] || null,
+        initialFlow: flow || null,
         visitorCollection: {
           enabled: vConfig.enabled,
           layer1_passive: vConfig.layer1_passive,

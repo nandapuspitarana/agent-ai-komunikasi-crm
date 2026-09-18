@@ -72,7 +72,9 @@ class AiAgentApiClient {
     final responseType = data['responseType']?.toString();
     final options = data['options'];
     final handoffOccurred = data['handoffOccurred'] == true;
-    final senderName = data['senderName']?.toString() ?? data['agentName']?.toString();
+    final senderName = data['senderName']?.toString() ??
+        data['agentName']?.toString() ??
+        (handoffOccurred ? null : data['botName']?.toString());
 
     return ChatMessage.fromApiResponse(
       id: 'bot_${DateTime.now().millisecondsSinceEpoch}',
