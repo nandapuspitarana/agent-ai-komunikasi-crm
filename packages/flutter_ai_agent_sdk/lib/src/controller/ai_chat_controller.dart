@@ -160,6 +160,11 @@ class AiChatController extends ChangeNotifier {
       // Add bot or agent reply
       _messages.add(botReply);
 
+      // Sync confirmed server sessionId for ongoing turns
+      if (botReply.sessionId != null && botReply.sessionId!.isNotEmpty) {
+        _sessionId = botReply.sessionId!;
+      }
+
       if (botReply.isHandoff || botReply.sender.isAgent) {
         _isHandoff = true;
       }

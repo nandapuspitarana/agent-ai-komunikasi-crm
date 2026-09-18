@@ -31,6 +31,7 @@ class ChatMessage {
   final DateTime timestamp;
   final MessageStatus status;
   final bool isHandoff;
+  final String? sessionId;
 
   const ChatMessage({
     required this.id,
@@ -44,6 +45,7 @@ class ChatMessage {
     required this.timestamp,
     this.status = MessageStatus.sent,
     this.isHandoff = false,
+    this.sessionId,
   });
 
   /// Factory for constructing a bot reply from raw CRM API response.
@@ -54,6 +56,7 @@ class ChatMessage {
     dynamic rawOptions,
     bool handoffOccurred = false,
     String? senderName,
+    String? sessionId,
   }) {
     ResponseType parsedType = ResponseType.fromString(responseType);
 
@@ -99,6 +102,7 @@ class ChatMessage {
       timestamp: DateTime.now(),
       status: MessageStatus.sent,
       isHandoff: isHandoff,
+      sessionId: sessionId,
     );
   }
 
@@ -108,6 +112,7 @@ class ChatMessage {
     MessageStatus? status,
     bool? isHandoff,
     String? senderName,
+    String? sessionId,
   }) {
     return ChatMessage(
       id: id,
@@ -121,6 +126,7 @@ class ChatMessage {
       timestamp: timestamp,
       status: status ?? this.status,
       isHandoff: isHandoff ?? this.isHandoff,
+      sessionId: sessionId ?? this.sessionId,
     );
   }
 
@@ -135,5 +141,6 @@ class ChatMessage {
         'form': form?.toJson(),
         'timestamp': timestamp.toIso8601String(),
         'isHandoff': isHandoff,
+        'sessionId': sessionId,
       };
 }

@@ -75,6 +75,7 @@ class AiAgentApiClient {
     final senderName = data['senderName']?.toString() ??
         data['agentName']?.toString() ??
         (handoffOccurred ? null : data['botName']?.toString());
+    final serverSessionId = data['sessionId']?.toString() ?? data['session_id']?.toString();
 
     return ChatMessage.fromApiResponse(
       id: 'bot_${DateTime.now().millisecondsSinceEpoch}',
@@ -83,6 +84,7 @@ class AiAgentApiClient {
       rawOptions: options,
       handoffOccurred: handoffOccurred,
       senderName: senderName,
+      sessionId: serverSessionId,
     );
   }
 

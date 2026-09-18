@@ -290,6 +290,35 @@ export async function POST(req: NextRequest) {
       }
 
       if (!bypassLLM) {
+        // Retrieve previous conversation history turns for this session
+        let conversationHistory: Array<{ role: string; content: string }> = [];
+        try {
+          const previousDbMessages = await prisma.message.findMany({
+            where: {
+              sessionId: currentSessionId,
+              id: { not: savedUserMsg.id },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+          });
+
+          conversationHistory = previousDbMessages
+            .reverse()
+            .map((m) => {
+              const cleanContent = m.content
+                .replace(/<[^>]*>/g, '')
+                .replace(/\[HANDOFF_REQUESTED\]/g, '')
+                .trim();
+              return {
+                role: m.senderType === 'user' ? 'user' : 'assistant',
+                content: cleanContent,
+              };
+            })
+            .filter((m) => m.content.length > 0);
+        } catch (histErr) {
+          console.error('[Widget Message] Failed to fetch session history:', histErr);
+        }
+
         // Step 3: Call AI Engine (Session, RAG, etc)
         try {
           const aiResponse = await chatWithAgent({
@@ -300,6 +329,7 @@ export async function POST(req: NextRequest) {
             flow_id: tenant.activeFlowId || undefined,  // RAG isolation: scope to active AI Bot
             system_prompt: dynamicSystemPrompt,
             document_ids: documentIds,
+            history: conversationHistory,
           });
 
           aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
