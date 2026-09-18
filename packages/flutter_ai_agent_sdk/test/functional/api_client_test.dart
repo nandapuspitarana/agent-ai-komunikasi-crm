@@ -125,5 +125,29 @@ void main() {
 
       verifyNever(() => mockClient.post(any(), headers: any(named: 'headers'), body: any(named: 'body')));
     });
+
+    test('TEST-AI-U18: sendMessage should extract server sessionId for session continuity', () async {
+      when(() => mockClient.post(
+            Uri.parse('https://cb242.ceosuite.com/api/widget/message'),
+            headers: any(named: 'headers'),
+            body: any(named: 'body'),
+          )).thenAnswer((_) async => http.Response(
+            jsonEncode({
+              'reply': 'Password wifi adalah ceosuite2026',
+              'sessionId': 'server_session_456',
+              'responseType': 'text',
+              'handoffOccurred': false,
+            }),
+            200,
+          ));
+
+      final reply = await apiClient.sendMessage(
+        sessionId: 'client_initial_session',
+        message: 'Password wifi apa ya?',
+      );
+
+      expect(reply.sessionId, equals('server_session_456'));
+      expect(reply.text, contains('Password wifi'));
+    });
   });
 }
