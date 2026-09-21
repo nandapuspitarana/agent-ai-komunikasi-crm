@@ -158,5 +158,66 @@ void main() {
       expect(controller.currentAgentName, equals('David Lee'));
       expect(controller.activeResponderName, equals('David Lee'));
     });
+
+    test('TEST-AI-U17: Multi-turn session persistence and context switching across topics (Booking -> Wifi)', () async {
+      final sessionCalls = <String>[];
+      final messageCalls = <String>[];
+
+      when(() => mockApiClient.sendMessage(
+            sessionId: any(named: 'sessionId'),
+            message: any(named: 'message'),
+            contactId: any(named: 'contactId'),
+          )).thenAnswer((invocation) async {
+        final sid = invocation.namedArguments[#sessionId] as String;
+        final msg = invocation.namedArguments[#message] as String;
+        sessionCalls.add(sid);
+        messageCalls.add(msg);
+
+        if (msg.contains('booking')) {
+          return ChatMessage(
+            id: 'bot_booking',
+            sender: MessageSender.bot,
+            text: 'Ruang meeting Garuda tersedia besok jam 10.',
+            timestamp: DateTime.now(),
+            sessionId: 'canonical_session_uuid_123',
+          );
+        } else {
+          return ChatMessage(
+            id: 'bot_wifi',
+            sender: MessageSender.bot,
+            text: 'SSID Wifi: CEOSuite_Guest, Password: welcome',
+            timestamp: DateTime.now(),
+            sessionId: 'canonical_session_uuid_123',
+          );
+        }
+      });
+
+      // Turn 1: User asks about booking
+      await controller.sendMessage('Saya mau booking ruang meeting Garuda besok');
+
+      expect(controller.messages.length, equals(2));
+      expect(controller.messages[0].text, equals('Saya mau booking ruang meeting Garuda besok'));
+      expect(controller.messages[1].text, contains('Ruang meeting Garuda'));
+      // Controller sessionId should sync with the canonical server session ID
+      expect(controller.sessionId, equals('canonical_session_uuid_123'));
+
+      // Wait for throttle interval before sending second message
+      await Future.delayed(const Duration(milliseconds: 60));
+
+      // Turn 2: User switches topic to WiFi within the same session
+      await controller.sendMessage('Btw password wifi di sana apa ya?');
+
+      expect(controller.messages.length, equals(4));
+      expect(controller.messages[2].text, equals('Btw password wifi di sana apa ya?'));
+      expect(controller.messages[3].text, contains('CEOSuite_Guest'));
+
+      // Both API calls must be recorded with exact session continuity
+      expect(sessionCalls.length, equals(2));
+      expect(sessionCalls[1], equals('canonical_session_uuid_123'));
+      expect(messageCalls, equals([
+        'Saya mau booking ruang meeting Garuda besok',
+        'Btw password wifi di sana apa ya?',
+      ]));
+    });
   });
 }

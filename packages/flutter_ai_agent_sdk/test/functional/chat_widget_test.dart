@@ -200,5 +200,26 @@ void main() {
       expect(find.text('Sarah Jenkins'), findsOneWidget);
       expect(find.byIcon(Icons.support_agent_rounded), findsWidgets);
     });
+
+    testWidgets('TEST-AI-W07: Default input hintText is English and can be customized', (tester) async {
+      when(() => mockApiClient.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {'config': {'welcomeMessage': 'Welcome'}},
+      );
+
+      // Default should be English "Type your message here..."
+      await tester.pumpWidget(createTestWidget(AiChatView(controller: controller)));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Type your message here...'), findsOneWidget);
+
+      // Custom override
+      await tester.pumpWidget(createTestWidget(AiChatView(
+        controller: controller,
+        inputHintText: 'Ketik pesan Anda di sini...',
+      )));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ketik pesan Anda di sini...'), findsOneWidget);
+    });
   });
 }

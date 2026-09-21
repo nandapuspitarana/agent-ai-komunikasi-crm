@@ -71,6 +71,13 @@ export async function POST(req: NextRequest) {
           include: {
             intents: true
           }
+        },
+        flows: {
+          take: 1,
+          orderBy: { updatedAt: 'desc' },
+          include: {
+            intents: true
+          }
         }
       }
     });
@@ -194,8 +201,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Fetch active flow config if present
-    const flowConfig: any = tenant.activeFlow?.config || {};
+    // Fetch active flow config if present (falling back to flows[0] if activeFlowId is not set)
+    const effectiveFlow = tenant.activeFlow || tenant.flows?.[0];
+    const flowConfig: any = effectiveFlow?.config || {};
     const flowSystemPrompt = flowConfig.systemPrompt;
     const flowHumanPromptTemplate = flowConfig.humanPrompt;
 
@@ -210,7 +218,7 @@ export async function POST(req: NextRequest) {
     // Build full prompt with context (We only need the system prompt, AI proxy handles history natively)
     const systemPrompt = buildSystemPrompt({
       tenantName: tenant.name,
-      botName: tenant.activeFlow?.name || 'Asisten AI',
+      botName: effectiveFlow?.name || 'Claire',
       customInstructions: finalCustomInstructions.trim() || undefined,
       handoffAgentName: tenant.handoffAgent?.name,
       language: flowConfig.language,
@@ -229,11 +237,11 @@ export async function POST(req: NextRequest) {
     let qnaMatch = null;
     
     // 2a. Check DB Intents first
-    if (tenant.activeFlow && tenant.activeFlow.intents) {
+    if (effectiveFlow && effectiveFlow.intents) {
       const userMsgLower = message.toLowerCase().trim();
       let maxMatchLength = 0;
       
-      for (const intent of tenant.activeFlow.intents) {
+      for (const intent of effectiveFlow.intents) {
         if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
         
         for (const phrase of intent.trainingPhrases) {
@@ -260,9 +268,10 @@ export async function POST(req: NextRequest) {
     if (tenant.aiEnabled) {
       // Fetch document IDs associated with the active flow for RAG isolation
       let documentIds: string[] = [];
-      if (tenant.activeFlowId) {
+      const effectiveFlowId = tenant.activeFlowId || effectiveFlow?.id;
+      if (effectiveFlowId) {
         const docs = await prisma.knowledgeDocument.findMany({
-          where: { flowId: tenant.activeFlowId, status: 'ready' },
+          where: { flowId: effectiveFlowId, status: 'ready' },
           select: { proxyDocId: true }
         });
         documentIds = docs.map(d => d.proxyDocId).filter((id): id is string => id !== null);
@@ -290,22 +299,60 @@ export async function POST(req: NextRequest) {
       }
 
       if (!bypassLLM) {
+        // Retrieve previous conversation history turns for this session
+        let conversationHistory: Array<{ role: string; content: string }> = [];
+        try {
+          const previousDbMessages = await prisma.message.findMany({
+            where: {
+              sessionId: currentSessionId,
+              id: { not: savedUserMsg.id },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+          });
+
+          conversationHistory = previousDbMessages
+            .reverse()
+            .map((m) => {
+              const cleanContent = m.content
+                .replace(/<[^>]*>/g, '')
+                .replace(/\[HANDOFF_REQUESTED\]/g, '')
+                .trim();
+              return {
+                role: m.senderType === 'user' ? 'user' : 'assistant',
+                content: cleanContent,
+              };
+            })
+            .filter((m) => m.content.length > 0);
+        } catch (histErr) {
+          console.error('[Widget Message] Failed to fetch session history:', histErr);
+        }
+
         // Step 3: Call AI Engine (Session, RAG, etc)
+        const isEn = (flowConfig?.language || '').toLowerCase().startsWith('en');
+        const defaultUnavailableMsg = isEn
+          ? 'Sorry, I am unable to answer at the moment.'
+          : 'Maaf, saya tidak bisa menjawab saat ini.';
+        const defaultFailureMsg = isEn
+          ? 'Sorry, our AI system is currently experiencing issues. I will connect you to our support team. [HANDOFF_REQUESTED]'
+          : 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
+
         try {
           const aiResponse = await chatWithAgent({
             message: formattedMessage, // Send the formatted message if human prompt exists
             session_id: currentSessionId,
             user_id: chatSession.contactId,
             tenant_id: tenantId,
-            flow_id: tenant.activeFlowId || undefined,  // RAG isolation: scope to active AI Bot
+            flow_id: effectiveFlowId || undefined,  // RAG isolation: scope to active AI Bot
             system_prompt: dynamicSystemPrompt,
             document_ids: documentIds,
+            history: conversationHistory,
           });
 
-          aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
+          aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || defaultUnavailableMsg;
         } catch (aiError) {
           console.error('[Widget Message] AI Engine error:', aiError);
-          aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
+          aiReplyRaw = flowConfig?.defaultResponse || defaultFailureMsg;
         }
       }
 

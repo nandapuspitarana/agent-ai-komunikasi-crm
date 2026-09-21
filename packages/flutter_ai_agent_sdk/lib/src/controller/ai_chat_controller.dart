@@ -29,11 +29,25 @@ class AiChatController extends ChangeNotifier {
     required this.config,
     this.contactId,
     String? initialSessionId,
+    List<ChatMessage>? initialMessages,
   })  : apiClient = apiClient ?? AiAgentApiClient(config: config),
         rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
-        _sessionId = initialSessionId ?? 'session_${DateTime.now().microsecondsSinceEpoch}';
+        _sessionId = initialSessionId ?? 'session_${DateTime.now().microsecondsSinceEpoch}',
+        _messages = initialMessages != null ? List.from(initialMessages) : [],
+        _isInitialized = initialMessages != null && initialMessages.isNotEmpty;
 
   List<ChatMessage> get messages => List.unmodifiable(_messages);
+
+  /// Restores previously persisted messages into controller state.
+  void restoreMessages(List<ChatMessage> messages, {String? sessionId}) {
+    if (messages.isEmpty) return;
+    _messages = List.from(messages);
+    if (sessionId != null && sessionId.isNotEmpty) {
+      _sessionId = sessionId;
+    }
+    _isInitialized = true;
+    notifyListeners();
+  }
   bool get isInitialized => _isInitialized;
   bool get isTyping => _isTyping;
   bool get isHandoff => _isHandoff;
@@ -123,7 +137,7 @@ class AiChatController extends ChangeNotifier {
 
     // Rate limiter anti-flood check
     if (!rateLimiter.allowAction()) {
-      _errorMessage = 'Mohon tunggu sebentar sebelum mengirim pesan kembali.';
+      _errorMessage = 'Please wait a moment before sending another message.';
       notifyListeners();
       return;
     }
@@ -160,6 +174,11 @@ class AiChatController extends ChangeNotifier {
       // Add bot or agent reply
       _messages.add(botReply);
 
+      // Sync confirmed server sessionId for ongoing turns
+      if (botReply.sessionId != null && botReply.sessionId!.isNotEmpty) {
+        _sessionId = botReply.sessionId!;
+      }
+
       if (botReply.isHandoff || botReply.sender.isAgent) {
         _isHandoff = true;
       }
@@ -179,7 +198,7 @@ class AiChatController extends ChangeNotifier {
         _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.error);
       }
 
-      _errorMessage = 'Gagal mengirim pesan: ${e.toString()}';
+      _errorMessage = 'Failed to send message: ${e.toString()}';
     } finally {
       _isTyping = false;
       notifyListeners();
