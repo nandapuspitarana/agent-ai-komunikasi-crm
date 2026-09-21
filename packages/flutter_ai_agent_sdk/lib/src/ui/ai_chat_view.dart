@@ -13,6 +13,7 @@ class AiChatView extends StatefulWidget {
   final VoidCallback? onClose;
   final ValueChanged<String>? onLaunchUrl;
   final bool showAppBar;
+  final String? inputHintText;
 
   const AiChatView({
     super.key,
@@ -22,6 +23,7 @@ class AiChatView extends StatefulWidget {
     this.onClose,
     this.onLaunchUrl,
     this.showAppBar = true,
+    this.inputHintText,
   });
 
   @override
@@ -227,7 +229,7 @@ class _AiChatViewState extends State<AiChatView> {
                         cursorColor: theme.primaryColor,
                         onSubmitted: (_) => _handleSend(),
                         decoration: InputDecoration(
-                          hintText: 'Ketik pesan Anda di sini...',
+                          hintText: widget.inputHintText ?? 'Type your message here...',
                           hintStyle: TextStyle(
                             fontSize: 13,
                             color: inputHintColor,

@@ -137,7 +137,7 @@ class AiChatController extends ChangeNotifier {
 
     // Rate limiter anti-flood check
     if (!rateLimiter.allowAction()) {
-      _errorMessage = 'Mohon tunggu sebentar sebelum mengirim pesan kembali.';
+      _errorMessage = 'Please wait a moment before sending another message.';
       notifyListeners();
       return;
     }
@@ -198,7 +198,7 @@ class AiChatController extends ChangeNotifier {
         _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.error);
       }
 
-      _errorMessage = 'Gagal mengirim pesan: ${e.toString()}';
+      _errorMessage = 'Failed to send message: ${e.toString()}';
     } finally {
       _isTyping = false;
       notifyListeners();

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class HandoffBanner extends StatelessWidget {
   final VoidCallback? onDismiss;
   final bool? isDark;
+  final String? message;
 
-  const HandoffBanner({super.key, this.onDismiss, this.isDark});
+  const HandoffBanner({super.key, this.onDismiss, this.isDark, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class HandoffBanner extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Percakapan telah dialihkan ke Tim Layanan Pelanggan (Human Agent). Mohon tunggu balasan.',
+              message ?? 'Percakapan telah dialihkan ke Tim Layanan Pelanggan (Human Agent). Mohon tunggu balasan.',
               style: TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w500,
