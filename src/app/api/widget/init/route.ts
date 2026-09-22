@@ -43,6 +43,8 @@ export async function POST(request: Request) {
         logo: tenant.themeBrandLogo || null,
         botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
         initialFlow: flow || null,
+        welcomeMessage: flowConfig?.welcomeMessage || null,
+        welcomeMessageOptions: flowConfig?.welcomeMessageOptions || null,
         visitorCollection: {
           enabled: vConfig.enabled,
           layer1_passive: vConfig.layer1_passive,
