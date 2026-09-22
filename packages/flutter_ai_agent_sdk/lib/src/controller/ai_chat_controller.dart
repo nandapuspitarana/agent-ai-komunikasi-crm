@@ -94,7 +94,7 @@ class AiChatController extends ChangeNotifier {
 
       final welcomeText = customWelcomeMessage ??
           tenantConfig['welcomeMessage']?.toString() ??
-          'Hello! How can I assist you with CEO Suite services today?';
+          'Hello! How can I assist you with CEOSUITE services today?';
 
       final optionsRaw = defaultOptions ?? tenantConfig['welcomeMessageOptions'];
 
@@ -119,7 +119,7 @@ class AiChatController extends ChangeNotifier {
           id: 'welcome_fallback',
           sender: MessageSender.bot,
           senderName: botName,
-          text: customWelcomeMessage ?? 'Welcome to CEO Suite Portal! How can we assist you today?',
+          text: customWelcomeMessage ?? 'Welcome to CEOSUITE Portal! How can we assist you today?',
           timestamp: DateTime.now(),
         ),
       ];
