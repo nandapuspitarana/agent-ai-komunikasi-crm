@@ -15,9 +15,9 @@ Hasil test terakhir: backend `npm run test:api` **26/26**, SDK `flutter test` **
 Dijalankan sebagai regression: 7 dari 9 test halaman mobile **gagal** di SDK lama (pin `199803e`) dan lulus di SDK baru → test benar-benar mengunci bug.
 
 **Belum di-commit / belum di-push.** Perubahan SDK ada di working tree repo backend; mobile masih memakai `ref: 001-data-fixing` @ `199803e`.
-Urutan rilis yang aman:
-1. Push branch backend `001-data-fixing` (memuat SDK baru) dan deploy backend.
-2. Di repo mobile: `flutter pub upgrade flutter_ai_agent_sdk` → `pubspec.lock` berpindah dari `199803e` ke commit SDK baru (pin `ref: 001-data-fixing` adalah branch, jadi `pubspec.yaml` tidak perlu diubah) → commit lock itu (MQ044).
+Urutan rilis yang aman (semua pekerjaan ini ada di branch `ceosuite`; `001-data-fixing` tidak berubah):
+1. Push branch backend `ceosuite` (memuat SDK baru) dan deploy backend.
+2. Di repo mobile ubah pin SDK di `pubspec.yaml` dari `ref: 001-data-fixing` menjadi `ref: ceosuite`, lalu `flutter pub upgrade flutter_ai_agent_sdk` dan commit `pubspec.yaml` + `pubspec.lock` (MQ044). **Jangan ubah pin sebelum `ceosuite` ter-push** — `origin/ceosuite` yang lama berisi SDK lebih tua dari `199803e` sehingga app mobile tidak akan compile.
 3. Baru build/rilis app. **Sebelum langkah 2 CI mobile merah** (test baru butuh SDK baru) dan APK yang dibuat belum punya tombol baru.
 Build number mobile sudah dinaikkan ke `1.0.0+65`. Jika repo SDK privat, isi secret `SDK_GIT_TOKEN` (read-only) di Gitea agar CI mobile bisa `pub get`.
 Kode mobile yang diubah kompatibel dengan SDK lama **dan** baru (dicek `flutter analyze`), jadi bisa dirilis sebelum pin diganti — tombol baru baru muncul setelah SDK di-upgrade.
