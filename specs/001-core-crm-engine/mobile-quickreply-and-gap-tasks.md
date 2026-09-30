@@ -1,7 +1,7 @@
 # Tasks: Mobile Quick-Reply Buttons (Welcome + After-Reply) & Gap Backlog
 
 **Scope**: `agent-ai-komunikasi-crm` (backend + `packages/flutter_ai_agent_sdk`) dan konsumennya `cs_portal_mobile`
-**Dibuat**: 2026-09-30 | **Basis kode**: branch `001-data-fixing` @ `199803e` (commit yang sama dengan `pubspec.lock` mobile)
+**Dibuat**: 2026-09-30 | **Branch**: `ceosuite` (cabang `001-data-fixing` sudah dihapus; semua pekerjaan langsung ke `ceosuite`)
 **Format**: `[ID] [P?] [Sev] Deskripsi` — `[P]` = bisa paralel, Sev = P0 blocker / P1 penting / P2 hardening
 
 Label bukti: **[CONFIRMED-RUN]** = direproduksi dengan test yang dijalankan · **[CONFIRMED-READ]** = dari membaca kode, belum dijalankan · **[UNVERIFIED]** = perlu dicek di server/device.
@@ -14,11 +14,11 @@ Label bukti: **[CONFIRMED-RUN]** = direproduksi dengan test yang dijalankan · *
 Hasil test terakhir: backend `npm run test:api` **26/26**, SDK `flutter test` **65/65**, mobile `test/unit/ai_agent + test/widget/ai_agent + performance` **37/37**.
 Dijalankan sebagai regression: 7 dari 9 test halaman mobile **gagal** di SDK lama (pin `199803e`) dan lulus di SDK baru → test benar-benar mengunci bug.
 
-**Belum di-commit / belum di-push.** Perubahan SDK ada di working tree repo backend; mobile masih memakai `ref: 001-data-fixing` @ `199803e`.
-Urutan rilis yang aman (semua pekerjaan ini ada di branch `ceosuite`; `001-data-fixing` tidak berubah):
-1. Push branch backend `ceosuite` (memuat SDK baru) dan deploy backend.
-2. Di repo mobile ubah pin SDK di `pubspec.yaml` dari `ref: 001-data-fixing` menjadi `ref: ceosuite`, lalu `flutter pub upgrade flutter_ai_agent_sdk` dan commit `pubspec.yaml` + `pubspec.lock` (MQ044). **Jangan ubah pin sebelum `ceosuite` ter-push** — `origin/ceosuite` yang lama berisi SDK lebih tua dari `199803e` sehingga app mobile tidak akan compile.
-3. Baru build/rilis app. **Sebelum langkah 2 CI mobile merah** (test baru butuh SDK baru) dan APK yang dibuat belum punya tombol baru.
+**Sudah di-commit dan di-push** ke `ceosuite` (GitHub + Gitea). Mobile (`nanda/redesign` di Gitea) sudah mem-pin SDK ke `ref: ceosuite`.
+Sisa langkah rilis:
+1. Deploy backend `ceosuite` ke server (belum dilakukan).
+2. Isi secret `SDK_GIT_TOKEN` (read-only) di Gitea agar CI mobile bisa mengambil repo SDK yang privat.
+3. Build/rilis app dari `nanda/redesign`. `pubspec.lock` mobile **di-gitignore**, jadi setiap build me-resolve SDK dari `ref: ceosuite` (ujung branch saat itu). Untuk build yang reproducible, pin ke tag/commit SDK sebelum rilis produksi.
 Build number mobile sudah dinaikkan ke `1.0.0+65`. Jika repo SDK privat, isi secret `SDK_GIT_TOKEN` (read-only) di Gitea agar CI mobile bisa `pub get`.
 Kode mobile yang diubah kompatibel dengan SDK lama **dan** baru (dicek `flutter analyze`), jadi bisa dirilis sebelum pin diganti — tombol baru baru muncul setelah SDK di-upgrade.
 
@@ -118,7 +118,7 @@ Kalau server mengirim `welcomeMessageOptions` dan sesi masih baru, tombol **munc
 - [x] MQ041 [P0] `_restoreSavedSession`: guard `_isRestoring` membuat controller kedua (ganti brand/contact cepat) tidak pernah restore. Ganti flag dengan `Future` per controller.
 - [x] MQ042 [P0] `ai_support_chat_page._initChat` — tunggu restore selesai sebelum `initialize()` dan sebelum `initialPrompt` dikirim (kalau tidak, welcome+tombol langsung tertutup balasan otomatis).
 - [ ] MQ043 [P1] Validasi konfigurasi saat startup: `AI_AGENT_TENANT_ID=='default-tenant'` di build release → log/assert; tampilkan error jelas, bukan fallback senyap.
-- [ ] MQ044 [P1] _(blocker rilis: SDK harus di-push dulu)_ Perbarui pin SDK di `pubspec.yaml` (`ref: 001-data-fixing` → tag rilis SDK, mis. `sdk-v1.1.0`) dan jalankan `flutter pub upgrade flutter_ai_agent_sdk`; `pubspec.lock` sekarang terkunci di `199803e`.
+- [x] MQ044 [P1] Pin SDK mobile dipindah dari `ref: 001-data-fixing` ke `ref: ceosuite` (commit `305a2d6`). Reproducibility: lock tidak ter-track → pertimbangkan tag SDK (mis. `sdk-v1.1.0`) untuk rilis produksi.
 - [ ] MQ045 [P1] Sinkron balasan agen manusia: setelah handoff mobile tidak punya kanal masuk (tidak ada socket/Supabase/polling) → balasan agen tidak pernah tampil. Pilih: polling `GET /api/chat/messages?sessionId=` (cepat) atau Supabase Realtime (`crm_agent_Message`) seperti web; plus push FCM saat agen membalas dan app di background.
 - [ ] MQ046 [P2] `contactId` = `odooId`/email → PII dikirim sebagai id dan disimpan di `VisitorProfile`; pakai id ter-hash/opaque.
 - [ ] MQ047 [P2] Kirim data visitor pasif (`/api/widget/visitor`: device/OS/app version) — mobile tidak memanggilnya sama sekali.
