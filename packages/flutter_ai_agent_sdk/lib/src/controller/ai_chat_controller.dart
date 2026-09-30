@@ -15,8 +15,15 @@ class AiChatController extends ChangeNotifier {
 
   List<ChatMessage> _messages = [];
   bool _isInitialized = false;
+  bool _configLoaded = false;
+  bool _initFailed = false;
+  Future<void>? _initFuture;
+  ChatMessage? _lastWelcome;
   bool _isTyping = false;
   bool _isHandoff = false;
+  String? _tenantName;
+  String? _botName;
+  String? _currentAgentName;
   String? _errorMessage;
   late String _sessionId;
   final String? contactId;
@@ -26,59 +33,205 @@ class AiChatController extends ChangeNotifier {
     required this.config,
     this.contactId,
     String? initialSessionId,
+    List<ChatMessage>? initialMessages,
   })  : apiClient = apiClient ?? AiAgentApiClient(config: config),
         rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
-        _sessionId = initialSessionId ?? 'session_${DateTime.now().microsecondsSinceEpoch}';
+        _sessionId = initialSessionId ?? _newSessionId(),
+        _messages = initialMessages != null ? List.from(initialMessages) : [],
+        _isInitialized = initialMessages != null && initialMessages.isNotEmpty;
+
+  static int _sessionSeq = 0;
+
+  /// Client-side session id. The counter keeps ids unique even when two are
+  /// created within one clock tick (coarse timers, e.g. on Windows).
+  static String _newSessionId() => 'session_${DateTime.now().microsecondsSinceEpoch}_${_sessionSeq++}';
 
   List<ChatMessage> get messages => List.unmodifiable(_messages);
+
+  /// Restores previously persisted messages into controller state.
+  void restoreMessages(List<ChatMessage> messages, {String? sessionId}) {
+    if (messages.isEmpty) return;
+    _messages = List.from(messages);
+    if (sessionId != null && sessionId.isNotEmpty) {
+      _sessionId = sessionId;
+    }
+    _isInitialized = true;
+    // Config may already have been fetched (init finished before the restore
+    // landed): apply the fresh greeting over a stale persisted one.
+    final welcome = _lastWelcome;
+    if (welcome != null) _refreshWelcome(welcome);
+    notifyListeners();
+  }
+
   bool get isInitialized => _isInitialized;
+
+  /// True when the last attempt to load the server config failed, so the UI
+  /// can offer a retry. [initialize] can be called again to retry.
+  bool get needsRetry => _initFailed;
   bool get isTyping => _isTyping;
   bool get isHandoff => _isHandoff;
+  String? get tenantName => _tenantName ?? config.tenantName;
+  String get botName => _botName ?? config.botName;
+  String? get currentAgentName => _currentAgentName;
+
+  /// Dynamic responder name:
+  /// - When in handoff mode: returns the human agent's name (or 'Live Support' fallback).
+  /// - When in bot mode: returns the dynamic bot name (e.g. 'Claire' or resolved from CRM server).
+  String get activeResponderName {
+    if (_isHandoff) {
+      return (_currentAgentName != null && _currentAgentName!.isNotEmpty)
+          ? _currentAgentName!
+          : 'Live Support';
+    }
+    return botName;
+  }
+
   String? get errorMessage => _errorMessage;
   String get sessionId => _sessionId;
 
-  /// Initializes conversation with Welcome message.
-  Future<void> initialize({String? customWelcomeMessage, List<String>? defaultOptions}) async {
-    if (_isInitialized) return;
+  /// Initializes the conversation with the welcome message from the server.
+  ///
+  /// Safe to call repeatedly and concurrently:
+  /// * concurrent calls share one request;
+  /// * a no-op once the config has been loaded;
+  /// * if history was restored (or an earlier attempt fell back offline) it
+  ///   only refreshes the greeting and bot names and never replaces the history.
+  Future<void> initialize({String? customWelcomeMessage, List<String>? defaultOptions}) {
+    final inFlight = _initFuture;
+    if (inFlight != null) return inFlight;
+    if (_isInitialized && _configLoaded) return Future.value();
 
+    late final Future<void> future;
+    future = _loadConfig(customWelcomeMessage, defaultOptions).whenComplete(() {
+      if (identical(_initFuture, future)) _initFuture = null;
+    });
+    _initFuture = future;
+    return future;
+  }
+
+  Future<void> _loadConfig(String? customWelcomeMessage, List<String>? defaultOptions) async {
     try {
       final initData = await apiClient.initWidget(contactId: contactId);
       final tenantConfig = initData['config'] as Map<String, dynamic>? ?? {};
 
-      final welcomeText = customWelcomeMessage ??
-          tenantConfig['welcomeMessage']?.toString() ??
-          'Hello! How can I assist you with CEO Suite services today?';
+      // Resolve tenant name dynamically from CRM init data if present
+      final fetchedTenantName = tenantConfig['tenantName']?.toString() ?? tenantConfig['name']?.toString();
+      if (fetchedTenantName != null && fetchedTenantName.isNotEmpty) {
+        _tenantName = fetchedTenantName;
+      }
 
-      final optionsRaw = defaultOptions ?? tenantConfig['welcomeMessageOptions'];
+      // Resolve bot name dynamically from CRM init data if present
+      final fetchedBotName = tenantConfig['botName']?.toString() ??
+          tenantConfig['agentName']?.toString() ??
+          (tenantConfig['initialFlow'] is Map ? tenantConfig['initialFlow']['name']?.toString() : null);
+      if (fetchedBotName != null && fetchedBotName.isNotEmpty) {
+        _botName = fetchedBotName;
+      }
 
-      _messages = [
-        ChatMessage(
-          id: 'welcome_${DateTime.now().millisecondsSinceEpoch}',
-          sender: MessageSender.bot,
-          text: welcomeText,
-          type: optionsRaw != null ? ResponseType.options : ResponseType.text,
-          options: QuickReplyOption.parseList(optionsRaw),
-          timestamp: DateTime.now(),
-        ),
-      ];
-
-      _isInitialized = true;
+      final welcome = _buildWelcome(tenantConfig, customWelcomeMessage, defaultOptions);
+      _lastWelcome = welcome;
+      _configLoaded = true;
+      _initFailed = false;
       _errorMessage = null;
-    } catch (e) {
-      // Offline fallback: still show default welcome message so UI never breaks
-      _messages = [
-        ChatMessage(
-          id: 'welcome_fallback',
-          sender: MessageSender.bot,
-          text: customWelcomeMessage ?? 'Welcome to CEO Suite Portal! How can we assist you today?',
-          timestamp: DateTime.now(),
-        ),
-      ];
+
+      if (_messages.isEmpty) {
+        _messages = [welcome];
+      } else {
+        // History exists (restored while the request was in flight, or a
+        // persisted session): keep it and only refresh a stale greeting.
+        _refreshWelcome(welcome);
+      }
       _isInitialized = true;
-      _errorMessage = 'Note: Connected in offline fallback mode.';
+    } catch (e) {
+      _initFailed = true;
+      if (_messages.isEmpty) {
+        // Offline fallback: still show a welcome message so the UI never
+        // breaks. Marked as welcome so a later successful init replaces it.
+        _messages = [
+          ChatMessage(
+            id: 'welcome_fallback',
+            sender: MessageSender.bot,
+            senderName: botName,
+            text: customWelcomeMessage ?? _fallbackWelcomeText,
+            timestamp: DateTime.now(),
+            isWelcome: true,
+          ),
+        ];
+        _errorMessage = 'Note: Connected in offline fallback mode.';
+      }
+      _isInitialized = true;
     } finally {
       notifyListeners();
     }
+  }
+
+  String get _defaultWelcomeText {
+    final name = tenantName;
+    return (name != null && name.isNotEmpty)
+        ? 'Hello! How can I assist you with $name today?'
+        : 'Hello! How can I assist you today?';
+  }
+
+  String get _fallbackWelcomeText {
+    final name = tenantName;
+    return (name != null && name.isNotEmpty)
+        ? 'Welcome to $name! How can we assist you today?'
+        : 'Welcome! How can we assist you today?';
+  }
+
+  ChatMessage _buildWelcome(
+    Map<String, dynamic> tenantConfig,
+    String? customWelcomeMessage,
+    List<String>? defaultOptions,
+  ) {
+    final serverText = tenantConfig['welcomeMessage']?.toString().trim();
+    final welcomeText = customWelcomeMessage ??
+        ((serverText != null && serverText.isNotEmpty) ? serverText : _defaultWelcomeText);
+
+    // Structured `welcomeOptions` (new servers) wins over the legacy comma string.
+    final optionsRaw = defaultOptions ?? tenantConfig['welcomeOptions'] ?? tenantConfig['welcomeMessageOptions'];
+    var options = QuickReplyOption.parseList(optionsRaw);
+
+    // An explicit text/form welcome must not show leftover buttons.
+    final declaredType = tenantConfig['welcomeMessageType']?.toString();
+    if (defaultOptions == null && (declaredType == 'text' || declaredType == 'form')) {
+      options = const [];
+    }
+
+    return ChatMessage(
+      id: 'welcome_${DateTime.now().millisecondsSinceEpoch}',
+      sender: MessageSender.bot,
+      senderName: botName,
+      text: welcomeText,
+      type: options.isNotEmpty ? ResponseType.options : ResponseType.text,
+      options: options,
+      timestamp: DateTime.now(),
+      isWelcome: true,
+    );
+  }
+
+  /// Replaces a stale greeting at the head of the history (different text or
+  /// buttons, or the offline fallback) without touching anything after it.
+  void _refreshWelcome(ChatMessage fresh) {
+    if (_messages.isEmpty) return;
+    final first = _messages.first;
+    if (!first.looksLikeWelcome) return;
+
+    final sameOptions = first.options.length == fresh.options.length &&
+        List.generate(first.options.length, (i) => i).every(
+            (i) => first.options[i].label == fresh.options[i].label && first.options[i].value == fresh.options[i].value);
+    if (first.isWelcome && first.text == fresh.text && sameOptions) return;
+
+    _messages[0] = ChatMessage(
+      id: first.id,
+      sender: MessageSender.bot,
+      senderName: fresh.senderName,
+      text: fresh.text,
+      type: fresh.type,
+      options: fresh.options,
+      timestamp: first.timestamp,
+      isWelcome: true,
+    );
   }
 
   /// Sends a text message from the user.
@@ -88,7 +241,7 @@ class AiChatController extends ChangeNotifier {
 
     // Rate limiter anti-flood check
     if (!rateLimiter.allowAction()) {
-      _errorMessage = 'Mohon tunggu sebentar sebelum mengirim pesan kembali.';
+      _errorMessage = 'Please wait a moment before sending another message.';
       notifyListeners();
       return;
     }
@@ -122,11 +275,30 @@ class AiChatController extends ChangeNotifier {
         _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.sent);
       }
 
-      // Add bot reply
-      _messages.add(botReply);
+      // Add bot or agent reply. An empty reply means a human agent already
+      // owns the session and will answer from the dashboard: no blank bubble.
+      final isEmptyReply = botReply.text.trim().isEmpty &&
+          botReply.options.isEmpty &&
+          botReply.card == null &&
+          botReply.form == null;
+      if (!isEmptyReply) _messages.add(botReply);
 
-      if (botReply.isHandoff) {
+      // Sync confirmed server sessionId for ongoing turns
+      if (botReply.sessionId != null && botReply.sessionId!.isNotEmpty) {
+        _sessionId = botReply.sessionId!;
+      }
+
+      if (botReply.isHandoff || botReply.sender.isAgent) {
         _isHandoff = true;
+      }
+
+      // Dynamically update responder name from response (bot or human agent)
+      if (botReply.senderName != null && botReply.senderName!.isNotEmpty) {
+        if (_isHandoff || botReply.sender.isAgent) {
+          _currentAgentName = botReply.senderName;
+        } else {
+          _botName = botReply.senderName;
+        }
       }
     } catch (e) {
       // Mark user message with error
@@ -135,7 +307,7 @@ class AiChatController extends ChangeNotifier {
         _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.error);
       }
 
-      _errorMessage = 'Gagal mengirim pesan: ${e.toString()}';
+      _errorMessage = 'Failed to send message: ${e.toString()}';
     } finally {
       _isTyping = false;
       notifyListeners();
@@ -149,9 +321,15 @@ class AiChatController extends ChangeNotifier {
 
   /// Resets conversation and session.
   Future<void> restartChat() async {
-    _sessionId = 'session_${DateTime.now().microsecondsSinceEpoch}';
+    _sessionId = _newSessionId();
     _isHandoff = false;
+    _currentAgentName = null;
+    _botName = null;
     _isInitialized = false;
+    _configLoaded = false;
+    _initFailed = false;
+    _initFuture = null;
+    _lastWelcome = null;
     _messages.clear();
     _errorMessage = null;
     rateLimiter.reset();

@@ -1,5 +1,6 @@
 import 'card_payload.dart';
 import 'form_payload.dart';
+import 'html_reply_parser.dart';
 import 'quick_reply_option.dart';
 import 'response_type.dart';
 
@@ -22,6 +23,7 @@ enum MessageStatus {
 class ChatMessage {
   final String id;
   final MessageSender sender;
+  final String? senderName;
   final ResponseType type;
   final String text;
   final List<QuickReplyOption> options;
@@ -30,10 +32,16 @@ class ChatMessage {
   final DateTime timestamp;
   final MessageStatus status;
   final bool isHandoff;
+  final String? sessionId;
+
+  /// True for the greeting built from the server's welcome config (or the
+  /// offline fallback). Lets the controller refresh a stale, persisted welcome.
+  final bool isWelcome;
 
   const ChatMessage({
     required this.id,
     required this.sender,
+    this.senderName,
     required this.text,
     this.type = ResponseType.text,
     this.options = const [],
@@ -42,7 +50,13 @@ class ChatMessage {
     required this.timestamp,
     this.status = MessageStatus.sent,
     this.isHandoff = false,
+    this.sessionId,
+    this.isWelcome = false,
   });
+
+  /// Whether this message is the greeting. Also recognises welcome messages
+  /// persisted by older SDK versions, which have no [isWelcome] flag.
+  bool get looksLikeWelcome => isWelcome || (sender.isBot && id.startsWith('welcome'));
 
   /// Factory for constructing a bot reply from raw CRM API response.
   factory ChatMessage.fromApiResponse({
@@ -51,6 +65,8 @@ class ChatMessage {
     String? responseType,
     dynamic rawOptions,
     bool handoffOccurred = false,
+    String? senderName,
+    String? sessionId,
   }) {
     ResponseType parsedType = ResponseType.fromString(responseType);
 
@@ -79,7 +95,16 @@ class ChatMessage {
     }
 
     // Parse options
-    final options = QuickReplyOption.parseList(rawOptions);
+    var options = QuickReplyOption.parseList(rawOptions);
+
+    // Older backends embed quick-reply buttons as HTML inside the reply text.
+    // Recover them as real options and never show raw tags in the bubble.
+    if (card == null && form == null && cleanText.contains('<')) {
+      final parsed = HtmlReplyParser.parse(cleanText);
+      cleanText = parsed.text;
+      if (options.isEmpty) options = parsed.options;
+    }
+
     if (options.isNotEmpty && parsedType == ResponseType.text) {
       parsedType = ResponseType.options;
     }
@@ -87,6 +112,7 @@ class ChatMessage {
     return ChatMessage(
       id: id,
       sender: isHandoff ? MessageSender.agent : MessageSender.bot,
+      senderName: senderName,
       text: cleanText,
       type: parsedType,
       options: options,
@@ -95,6 +121,7 @@ class ChatMessage {
       timestamp: DateTime.now(),
       status: MessageStatus.sent,
       isHandoff: isHandoff,
+      sessionId: sessionId,
     );
   }
 
@@ -103,10 +130,13 @@ class ChatMessage {
     String? text,
     MessageStatus? status,
     bool? isHandoff,
+    String? senderName,
+    String? sessionId,
   }) {
     return ChatMessage(
       id: id,
       sender: sender,
+      senderName: senderName ?? this.senderName,
       text: text ?? this.text,
       type: type,
       options: options,
@@ -115,12 +145,45 @@ class ChatMessage {
       timestamp: timestamp,
       status: status ?? this.status,
       isHandoff: isHandoff ?? this.isHandoff,
+      sessionId: sessionId ?? this.sessionId,
+      isWelcome: isWelcome,
+    );
+  }
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      id: json['id'] as String? ?? 'msg_${DateTime.now().millisecondsSinceEpoch}',
+      sender: MessageSender.values.firstWhere(
+        (s) => s.name == json['sender'],
+        orElse: () => MessageSender.bot,
+      ),
+      senderName: json['senderName'] as String?,
+      text: json['text'] as String? ?? '',
+      type: ResponseType.fromString(json['type'] as String?),
+      options: (json['options'] as List<dynamic>?)
+              ?.map((o) => QuickReplyOption.fromJson(Map<String, dynamic>.from(o as Map)))
+              .toList() ??
+          const [],
+      card: json['card'] != null
+          ? CardPayload.fromJson(Map<String, dynamic>.from(json['card'] as Map))
+          : null,
+      form: json['form'] != null
+          ? FormPayload.fromJson(Map<String, dynamic>.from(json['form'] as Map))
+          : null,
+      timestamp: json['timestamp'] != null
+          ? DateTime.tryParse(json['timestamp'] as String) ?? DateTime.now()
+          : DateTime.now(),
+      status: MessageStatus.sent,
+      isHandoff: json['isHandoff'] == true,
+      sessionId: json['sessionId'] as String?,
+      isWelcome: json['isWelcome'] == true,
     );
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'sender': sender.name,
+        'senderName': senderName,
         'type': type.name,
         'text': text,
         'options': options.map((o) => o.toJson()).toList(),
@@ -128,5 +191,7 @@ class ChatMessage {
         'form': form?.toJson(),
         'timestamp': timestamp.toIso8601String(),
         'isHandoff': isHandoff,
+        'sessionId': sessionId,
+        'isWelcome': isWelcome,
       };
 }

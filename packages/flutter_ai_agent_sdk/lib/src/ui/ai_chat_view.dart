@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controller/ai_chat_controller.dart';
 import '../models/quick_reply_option.dart';
+import 'quick_reply_style.dart';
 import 'theme/ai_chat_theme.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/handoff_banner.dart';
@@ -13,6 +14,10 @@ class AiChatView extends StatefulWidget {
   final VoidCallback? onClose;
   final ValueChanged<String>? onLaunchUrl;
   final bool showAppBar;
+  final String? inputHintText;
+
+  /// Where quick-reply options render. Defaults to chips under the bubble.
+  final QuickReplyStyle quickReplyStyle;
 
   const AiChatView({
     super.key,
@@ -22,6 +27,8 @@ class AiChatView extends StatefulWidget {
     this.onClose,
     this.onLaunchUrl,
     this.showAppBar = true,
+    this.inputHintText,
+    this.quickReplyStyle = QuickReplyStyle.inline,
   });
 
   @override
@@ -36,9 +43,9 @@ class _AiChatViewState extends State<AiChatView> {
   void initState() {
     super.initState();
     widget.controller.addListener(_onControllerUpdate);
-    if (!widget.controller.isInitialized) {
-      widget.controller.initialize();
-    }
+    // Idempotent: fetches config on first open, refreshes a restored session's
+    // greeting, retries after an offline fallback, and is a no-op otherwise.
+    widget.controller.initialize();
   }
 
   @override
@@ -80,32 +87,58 @@ class _AiChatViewState extends State<AiChatView> {
     final controller = widget.controller;
     final theme = widget.theme;
 
+    // Detect dark mode from theme or ambient context
+    final isDark = theme.isDark || Theme.of(context).brightness == Brightness.dark;
+
+    final inputBg = theme.inputBackgroundColor ?? (isDark ? const Color(0xFF18181A) : Colors.white);
+    final inputFill = theme.inputFillColor ?? (isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9));
+    final inputTextColor = theme.inputTextColor ?? (isDark ? const Color(0xFFF2F2F2) : const Color(0xFF0F172A));
+    final inputHintColor = theme.inputHintColor ?? (isDark ? const Color(0xFF8E8E93) : const Color(0xFF94A3B8));
+    final inputBorderColor = isDark ? theme.cardBorderColor : Colors.grey.shade200;
+
     // Extract quick reply options from the last bot message
     final lastBotMessage = controller.messages.isNotEmpty && controller.messages.last.sender.isBot
         ? controller.messages.last
         : null;
     final activeOptions = lastBotMessage?.options ?? const <QuickReplyOption>[];
+    final useBar = widget.quickReplyStyle == QuickReplyStyle.bar;
 
     final bodyContent = Column(
         children: [
           // Human handoff banner if active
-          if (controller.isHandoff) const HandoffBanner(),
+          if (controller.isHandoff) HandoffBanner(isDark: isDark),
 
           // Error notification banner if any
           if (controller.errorMessage != null)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              color: Colors.amber.shade50,
+              color: isDark ? const Color(0xFF332008) : Colors.amber.shade50,
               child: Row(
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 16, color: Colors.amber.shade900),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 16,
+                    color: isDark ? Colors.amber.shade300 : Colors.amber.shade900,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       controller.errorMessage!,
-                      style: TextStyle(fontSize: 12, color: Colors.amber.shade900),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
+                      ),
                     ),
                   ),
+                  if (controller.needsRetry)
+                    TextButton(
+                      onPressed: () => controller.initialize(),
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        minimumSize: const Size(48, 32),
+                      ),
+                      child: const Text('Retry', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    ),
                 ],
               ),
             ),
@@ -137,10 +170,14 @@ class _AiChatViewState extends State<AiChatView> {
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               Text(
                                 'Assistant is typing...',
-                                style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontStyle: FontStyle.italic),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
                             ],
                           ),
@@ -151,74 +188,115 @@ class _AiChatViewState extends State<AiChatView> {
                 }
 
                 final msg = controller.messages[index];
+                final isLatest = index == controller.messages.length - 1;
+
+                // Which option (if any) the user picked from this message
+                String? selectedValue;
+                if (msg.options.isNotEmpty && index + 1 < controller.messages.length) {
+                  final next = controller.messages[index + 1];
+                  if (next.sender.isUser) {
+                    for (final o in msg.options) {
+                      if (o.value == next.text || o.label == next.text) {
+                        selectedValue = o.value;
+                        break;
+                      }
+                    }
+                  }
+                }
+
                 return RepaintBoundary(
                   child: ChatBubble(
                     message: msg,
                     theme: theme,
                     onLaunchUrl: widget.onLaunchUrl,
+                    showInlineOptions: !useBar,
+                    optionsEnabled: isLatest && !controller.isTyping && msg.sender.isBot,
+                    selectedOptionValue: selectedValue,
+                    onOptionSelected: (opt) => controller.selectOption(opt),
                   ),
                 );
               },
             ),
           ),
 
-          // Quick reply chips
-          if (activeOptions.isNotEmpty && !controller.isTyping)
+          // Quick reply chips (legacy bar style)
+          if (useBar && activeOptions.isNotEmpty && !controller.isTyping)
             QuickReplyBar(
               options: activeOptions,
               theme: theme,
               onOptionSelected: (opt) => controller.selectOption(opt),
             ),
 
-          // Input Bar
+          // Input Bar (Mobile responsive with dark mode support)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey.shade200)),
+              color: inputBg,
+              border: Border(top: BorderSide(color: inputBorderColor, width: 0.8)),
             ),
             child: SafeArea(
+              top: false,
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9), // Slate 100
+                        color: inputFill,
                         borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: isDark ? theme.cardBorderColor : Colors.transparent,
+                          width: 0.8,
+                        ),
                       ),
                       child: TextField(
                         controller: _inputController,
                         textInputAction: TextInputAction.send,
+                        keyboardType: TextInputType.multiline,
+                        minLines: 1,
+                        maxLines: 4,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: inputTextColor,
+                          height: 1.3,
+                        ),
+                        cursorColor: theme.primaryColor,
                         onSubmitted: (_) => _handleSend(),
-                        decoration: const InputDecoration(
-                          hintText: 'Ketik pesan Anda di sini...',
-                          hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                        decoration: InputDecoration(
+                          hintText: widget.inputHintText ?? 'Type your message here...',
+                          hintStyle: TextStyle(
+                            fontSize: 13,
+                            color: inputHintColor,
+                          ),
                           border: InputBorder.none,
                           isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  InkWell(
-                    onTap: _handleSend,
-                    borderRadius: BorderRadius.circular(24),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.primaryColor.withOpacity(0.3),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: InkWell(
+                      onTap: _handleSend,
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.primaryColor.withOpacity(0.35),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
                       ),
-                      child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
                     ),
                   ),
                 ],
@@ -239,10 +317,14 @@ class _AiChatViewState extends State<AiChatView> {
       backgroundColor: theme.backgroundColor,
       appBar: AppBar(
         elevation: 0.5,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.resolvedAppBarBackgroundColor,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF1E293B)),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 18,
+            color: theme.resolvedAppBarTextColor,
+          ),
           onPressed: () {
             if (widget.onClose != null) {
               widget.onClose!();
@@ -255,8 +337,12 @@ class _AiChatViewState extends State<AiChatView> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: theme.primaryColor,
-              child: const Icon(Icons.smart_toy_rounded, size: 18, color: Colors.white),
+              backgroundColor: controller.isHandoff ? const Color(0xFF2563EB) : theme.primaryColor,
+              child: Icon(
+                controller.isHandoff ? Icons.support_agent_rounded : Icons.smart_toy_rounded,
+                size: 18,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 10),
             Column(
@@ -264,11 +350,11 @@ class _AiChatViewState extends State<AiChatView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.title ?? controller.config.botName,
-                  style: const TextStyle(
+                  widget.title ?? controller.tenantName ?? controller.botName,
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: theme.resolvedAppBarTextColor,
                   ),
                 ),
                 Row(
@@ -276,15 +362,20 @@ class _AiChatViewState extends State<AiChatView> {
                     Container(
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF22C55E),
+                      decoration: BoxDecoration(
+                        color: controller.isHandoff ? const Color(0xFF3B82F6) : const Color(0xFF22C55E),
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      'Online 24/7 Support',
-                      style: TextStyle(fontSize: 10.5, color: Color(0xFF64748B)),
+                    Text(
+                      controller.isHandoff
+                          ? 'Online  ${controller.currentAgentName ?? "Human Agent"}'
+                          : (controller.tenantName != null ? 'Online  ${controller.botName}' : 'Online 24/7 Support'),
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
                     ),
                   ],
                 ),
@@ -294,7 +385,11 @@ class _AiChatViewState extends State<AiChatView> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Color(0xFF64748B), size: 20),
+            icon: Icon(
+              Icons.refresh_rounded,
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              size: 20,
+            ),
             tooltip: 'Restart Conversation',
             onPressed: () => controller.restartChat(),
           ),
@@ -304,3 +399,4 @@ class _AiChatViewState extends State<AiChatView> {
     );
   }
 }
+

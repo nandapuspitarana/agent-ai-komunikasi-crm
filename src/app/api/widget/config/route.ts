@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from 'next/server';
 import crypto from 'crypto';
 
 import { prisma } from '@/lib/prisma';
+import { resolveEffectiveFlow, readWelcomeConfig } from '@/lib/flow-resolver';
+import { toOptionStrings } from '@/lib/quick-replies';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -18,9 +20,12 @@ export async function GET(request: Request) {
   }
 
   // Integrasi dengan Prisma untuk mengambil data asli
-  const tenant = await prisma.tenant.findUnique({ 
+  const tenant = await prisma.tenant.findUnique({
     where: { id: tenantId },
-    include: { activeFlow: true }
+    include: {
+      activeFlow: true,
+      flows: { take: 1, orderBy: { updatedAt: 'desc' } }
+    }
   });
   
   if (!tenant) {
@@ -30,7 +35,9 @@ export async function GET(request: Request) {
     );
   }
 
-  const flowConfig = tenant.activeFlow?.config as any;
+  const flow = resolveEffectiveFlow(tenant);
+  const flowConfig = flow?.config as any;
+  const welcome = readWelcomeConfig(flowConfig);
 
   const visitorConfig = typeof tenant.visitorConfig === 'object' && tenant.visitorConfig 
     ? tenant.visitorConfig as any 
@@ -39,10 +46,12 @@ export async function GET(request: Request) {
   const settings = {
     tenantId,
     primaryColor: tenant.themeBrandColor || '#2563eb',
-    welcomeMessage: flowConfig?.welcomeMessage || '',
-    welcomeMessageOptions: flowConfig?.welcomeMessageOptions ? flowConfig.welcomeMessageOptions.split(',').map((o: string) => o.trim()) : [],
+    welcomeMessage: welcome.message || '',
+    welcomeMessageType: welcome.type,
+    // "Label|Value" strings, as consumed by the web ChatUI
+    welcomeMessageOptions: toOptionStrings(welcome.options),
     logoUrl: tenant.themeBrandLogo || 'https://via.placeholder.com/40',
-    botName: flowConfig?.name || tenant.activeFlow?.name || 'CRM Support Bot',
+    botName: flowConfig?.name || flow?.name || 'CRM Support Bot',
     tenantName: tenant.name || 'CRM Support',
     botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
     position: tenant.widgetPosition || 'right',

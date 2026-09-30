@@ -18,6 +18,9 @@ class QuickReplyBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (options.isEmpty) return const SizedBox.shrink();
 
+    final isDark = theme.isDark || Theme.of(context).brightness == Brightness.dark;
+    final chipBg = theme.cardBackgroundColor ?? (isDark ? const Color(0xFF222225) : Colors.white);
+
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -35,11 +38,14 @@ class QuickReplyBar extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: theme.primaryColor,
             ),
-            backgroundColor: Colors.white,
-            side: BorderSide(color: theme.primaryColor.withOpacity(0.35), width: 1.2),
+            backgroundColor: chipBg,
+            side: BorderSide(
+              color: theme.primaryColor.withOpacity(isDark ? 0.5 : 0.35),
+              width: 1.2,
+            ),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 1,
-            shadowColor: Colors.black.withOpacity(0.06),
+            shadowColor: Colors.black.withOpacity(isDark ? 0.3 : 0.06),
             onPressed: () => onOptionSelected(opt),
           );
         },

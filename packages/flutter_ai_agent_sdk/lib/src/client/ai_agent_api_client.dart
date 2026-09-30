@@ -71,7 +71,13 @@ class AiAgentApiClient {
     final replyText = data['reply']?.toString() ?? '';
     final responseType = data['responseType']?.toString();
     final options = data['options'];
-    final handoffOccurred = data['handoffOccurred'] == true;
+    // status 'agent' = a human already owns the session; the server sends
+    // reply:null because the agent answers from the dashboard.
+    final handoffOccurred = data['handoffOccurred'] == true || data['status']?.toString() == 'agent';
+    final senderName = data['senderName']?.toString() ??
+        data['agentName']?.toString() ??
+        (handoffOccurred ? null : data['botName']?.toString());
+    final serverSessionId = data['sessionId']?.toString() ?? data['session_id']?.toString();
 
     return ChatMessage.fromApiResponse(
       id: 'bot_${DateTime.now().millisecondsSinceEpoch}',
@@ -79,6 +85,8 @@ class AiAgentApiClient {
       responseType: responseType,
       rawOptions: options,
       handoffOccurred: handoffOccurred,
+      senderName: senderName,
+      sessionId: serverSessionId,
     );
   }
 

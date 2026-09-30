@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
+import { getVisitorConfig } from '@/lib/visitor-config';
+import { resolveEffectiveFlow, readWelcomeConfig } from '@/lib/flow-resolver';
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +15,7 @@ export async function POST(request: Request) {
     const tenant = await prisma.tenant.findUnique({
       where: { id: tenantId },
       include: {
+        activeFlow: true,
         flows: {
           take: 1,
           orderBy: { updatedAt: 'desc' }
@@ -24,20 +27,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
     }
 
-    const flowConfig = tenant.flows[0]?.config as any;
-    
-    // Import manually since we might not have it in context, or simply parse it here
-    const { getVisitorConfig } = require('@/lib/visitor-config');
+    const flow = resolveEffectiveFlow(tenant);
+    const flowConfig = (flow?.config || {}) as any;
+    const dynamicBotName = flowConfig?.name || flow?.name || 'Claire';
+    const welcome = readWelcomeConfig(flowConfig);
     const vConfig = getVisitorConfig(tenant.visitorConfig);
 
     return NextResponse.json({
       status: 'success',
       config: {
         name: tenant.name,
+        tenantName: tenant.name,
+        botName: dynamicBotName,
         primaryColor: tenant.themeBrandColor || '#2563eb', // Use tenant color
         logo: tenant.themeBrandLogo || null,
         botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
-        initialFlow: tenant.flows[0] || null,
+        // Public endpoint: expose identity only. The full flow row carries
+        // config.systemPrompt / humanPrompt / businessNeeds, which must not leak.
+        initialFlow: flow ? { id: flow.id, name: flow.name } : null,
+        welcomeMessage: welcome.message,
+        welcomeMessageType: welcome.type,
+        // Comma string kept for SDK builds that parse it themselves.
+        welcomeMessageOptions: welcome.rawOptions,
+        // Structured form: [{ label, value }]
+        welcomeOptions: welcome.options,
         visitorCollection: {
           enabled: vConfig.enabled,
           layer1_passive: vConfig.layer1_passive,

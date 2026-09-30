@@ -61,7 +61,7 @@ class CardPayload {
     if (title.isEmpty && description.isEmpty) return null;
 
     return CardPayload(
-      title: title.isEmpty ? 'CEO Suite Location' : title,
+      title: title.isEmpty ? 'CEOSUITE Location' : title,
       description: description,
       linkUrl: linkUrl,
       ctaNote: ctaNote,

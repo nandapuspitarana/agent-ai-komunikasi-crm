@@ -9,7 +9,10 @@ class AiAgentConfig {
   /// Unique Tenant Identifier (e.g. 'default-tenant')
   final String tenantId;
 
-  /// Display name of the bot (e.g. 'CEO Suite Executive Assistant')
+  /// Display name of the tenant (e.g. 'CEO Suite')
+  final String? tenantName;
+
+  /// Display name of the bot (e.g. 'agentbot' or 'CEO Suite Assistant')
   final String botName;
 
   /// Brand primary color (Default CEO Suite Executive Red #801517)
@@ -24,6 +27,7 @@ class AiAgentConfig {
   const AiAgentConfig({
     required this.apiUrl,
     required this.tenantId,
+    this.tenantName,
     this.botName = 'CEO Suite Assistant',
     this.primaryColor = const Color(0xFF801517),
     this.timeout = const Duration(seconds: 30),

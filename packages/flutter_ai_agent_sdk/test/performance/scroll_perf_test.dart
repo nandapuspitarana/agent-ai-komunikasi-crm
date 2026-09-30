@@ -91,6 +91,7 @@ void main() {
     test('TEST-AI-PERF03: Controller disposal cleans up references without leaks', () {
       controller.dispose();
       // Verifies no exception thrown on disposal
+      // ignore: invalid_use_of_protected_member
       expect(controller.hasListeners, isFalse);
     });
   });

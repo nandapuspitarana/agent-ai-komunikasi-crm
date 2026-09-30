@@ -8,6 +8,7 @@ import {
   parseDataExtractionTag
 } from '@/lib/ai-rules';
 import { getVisitorConfig } from '@/lib/visitor-config';
+import { parseOptions, toLegacyHtml } from '@/lib/quick-replies';
 import { extractVisitorData } from '@/lib/visitor-extractor';
 import { updateVisitorFromExtraction, upsertVisitorProfile, updateVisitorClassification, shouldTriggerLeadForm } from '@/lib/visitor-service';
 
@@ -68,6 +69,13 @@ export async function POST(req: NextRequest) {
           select: { name: true }
         },
         activeFlow: {
+          include: {
+            intents: true
+          }
+        },
+        flows: {
+          take: 1,
+          orderBy: { updatedAt: 'desc' },
           include: {
             intents: true
           }
@@ -194,8 +202,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Fetch active flow config if present
-    const flowConfig: any = tenant.activeFlow?.config || {};
+    // Fetch active flow config if present (falling back to flows[0] if activeFlowId is not set)
+    const effectiveFlow = tenant.activeFlow || tenant.flows?.[0];
+    const flowConfig: any = effectiveFlow?.config || {};
     const flowSystemPrompt = flowConfig.systemPrompt;
     const flowHumanPromptTemplate = flowConfig.humanPrompt;
 
@@ -210,7 +219,7 @@ export async function POST(req: NextRequest) {
     // Build full prompt with context (We only need the system prompt, AI proxy handles history natively)
     const systemPrompt = buildSystemPrompt({
       tenantName: tenant.name,
-      botName: tenant.activeFlow?.name || 'Asisten AI',
+      botName: effectiveFlow?.name || 'Claire',
       customInstructions: finalCustomInstructions.trim() || undefined,
       handoffAgentName: tenant.handoffAgent?.name,
       language: flowConfig.language,
@@ -229,11 +238,11 @@ export async function POST(req: NextRequest) {
     let qnaMatch = null;
     
     // 2a. Check DB Intents first
-    if (tenant.activeFlow && tenant.activeFlow.intents) {
+    if (effectiveFlow && effectiveFlow.intents) {
       const userMsgLower = message.toLowerCase().trim();
       let maxMatchLength = 0;
       
-      for (const intent of tenant.activeFlow.intents) {
+      for (const intent of effectiveFlow.intents) {
         if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
         
         for (const phrase of intent.trainingPhrases) {
@@ -260,9 +269,10 @@ export async function POST(req: NextRequest) {
     if (tenant.aiEnabled) {
       // Fetch document IDs associated with the active flow for RAG isolation
       let documentIds: string[] = [];
-      if (tenant.activeFlowId) {
+      const effectiveFlowId = tenant.activeFlowId || effectiveFlow?.id;
+      if (effectiveFlowId) {
         const docs = await prisma.knowledgeDocument.findMany({
-          where: { flowId: tenant.activeFlowId, status: 'ready' },
+          where: { flowId: effectiveFlowId, status: 'ready' },
           select: { proxyDocId: true }
         });
         documentIds = docs.map(d => d.proxyDocId).filter((id): id is string => id !== null);
@@ -290,36 +300,60 @@ export async function POST(req: NextRequest) {
       }
 
       if (!bypassLLM) {
+        // Retrieve previous conversation history turns for this session
+        let conversationHistory: Array<{ role: string; content: string }> = [];
+        try {
+          const previousDbMessages = await prisma.message.findMany({
+            where: {
+              sessionId: currentSessionId,
+              id: { not: savedUserMsg.id },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+          });
+
+          conversationHistory = previousDbMessages
+            .reverse()
+            .map((m) => {
+              const cleanContent = m.content
+                .replace(/<[^>]*>/g, '')
+                .replace(/\[HANDOFF_REQUESTED\]/g, '')
+                .trim();
+              return {
+                role: m.senderType === 'user' ? 'user' : 'assistant',
+                content: cleanContent,
+              };
+            })
+            .filter((m) => m.content.length > 0);
+        } catch (histErr) {
+          console.error('[Widget Message] Failed to fetch session history:', histErr);
+        }
+
         // Step 3: Call AI Engine (Session, RAG, etc)
+        const isEn = (flowConfig?.language || '').toLowerCase().startsWith('en');
+        const defaultUnavailableMsg = isEn
+          ? 'Sorry, I am unable to answer at the moment.'
+          : 'Maaf, saya tidak bisa menjawab saat ini.';
+        const defaultFailureMsg = isEn
+          ? 'Sorry, our AI system is currently experiencing issues. I will connect you to our support team. [HANDOFF_REQUESTED]'
+          : 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
+
         try {
           const aiResponse = await chatWithAgent({
             message: formattedMessage, // Send the formatted message if human prompt exists
             session_id: currentSessionId,
             user_id: chatSession.contactId,
             tenant_id: tenantId,
-            flow_id: tenant.activeFlowId || undefined,  // RAG isolation: scope to active AI Bot
+            flow_id: effectiveFlowId || undefined,  // RAG isolation: scope to active AI Bot
             system_prompt: dynamicSystemPrompt,
             document_ids: documentIds,
+            history: conversationHistory,
           });
 
-          aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || 'Maaf, saya tidak bisa menjawab saat ini.';
+          aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || defaultUnavailableMsg;
         } catch (aiError) {
           console.error('[Widget Message] AI Engine error:', aiError);
-          aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, sistem AI kami sedang mengalami gangguan. Saya akan menghubungkan Anda ke agen kami. [HANDOFF_REQUESTED]';
-        }
-      }
-
-      // Re-append HTML options from QnA match if any
-      // Supports "Label|Value" format: button shows Label, but sends Value to intent matcher
-      if (qnaMatch && qnaMatch.options) {
-        const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
-        if (opts.length > 0) {
-          aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => {
-            const pipeIdx = o.indexOf('|');
-            const label = pipeIdx !== -1 ? o.substring(0, pipeIdx).trim() : o;
-            const value = pipeIdx !== -1 ? o.substring(pipeIdx + 1).trim() : o;
-            return `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${value}'}, '*')">${label}</button>`;
-          }).join('') + `</div>`;
+          aiReplyRaw = flowConfig?.defaultResponse || defaultFailureMsg;
         }
       }
 
@@ -330,18 +364,6 @@ export async function POST(req: NextRequest) {
         if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
           aiReplyRaw += ' [HANDOFF_REQUESTED]';
         }
-        if (qnaMatch.options) {
-          // Supports "Label|Value" format: button shows Label, but sends Value to intent matcher
-          const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
-          if (opts.length > 0) {
-            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => {
-              const pipeIdx = o.indexOf('|');
-              const label = pipeIdx !== -1 ? o.substring(0, pipeIdx).trim() : o;
-              const value = pipeIdx !== -1 ? o.substring(pipeIdx + 1).trim() : o;
-              return `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${value}'}, '*')">${label}</button>`;
-            }).join('') + `</div>`;
-          }
-        }
       } else {
         aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, saya belum mengerti pesan Anda. Apakah Anda ingin berbicara dengan agen kami? [HANDOFF_REQUESTED]';
       }
@@ -350,7 +372,22 @@ export async function POST(req: NextRequest) {
     // Step 4: Parse AI response for handoff flag, classification, and data extraction
     const { cleanReply: parsedExtraction, extractedData } = parseDataExtractionTag(aiReplyRaw);
     const { cleanReply: parsedClassification, classification } = parseClassificationTag(parsedExtraction);
-    const { cleanReply, handoffRequested } = parseAIResponseForHandoff(parsedClassification);
+    const { cleanReply: textReply, handoffRequested } = parseAIResponseForHandoff(parsedClassification);
+
+    // Quick-reply buttons from the matched intent ("Label|Value" supported: the
+    // button shows Label but sends Value back as the user's message).
+    //  - web widget (channel 'widget') renders HTML, so buttons are appended to the reply as before
+    //  - every other channel (e.g. mobile_app) gets clean text plus a structured `options` array
+    const quickOptions = qnaMatch?.options ? parseOptions(qnaMatch.options) : [];
+    const useLegacyHtml = channel === 'widget';
+    const cleanReply = useLegacyHtml && quickOptions.length > 0
+      ? textReply + toLegacyHtml(quickOptions)
+      : textReply;
+    const structuredOptions = !useLegacyHtml ? quickOptions : [];
+    const matchedType: string = qnaMatch?.responseType ?? '';
+    const responseType = ['card', 'form'].includes(matchedType)
+      ? matchedType
+      : quickOptions.length > 0 ? 'options' : 'text';
 
     let triggerLeadForm = false;
     let leadFormConfig = null;
@@ -412,11 +449,17 @@ export async function POST(req: NextRequest) {
 
     // Step 6: Supabase Realtime automatically broadcasts changes
 
+    const dynamicBotName = flowConfig?.name || tenant.activeFlow?.name || 'Claire';
+
     return corsResponse({
       sessionId: currentSessionId,
       status: handoffOccurred ? 'queue' : 'bot',
       reply: cleanReply,
+      responseType,
+      ...(structuredOptions.length > 0 && { options: structuredOptions }),
       handoffOccurred,
+      senderName: handoffOccurred ? undefined : dynamicBotName,
+      botName: dynamicBotName,
       triggerLeadForm,
       ...(triggerLeadForm && { leadFormConfig })
     });

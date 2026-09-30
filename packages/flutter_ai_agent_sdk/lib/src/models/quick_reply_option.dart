@@ -16,6 +16,11 @@ class QuickReplyOption {
     if (raw is List) {
       return raw.map((item) {
         if (item is QuickReplyOption) return item;
+        if (item is Map) {
+          final label = (item['label'] ?? item['title'] ?? '').toString().trim();
+          final value = (item['value'] ?? '').toString().trim();
+          return QuickReplyOption(label: label, value: value.isEmpty ? label : value);
+        }
         final str = item.toString().trim();
         return _parseSingle(str);
       }).where((opt) => opt.label.isNotEmpty).toList();
@@ -43,6 +48,11 @@ class QuickReplyOption {
     }
     return QuickReplyOption(label: str, value: str);
   }
+
+  factory QuickReplyOption.fromJson(Map<String, dynamic> json) => QuickReplyOption(
+        label: json['label'] as String? ?? '',
+        value: json['value'] as String? ?? '',
+      );
 
   Map<String, dynamic> toJson() => {'label': label, 'value': value};
 }

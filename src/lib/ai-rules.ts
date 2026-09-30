@@ -121,15 +121,41 @@ export function buildSystemPrompt(options: {
     enableExtraction = false
   } = options;
 
-  let handoffInstruction = '4. Jika pengguna meminta untuk berbicara dengan manusia/agen, segera tandai percakapan untuk dialihkan.';
-  let exampleHandoff = 'Misalnya: "Tentu, saya akan menghubungkan Anda dengan agen kami sekarang. Mohon tunggu sebentar. [HANDOFF_REQUESTED]"';
+  const isEnglish = (language || '').toLowerCase().startsWith('en');
+
+  let handoffInstruction = isEnglish
+    ? '4. If the user requests to speak with a human or an agent, immediately flag the conversation for handoff.'
+    : '4. Jika pengguna meminta untuk berbicara dengan manusia/agen, segera tandai percakapan untuk dialihkan.';
+  let exampleHandoff = isEnglish
+    ? 'For example: "Sure, I will connect you with our team right away. Please hold on a moment. [HANDOFF_REQUESTED]"'
+    : 'Misalnya: "Tentu, saya akan menghubungkan Anda dengan agen kami sekarang. Mohon tunggu sebentar. [HANDOFF_REQUESTED]"';
 
   if (handoffAgentName) {
-    handoffInstruction = `4. Jika pengguna meminta untuk berbicara dengan manusia/agen, beri tahu bahwa mereka akan dihubungkan dengan agen manusia kami bernama ${handoffAgentName}, dan segera tandai percakapan untuk dialihkan.`;
-    exampleHandoff = `Misalnya: "Tentu, saya akan segera menghubungkan Anda dengan agen kami, ${handoffAgentName}. Mohon tunggu sebentar ya! [HANDOFF_REQUESTED]"`;
+    handoffInstruction = isEnglish
+      ? `4. If the user requests to speak with a human or an agent, inform them that they will be connected to our team member ${handoffAgentName}, and immediately flag the conversation for handoff.`
+      : `4. Jika pengguna meminta untuk berbicara dengan manusia/agen, beri tahu bahwa mereka akan dihubungkan dengan agen manusia kami bernama ${handoffAgentName}, dan segera tandai percakapan untuk dialihkan.`;
+    exampleHandoff = isEnglish
+      ? `For example: "Sure, I will connect you with ${handoffAgentName} right away. Please hold on a moment! [HANDOFF_REQUESTED]"`
+      : `Misalnya: "Tentu, saya akan segera menghubungkan Anda dengan agen kami, ${handoffAgentName}. Mohon tunggu sebentar ya! [HANDOFF_REQUESTED]"`;
   }
 
-  const base = `Anda adalah ${botName}, asisten layanan pelanggan AI yang ${speakingStyle} untuk ${tenantName}.
+  const base = isEnglish
+    ? `You are ${botName}, a customer support AI assistant who is ${speakingStyle || 'helpful and professional'} for ${tenantName}.
+
+PRIMARY RULES:
+1. Always answer politely, clearly, and concisely in ${language}.
+2. If you do not know the answer, be honest and recommend contacting our team.
+3. NEVER provide false or speculative information.
+${handoffInstruction}
+5. Keep answers short and to-the-point (maximum 3-4 sentences unless more details are specifically requested).
+${businessNeeds ? `\nBUSINESS CONTEXT:\n${businessNeeds}\nUse the above information as the primary context when responding to users.` : ''}
+
+HANDOFF FORMAT:
+If you detect that the user wants to speak with a human, append this exact tag at the end of your response:
+[HANDOFF_REQUESTED]
+
+${exampleHandoff}`
+    : `Anda adalah ${botName}, asisten layanan pelanggan AI yang ${speakingStyle} untuk ${tenantName}.
 
 ATURAN UTAMA:
 1. Selalu jawab dengan sopan, jelas, dan ringkas dalam ${language}.
