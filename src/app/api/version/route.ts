@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getVersionInfo, API_VERSION, APP_VERSION } from '@/lib/version';
+import { getVersionInfo, getAppVersion, API_VERSION } from '@/lib/version';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     headers: {
       ...corsHeaders,
       'Cache-Control': 'no-store',
-      'X-App-Version': APP_VERSION,
+      'X-App-Version': getAppVersion(),
       'X-API-Version': API_VERSION,
     },
   });

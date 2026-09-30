@@ -1,6 +1,23 @@
+const { execSync } = require('child_process');
+
+// Build metadata baked into the server bundle and reported by GET /api/version.
+// In Docker .git is not available, so pass --build-arg APP_COMMIT=...; the build
+// time is always recorded, which proves the running code was built after a deploy.
+function gitCommit() {
+  try {
+    return execSync('git rev-parse --short=12 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+  } catch {
+    return '';
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  env: {
+    BUILD_COMMIT: process.env.APP_COMMIT || gitCommit(),
+    BUILD_TIME: process.env.APP_BUILT_AT || new Date().toISOString(),
+  },
   devIndicators: {
     buildActivity: false,
   },

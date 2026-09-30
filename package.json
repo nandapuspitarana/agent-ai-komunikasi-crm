@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:api": "vitest run",
+    "check:deploy": "node scripts/check-deploy.js",
     "type-check": "tsc --noEmit --ignoreDeprecations 6.0",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",

@@ -49,7 +49,7 @@ Public, unauthenticated, no tenant data.
 ```json
 {
   "name": "agent-komunikasi",
-  "version": "1.1.0",          // server release (package.json)
+  "version": "1.1.0",          // server release: CRM_VERSION, fallback package.json
   "apiVersion": "1.1.0",       // widget / mobile API contract
   "commit": "abcdef123456",    // null unless the image was built with APP_COMMIT
   "builtAt": "2026-09-30T10:00:00Z",
@@ -80,10 +80,37 @@ aiAgentSdkVersion;                                 // '1.1.0' — the SDK's own 
 
 | What | Where to bump |
 |---|---|
-| Server | `version` in `package.json` (and lockfile root) |
+| Server | `CRM_VERSION` in `.env` (same variable as the docker image tag; read at request time). `package.json` `version` is only the fallback when it is unset or `latest` |
 | API contract | `API_VERSION` in `src/lib/version.ts` (minor = additive, major = breaking) |
 | Flutter SDK | `version:` in the SDK `pubspec.yaml`, `aiAgentSdkVersion` in `lib/src/version.dart`, `SDK_LATEST_VERSION` in `src/lib/version.ts` |
 | Drop old SDKs | raise `SDK_MIN_SUPPORTED_VERSION` |
 
 `tests/api/version.test.ts` fails if the SDK pubspec, the Dart constant and `SDK_LATEST_VERSION` disagree.
 Build metadata: `docker build --build-arg APP_COMMIT=$(git rev-parse --short HEAD) --build-arg APP_BUILT_AT=$(date -u +%FT%TZ) .` (docker-compose passes the same as env `APP_COMMIT` / `APP_BUILT_AT`).
+
+### Verifying a deployment (UAT / production)
+
+The server version is `CRM_VERSION` from the environment's `.env` — the same variable docker-compose uses for the image tag — so bumping it is what "releases" a version. Each build also records when it was built and (optionally) from which commit:
+
+```bash
+# on the build machine, for each environment (.env with the new CRM_VERSION)
+APP_COMMIT=$(git rev-parse --short=12 HEAD) APP_BUILT_AT=$(date -u +%FT%TZ) docker compose build web
+docker compose up -d web
+```
+
+- `builtAt` is always filled (recorded by `next build`, so it changes on every build); `commit` needs `APP_COMMIT` because `.git` is not inside the image.
+- Runtime `APP_COMMIT` / `APP_BUILT_AT` override the baked-in values.
+
+Check what is really running, in all environments at once (URLs are not stored in the repo):
+
+```bash
+npm run check:deploy -- --expect 1.2.0 uat=https://<uat-host> prod=https://<prod-host>
+# or: DEPLOY_TARGETS="uat=https://...,prod=https://..." EXPECT_VERSION=1.2.0 npm run check:deploy
+```
+
+```
+OK       uat        v1.2.0  api 1.1.0  commit 4775e3384662  built 2026-10-01T08:00:00.000Z
+MISMATCH prod       v1.1.0  ...  (expected 1.2.0, running 1.1.0)
+```
+
+Statuses: `OK`, `MISMATCH` (older/newer version running), `NO_ENDPOINT` (server predates `/api/version`), `UNREACHABLE`, `INVALID`. Exit code is 0 only if every target is `OK`, so it can gate a pipeline. `--expect` defaults to `CRM_VERSION`, then `package.json`.

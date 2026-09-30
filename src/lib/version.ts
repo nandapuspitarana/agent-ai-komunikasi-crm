@@ -5,7 +5,8 @@ import pkg from '../../package.json';
  * the `version` block of POST /api/widget/init).
  *
  * Release checklist:
- *  - server release  -> bump "version" in package.json
+ *  - server release  -> set CRM_VERSION in .env (also the docker image tag in
+ *                       docker-compose); package.json "version" is the fallback
  *  - API contract    -> bump API_VERSION (minor = additive, major = breaking)
  *  - new SDK release -> bump SDK_LATEST_VERSION together with
  *                       packages/flutter_ai_agent_sdk/pubspec.yaml and
@@ -13,10 +14,22 @@ import pkg from '../../package.json';
  *  - drop support for old SDKs -> raise SDK_MIN_SUPPORTED_VERSION
  */
 export const APP_NAME = 'agent-komunikasi';
-export const APP_VERSION: string = pkg.version;
 export const API_VERSION = '1.1.0';
 export const SDK_LATEST_VERSION = '1.1.0';
 export const SDK_MIN_SUPPORTED_VERSION = '1.0.0';
+
+/**
+ * Server version. Taken from CRM_VERSION (the variable docker-compose already
+ * uses for the image tag, so tag and reported version cannot disagree) and read
+ * on every call so it reflects the running container's environment. Falls back
+ * to package.json when unset; "latest" (compose's default tag) is not a version
+ * and is ignored. A leading "v" is dropped.
+ */
+export function getAppVersion(): string {
+  const raw = (process.env.CRM_VERSION || '').trim().replace(/^v/i, '');
+  if (raw && raw.toLowerCase() !== 'latest') return raw.slice(0, 40);
+  return pkg.version;
+}
 
 /** `current` = latest (or newer), `outdated` = works but an update exists, `unsupported` = below the minimum, `unknown` = client did not say. */
 export type SdkStatus = 'current' | 'outdated' | 'unsupported' | 'unknown';
@@ -65,8 +78,11 @@ export interface VersionInfo {
 
 /** Build metadata injected at image build time (see Dockerfile ARGs). */
 function buildInfo() {
-  const commit = process.env.APP_COMMIT || process.env.GIT_COMMIT || process.env.VERCEL_GIT_COMMIT_SHA || '';
-  const builtAt = process.env.APP_BUILT_AT || '';
+  // Runtime env wins; BUILD_* are inlined by next.config.js at build time (literal
+  // property access is required for Next to replace them).
+  const commit =
+    process.env.APP_COMMIT || process.env.GIT_COMMIT || process.env.VERCEL_GIT_COMMIT_SHA || process.env.BUILD_COMMIT || '';
+  const builtAt = process.env.APP_BUILT_AT || process.env.BUILD_TIME || '';
   return {
     commit: commit ? commit.slice(0, 12) : null,
     builtAt: builtAt || null,
@@ -78,7 +94,7 @@ export function getVersionInfo(clientSdkVersion?: unknown): VersionInfo {
   const status = getSdkStatus(client);
   return {
     name: APP_NAME,
-    version: APP_VERSION,
+    version: getAppVersion(),
     apiVersion: API_VERSION,
     ...buildInfo(),
     sdk: {

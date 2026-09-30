@@ -19,6 +19,12 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# Build metadata baked into the bundle (see next.config.js -> GET /api/version)
+ARG APP_COMMIT=""
+ARG APP_BUILT_AT=""
+ENV APP_COMMIT=$APP_COMMIT
+ENV APP_BUILT_AT=$APP_BUILT_AT
+
 # Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
