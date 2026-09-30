@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:api": "vitest run",
+    "type-check": "tsc --noEmit --ignoreDeprecations 6.0",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma db push --force-reset && npm run db:seed",
@@ -53,7 +55,8 @@
     "postcss": "^8.5.13",
     "tailwindcss": "^4.2.4",
     "tsx": "^4.22.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.2"
   },
   "description": ""
 }

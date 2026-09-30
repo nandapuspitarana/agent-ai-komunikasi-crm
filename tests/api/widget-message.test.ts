@@ -1,0 +1,117 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
+
+const prismaMock = vi.hoisted(() => ({
+  tenant: { findUnique: vi.fn() },
+  chatSession: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
+  message: { create: vi.fn(), findMany: vi.fn() },
+  knowledgeDocument: { findMany: vi.fn() },
+  visitorProfile: { update: vi.fn() },
+}));
+vi.mock('@/lib/prisma', () => ({ prisma: prismaMock }));
+vi.mock('@/lib/ai-agent', () => ({ chatWithAgent: vi.fn().mockResolvedValue({ reply: 'LLM reply' }) }));
+vi.mock('@/lib/visitor-service', () => ({
+  updateVisitorFromExtraction: vi.fn().mockResolvedValue(undefined),
+  upsertVisitorProfile: vi.fn().mockResolvedValue(undefined),
+  updateVisitorClassification: vi.fn().mockResolvedValue(undefined),
+  shouldTriggerLeadForm: vi.fn().mockResolvedValue(false),
+}));
+
+import { POST } from '@/app/api/widget/message/route';
+
+const intent = (over: any = {}) => ({
+  name: 'Rooms',
+  trainingPhrases: ['rooms'],
+  response: 'Pilih tipe ruang:',
+  responseType: 'options',
+  options: "Office|Private Office, Kids' room",
+  ...over,
+});
+
+const tenant = (over: any = {}, intents: any[] = [intent()]) => ({
+  id: 't1',
+  name: 'CEOSUITE',
+  aiEnabled: false,
+  aiSystemPrompt: '',
+  visitorConfig: { enabled: false },
+  handoffAgent: null,
+  activeFlowId: 'f1',
+  activeFlow: { id: 'f1', name: 'Claire', config: {}, intents },
+  flows: [],
+  ...over,
+});
+
+const send = (message: string, channel?: string) =>
+  POST(
+    new NextRequest('http://localhost/api/widget/message', {
+      method: 'POST',
+      body: JSON.stringify({ tenantId: 't1', message, contactId: 'c1', ...(channel && { channel }) }),
+    })
+  );
+
+beforeEach(() => {
+  Object.values(prismaMock).forEach((m) => Object.values(m).forEach((fn: any) => fn.mockReset()));
+  prismaMock.chatSession.findUnique.mockResolvedValue(null);
+  prismaMock.chatSession.create.mockResolvedValue({ id: 's1', contactId: 'c1', status: 'bot' });
+  prismaMock.message.create.mockImplementation(async ({ data }: any) => ({ id: 'm', ...data }));
+  prismaMock.message.findMany.mockResolvedValue([]);
+  prismaMock.knowledgeDocument.findMany.mockResolvedValue([]);
+});
+
+describe('POST /api/widget/message — quick reply options', () => {
+  it('TEST-AI-F03a mobile_app: clean reply + structured options + responseType, nothing HTML in DB', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant());
+    const json = await (await send('rooms', 'mobile_app')).json();
+
+    expect(json.reply).toBe('Pilih tipe ruang:');
+    expect(json.reply).not.toMatch(/<button|<div/);
+    expect(json.responseType).toBe('options');
+    expect(json.options).toEqual([
+      { label: 'Office', value: 'Private Office' },
+      { label: "Kids' room", value: "Kids' room" },
+    ]);
+
+    const saved = prismaMock.message.create.mock.calls.map((c: any) => c[0].data).find((d: any) => d.senderType === 'bot');
+    expect(saved.content).toBe('Pilih tipe ruang:');
+  });
+
+  it('TEST-AI-R14 web widget keeps HTML buttons, escaped, and no separate options field (avoids double render)', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant());
+    const json = await (await send('rooms')).json(); // default channel = widget
+
+    expect(json.reply).toContain('<button');
+    expect(json.reply).toContain('Kids&#39; room</button>');
+    expect(json.reply).not.toContain("text: 'Kids' room'"); // the old, breakable form
+    expect(json.options).toBeUndefined();
+    expect(json.responseType).toBe('options'); // responseType is informational for widget
+  });
+
+  it('TEST-AI-F03b aiEnabled=true with option intent bypasses LLM and still returns options', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant({ aiEnabled: true }));
+    const json = await (await send('rooms', 'mobile_app')).json();
+    expect(json.reply).toBe('Pilih tipe ruang:');
+    expect(json.options).toHaveLength(2);
+  });
+
+  it('no options intent -> responseType text and no options field', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant({}, [intent({ options: '', responseType: 'text' })]));
+    const json = await (await send('rooms', 'mobile_app')).json();
+    expect(json.responseType).toBe('text');
+    expect(json.options).toBeUndefined();
+  });
+
+  it('form/card intents pass their responseType through', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(
+      tenant({}, [intent({ responseType: 'card', options: '', response: "<div class='card'>x</div>" })])
+    );
+    const json = await (await send('rooms', 'mobile_app')).json();
+    expect(json.responseType).toBe('card');
+  });
+
+  it('TEST-AI-F04 handoff keyword short-circuits to queue', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant());
+    const json = await (await send('saya mau bicara dengan agen', 'mobile_app')).json();
+    expect(json.status).toBe('queue');
+    expect(json.handoffOccurred).toBe(true);
+  });
+});
