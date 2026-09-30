@@ -38,6 +38,9 @@ class ChatMessage {
   /// offline fallback). Lets the controller refresh a stale, persisted welcome.
   final bool isWelcome;
 
+  /// True once the user submitted this message's [form]; the form is then locked.
+  final bool formSubmitted;
+
   const ChatMessage({
     required this.id,
     required this.sender,
@@ -52,6 +55,7 @@ class ChatMessage {
     this.isHandoff = false,
     this.sessionId,
     this.isWelcome = false,
+    this.formSubmitted = false,
   });
 
   /// Whether this message is the greeting. Also recognises welcome messages
@@ -132,6 +136,7 @@ class ChatMessage {
     bool? isHandoff,
     String? senderName,
     String? sessionId,
+    bool? formSubmitted,
   }) {
     return ChatMessage(
       id: id,
@@ -147,6 +152,7 @@ class ChatMessage {
       isHandoff: isHandoff ?? this.isHandoff,
       sessionId: sessionId ?? this.sessionId,
       isWelcome: isWelcome,
+      formSubmitted: formSubmitted ?? this.formSubmitted,
     );
   }
 
@@ -177,6 +183,7 @@ class ChatMessage {
       isHandoff: json['isHandoff'] == true,
       sessionId: json['sessionId'] as String?,
       isWelcome: json['isWelcome'] == true,
+      formSubmitted: json['formSubmitted'] == true,
     );
   }
 
@@ -193,5 +200,6 @@ class ChatMessage {
         'isHandoff': isHandoff,
         'sessionId': sessionId,
         'isWelcome': isWelcome,
+        'formSubmitted': formSubmitted,
       };
 }

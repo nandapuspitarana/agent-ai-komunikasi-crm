@@ -36,7 +36,11 @@ void main() {
     }
 
     Future<void> pump(WidgetTester tester, {QuickReplyStyle style = QuickReplyStyle.inline}) async {
-      await tester.pumpWidget(MaterialApp(home: AiChatView(controller: controller, quickReplyStyle: style)));
+      await tester.pumpWidget(MaterialApp(
+        // Flutter's ink sparkle shader cannot be loaded by flutter_test on some setups.
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
+        home: AiChatView(controller: controller, quickReplyStyle: style),
+      ));
       await tester.pumpAndSettle();
     }
 

@@ -28,6 +28,11 @@ class AiChatController extends ChangeNotifier {
   String? _currentAgentName;
   String? _errorMessage;
   late String _sessionId;
+
+  /// Session id the server has confirmed in a reply. Forms are only recorded
+  /// against a session the server knows (a fresh client id has no row yet).
+  String? _serverSessionId;
+  final Set<String> _submittingForms = {};
   final String? contactId;
 
   AiChatController({
@@ -59,6 +64,12 @@ class AiChatController extends ChangeNotifier {
       _sessionId = sessionId;
     }
     _isInitialized = true;
+    for (final m in messages.reversed) {
+      if (m.sessionId != null && m.sessionId!.isNotEmpty) {
+        _serverSessionId = m.sessionId;
+        break;
+      }
+    }
     // Config may already have been fetched (init finished before the restore
     // landed): apply the fresh greeting over a stale persisted one.
     final welcome = _lastWelcome;
@@ -328,6 +339,7 @@ class AiChatController extends ChangeNotifier {
       // Sync confirmed server sessionId for ongoing turns
       if (botReply.sessionId != null && botReply.sessionId!.isNotEmpty) {
         _sessionId = botReply.sessionId!;
+        _serverSessionId = botReply.sessionId;
       }
 
       if (botReply.isHandoff || botReply.sender.isAgent) {
@@ -362,9 +374,79 @@ class AiChatController extends ChangeNotifier {
     await sendMessage(option.value.isNotEmpty ? option.value : option.label);
   }
 
+  /// Submits the lead form of message [messageId] with [values] (field name ->
+  /// entered text).
+  ///
+  /// With a webhook the values go through the CRM's form-proxy, then the chat
+  /// shows what was sent and a confirmation, like the web widget. Without a
+  /// webhook the answers are sent to the agent as a normal message.
+  ///
+  /// Returns `null` on success, otherwise a message to show next to the form
+  /// (which stays editable so the user can retry).
+  Future<String?> submitForm(String messageId, Map<String, String> values) async {
+    final idx = _messages.indexWhere((m) => m.id == messageId);
+    if (idx == -1) return config.formErrorMessage;
+    final message = _messages[idx];
+    final form = message.form;
+    if (form == null || message.formSubmitted) return null;
+    if (!_submittingForms.add(messageId)) return null; // double tap
+
+    try {
+      final summary = formSummary(values);
+      final url = form.webhookUrl;
+
+      if (url == null || url.isEmpty) {
+        final before = _messages.length;
+        await sendMessage(summary);
+        final sent = _messages.length > before &&
+            _messages[before].status != MessageStatus.error;
+        if (!sent) return _errorMessage ?? config.formErrorMessage;
+      } else {
+        try {
+          await apiClient.submitForm(
+            url: url,
+            payload: values,
+            sessionId: _serverSessionId,
+          );
+        } catch (_) {
+          return config.formErrorMessage;
+        }
+        _messages.add(ChatMessage(
+          id: 'user_form_${DateTime.now().microsecondsSinceEpoch}',
+          sender: MessageSender.user,
+          text: summary,
+          timestamp: DateTime.now(),
+        ));
+        _messages.add(ChatMessage(
+          id: 'bot_form_${DateTime.now().microsecondsSinceEpoch}',
+          sender: MessageSender.bot,
+          senderName: botName,
+          text: config.formSuccessMessage,
+          timestamp: DateTime.now(),
+        ));
+      }
+
+      final at = _messages.indexWhere((m) => m.id == messageId);
+      if (at != -1) {
+        _messages[at] = _messages[at].copyWith(formSubmitted: true);
+      }
+      return null;
+    } finally {
+      _submittingForms.remove(messageId);
+      notifyListeners();
+    }
+  }
+
+  /// Text shown in the chat for a submitted form, same shape as the web widget.
+  static String formSummary(Map<String, String> values) =>
+      '\u{1F4DD} [Form Submitted]\n'
+      '${values.entries.map((e) => '- ${e.key}: ${e.value}').join('\n')}';
+
   /// Resets conversation and session.
   Future<void> restartChat() async {
     _sessionId = _newSessionId();
+    _serverSessionId = null;
+    _submittingForms.clear();
     _isHandoff = false;
     _currentAgentName = null;
     _botName = null;

@@ -116,6 +116,37 @@ class AiAgentApiClient {
     );
   }
 
+  /// Submits a lead form through the CRM's `/api/widget/form-proxy`, exactly
+  /// like the web widget: the CRM forwards [payload] to the form's webhook
+  /// [url] and, when [sessionId] is a session the server knows, records the
+  /// submission in that conversation.
+  ///
+  /// Not retried: a second POST could deliver the same lead twice.
+  Future<void> submitForm({
+    required String url,
+    required Map<String, String> payload,
+    String? sessionId,
+  }) async {
+    final uri = Uri.parse('${config.sanitizedApiUrl}/api/widget/form-proxy');
+    final body = jsonEncode({
+      'url': url,
+      'payload': payload,
+      if (sessionId != null) 'sessionId': sessionId,
+      'tenantId': config.tenantId,
+    });
+
+    final http.Response res;
+    try {
+      res = await _httpClient.post(uri, headers: _headers, body: body).timeout(config.timeout);
+    } catch (e) {
+      throw AiAgentApiException('Network connection failure: $e');
+    }
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw AiAgentApiException('Server returned error: ${res.statusCode}',
+          statusCode: res.statusCode, details: res.body);
+    }
+  }
+
   /// Internal POST with 1-time retry for transient network drops.
   Future<http.Response> _postWithRetry(Uri uri, String body) async {
     int attempts = 0;

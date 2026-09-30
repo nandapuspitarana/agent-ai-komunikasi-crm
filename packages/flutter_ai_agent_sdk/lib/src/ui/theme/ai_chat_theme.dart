@@ -13,6 +13,9 @@ class AiChatTheme {
 
   /// Additional theme attributes for dark mode & input styling
   final Color? cardBackgroundColor;
+
+  /// Outline of bot/agent bubbles (the web widget draws a hairline around them).
+  final Color? botBubbleBorderColor;
   final Color? inputBackgroundColor;
   final Color? inputFillColor;
   final Color? inputTextColor;
@@ -30,6 +33,7 @@ class AiChatTheme {
     this.cardBorderColor = const Color(0xFFE2E8F0), // Slate 200
     this.bubbleRadius = 16.0,
     this.cardBackgroundColor,
+    this.botBubbleBorderColor,
     this.inputBackgroundColor,
     this.inputFillColor,
     this.inputTextColor,
@@ -44,6 +48,9 @@ class AiChatTheme {
 
   Color get resolvedCardBackgroundColor =>
       cardBackgroundColor ?? (isDark ? const Color(0xFF1E1E20) : Colors.white);
+
+  Color get resolvedBotBubbleBorderColor =>
+      botBubbleBorderColor ?? (isDark ? cardBorderColor : const Color(0xFFF1F5F9));
 
   Color get resolvedInputBackgroundColor =>
       inputBackgroundColor ?? (isDark ? const Color(0xFF18181A) : Colors.white);
@@ -87,9 +94,9 @@ class AiChatTheme {
       primaryColor: Color(0xFF801517),
       userBubbleColor: Color(0xFF801517),
       userTextColor: Colors.white,
-      botBubbleColor: Color(0xFFF1F5F9),
+      botBubbleColor: Colors.white,
       botTextColor: Color(0xFF1E293B),
-      backgroundColor: Color(0xFFF7F4F0),
+      backgroundColor: Color(0xFFF8FAFC), // slate-50, like the web widget
       cardBorderColor: Color(0xFFE7DED8),
       cardBackgroundColor: Colors.white,
       inputBackgroundColor: Colors.white,

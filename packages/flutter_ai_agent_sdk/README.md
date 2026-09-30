@@ -10,7 +10,7 @@ SDK Client & UI Kit Flutter untuk mengintegrasikan **AI Agent Chatbot & CRM Supp
   1. 💬 **Text Only**: Teks percakapan standar dengan formatting markdown & URL.
   2. 🔘 **Quick Reply Options**: Tombol opsi cepat (*horizontal chips* dengan pipe parsing `Label|SentValue`).
   3. 🃏 **Info Card**: Kartu visual featured lokasi/layanan dengan tombol link eksternal.
-  4. 📋 **Lead Form**: Formulir penangkap prospek dinamis terhubung webhook.
+  4. 📋 **Lead Form**: Formulir penangkap prospek dinamis terhubung webhook. Dirender native (`LeadFormView`) di dalam bubble; submit lewat `POST /api/widget/form-proxy` seperti widget web, lalu chat menampilkan ringkasan isian + pesan terima kasih (`AiAgentConfig.formSuccessMessage` / `formErrorMessage`). Label validasi bisa dilokalkan lewat `AiChatView(formStrings: LeadFormStrings(...))`.
   5. 🙋 **Human Handoff**: Banner otomatis ketika percakapan dialihkan ke Customer Service.
 - **Security & Anti-Flood Built-in**:
   - `ContentSanitizer`: Perlindungan dari XSS dan script injection berbahaya.

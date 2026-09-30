@@ -24,6 +24,8 @@ void main() {
 
     Widget createTestWidget(Widget child) {
       return MaterialApp(
+        // Flutter's ink sparkle shader cannot be loaded by flutter_test on some setups.
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
         home: child,
       );
     }
@@ -36,7 +38,8 @@ void main() {
       await tester.pumpWidget(createTestWidget(AiChatView(controller: controller)));
       await tester.pumpAndSettle();
 
-      expect(find.text('CEO Suite Assistant'), findsOneWidget);
+      final appBar = find.byType(AppBar);
+      expect(find.descendant(of: appBar, matching: find.text('CEO Suite Assistant')), findsOneWidget);
       expect(find.text('Online 24/7 Support'), findsOneWidget);
       expect(find.text('Welcome!'), findsOneWidget);
     });

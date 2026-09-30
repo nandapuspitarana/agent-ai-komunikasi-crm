@@ -108,9 +108,10 @@ Kalau server mengirim `welcomeMessageOptions` dan sesi masih baru, tombol **munc
 - [x] MQ031 [P1] Perilaku setelah dipilih: chip pesan itu menjadi disabled + tersorot (pilihan user), chip pesan lama tidak bisa diklik ulang; buka kembali hanya untuk pesan bot terakhir.
 - [x] MQ032 [P1] Chip tetap terlihat saat `isTyping` (disabled, bukan hilang) agar layout tidak melompat.
 - [x] MQ033 [P1] Aksesibilitas: `Semantics(button: true, label:)`, target sentuh ≥ 44dp, dukung teks panjang (wrap, bukan strip 1 baris 48px), dark mode. _Selesai: semantics + wrap label panjang (test F15/F19); target sentuh 48dp via `MaterialTapTargetSize.padded`._
-- [ ] MQ034 [P1] Render `ResponseType.form` — `FormPayload` sudah di-parse tapi **tidak ada widget form** (`ui/widgets/` hanya bubble, card, quick-reply, handoff). Buat `LeadFormView` + submit ke `form-proxy`/webhook.
+- [x] MQ034 [P1] Render `ResponseType.form` — `FormPayload` sudah di-parse tapi **tidak ada widget form** (`ui/widgets/` hanya bubble, card, quick-reply, handoff). Buat `LeadFormView` + submit ke `form-proxy`/webhook. _Selesai: `LeadFormView` (text/email/tel/number/date/textarea/select, validasi required/email/number, tel hanya digit seperti web), `AiChatController.submitForm` → `POST /api/widget/form-proxy` (`sessionId` hanya bila sudah dikonfirmasi server), bubble ringkasan `📝 [Form Submitted]` + pesan terima kasih seperti web, form terkunci setelah terkirim (ikut tersimpan di cache sesi). Form tanpa webhook dikirim ke agen sebagai pesan biasa. Parser `FormPayload.parseFromHtml` diperbaiki: `required` sebelumnya selalu `false` dan `<textarea>` tidak terbaca._
 - [ ] MQ036 [P1] Overflow AppBar SDK di layar ≤ 320dp (lihat Temuan baru).
-- [ ] MQ035 [P2] Markdown/link di teks bot (README menjanjikan "markdown & URL", `ChatBubble` memakai `SelectableText` polos); `onLaunchUrl` saat ini hanya dipakai kartu.
+- [x] MQ035 [P2] Markdown/link di teks bot (README menjanjikan "markdown & URL", `ChatBubble` memakai `SelectableText` polos); `onLaunchUrl` saat ini hanya dipakai kartu. _Selesai: `RichMessageText` — `**tebal**`, `[label](url)`, dan URL polos; tap memanggil `onLaunchUrl` (tanpa callback link tidak ditampilkan sebagai link)._
+- [x] MQ037 [P1] Kemiripan bubble dengan web `ChatUI`: nama pengirim di atas bubble, bubble bot putih + border hairline, waktu di bawah bubble, avatar 24px, indikator mengetik berupa spinner, caption "Conversation Started", tombol "Talk to Human Agent" (opt-in `talkToAgentLabel`), input berbentuk pill dengan tombol kirim di dalam. Header halaman mobile memakai warna brand seperti header widget web.
 
 ## Phase C — Aplikasi mobile (`cs_portal_mobile`)
 
@@ -211,7 +212,7 @@ Kalau server mengirim `welcomeMessageOptions` dan sesi masih baru, tombol **munc
 - [x] TEST-AI-F13 `Label|Value`: label tampil, `value` terkirim.
 - [x] TEST-AI-F14 Saat `isTyping` chip disabled (tidak hilang); layout tidak bergeser (golden test).
 - [x] TEST-AI-F15 Teks panjang/RTL/emoji pada label chip: wrap, tidak overflow; dark mode kontras.
-- [ ] TEST-AI-F22 Form: `ResponseType.form` merender field, validasi `required`/email/tel, submit sukses/gagal, tombol submit disabled saat loading.
+- [x] TEST-AI-F22 Form: `ResponseType.form` merender field, validasi `required`/email/tel, submit sukses/gagal, tombol submit disabled saat loading. _SDK: `test/functional/lead_form_test.dart` (F20–F35); mobile: `test/widget/ai_agent/ai_support_chat_form_test.dart` (F40–F44, F50–F51)._
 - [ ] TEST-AI-F23 Card: tombol link memanggil `onLaunchUrl`, URL non-http(s) ditolak.
 - [ ] TEST-AI-F24 Handoff: banner muncul, nama agen tampil, pesan agen bertanda `MessageSender.agent`, tidak ada bubble kosong.
 - [ ] TEST-AI-F20 Rate limiter: tap chip beruntun cepat hanya mengirim satu pesan.

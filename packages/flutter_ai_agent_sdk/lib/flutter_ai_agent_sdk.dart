@@ -17,6 +17,8 @@ export 'src/controller/ai_chat_controller.dart';
 export 'src/ui/theme/ai_chat_theme.dart';
 export 'src/ui/widgets/chat_bubble.dart';
 export 'src/ui/widgets/info_card_view.dart';
+export 'src/ui/widgets/lead_form_view.dart';
+export 'src/ui/widgets/rich_message_text.dart';
 export 'src/ui/widgets/quick_reply_bar.dart';
 export 'src/ui/widgets/handoff_banner.dart';
 export 'src/ui/quick_reply_style.dart';

@@ -24,6 +24,12 @@ class AiAgentConfig {
   /// Client-side rate-limiter interval to prevent spam / rapid double clicks
   final Duration floodThrottleInterval;
 
+  /// Bot message shown after a lead form was submitted.
+  final String formSuccessMessage;
+
+  /// Shown next to a lead form when submitting failed.
+  final String formErrorMessage;
+
   const AiAgentConfig({
     required this.apiUrl,
     required this.tenantId,
@@ -32,6 +38,10 @@ class AiAgentConfig {
     this.primaryColor = const Color(0xFF801517),
     this.timeout = const Duration(seconds: 30),
     this.floodThrottleInterval = const Duration(milliseconds: 1200),
+    this.formSuccessMessage =
+        'Thank you! Your details have been submitted. Our team will contact you soon.',
+    this.formErrorMessage =
+        'Failed to submit the form. Please check your connection and try again.',
   });
 
   /// Sanitizes the base API URL to remove trailing slashes.

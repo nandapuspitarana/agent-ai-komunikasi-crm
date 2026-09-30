@@ -5,6 +5,7 @@ import 'quick_reply_style.dart';
 import 'theme/ai_chat_theme.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/handoff_banner.dart';
+import 'widgets/lead_form_view.dart';
 import 'widgets/quick_reply_bar.dart';
 
 class AiChatView extends StatefulWidget {
@@ -19,6 +20,21 @@ class AiChatView extends StatefulWidget {
   /// Where quick-reply options render. Defaults to chips under the bubble.
   final QuickReplyStyle quickReplyStyle;
 
+  /// Labels of the lead form rendered for `responseType: form` replies.
+  final LeadFormStrings formStrings;
+
+  /// Show the sender's name above bot/agent bubbles (as the web widget does).
+  final bool showSenderName;
+
+  /// Small caption above the first message (web: "Conversation started").
+  final String? conversationStartedLabel;
+
+  /// When set, a "talk to a human" button is shown above the input while the
+  /// bot is answering (web: `talkToAgentBtn`). Tapping it sends
+  /// [talkToAgentMessage].
+  final String? talkToAgentLabel;
+  final String talkToAgentMessage;
+
   const AiChatView({
     super.key,
     required this.controller,
@@ -29,6 +45,11 @@ class AiChatView extends StatefulWidget {
     this.showAppBar = true,
     this.inputHintText,
     this.quickReplyStyle = QuickReplyStyle.inline,
+    this.formStrings = const LeadFormStrings(),
+    this.showSenderName = true,
+    this.conversationStartedLabel,
+    this.talkToAgentLabel,
+    this.talkToAgentMessage = 'Saya ingin bicara dengan agen manusia',
   });
 
   @override
@@ -82,6 +103,47 @@ class _AiChatViewState extends State<AiChatView> {
     widget.controller.sendMessage(text);
   }
 
+  Widget _buildTypingIndicator(AiChatTheme theme, bool isDark) {
+    return Semantics(
+      label: 'Assistant is typing',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: CircleAvatar(
+                radius: 12,
+                backgroundColor: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE2E8F0),
+                child: const Icon(Icons.smart_toy_rounded, size: 14, color: Color(0xFF64748B)),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: theme.botBubbleColor,
+                border: Border.all(color: theme.resolvedBotBubbleBorderColor),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(theme.bubbleRadius),
+                  topRight: Radius.circular(theme.bubbleRadius),
+                  bottomLeft: const Radius.circular(4),
+                  bottomRight: Radius.circular(theme.bubbleRadius),
+                ),
+              ),
+              child: const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF94A3B8)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
@@ -102,6 +164,7 @@ class _AiChatViewState extends State<AiChatView> {
         : null;
     final activeOptions = lastBotMessage?.options ?? const <QuickReplyOption>[];
     final useBar = widget.quickReplyStyle == QuickReplyStyle.bar;
+    final captionRows = widget.conversationStartedLabel != null ? 1 : 0;
 
     final bodyContent = Column(
         children: [
@@ -147,44 +210,26 @@ class _AiChatViewState extends State<AiChatView> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.symmetric(vertical: 12),
-              itemCount: controller.messages.length + (controller.isTyping ? 1 : 0),
-              itemBuilder: (context, index) {
-                // Typing indicator bubble at the end
-                if (index == controller.messages.length && controller.isTyping) {
+              itemCount: captionRows + controller.messages.length + (controller.isTyping ? 1 : 0),
+              itemBuilder: (context, rawIndex) {
+                if (captionRows == 1 && rawIndex == 0) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 14,
-                          backgroundColor: theme.primaryColor.withOpacity(0.12),
-                          child: Icon(Icons.smart_toy_rounded, size: 16, color: theme.primaryColor),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: theme.botBubbleColor,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Assistant is typing...',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    padding: const EdgeInsets.only(top: 4, bottom: 12),
+                    child: Center(
+                      child: Text(
+                        widget.conversationStartedLabel!,
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                      ),
                     ),
                   );
+                }
+                final index = rawIndex - captionRows;
+
+                // Typing indicator bubble at the end
+                if (index == controller.messages.length && controller.isTyping) {
+                  return _buildTypingIndicator(theme, isDark);
                 }
 
                 final msg = controller.messages[index];
@@ -209,6 +254,9 @@ class _AiChatViewState extends State<AiChatView> {
                     message: msg,
                     theme: theme,
                     onLaunchUrl: widget.onLaunchUrl,
+                    formStrings: widget.formStrings,
+                    showSenderName: widget.showSenderName,
+                    onSubmitForm: (m, values) => controller.submitForm(m.id, values),
                     showInlineOptions: !useBar,
                     optionsEnabled: isLatest && !controller.isTyping && msg.sender.isBot,
                     selectedOptionValue: selectedValue,
@@ -227,29 +275,54 @@ class _AiChatViewState extends State<AiChatView> {
               onOptionSelected: (opt) => controller.selectOption(opt),
             ),
 
-          // Input Bar (Mobile responsive with dark mode support)
+          // "Talk to a human": only while the bot is answering, like the web widget
+          if (widget.talkToAgentLabel != null && !controller.isHandoff)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  key: const ValueKey('talk_to_agent'),
+                  onPressed: controller.isTyping
+                      ? null
+                      : () => controller.sendMessage(widget.talkToAgentMessage),
+                  icon: const Icon(Icons.phone_in_talk_outlined, size: 14),
+                  label: Text(widget.talkToAgentLabel!),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                    backgroundColor: isDark ? const Color(0xFF1E1E20) : Colors.white,
+                    side: BorderSide(color: isDark ? theme.cardBorderColor : const Color(0xFFE2E8F0)),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    textStyle: const TextStyle(fontSize: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            ),
+
+          // Input bar: one pill with the send button inside it (as on the web)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: inputBg,
               border: Border(top: BorderSide(color: inputBorderColor, width: 0.8)),
             ),
             child: SafeArea(
               top: false,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      decoration: BoxDecoration(
-                        color: inputFill,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: isDark ? theme.cardBorderColor : Colors.transparent,
-                          width: 0.8,
-                        ),
-                      ),
+              child: Container(
+                padding: const EdgeInsets.only(left: 18, right: 5),
+                decoration: BoxDecoration(
+                  color: inputFill,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: isDark ? theme.cardBorderColor : Colors.transparent,
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
                       child: TextField(
                         controller: _inputController,
                         textInputAction: TextInputAction.send,
@@ -271,35 +344,41 @@ class _AiChatViewState extends State<AiChatView> {
                           ),
                           border: InputBorder.none,
                           isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: InkWell(
-                      onTap: _handleSend,
-                      borderRadius: BorderRadius.circular(24),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.primaryColor.withOpacity(0.35),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                    const SizedBox(width: 6),
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _inputController,
+                      builder: (context, value, _) {
+                        final canSend = value.text.trim().isNotEmpty;
+                        return Opacity(
+                          opacity: canSend ? 1 : 0.5,
+                          child: InkWell(
+                            onTap: _handleSend,
+                            borderRadius: BorderRadius.circular(24),
+                            child: Container(
+                              padding: const EdgeInsets.all(9),
+                              decoration: BoxDecoration(
+                                color: theme.primaryColor,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: theme.primaryColor.withOpacity(0.3),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(Icons.send_rounded, color: Colors.white, size: 16),
                             ),
-                          ],
-                        ),
-                        child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
-                      ),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -399,4 +478,3 @@ class _AiChatViewState extends State<AiChatView> {
     );
   }
 }
-

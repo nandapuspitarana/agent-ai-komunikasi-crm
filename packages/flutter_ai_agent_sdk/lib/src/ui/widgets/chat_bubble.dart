@@ -5,7 +5,12 @@ import '../../models/quick_reply_option.dart';
 import '../../models/response_type.dart';
 import '../theme/ai_chat_theme.dart';
 import 'info_card_view.dart';
+import 'lead_form_view.dart';
+import 'rich_message_text.dart';
 
+/// One message of the conversation, laid out like the CRM web widget: a small
+/// avatar and the sender's name next to bot/agent messages, a bubble with a
+/// tail corner, the time underneath, and quick-reply chips below the bubble.
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
   final AiChatTheme theme;
@@ -22,6 +27,16 @@ class ChatBubble extends StatelessWidget {
 
   final ValueChanged<QuickReplyOption>? onOptionSelected;
 
+  /// Submits the lead form of a [ResponseType.form] message. Returns `null` on
+  /// success or an error message to show under the form.
+  final Future<String?> Function(ChatMessage message, Map<String, String> values)?
+      onSubmitForm;
+
+  final LeadFormStrings formStrings;
+
+  /// Show the sender's name above bot/agent bubbles (as the web widget does).
+  final bool showSenderName;
+
   const ChatBubble({
     super.key,
     required this.message,
@@ -31,148 +46,177 @@ class ChatBubble extends StatelessWidget {
     this.optionsEnabled = false,
     this.selectedOptionValue,
     this.onOptionSelected,
+    this.onSubmitForm,
+    this.formStrings = const LeadFormStrings(),
+    this.showSenderName = true,
   });
+
+  static const double _avatarRadius = 12;
+  static const Color _slate400 = Color(0xFF94A3B8);
+  static const Color _slate500 = Color(0xFF64748B);
+  static const Color _agentGreen = Color(0xFF059669);
+
+  bool get _hasForm => message.type == ResponseType.form && message.form != null;
 
   @override
   Widget build(BuildContext context) {
     final isUser = message.sender.isUser;
+    final isAgent = message.sender.isAgent;
+    final isDark =
+        theme.isDark || Theme.of(context).brightness == Brightness.dark;
     final timeStr = DateFormat('HH:mm').format(message.timestamp);
 
-    final bubble = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+    final senderName = isAgent
+        ? ((message.senderName ?? '').isNotEmpty ? message.senderName! : 'Human Agent')
+        : message.senderName;
+    final showName = showSenderName && !isUser && (senderName ?? '').isNotEmpty;
+
+    final width = MediaQuery.of(context).size.width;
+    final maxBubbleWidth = width * (_hasForm ? 0.86 : 0.78);
+
+    final bubbleColor = isUser ? theme.userBubbleColor : theme.botBubbleColor;
+    final textColor = isUser ? theme.userTextColor : theme.botTextColor;
+
+    final bubble = Container(
+      constraints: BoxConstraints(maxWidth: maxBubbleWidth),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: bubbleColor,
+        border: isUser
+            ? null
+            : Border.all(color: theme.resolvedBotBubbleBorderColor, width: 1),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(theme.bubbleRadius),
+          topRight: Radius.circular(theme.bubbleRadius),
+          bottomLeft: Radius.circular(isUser ? theme.bubbleRadius : 4),
+          bottomRight: Radius.circular(isUser ? 4 : theme.bubbleRadius),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment:
+            isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          if (message.text.isNotEmpty || !_hasForm)
+            RichMessageText(
+              text: message.text,
+              onLaunchUrl: onLaunchUrl,
+              linkColor: isUser ? Colors.white : theme.primaryColor,
+              style: TextStyle(fontSize: 14, color: textColor, height: 1.5),
+            ),
+
+          // Info Card Embed
+          if (message.type == ResponseType.card && message.card != null)
+            InfoCardView(
+                card: message.card!, theme: theme, onLaunchUrl: onLaunchUrl),
+
+          // Lead form (the CRM Form Builder's form-card)
+          if (_hasForm)
+            LeadFormView(
+              key: ValueKey('lead_form_${message.id}'),
+              form: message.form!,
+              theme: theme,
+              submitted: message.formSubmitted,
+              strings: formStrings,
+              onSubmit: (values) async =>
+                  onSubmitForm == null ? null : onSubmitForm!(message, values),
+            ),
+        ],
+      ),
+    );
+
+    final meta = Padding(
+      padding: const EdgeInsets.only(top: 4, left: 2, right: 2),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(timeStr, style: const TextStyle(fontSize: 10, color: _slate400)),
+          if (isUser) ...[
+            const SizedBox(width: 4),
+            if (message.status == MessageStatus.sending)
+              const SizedBox(
+                width: 10,
+                height: 10,
+                child: CircularProgressIndicator(strokeWidth: 1.5, color: _slate400),
+              )
+            else if (message.status == MessageStatus.error)
+              const Icon(Icons.error_outline_rounded,
+                  size: 12, color: Color(0xFFF59E0B))
+            else
+              const Icon(Icons.done_rounded, size: 12, color: _slate400),
+          ],
+        ],
+      ),
+    );
+
+    final avatarBg = isAgent
+        ? _agentGreen.withOpacity(0.15)
+        : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE2E8F0));
+
+    final row = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Row(
         mainAxisAlignment:
             isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
-            CircleAvatar(
-              radius: 14,
-              backgroundColor: message.sender.isAgent
-                  ? const Color(0xFF3B82F6).withOpacity(0.15)
-                  : theme.primaryColor.withOpacity(0.12),
-              child: Icon(
-                message.sender.isAgent
-                    ? Icons.support_agent_rounded
-                    : Icons.smart_toy_rounded,
-                size: 16,
-                color: message.sender.isAgent
-                    ? const Color(0xFF3B82F6)
-                    : theme.primaryColor,
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: CircleAvatar(
+                radius: _avatarRadius,
+                backgroundColor: avatarBg,
+                child: Icon(
+                  isAgent ? Icons.person_rounded : Icons.smart_toy_rounded,
+                  size: 14,
+                  color: isAgent ? _agentGreen : _slate500,
+                ),
               ),
             ),
             const SizedBox(width: 8),
           ],
           Flexible(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.76,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: isUser ? theme.userBubbleColor : theme.botBubbleColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(theme.bubbleRadius),
-                  topRight: Radius.circular(theme.bubbleRadius),
-                  bottomLeft: Radius.circular(isUser ? theme.bubbleRadius : 4),
-                  bottomRight: Radius.circular(isUser ? 4 : theme.bubbleRadius),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment:
-                    isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                children: [
-                  // Sender name tag when a human agent takes over
-                  if (!isUser &&
-                      message.sender.isAgent &&
-                      message.senderName != null &&
-                      message.senderName!.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        message.senderName!,
-                        style: const TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2563EB),
-                        ),
+            child: Column(
+              crossAxisAlignment:
+                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                if (showName)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 4),
+                    child: Text(
+                      senderName!,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? const Color(0xFFA1A1AA) : _slate500,
                       ),
                     ),
-
-                  // Text Content
-                  SelectableText(
-                    message.text,
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      color: isUser ? theme.userTextColor : theme.botTextColor,
-                      height: 1.38,
-                    ),
                   ),
-
-                  // Info Card Embed
-                  if (message.type == ResponseType.card && message.card != null)
-                    InfoCardView(
-                        card: message.card!,
-                        theme: theme,
-                        onLaunchUrl: onLaunchUrl),
-
-                  // Timestamp & Status icon
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        timeStr,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: (isUser
-                              ? Colors.white70
-                              : const Color(0xFF94A3B8)),
-                        ),
-                      ),
-                      if (isUser) ...[
-                        const SizedBox(width: 4),
-                        if (message.status == MessageStatus.sending)
-                          const SizedBox(
-                            width: 10,
-                            height: 10,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 1.5, color: Colors.white70),
-                          )
-                        else if (message.status == MessageStatus.error)
-                          const Icon(Icons.error_outline_rounded,
-                              size: 12, color: Colors.amberAccent)
-                        else
-                          const Icon(Icons.done_rounded,
-                              size: 12, color: Colors.white70),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
+                bubble,
+                meta,
+              ],
             ),
           ),
         ],
       ),
     );
 
-    if (!showInlineOptions || isUser || message.options.isEmpty) return bubble;
+    if (!showInlineOptions || isUser || message.options.isEmpty) return row;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        bubble,
+        row,
         Padding(
-          // 14 (row padding) + 28 (avatar) + 8 (gap): align chips with the bubble
+          // 14 (row padding) + 24 (avatar) + 8 (gap): align chips with the bubble
           padding:
-              const EdgeInsets.only(left: 50, right: 14, top: 2, bottom: 6),
+              const EdgeInsets.only(left: 46, right: 14, top: 0, bottom: 6),
           child: Wrap(
             spacing: 8,
             runSpacing: 6,
@@ -201,9 +245,9 @@ class ChatBubble extends StatelessWidget {
       // Used-up chips stay readable but clearly inactive; the chosen one stays prominent.
       opacity: (canTap || isSelected) ? 1 : 0.55,
       child: ConstrainedBox(
-        // chips sit at left:50 / right:14 inside the list; never wider than that so long labels wrap
+        // chips sit at left:46 / right:14 inside the list; never wider than that so long labels wrap
         constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 64),
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 60),
         child: ActionChip(
           key: ValueKey('quick_reply_${message.id}_$index'),
           label: Text(opt.label, maxLines: 3, overflow: TextOverflow.ellipsis),
