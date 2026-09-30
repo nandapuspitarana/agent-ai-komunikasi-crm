@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getVersionInfo, getAppVersion, API_VERSION } from '@/lib/version';
+import { publicOrigin } from '@/lib/sdk-registry';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const clientSdk = searchParams.get('sdk') || request.headers.get('x-sdk-version');
 
-  return NextResponse.json(getVersionInfo(clientSdk), {
+  return NextResponse.json(getVersionInfo(clientSdk, { origin: publicOrigin(request) }), {
     status: 200,
     headers: {
       ...corsHeaders,

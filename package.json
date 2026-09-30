@@ -4,6 +4,8 @@
   "main": "tailwind.config.js",
   "scripts": {
     "dev": "next dev -p 8201",
+    "build:sdk": "node scripts/build-sdk-package.js",
+    "prebuild": "npm run build:sdk",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -57,7 +59,8 @@
     "tailwindcss": "^4.2.4",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.2"
+    "vitest": "^5.0.2",
+    "yaml": "^2.9.1"
   },
   "description": ""
 }

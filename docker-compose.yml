@@ -11,6 +11,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
+        CRM_VERSION: ${CRM_VERSION:-}
         APP_COMMIT: ${APP_COMMIT:-}
         APP_BUILT_AT: ${APP_BUILT_AT:-}
     image: crm-web:${CRM_VERSION:-latest}  # Supports dynamic version tag upgrades & rollbacks

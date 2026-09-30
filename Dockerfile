@@ -19,6 +19,10 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# CRM_VERSION stamps the Flutter SDK archive built by `npm run build` (prebuild hook)
+ARG CRM_VERSION=""
+ENV CRM_VERSION=$CRM_VERSION
+
 # Build metadata baked into the bundle (see next.config.js -> GET /api/version)
 ARG APP_COMMIT=""
 ARG APP_BUILT_AT=""
@@ -60,6 +64,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
+# Flutter SDK archive + manifest served by /api/pub (built by scripts/build-sdk-package.js)
+COPY --from=builder /app/sdk-dist ./sdk-dist
 
 # Change ownership to non-root user
 RUN chown -R nextjs:nodejs /app

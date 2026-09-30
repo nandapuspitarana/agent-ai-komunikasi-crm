@@ -1,4 +1,5 @@
 import pkg from '../../package.json';
+import { readManifest } from '@/lib/sdk-registry';
 
 /**
  * Single source of truth for versions exposed to clients (GET /api/version and
@@ -8,14 +9,13 @@ import pkg from '../../package.json';
  *  - server release  -> set CRM_VERSION in .env (also the docker image tag in
  *                       docker-compose); package.json "version" is the fallback
  *  - API contract    -> bump API_VERSION (minor = additive, major = breaking)
- *  - new SDK release -> bump SDK_LATEST_VERSION together with
- *                       packages/flutter_ai_agent_sdk/pubspec.yaml and
- *                       lib/src/version.dart (tests/api/version.test.ts fails if they drift)
+ *  - SDK release     -> nothing to bump: the SDK archive is stamped with CRM_VERSION at
+ *                       build time (scripts/build-sdk-package.js) and served from /api/pub;
+ *                       the version in the SDK source is only the fallback
  *  - drop support for old SDKs -> raise SDK_MIN_SUPPORTED_VERSION
  */
 export const APP_NAME = 'agent-komunikasi';
 export const API_VERSION = '1.1.0';
-export const SDK_LATEST_VERSION = '1.1.0';
 export const SDK_MIN_SUPPORTED_VERSION = '1.0.0';
 
 /**
@@ -29,6 +29,15 @@ export function getAppVersion(): string {
   const raw = (process.env.CRM_VERSION || '').trim().replace(/^v/i, '');
   if (raw && raw.toLowerCase() !== 'latest') return raw.slice(0, 40);
   return pkg.version;
+}
+
+/**
+ * Newest SDK the server can hand out: the version of the archive built into
+ * this deployment (which equals CRM_VERSION at build time), otherwise the CRM
+ * version itself.
+ */
+export function getSdkLatestVersion(): string {
+  return readManifest()?.version ?? getAppVersion();
 }
 
 /** `current` = latest (or newer), `outdated` = works but an update exists, `unsupported` = below the minimum, `unknown` = client did not say. */
@@ -54,7 +63,7 @@ export function compareSemver(a: unknown, b: unknown): number | null {
 
 export function getSdkStatus(clientVersion: unknown): SdkStatus {
   const vsMin = compareSemver(clientVersion, SDK_MIN_SUPPORTED_VERSION);
-  const vsLatest = compareSemver(clientVersion, SDK_LATEST_VERSION);
+  const vsLatest = compareSemver(clientVersion, getSdkLatestVersion());
   if (vsMin === null || vsLatest === null) return 'unknown';
   if (vsMin < 0) return 'unsupported';
   return vsLatest < 0 ? 'outdated' : 'current';
@@ -69,6 +78,8 @@ export interface VersionInfo {
   sdk: {
     latest: string;
     minSupported: string;
+    /** pub repository URL to depend on (null when no SDK is built into this deployment or the origin is unknown). */
+    registry: string | null;
     /** Version the caller reported (`sdkVersion` / `?sdk=` / X-SDK-Version), if any. */
     client: string | null;
     status: SdkStatus;
@@ -89,7 +100,7 @@ function buildInfo() {
   };
 }
 
-export function getVersionInfo(clientSdkVersion?: unknown): VersionInfo {
+export function getVersionInfo(clientSdkVersion?: unknown, opts: { origin?: string } = {}): VersionInfo {
   const client = typeof clientSdkVersion === 'string' && clientSdkVersion.trim() ? clientSdkVersion.trim().slice(0, 40) : null;
   const status = getSdkStatus(client);
   return {
@@ -98,8 +109,9 @@ export function getVersionInfo(clientSdkVersion?: unknown): VersionInfo {
     apiVersion: API_VERSION,
     ...buildInfo(),
     sdk: {
-      latest: SDK_LATEST_VERSION,
+      latest: getSdkLatestVersion(),
       minSupported: SDK_MIN_SUPPORTED_VERSION,
+      registry: opts.origin && readManifest() ? `${opts.origin}/api/pub` : null,
       client,
       status,
       updateAvailable: status === 'outdated' || status === 'unsupported',

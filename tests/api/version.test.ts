@@ -8,7 +8,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: { tenant: { findUnique } } }));
 import {
   getAppVersion,
   API_VERSION,
-  SDK_LATEST_VERSION,
+  getSdkLatestVersion,
   SDK_MIN_SUPPORTED_VERSION,
   compareSemver,
   parseSemver,
@@ -23,12 +23,16 @@ const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
 
 // CRM_VERSION may be set in the developer's shell / CI; every test starts without it.
 const ORIGINAL_CRM_VERSION = process.env.CRM_VERSION;
+const ORIGINAL_SDK_DIST_DIR = process.env.SDK_DIST_DIR;
 beforeEach(() => {
   delete process.env.CRM_VERSION;
+  process.env.SDK_DIST_DIR = path.join(root, 'tests', '__no_sdk_dist__'); // no SDK built into "this deployment"
 });
 afterEach(() => {
   if (ORIGINAL_CRM_VERSION === undefined) delete process.env.CRM_VERSION;
   else process.env.CRM_VERSION = ORIGINAL_CRM_VERSION;
+  if (ORIGINAL_SDK_DIST_DIR === undefined) delete process.env.SDK_DIST_DIR;
+  else process.env.SDK_DIST_DIR = ORIGINAL_SDK_DIST_DIR;
 });
 
 describe('semver helpers', () => {
@@ -50,10 +54,10 @@ describe('semver helpers', () => {
 
 describe('getSdkStatus', () => {
   it('TEST-AI-V03 maps client versions to current / outdated / unsupported / unknown', () => {
-    expect(getSdkStatus(SDK_LATEST_VERSION)).toBe('current');
+    expect(getSdkStatus(getSdkLatestVersion())).toBe('current');
     expect(getSdkStatus('99.0.0')).toBe('current'); // ahead of the server's knowledge
     expect(getSdkStatus(SDK_MIN_SUPPORTED_VERSION)).toBe(
-      compareSemver(SDK_MIN_SUPPORTED_VERSION, SDK_LATEST_VERSION)! < 0 ? 'outdated' : 'current'
+      compareSemver(SDK_MIN_SUPPORTED_VERSION, getSdkLatestVersion())! < 0 ? 'outdated' : 'current'
     );
     expect(getSdkStatus('0.0.1')).toBe('unsupported');
     expect(getSdkStatus(undefined)).toBe('unknown');
@@ -65,11 +69,10 @@ describe('release consistency (fails when versions drift)', () => {
   const sdkPubspec = fs.readFileSync(path.join(root, 'packages/flutter_ai_agent_sdk/pubspec.yaml'), 'utf8');
   const sdkDart = fs.readFileSync(path.join(root, 'packages/flutter_ai_agent_sdk/lib/src/version.dart'), 'utf8');
 
-  it('TEST-AI-V04 SDK pubspec, Dart constant and SDK_LATEST_VERSION are the same version', () => {
+  it('TEST-AI-V04 SDK source: pubspec version equals the Dart constant (releases are stamped with CRM_VERSION)', () => {
     const pubspecVersion = /^version:\s*(\S+)/m.exec(sdkPubspec)![1];
     const dartVersion = /aiAgentSdkVersion\s*=\s*'([^']+)'/.exec(sdkDart)![1];
     expect(dartVersion).toBe(pubspecVersion);
-    expect(SDK_LATEST_VERSION).toBe(pubspecVersion);
   });
 
   it('TEST-AI-V05 without CRM_VERSION the server version falls back to package.json (and the lockfile root matches)', () => {
@@ -80,7 +83,7 @@ describe('release consistency (fails when versions drift)', () => {
   });
 
   it('minimum supported SDK is never newer than the latest', () => {
-    expect(compareSemver(SDK_MIN_SUPPORTED_VERSION, SDK_LATEST_VERSION)!).toBeLessThanOrEqual(0);
+    expect(compareSemver(SDK_MIN_SUPPORTED_VERSION, getSdkLatestVersion())!).toBeLessThanOrEqual(0);
   });
 });
 
@@ -132,7 +135,7 @@ describe('GET /api/version', () => {
       name: 'agent-komunikasi',
       version: getAppVersion(),
       apiVersion: API_VERSION,
-      sdk: { latest: SDK_LATEST_VERSION, minSupported: SDK_MIN_SUPPORTED_VERSION, client: null, status: 'unknown', updateAvailable: false },
+      sdk: { latest: getSdkLatestVersion(), minSupported: SDK_MIN_SUPPORTED_VERSION, client: null, status: 'unknown', updateAvailable: false, registry: null },
     });
     expect(res.headers.get('cache-control')).toBe('no-store');
     expect(res.headers.get('access-control-allow-origin')).toBe('*');
@@ -141,8 +144,8 @@ describe('GET /api/version', () => {
   });
 
   it('TEST-AI-V07 reports whether the calling SDK is current (?sdk= or X-SDK-Version)', async () => {
-    const current = await (await versionGet(new Request(`http://localhost/api/version?sdk=${SDK_LATEST_VERSION}`))).json();
-    expect(current.sdk).toMatchObject({ client: SDK_LATEST_VERSION, status: 'current', updateAvailable: false });
+    const current = await (await versionGet(new Request(`http://localhost/api/version?sdk=${getSdkLatestVersion()}`))).json();
+    expect(current.sdk).toMatchObject({ client: getSdkLatestVersion(), status: 'current', updateAvailable: false });
 
     const old = await (await versionGet(new Request('http://localhost/api/version', { headers: { 'x-sdk-version': '0.0.1' } }))).json();
     expect(old.sdk).toMatchObject({ client: '0.0.1', status: 'unsupported', updateAvailable: true });

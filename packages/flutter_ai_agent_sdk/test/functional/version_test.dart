@@ -8,13 +8,13 @@ import 'package:flutter_ai_agent_sdk/flutter_ai_agent_sdk.dart';
 
 const _cfg = AiAgentConfig(apiUrl: 'https://example.test/', tenantId: 't1');
 
-Map<String, dynamic> _versionJson({String latest = '1.1.0', String min = '1.0.0'}) => {
+Map<String, dynamic> _versionJson({String? latest, String min = '1.0.0'}) => {
       'name': 'agent-komunikasi',
       'version': '1.1.0',
       'apiVersion': '1.1.0',
       'commit': 'abcdef123456',
       'builtAt': '2026-09-30T10:00:00Z',
-      'sdk': {'latest': latest, 'minSupported': min, 'client': aiAgentSdkVersion, 'status': 'current'},
+      'sdk': {'latest': latest ?? aiAgentSdkVersion, 'minSupported': min, 'client': aiAgentSdkVersion, 'status': 'current'},
     };
 
 void main() {
@@ -83,7 +83,7 @@ void main() {
       expect(info.serverVersion, '1.1.0');
       expect(info.apiVersion, '1.1.0');
       expect(info.commit, 'abcdef123456');
-      expect(info.latestSdk, '1.1.0');
+      expect(info.latestSdk, aiAgentSdkVersion);
       expect(info.status, SdkStatus.current);
     });
 
