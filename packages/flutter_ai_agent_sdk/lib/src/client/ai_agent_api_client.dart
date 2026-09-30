@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../config/ai_agent_config.dart';
 import '../models/chat_message.dart';
 import '../security/content_sanitizer.dart';
+import '../version.dart';
 
 class AiAgentApiException implements Exception {
   final String message;
@@ -37,10 +38,33 @@ class AiAgentApiClient {
     final body = jsonEncode({
       'tenantId': config.tenantId,
       if (contactId != null) 'contactId': contactId,
+      // lets the server report whether this SDK is current / outdated / unsupported
+      'sdkVersion': aiAgentSdkVersion,
     });
 
     final res = await _postWithRetry(uri, body);
     return jsonDecode(res.body) as Map<String, dynamic>;
+  }
+
+  /// Reads server, API and SDK versions from `GET /api/version`, so the app can
+  /// tell whether this SDK (and the backend) is up to date.
+  Future<ServerVersionInfo> fetchServerVersion() async {
+    final uri = Uri.parse('${config.sanitizedApiUrl}/api/version')
+        .replace(queryParameters: {'sdk': aiAgentSdkVersion});
+
+    final http.Response res;
+    try {
+      res =
+          await _httpClient.get(uri, headers: _headers).timeout(config.timeout);
+    } catch (e) {
+      throw AiAgentApiException('Network connection failure: $e');
+    }
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw AiAgentApiException('Server returned error: ${res.statusCode}',
+          statusCode: res.statusCode, details: res.body);
+    }
+    return ServerVersionInfo.fromJson(
+        jsonDecode(res.body) as Map<String, dynamic>);
   }
 
   /// Sends a chat message to the agent.
@@ -73,11 +97,13 @@ class AiAgentApiClient {
     final options = data['options'];
     // status 'agent' = a human already owns the session; the server sends
     // reply:null because the agent answers from the dashboard.
-    final handoffOccurred = data['handoffOccurred'] == true || data['status']?.toString() == 'agent';
+    final handoffOccurred = data['handoffOccurred'] == true ||
+        data['status']?.toString() == 'agent';
     final senderName = data['senderName']?.toString() ??
         data['agentName']?.toString() ??
         (handoffOccurred ? null : data['botName']?.toString());
-    final serverSessionId = data['sessionId']?.toString() ?? data['session_id']?.toString();
+    final serverSessionId =
+        data['sessionId']?.toString() ?? data['session_id']?.toString();
 
     return ChatMessage.fromApiResponse(
       id: 'bot_${DateTime.now().millisecondsSinceEpoch}',

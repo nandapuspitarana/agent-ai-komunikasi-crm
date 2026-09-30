@@ -3,10 +3,11 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getVisitorConfig } from '@/lib/visitor-config';
 import { resolveEffectiveFlow, readWelcomeConfig } from '@/lib/flow-resolver';
+import { getVersionInfo } from '@/lib/version';
 
 export async function POST(request: Request) {
   try {
-    const { websiteUrl, tenantId } = await request.json();
+    const { websiteUrl, tenantId, sdkVersion } = await request.json();
 
     if (!tenantId) {
       return NextResponse.json({ error: 'tenantId is required' }, { status: 400 });
@@ -35,6 +36,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       status: 'success',
+      // server/API/SDK versions; `sdk.status` tells the caller if its SDK is current
+      version: getVersionInfo(sdkVersion ?? request.headers.get('x-sdk-version')),
       config: {
         name: tenant.name,
         tenantName: tenant.name,

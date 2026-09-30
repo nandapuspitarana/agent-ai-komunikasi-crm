@@ -5,6 +5,7 @@ import '../models/chat_message.dart';
 import '../models/quick_reply_option.dart';
 import '../models/response_type.dart';
 import '../security/rate_limiter.dart';
+import '../version.dart';
 
 /// State Controller for the AI Chat Widget.
 /// Uses standard [ChangeNotifier] for complete compatibility with any Flutter app.
@@ -19,6 +20,7 @@ class AiChatController extends ChangeNotifier {
   bool _initFailed = false;
   Future<void>? _initFuture;
   ChatMessage? _lastWelcome;
+  ServerVersionInfo? _versionInfo;
   bool _isTyping = false;
   bool _isHandoff = false;
   String? _tenantName;
@@ -44,7 +46,8 @@ class AiChatController extends ChangeNotifier {
 
   /// Client-side session id. The counter keeps ids unique even when two are
   /// created within one clock tick (coarse timers, e.g. on Windows).
-  static String _newSessionId() => 'session_${DateTime.now().microsecondsSinceEpoch}_${_sessionSeq++}';
+  static String _newSessionId() =>
+      'session_${DateTime.now().microsecondsSinceEpoch}_${_sessionSeq++}';
 
   List<ChatMessage> get messages => List.unmodifiable(_messages);
 
@@ -64,6 +67,26 @@ class AiChatController extends ChangeNotifier {
   }
 
   bool get isInitialized => _isInitialized;
+
+  /// Server/API/SDK versions, as reported by the backend during [initialize]
+  /// or the last [checkVersion]. `null` until known (or for servers too old to report it).
+  ServerVersionInfo? get versionInfo => _versionInfo;
+
+  /// Whether this SDK is current, outdated or unsupported according to the server.
+  SdkStatus get sdkStatus => _versionInfo?.status ?? SdkStatus.unknown;
+
+  /// Asks the server for its versions (`GET /api/version`). Returns `null` if
+  /// the check fails; never throws, so it is safe to call fire-and-forget.
+  Future<ServerVersionInfo?> checkVersion() async {
+    try {
+      final info = await apiClient.fetchServerVersion();
+      _versionInfo = info;
+      notifyListeners();
+      return info;
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// True when the last attempt to load the server config failed, so the UI
   /// can offer a retry. [initialize] can be called again to retry.
@@ -96,7 +119,8 @@ class AiChatController extends ChangeNotifier {
   /// * a no-op once the config has been loaded;
   /// * if history was restored (or an earlier attempt fell back offline) it
   ///   only refreshes the greeting and bot names and never replaces the history.
-  Future<void> initialize({String? customWelcomeMessage, List<String>? defaultOptions}) {
+  Future<void> initialize(
+      {String? customWelcomeMessage, List<String>? defaultOptions}) {
     final inFlight = _initFuture;
     if (inFlight != null) return inFlight;
     if (_isInitialized && _configLoaded) return Future.value();
@@ -109,13 +133,21 @@ class AiChatController extends ChangeNotifier {
     return future;
   }
 
-  Future<void> _loadConfig(String? customWelcomeMessage, List<String>? defaultOptions) async {
+  Future<void> _loadConfig(
+      String? customWelcomeMessage, List<String>? defaultOptions) async {
     try {
       final initData = await apiClient.initWidget(contactId: contactId);
       final tenantConfig = initData['config'] as Map<String, dynamic>? ?? {};
 
+      final versionJson = initData['version'];
+      if (versionJson is Map) {
+        _versionInfo =
+            ServerVersionInfo.fromJson(Map<String, dynamic>.from(versionJson));
+      }
+
       // Resolve tenant name dynamically from CRM init data if present
-      final fetchedTenantName = tenantConfig['tenantName']?.toString() ?? tenantConfig['name']?.toString();
+      final fetchedTenantName = tenantConfig['tenantName']?.toString() ??
+          tenantConfig['name']?.toString();
       if (fetchedTenantName != null && fetchedTenantName.isNotEmpty) {
         _tenantName = fetchedTenantName;
       }
@@ -123,12 +155,15 @@ class AiChatController extends ChangeNotifier {
       // Resolve bot name dynamically from CRM init data if present
       final fetchedBotName = tenantConfig['botName']?.toString() ??
           tenantConfig['agentName']?.toString() ??
-          (tenantConfig['initialFlow'] is Map ? tenantConfig['initialFlow']['name']?.toString() : null);
+          (tenantConfig['initialFlow'] is Map
+              ? tenantConfig['initialFlow']['name']?.toString()
+              : null);
       if (fetchedBotName != null && fetchedBotName.isNotEmpty) {
         _botName = fetchedBotName;
       }
 
-      final welcome = _buildWelcome(tenantConfig, customWelcomeMessage, defaultOptions);
+      final welcome =
+          _buildWelcome(tenantConfig, customWelcomeMessage, defaultOptions);
       _lastWelcome = welcome;
       _configLoaded = true;
       _initFailed = false;
@@ -186,15 +221,20 @@ class AiChatController extends ChangeNotifier {
   ) {
     final serverText = tenantConfig['welcomeMessage']?.toString().trim();
     final welcomeText = customWelcomeMessage ??
-        ((serverText != null && serverText.isNotEmpty) ? serverText : _defaultWelcomeText);
+        ((serverText != null && serverText.isNotEmpty)
+            ? serverText
+            : _defaultWelcomeText);
 
     // Structured `welcomeOptions` (new servers) wins over the legacy comma string.
-    final optionsRaw = defaultOptions ?? tenantConfig['welcomeOptions'] ?? tenantConfig['welcomeMessageOptions'];
+    final optionsRaw = defaultOptions ??
+        tenantConfig['welcomeOptions'] ??
+        tenantConfig['welcomeMessageOptions'];
     var options = QuickReplyOption.parseList(optionsRaw);
 
     // An explicit text/form welcome must not show leftover buttons.
     final declaredType = tenantConfig['welcomeMessageType']?.toString();
-    if (defaultOptions == null && (declaredType == 'text' || declaredType == 'form')) {
+    if (defaultOptions == null &&
+        (declaredType == 'text' || declaredType == 'form')) {
       options = const [];
     }
 
@@ -218,8 +258,9 @@ class AiChatController extends ChangeNotifier {
     if (!first.looksLikeWelcome) return;
 
     final sameOptions = first.options.length == fresh.options.length &&
-        List.generate(first.options.length, (i) => i).every(
-            (i) => first.options[i].label == fresh.options[i].label && first.options[i].value == fresh.options[i].value);
+        List.generate(first.options.length, (i) => i).every((i) =>
+            first.options[i].label == fresh.options[i].label &&
+            first.options[i].value == fresh.options[i].value);
     if (first.isWelcome && first.text == fresh.text && sameOptions) return;
 
     _messages[0] = ChatMessage(
@@ -272,7 +313,8 @@ class AiChatController extends ChangeNotifier {
       // Update user message status to sent
       final userIdx = _messages.indexWhere((m) => m.id == userMsgId);
       if (userIdx != -1) {
-        _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.sent);
+        _messages[userIdx] =
+            _messages[userIdx].copyWith(status: MessageStatus.sent);
       }
 
       // Add bot or agent reply. An empty reply means a human agent already
@@ -304,7 +346,8 @@ class AiChatController extends ChangeNotifier {
       // Mark user message with error
       final userIdx = _messages.indexWhere((m) => m.id == userMsgId);
       if (userIdx != -1) {
-        _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.error);
+        _messages[userIdx] =
+            _messages[userIdx].copyWith(status: MessageStatus.error);
       }
 
       _errorMessage = 'Failed to send message: ${e.toString()}';

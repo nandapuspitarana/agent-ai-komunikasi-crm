@@ -2,6 +2,7 @@
 /// Production-grade mobile integration package for Next.js CRM AI Engine.
 library flutter_ai_agent_sdk;
 
+export 'src/version.dart';
 export 'src/config/ai_agent_config.dart';
 export 'src/models/response_type.dart';
 export 'src/models/quick_reply_option.dart';

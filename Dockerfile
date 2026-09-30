@@ -35,6 +35,12 @@ ENV NODE_ENV=production
 ENV PORT=8201
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Build metadata reported by GET /api/version (docker build --build-arg APP_COMMIT=$(git rev-parse --short HEAD) ...)
+ARG APP_COMMIT=""
+ARG APP_BUILT_AT=""
+ENV APP_COMMIT=$APP_COMMIT
+ENV APP_BUILT_AT=$APP_BUILT_AT
+
 # Install system utilities needed for debian runtime
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 

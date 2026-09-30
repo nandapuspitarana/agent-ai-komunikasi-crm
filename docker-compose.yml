@@ -10,6 +10,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        APP_COMMIT: ${APP_COMMIT:-}
+        APP_BUILT_AT: ${APP_BUILT_AT:-}
     image: crm-web:${CRM_VERSION:-latest}  # Supports dynamic version tag upgrades & rollbacks
     container_name: crm-web
     ports:
