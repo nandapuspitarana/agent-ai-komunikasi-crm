@@ -16,6 +16,11 @@ class QuickReplyOption {
     if (raw is List) {
       return raw.map((item) {
         if (item is QuickReplyOption) return item;
+        if (item is Map) {
+          final label = (item['label'] ?? item['title'] ?? '').toString().trim();
+          final value = (item['value'] ?? '').toString().trim();
+          return QuickReplyOption(label: label, value: value.isEmpty ? label : value);
+        }
         final str = item.toString().trim();
         return _parseSingle(str);
       }).where((opt) => opt.label.isNotEmpty).toList();

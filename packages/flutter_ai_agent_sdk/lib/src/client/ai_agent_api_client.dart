@@ -71,7 +71,9 @@ class AiAgentApiClient {
     final replyText = data['reply']?.toString() ?? '';
     final responseType = data['responseType']?.toString();
     final options = data['options'];
-    final handoffOccurred = data['handoffOccurred'] == true;
+    // status 'agent' = a human already owns the session; the server sends
+    // reply:null because the agent answers from the dashboard.
+    final handoffOccurred = data['handoffOccurred'] == true || data['status']?.toString() == 'agent';
     final senderName = data['senderName']?.toString() ??
         data['agentName']?.toString() ??
         (handoffOccurred ? null : data['botName']?.toString());

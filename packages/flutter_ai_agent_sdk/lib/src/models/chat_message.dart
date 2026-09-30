@@ -1,5 +1,6 @@
 import 'card_payload.dart';
 import 'form_payload.dart';
+import 'html_reply_parser.dart';
 import 'quick_reply_option.dart';
 import 'response_type.dart';
 
@@ -33,6 +34,10 @@ class ChatMessage {
   final bool isHandoff;
   final String? sessionId;
 
+  /// True for the greeting built from the server's welcome config (or the
+  /// offline fallback). Lets the controller refresh a stale, persisted welcome.
+  final bool isWelcome;
+
   const ChatMessage({
     required this.id,
     required this.sender,
@@ -46,7 +51,12 @@ class ChatMessage {
     this.status = MessageStatus.sent,
     this.isHandoff = false,
     this.sessionId,
+    this.isWelcome = false,
   });
+
+  /// Whether this message is the greeting. Also recognises welcome messages
+  /// persisted by older SDK versions, which have no [isWelcome] flag.
+  bool get looksLikeWelcome => isWelcome || (sender.isBot && id.startsWith('welcome'));
 
   /// Factory for constructing a bot reply from raw CRM API response.
   factory ChatMessage.fromApiResponse({
@@ -85,7 +95,16 @@ class ChatMessage {
     }
 
     // Parse options
-    final options = QuickReplyOption.parseList(rawOptions);
+    var options = QuickReplyOption.parseList(rawOptions);
+
+    // Older backends embed quick-reply buttons as HTML inside the reply text.
+    // Recover them as real options and never show raw tags in the bubble.
+    if (card == null && form == null && cleanText.contains('<')) {
+      final parsed = HtmlReplyParser.parse(cleanText);
+      cleanText = parsed.text;
+      if (options.isEmpty) options = parsed.options;
+    }
+
     if (options.isNotEmpty && parsedType == ResponseType.text) {
       parsedType = ResponseType.options;
     }
@@ -127,6 +146,7 @@ class ChatMessage {
       status: status ?? this.status,
       isHandoff: isHandoff ?? this.isHandoff,
       sessionId: sessionId ?? this.sessionId,
+      isWelcome: isWelcome,
     );
   }
 
@@ -156,6 +176,7 @@ class ChatMessage {
       status: MessageStatus.sent,
       isHandoff: json['isHandoff'] == true,
       sessionId: json['sessionId'] as String?,
+      isWelcome: json['isWelcome'] == true,
     );
   }
 
@@ -171,5 +192,6 @@ class ChatMessage {
         'timestamp': timestamp.toIso8601String(),
         'isHandoff': isHandoff,
         'sessionId': sessionId,
+        'isWelcome': isWelcome,
       };
 }

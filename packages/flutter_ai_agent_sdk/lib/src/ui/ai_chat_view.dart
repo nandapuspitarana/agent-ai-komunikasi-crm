@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controller/ai_chat_controller.dart';
 import '../models/quick_reply_option.dart';
+import 'quick_reply_style.dart';
 import 'theme/ai_chat_theme.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/handoff_banner.dart';
@@ -15,6 +16,9 @@ class AiChatView extends StatefulWidget {
   final bool showAppBar;
   final String? inputHintText;
 
+  /// Where quick-reply options render. Defaults to chips under the bubble.
+  final QuickReplyStyle quickReplyStyle;
+
   const AiChatView({
     super.key,
     required this.controller,
@@ -24,6 +28,7 @@ class AiChatView extends StatefulWidget {
     this.onLaunchUrl,
     this.showAppBar = true,
     this.inputHintText,
+    this.quickReplyStyle = QuickReplyStyle.inline,
   });
 
   @override
@@ -38,9 +43,9 @@ class _AiChatViewState extends State<AiChatView> {
   void initState() {
     super.initState();
     widget.controller.addListener(_onControllerUpdate);
-    if (!widget.controller.isInitialized) {
-      widget.controller.initialize();
-    }
+    // Idempotent: fetches config on first open, refreshes a restored session's
+    // greeting, retries after an offline fallback, and is a no-op otherwise.
+    widget.controller.initialize();
   }
 
   @override
@@ -96,6 +101,7 @@ class _AiChatViewState extends State<AiChatView> {
         ? controller.messages.last
         : null;
     final activeOptions = lastBotMessage?.options ?? const <QuickReplyOption>[];
+    final useBar = widget.quickReplyStyle == QuickReplyStyle.bar;
 
     final bodyContent = Column(
         children: [
@@ -124,6 +130,15 @@ class _AiChatViewState extends State<AiChatView> {
                       ),
                     ),
                   ),
+                  if (controller.needsRetry)
+                    TextButton(
+                      onPressed: () => controller.initialize(),
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        minimumSize: const Size(48, 32),
+                      ),
+                      child: const Text('Retry', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    ),
                 ],
               ),
             ),
@@ -173,19 +188,39 @@ class _AiChatViewState extends State<AiChatView> {
                 }
 
                 final msg = controller.messages[index];
+                final isLatest = index == controller.messages.length - 1;
+
+                // Which option (if any) the user picked from this message
+                String? selectedValue;
+                if (msg.options.isNotEmpty && index + 1 < controller.messages.length) {
+                  final next = controller.messages[index + 1];
+                  if (next.sender.isUser) {
+                    for (final o in msg.options) {
+                      if (o.value == next.text || o.label == next.text) {
+                        selectedValue = o.value;
+                        break;
+                      }
+                    }
+                  }
+                }
+
                 return RepaintBoundary(
                   child: ChatBubble(
                     message: msg,
                     theme: theme,
                     onLaunchUrl: widget.onLaunchUrl,
+                    showInlineOptions: !useBar,
+                    optionsEnabled: isLatest && !controller.isTyping && msg.sender.isBot,
+                    selectedOptionValue: selectedValue,
+                    onOptionSelected: (opt) => controller.selectOption(opt),
                   ),
                 );
               },
             ),
           ),
 
-          // Quick reply chips
-          if (activeOptions.isNotEmpty && !controller.isTyping)
+          // Quick reply chips (legacy bar style)
+          if (useBar && activeOptions.isNotEmpty && !controller.isTyping)
             QuickReplyBar(
               options: activeOptions,
               theme: theme,
