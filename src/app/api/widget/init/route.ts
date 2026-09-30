@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
+import { getVisitorConfig } from '@/lib/visitor-config';
+import { resolveEffectiveFlow, readWelcomeConfig } from '@/lib/flow-resolver';
 
 export async function POST(request: Request) {
   try {
@@ -25,12 +27,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
     }
 
-    const flow = tenant.activeFlow || tenant.flows[0];
+    const flow = resolveEffectiveFlow(tenant);
     const flowConfig = (flow?.config || {}) as any;
     const dynamicBotName = flowConfig?.name || flow?.name || 'Claire';
-    
-    // Import manually since we might not have it in context, or simply parse it here
-    const { getVisitorConfig } = require('@/lib/visitor-config');
+    const welcome = readWelcomeConfig(flowConfig);
     const vConfig = getVisitorConfig(tenant.visitorConfig);
 
     return NextResponse.json({
@@ -42,9 +42,15 @@ export async function POST(request: Request) {
         primaryColor: tenant.themeBrandColor || '#2563eb', // Use tenant color
         logo: tenant.themeBrandLogo || null,
         botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
-        initialFlow: flow || null,
-        welcomeMessage: flowConfig?.welcomeMessage || null,
-        welcomeMessageOptions: flowConfig?.welcomeMessageOptions || null,
+        // Public endpoint: expose identity only. The full flow row carries
+        // config.systemPrompt / humanPrompt / businessNeeds, which must not leak.
+        initialFlow: flow ? { id: flow.id, name: flow.name } : null,
+        welcomeMessage: welcome.message,
+        welcomeMessageType: welcome.type,
+        // Comma string kept for SDK builds that parse it themselves.
+        welcomeMessageOptions: welcome.rawOptions,
+        // Structured form: [{ label, value }]
+        welcomeOptions: welcome.options,
         visitorCollection: {
           enabled: vConfig.enabled,
           layer1_passive: vConfig.layer1_passive,

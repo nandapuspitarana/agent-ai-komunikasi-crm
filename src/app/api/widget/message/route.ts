@@ -8,6 +8,7 @@ import {
   parseDataExtractionTag
 } from '@/lib/ai-rules';
 import { getVisitorConfig } from '@/lib/visitor-config';
+import { parseOptions, toLegacyHtml } from '@/lib/quick-replies';
 import { extractVisitorData } from '@/lib/visitor-extractor';
 import { updateVisitorFromExtraction, upsertVisitorProfile, updateVisitorClassification, shouldTriggerLeadForm } from '@/lib/visitor-service';
 
@@ -356,38 +357,12 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Re-append HTML options from QnA match if any
-      // Supports "Label|Value" format: button shows Label, but sends Value to intent matcher
-      if (qnaMatch && qnaMatch.options) {
-        const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
-        if (opts.length > 0) {
-          aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => {
-            const pipeIdx = o.indexOf('|');
-            const label = pipeIdx !== -1 ? o.substring(0, pipeIdx).trim() : o;
-            const value = pipeIdx !== -1 ? o.substring(pipeIdx + 1).trim() : o;
-            return `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${value}'}, '*')">${label}</button>`;
-          }).join('') + `</div>`;
-        }
-      }
-
     } else {
       // If AI Agent is not enabled, directly fallback to static message (much faster!)
       if (qnaMatch) {
         aiReplyRaw = qnaMatch.response;
         if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
           aiReplyRaw += ' [HANDOFF_REQUESTED]';
-        }
-        if (qnaMatch.options) {
-          // Supports "Label|Value" format: button shows Label, but sends Value to intent matcher
-          const opts = qnaMatch.options.split(',').map((o: string) => o.trim()).filter(Boolean);
-          if (opts.length > 0) {
-            aiReplyRaw += `<div class="flex flex-wrap gap-2 mt-3">` + opts.map((o: string) => {
-              const pipeIdx = o.indexOf('|');
-              const label = pipeIdx !== -1 ? o.substring(0, pipeIdx).trim() : o;
-              const value = pipeIdx !== -1 ? o.substring(pipeIdx + 1).trim() : o;
-              return `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" onclick="window.postMessage({type: 'widget_quick_reply', text: '${value}'}, '*')">${label}</button>`;
-            }).join('') + `</div>`;
-          }
         }
       } else {
         aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, saya belum mengerti pesan Anda. Apakah Anda ingin berbicara dengan agen kami? [HANDOFF_REQUESTED]';
@@ -397,7 +372,22 @@ export async function POST(req: NextRequest) {
     // Step 4: Parse AI response for handoff flag, classification, and data extraction
     const { cleanReply: parsedExtraction, extractedData } = parseDataExtractionTag(aiReplyRaw);
     const { cleanReply: parsedClassification, classification } = parseClassificationTag(parsedExtraction);
-    const { cleanReply, handoffRequested } = parseAIResponseForHandoff(parsedClassification);
+    const { cleanReply: textReply, handoffRequested } = parseAIResponseForHandoff(parsedClassification);
+
+    // Quick-reply buttons from the matched intent ("Label|Value" supported: the
+    // button shows Label but sends Value back as the user's message).
+    //  - web widget (channel 'widget') renders HTML, so buttons are appended to the reply as before
+    //  - every other channel (e.g. mobile_app) gets clean text plus a structured `options` array
+    const quickOptions = qnaMatch?.options ? parseOptions(qnaMatch.options) : [];
+    const useLegacyHtml = channel === 'widget';
+    const cleanReply = useLegacyHtml && quickOptions.length > 0
+      ? textReply + toLegacyHtml(quickOptions)
+      : textReply;
+    const structuredOptions = !useLegacyHtml ? quickOptions : [];
+    const matchedType: string = qnaMatch?.responseType ?? '';
+    const responseType = ['card', 'form'].includes(matchedType)
+      ? matchedType
+      : quickOptions.length > 0 ? 'options' : 'text';
 
     let triggerLeadForm = false;
     let leadFormConfig = null;
@@ -465,6 +455,8 @@ export async function POST(req: NextRequest) {
       sessionId: currentSessionId,
       status: handoffOccurred ? 'queue' : 'bot',
       reply: cleanReply,
+      responseType,
+      ...(structuredOptions.length > 0 && { options: structuredOptions }),
       handoffOccurred,
       senderName: handoffOccurred ? undefined : dynamicBotName,
       botName: dynamicBotName,
