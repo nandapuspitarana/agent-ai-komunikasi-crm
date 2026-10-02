@@ -5,6 +5,8 @@ class CardPayload {
   final String? linkUrl;
   final String? ctaNote;
   final String? imageUrl;
+  final String? actionLabel;
+  final String? bannerTitle;
 
   const CardPayload({
     required this.title,
@@ -12,6 +14,8 @@ class CardPayload {
     this.linkUrl,
     this.ctaNote,
     this.imageUrl,
+    this.actionLabel,
+    this.bannerTitle,
   });
 
   factory CardPayload.fromJson(Map<String, dynamic> json) {
@@ -21,6 +25,8 @@ class CardPayload {
       linkUrl: json['linkUrl'] ?? json['url'],
       ctaNote: json['ctaNote'] ?? json['cta'],
       imageUrl: json['imageUrl'] ?? json['image'],
+      actionLabel: json['actionLabel'] ?? json['action_label'] ?? json['buttonText'],
+      bannerTitle: json['bannerTitle'] ?? json['banner_title'] ?? json['headerTitle'],
     );
   }
 
@@ -35,6 +41,8 @@ class CardPayload {
     String description = '';
     String? linkUrl;
     String? ctaNote;
+    String? actionLabel;
+    String? bannerTitle;
 
     final titleMatch = RegExp(r"class=['\x22]card-title['\x22]>([^<]+)<").firstMatch(html);
     if (titleMatch != null) {
@@ -58,6 +66,16 @@ class CardPayload {
       ctaNote = ctaMatch.group(1);
     }
 
+    final actionMatch = RegExp(r"class=['\x22](?:card-action|action-label|card-btn)['\x22][^>]*>([^<]+)<").firstMatch(html);
+    if (actionMatch != null) {
+      actionLabel = actionMatch.group(1)?.trim();
+    }
+
+    final bannerMatch = RegExp(r"class=['\x22](?:card-banner|banner-title)['\x22][^>]*>([^<]+)<").firstMatch(html);
+    if (bannerMatch != null) {
+      bannerTitle = bannerMatch.group(1)?.trim();
+    }
+
     if (title.isEmpty && description.isEmpty) return null;
 
     return CardPayload(
@@ -65,6 +83,8 @@ class CardPayload {
       description: description,
       linkUrl: linkUrl,
       ctaNote: ctaNote,
+      actionLabel: actionLabel,
+      bannerTitle: bannerTitle,
     );
   }
 
@@ -74,5 +94,7 @@ class CardPayload {
         'linkUrl': linkUrl,
         'ctaNote': ctaNote,
         'imageUrl': imageUrl,
+        if (actionLabel != null) 'actionLabel': actionLabel,
+        if (bannerTitle != null) 'bannerTitle': bannerTitle,
       };
 }

@@ -224,5 +224,99 @@ void main() {
 
       expect(find.text('Ketik pesan Anda di sini...'), findsOneWidget);
     });
+
+    testWidgets('TEST-AI-W08: Default info card action text is English and can be dynamically customized', (tester) async {
+      when(() => mockApiClient.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {'config': {'welcomeMessage': 'Welcome'}},
+      );
+
+      final cardMsg = ChatMessage(
+        id: 'c1',
+        sender: MessageSender.bot,
+        text: 'Here is a recommended office:',
+        type: ResponseType.card,
+        card: const CardPayload(
+          title: 'Axiata Tower',
+          description: 'Serviced office in KL',
+          linkUrl: 'https://ceosuite.com/axiata',
+        ),
+        timestamp: DateTime.now(),
+      );
+
+      final cardController = AiChatController(
+        apiClient: mockApiClient,
+        config: config,
+        initialMessages: [cardMsg],
+      );
+
+      // 1. Default should be English "View Location Details" and "Featured Information"
+      await tester.pumpWidget(createTestWidget(AiChatView(controller: cardController)));
+      await tester.pumpAndSettle();
+
+      expect(find.text('View Location Details'), findsOneWidget);
+      expect(find.text('Featured Information'), findsOneWidget);
+      expect(find.text('Lihat Detail Lokasi'), findsNothing);
+
+      // 2. Widget-level override via cardActionLabel
+      await tester.pumpWidget(createTestWidget(AiChatView(
+        controller: cardController,
+        cardActionLabel: 'Explore Location',
+        cardBannerTitle: 'Top Pick',
+      )));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Explore Location'), findsOneWidget);
+      expect(find.text('Top Pick'), findsOneWidget);
+
+      // 3. Tenant config override from initWidget
+      final mockTenantApiClient = MockAiAgentApiClient();
+      when(() => mockTenantApiClient.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {
+          'config': {
+            'welcomeMessage': 'Selamat datang',
+            'cardActionLabel': 'Lihat Detail Lokasi',
+            'cardBannerTitle': 'Informasi Unggulan',
+          }
+        },
+      );
+
+      final tenantController = AiChatController(
+        apiClient: mockTenantApiClient,
+        config: config,
+        initialMessages: [cardMsg],
+      );
+
+      await tester.pumpWidget(createTestWidget(AiChatView(controller: tenantController)));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Lihat Detail Lokasi'), findsOneWidget);
+      expect(find.text('Informasi Unggulan'), findsOneWidget);
+
+      // 4. Card-level actionLabel overrides everything
+      final customCardMsg = ChatMessage(
+        id: 'c2',
+        sender: MessageSender.bot,
+        text: 'Special promo:',
+        type: ResponseType.card,
+        card: const CardPayload(
+          title: 'Special Suite',
+          description: 'Limited offer',
+          linkUrl: 'https://ceosuite.com/promo',
+          actionLabel: 'Book Tour Now',
+        ),
+        timestamp: DateTime.now(),
+      );
+
+      final specificCardController = AiChatController(
+        apiClient: mockTenantApiClient,
+        config: config,
+        initialMessages: [customCardMsg],
+      );
+
+      await tester.pumpWidget(createTestWidget(AiChatView(controller: specificCardController)));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Book Tour Now'), findsOneWidget);
+    });
   });
 }

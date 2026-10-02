@@ -5,6 +5,7 @@ import 'quick_reply_style.dart';
 import 'theme/ai_chat_theme.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/handoff_banner.dart';
+import 'widgets/info_card_view.dart';
 import 'widgets/lead_form_view.dart';
 import 'widgets/quick_reply_bar.dart';
 
@@ -22,6 +23,17 @@ class AiChatView extends StatefulWidget {
 
   /// Labels of the lead form rendered for `responseType: form` replies.
   final LeadFormStrings formStrings;
+
+  /// Labels/strings of the info card rendered for `responseType: card` replies.
+  final InfoCardStrings cardStrings;
+
+  /// Optional override for the info card action button label.
+  /// If null, uses [controller.cardActionLabel] (from tenant config) or [cardStrings.actionLabel].
+  final String? cardActionLabel;
+
+  /// Optional override for the info card header banner title.
+  /// If null, uses [controller.cardBannerTitle] (from tenant config) or [cardStrings.bannerTitle].
+  final String? cardBannerTitle;
 
   /// Show the sender's name above bot/agent bubbles (as the web widget does).
   final bool showSenderName;
@@ -46,6 +58,9 @@ class AiChatView extends StatefulWidget {
     this.inputHintText,
     this.quickReplyStyle = QuickReplyStyle.inline,
     this.formStrings = const LeadFormStrings(),
+    this.cardStrings = const InfoCardStrings(),
+    this.cardActionLabel,
+    this.cardBannerTitle,
     this.showSenderName = true,
     this.conversationStartedLabel,
     this.talkToAgentLabel,
@@ -67,6 +82,16 @@ class _AiChatViewState extends State<AiChatView> {
     // Idempotent: fetches config on first open, refreshes a restored session's
     // greeting, retries after an offline fallback, and is a no-op otherwise.
     widget.controller.initialize();
+  }
+
+  @override
+  void didUpdateWidget(AiChatView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onControllerUpdate);
+      widget.controller.addListener(_onControllerUpdate);
+      widget.controller.initialize();
+    }
   }
 
   @override
@@ -255,6 +280,9 @@ class _AiChatViewState extends State<AiChatView> {
                     theme: theme,
                     onLaunchUrl: widget.onLaunchUrl,
                     formStrings: widget.formStrings,
+                    cardStrings: widget.cardStrings,
+                    cardActionLabel: widget.cardActionLabel ?? controller.cardActionLabel,
+                    cardBannerTitle: widget.cardBannerTitle ?? controller.cardBannerTitle,
                     showSenderName: widget.showSenderName,
                     onSubmitForm: (m, values) => controller.submitForm(m.id, values),
                     showInlineOptions: !useBar,

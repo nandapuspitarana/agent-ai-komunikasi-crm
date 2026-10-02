@@ -26,6 +26,8 @@ class AiChatController extends ChangeNotifier {
   String? _tenantName;
   String? _botName;
   String? _currentAgentName;
+  String? _cardActionLabel;
+  String? _cardBannerTitle;
   String? _errorMessage;
   late String _sessionId;
 
@@ -107,6 +109,8 @@ class AiChatController extends ChangeNotifier {
   String? get tenantName => _tenantName ?? config.tenantName;
   String get botName => _botName ?? config.botName;
   String? get currentAgentName => _currentAgentName;
+  String? get cardActionLabel => _cardActionLabel ?? config.cardActionLabel;
+  String? get cardBannerTitle => _cardBannerTitle ?? config.cardBannerTitle;
 
   /// Dynamic responder name:
   /// - When in handoff mode: returns the human agent's name (or 'Live Support' fallback).
@@ -171,6 +175,20 @@ class AiChatController extends ChangeNotifier {
               : null);
       if (fetchedBotName != null && fetchedBotName.isNotEmpty) {
         _botName = fetchedBotName;
+      }
+
+      // Resolve info card strings dynamically from CRM init data if present
+      final fetchedCardAction = tenantConfig['cardActionLabel']?.toString() ??
+          tenantConfig['cardActionText']?.toString() ??
+          tenantConfig['infoCardActionLabel']?.toString();
+      if (fetchedCardAction != null && fetchedCardAction.isNotEmpty) {
+        _cardActionLabel = fetchedCardAction;
+      }
+
+      final fetchedBannerTitle = tenantConfig['cardBannerTitle']?.toString() ??
+          tenantConfig['infoCardBannerTitle']?.toString();
+      if (fetchedBannerTitle != null && fetchedBannerTitle.isNotEmpty) {
+        _cardBannerTitle = fetchedBannerTitle;
       }
 
       final welcome =

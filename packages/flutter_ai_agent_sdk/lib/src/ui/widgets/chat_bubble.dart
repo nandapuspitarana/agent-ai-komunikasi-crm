@@ -33,6 +33,9 @@ class ChatBubble extends StatelessWidget {
       onSubmitForm;
 
   final LeadFormStrings formStrings;
+  final InfoCardStrings cardStrings;
+  final String? cardActionLabel;
+  final String? cardBannerTitle;
 
   /// Show the sender's name above bot/agent bubbles (as the web widget does).
   final bool showSenderName;
@@ -48,6 +51,9 @@ class ChatBubble extends StatelessWidget {
     this.onOptionSelected,
     this.onSubmitForm,
     this.formStrings = const LeadFormStrings(),
+    this.cardStrings = const InfoCardStrings(),
+    this.cardActionLabel,
+    this.cardBannerTitle,
     this.showSenderName = true,
   });
 
@@ -114,7 +120,13 @@ class ChatBubble extends StatelessWidget {
           // Info Card Embed
           if (message.type == ResponseType.card && message.card != null)
             InfoCardView(
-                card: message.card!, theme: theme, onLaunchUrl: onLaunchUrl),
+              card: message.card!,
+              theme: theme,
+              onLaunchUrl: onLaunchUrl,
+              strings: cardStrings,
+              actionLabel: cardActionLabel,
+              bannerTitle: cardBannerTitle,
+            ),
 
           // Lead form (the CRM Form Builder's form-card)
           if (_hasForm)

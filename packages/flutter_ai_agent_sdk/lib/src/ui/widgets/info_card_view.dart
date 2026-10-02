@@ -2,16 +2,33 @@ import 'package:flutter/material.dart';
 import '../../models/card_payload.dart';
 import '../theme/ai_chat_theme.dart';
 
+/// User-facing strings of [InfoCardView]; override them to localise or customize per tenant.
+class InfoCardStrings {
+  final String actionLabel;
+  final String bannerTitle;
+
+  const InfoCardStrings({
+    this.actionLabel = 'View Location Details',
+    this.bannerTitle = 'Featured Information',
+  });
+}
+
 class InfoCardView extends StatelessWidget {
   final CardPayload card;
   final AiChatTheme theme;
   final ValueChanged<String>? onLaunchUrl;
+  final InfoCardStrings strings;
+  final String? actionLabel;
+  final String? bannerTitle;
 
   const InfoCardView({
     super.key,
     required this.card,
     required this.theme,
     this.onLaunchUrl,
+    this.strings = const InfoCardStrings(),
+    this.actionLabel,
+    this.bannerTitle,
   });
 
   @override
@@ -23,6 +40,18 @@ class InfoCardView extends StatelessWidget {
     final bannerBg = isDark ? const Color(0xFF2B2317) : Colors.amber.shade50;
     final bannerTextColor = isDark ? Colors.amber.shade300 : Colors.amber.shade900;
     final bannerIconColor = isDark ? Colors.amber.shade400 : Colors.amber.shade800;
+
+    final effectiveBanner = (card.bannerTitle != null && card.bannerTitle!.isNotEmpty)
+        ? card.bannerTitle!
+        : (bannerTitle != null && bannerTitle!.isNotEmpty)
+            ? bannerTitle!
+            : strings.bannerTitle;
+
+    final effectiveAction = (card.actionLabel != null && card.actionLabel!.isNotEmpty)
+        ? card.actionLabel!
+        : (actionLabel != null && actionLabel!.isNotEmpty)
+            ? actionLabel!
+            : strings.actionLabel;
 
     return Container(
       margin: const EdgeInsets.only(top: 8),
@@ -54,7 +83,7 @@ class InfoCardView extends StatelessWidget {
                   Icon(Icons.apartment_rounded, color: bannerIconColor, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'Featured Information',
+                    effectiveBanner,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -99,7 +128,7 @@ class InfoCardView extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Lihat Detail Lokasi',
+                              effectiveAction,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,

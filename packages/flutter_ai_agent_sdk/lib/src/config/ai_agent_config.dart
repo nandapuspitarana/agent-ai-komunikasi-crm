@@ -30,6 +30,14 @@ class AiAgentConfig {
   /// Shown next to a lead form when submitting failed.
   final String formErrorMessage;
 
+  /// Action label on info cards (e.g. 'View Location Details' or 'Lihat Detail Lokasi').
+  /// If null, defaults to 'View Location Details' or tenant-configured text.
+  final String? cardActionLabel;
+
+  /// Top header banner title on info cards (e.g. 'Featured Information').
+  /// If null, defaults to 'Featured Information' or tenant-configured text.
+  final String? cardBannerTitle;
+
   const AiAgentConfig({
     required this.apiUrl,
     required this.tenantId,
@@ -42,6 +50,8 @@ class AiAgentConfig {
         'Thank you! Your details have been submitted. Our team will contact you soon.',
     this.formErrorMessage =
         'Failed to submit the form. Please check your connection and try again.',
+    this.cardActionLabel,
+    this.cardBannerTitle,
   });
 
   /// Sanitizes the base API URL to remove trailing slashes.
