@@ -550,6 +550,13 @@ function AgentBuilderContent() {
     if (intents && intents.length > 0) {
       let maxMatchLength = 0;
       for (const intent of intents) {
+        const intentNameLower = (intent.name || '').toLowerCase().trim();
+        if (lowerMsg === intentNameLower) {
+          matchedIntent = intent;
+          maxMatchLength = Infinity;
+          break;
+        }
+
         if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
         for (const phrase of intent.trainingPhrases) {
           const lowerPhrase = phrase.toLowerCase().trim();

@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
       let maxMatchLength = 0;
       
       for (const intent of flow.intents) {
+        const lowerIntentName = (intent.name || '').toLowerCase().trim();
+        if (lowerMsg === lowerIntentName) {
+          bestMatch = intent;
+          maxMatchLength = Infinity;
+          break;
+        }
+
         if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
         
         for (const phrase of intent.trainingPhrases) {

@@ -280,7 +280,6 @@ class ChatBubble extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           materialTapTargetSize: MaterialTapTargetSize.padded,
-          tooltip: opt.label,
           onPressed: canTap ? () => onOptionSelected!(opt) : null,
         ),
       ),

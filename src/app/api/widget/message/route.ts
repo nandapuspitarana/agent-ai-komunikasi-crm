@@ -243,6 +243,13 @@ export async function POST(req: NextRequest) {
       let maxMatchLength = 0;
       
       for (const intent of effectiveFlow.intents) {
+        const lowerIntentName = (intent.name || '').toLowerCase().trim();
+        if (userMsgLower === lowerIntentName) {
+          qnaMatch = intent;
+          maxMatchLength = Infinity;
+          break;
+        }
+
         if (!intent.trainingPhrases || !Array.isArray(intent.trainingPhrases)) continue;
         
         for (const phrase of intent.trainingPhrases) {

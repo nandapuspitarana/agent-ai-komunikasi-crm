@@ -273,7 +273,6 @@ export function ChatUI({
                       disabled={isTyping || status === 'closed'}
                       className="px-3 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-brand/30 transition-colors shadow-sm disabled:opacity-50"
                       style={{ borderColor: config.primaryColor + '40', color: config.primaryColor }}
-                      title={pipeIdx !== -1 ? `Sends: ${value}` : undefined}
                     >
                       {label}
                     </button>
