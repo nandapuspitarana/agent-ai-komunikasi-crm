@@ -41,18 +41,31 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const sessionId = searchParams.get('sessionId');
+    const contactId = searchParams.get('contactId');
+    const tenantId = searchParams.get('tenantId');
     const after = searchParams.get('after');
 
-    if (!sessionId) {
+    if (!sessionId && !(contactId && tenantId)) {
       return corsResponse(
-        { error: 'Missing required query parameter: sessionId' },
+        { error: 'Missing required query parameter: sessionId or (contactId and tenantId)' },
         { status: 400 }
       );
     }
 
-    const session = await prisma.chatSession.findUnique({
-      where: { id: sessionId },
-    });
+    let session = sessionId && !sessionId.startsWith('session_')
+      ? await prisma.chatSession.findUnique({ where: { id: sessionId } })
+      : null;
+
+    if (!session && contactId && tenantId) {
+      session = await prisma.chatSession.findFirst({
+        where: {
+          tenantId,
+          contactId,
+          status: { in: ['agent', 'queue', 'bot'] }
+        },
+        orderBy: { updatedAt: 'desc' }
+      });
+    }
 
     if (!session) {
       return corsResponse(

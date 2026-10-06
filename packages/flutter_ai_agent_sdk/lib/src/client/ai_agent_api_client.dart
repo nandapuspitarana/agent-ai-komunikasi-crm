@@ -71,11 +71,14 @@ class AiAgentApiClient {
   /// Allows the client to receive human agent replies and status updates asynchronously.
   Future<Map<String, dynamic>> syncMessages({
     required String sessionId,
+    String? contactId,
     String? after,
   }) async {
     final uri = Uri.parse('${config.sanitizedApiUrl}/api/widget/message').replace(
       queryParameters: {
         'sessionId': sessionId,
+        'tenantId': config.tenantId,
+        if (contactId != null && contactId.isNotEmpty) 'contactId': contactId,
         if (after != null && after.isNotEmpty) 'after': after,
       },
     );

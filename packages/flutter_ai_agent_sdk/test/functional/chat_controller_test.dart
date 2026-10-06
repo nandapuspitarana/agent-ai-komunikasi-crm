@@ -221,7 +221,10 @@ void main() {
     });
 
     test('TEST-AI-U18: syncMessages fetches human agent reply and updates status and responder name', () async {
-      when(() => mockApiClient.syncMessages(sessionId: any(named: 'sessionId'))).thenAnswer(
+      when(() => mockApiClient.syncMessages(
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+          )).thenAnswer(
         (_) async => {
           'success': true,
           'sessionId': 'canonical_session_uuid_123',

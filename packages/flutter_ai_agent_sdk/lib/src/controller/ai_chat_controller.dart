@@ -67,6 +67,9 @@ class AiChatController extends ChangeNotifier {
     _messages = List.from(messages);
     if (sessionId != null && sessionId.isNotEmpty) {
       _sessionId = sessionId;
+      if (!sessionId.startsWith('session_')) {
+        _serverSessionId = sessionId;
+      }
     }
     _isInitialized = true;
     for (final m in messages.reversed) {
@@ -490,6 +493,7 @@ class AiChatController extends ChangeNotifier {
   void startPolling({Duration? interval}) {
     final pollInterval = interval ?? config.pollingInterval;
     _pollTimer?.cancel();
+    syncMessages();
     _pollTimer = Timer.periodic(pollInterval, (_) {
       syncMessages();
     });
@@ -504,12 +508,21 @@ class AiChatController extends ChangeNotifier {
   /// Syncs session state and incoming messages from the server.
   Future<void> syncMessages() async {
     final activeSessionId = _serverSessionId ?? (_sessionId.startsWith('session_') ? null : _sessionId);
-    if (activeSessionId == null || activeSessionId.isEmpty) return;
+    if ((activeSessionId == null || activeSessionId.isEmpty) && (contactId == null || contactId!.isEmpty)) return;
     if (_isSyncing) return;
 
     _isSyncing = true;
     try {
-      final syncData = await apiClient.syncMessages(sessionId: activeSessionId);
+      final syncData = await apiClient.syncMessages(
+        sessionId: activeSessionId ?? _sessionId,
+        contactId: contactId,
+      );
+      final confirmedSessionId = syncData['sessionId']?.toString();
+      if (confirmedSessionId != null && confirmedSessionId.isNotEmpty) {
+        _sessionId = confirmedSessionId;
+        _serverSessionId = confirmedSessionId;
+      }
+
       final status = syncData['status']?.toString();
       final agentName = syncData['assignedAgentName']?.toString();
       final rawMessages = syncData['messages'] as List<dynamic>? ?? [];
