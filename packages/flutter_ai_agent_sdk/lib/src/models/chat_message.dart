@@ -133,6 +133,41 @@ class ChatMessage {
     );
   }
 
+  /// Factory for constructing a message from the server sync/polling response.
+  factory ChatMessage.fromSyncJson(Map<String, dynamic> json, {String? defaultAgentName}) {
+    final id = json['id']?.toString() ?? 'msg_${DateTime.now().millisecondsSinceEpoch}';
+    final senderType = (json['senderType']?.toString() ?? json['sender']?.toString() ?? 'bot').toLowerCase();
+    final rawText = json['content']?.toString() ?? json['text']?.toString() ?? '';
+    final createdAtStr = json['createdAt']?.toString() ?? json['timestamp']?.toString();
+    final timestamp = createdAtStr != null
+        ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+        : DateTime.now();
+
+    final MessageSender sender;
+    if (senderType == 'user') {
+      sender = MessageSender.user;
+    } else if (senderType == 'agent') {
+      sender = MessageSender.agent;
+    } else {
+      sender = MessageSender.bot;
+    }
+
+    final isHandoff = sender == MessageSender.agent;
+    final senderName = json['senderName']?.toString() ??
+        (sender == MessageSender.agent ? (defaultAgentName ?? 'Live Support') : null);
+
+    return ChatMessage(
+      id: id,
+      sender: sender,
+      senderName: senderName,
+      text: rawText.replaceAll('[HANDOFF_REQUESTED]', '').trim(),
+      timestamp: timestamp,
+      status: MessageStatus.sent,
+      isHandoff: isHandoff,
+      sessionId: json['sessionId']?.toString(),
+    );
+  }
+
   /// Creates a copy of this message with updated status.
   ChatMessage copyWith({
     String? text,

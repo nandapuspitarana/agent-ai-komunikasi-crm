@@ -7,6 +7,7 @@ const prismaMock = vi.hoisted(() => ({
   message: { create: vi.fn(), findMany: vi.fn() },
   knowledgeDocument: { findMany: vi.fn() },
   visitorProfile: { update: vi.fn() },
+  user: { findUnique: vi.fn() },
 }));
 vi.mock('@/lib/prisma', () => ({ prisma: prismaMock }));
 vi.mock('@/lib/ai-agent', () => ({ chatWithAgent: vi.fn().mockResolvedValue({ reply: 'LLM reply' }) }));
@@ -17,7 +18,7 @@ vi.mock('@/lib/visitor-service', () => ({
   shouldTriggerLeadForm: vi.fn().mockResolvedValue(false),
 }));
 
-import { POST } from '@/app/api/widget/message/route';
+import { POST, GET } from '@/app/api/widget/message/route';
 
 const intent = (over: any = {}) => ({
   name: 'Rooms',
@@ -151,3 +152,57 @@ describe('POST /api/widget/message — quick reply options', () => {
     expect(json.reply).not.toContain('[HANDOFF_REQUESTED]');
   });
 });
+
+describe('GET /api/widget/message — polling and sync', () => {
+  it('returns 400 when sessionId is missing', async () => {
+    const res = await GET(new NextRequest('http://localhost/api/widget/message'));
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toContain('sessionId');
+  });
+
+  it('returns 404 when session does not exist', async () => {
+    prismaMock.chatSession.findUnique.mockResolvedValue(null);
+    const res = await GET(new NextRequest('http://localhost/api/widget/message?sessionId=non-existent'));
+    expect(res.status).toBe(404);
+  });
+
+  it('returns session status, assigned agent name, and messages for valid session', async () => {
+    prismaMock.chatSession.findUnique.mockResolvedValue({
+      id: 's1',
+      status: 'agent',
+      handoffRequested: false,
+      assignedAgentId: 'agent-123',
+    });
+    prismaMock.user.findUnique.mockResolvedValue({ name: 'Nanda Support' });
+    prismaMock.message.findMany.mockResolvedValue([
+      {
+        id: 'm1',
+        sessionId: 's1',
+        senderType: 'user',
+        content: 'Halo saya butuh bantuan',
+        createdAt: new Date('2026-10-06T07:50:00Z'),
+      },
+      {
+        id: 'm2',
+        sessionId: 's1',
+        senderType: 'agent',
+        content: 'Halo, saya Nanda siap membantu.',
+        createdAt: new Date('2026-10-06T07:51:00Z'),
+      },
+    ]);
+
+    const res = await GET(new NextRequest('http://localhost/api/widget/message?sessionId=s1'));
+    expect(res.status).toBe(200);
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.status).toBe('agent');
+    expect(json.assignedAgentName).toBe('Nanda Support');
+    expect(json.messages).toHaveLength(2);
+    expect(json.messages[1].senderType).toBe('agent');
+    expect(json.messages[1].senderName).toBe('Nanda Support');
+    expect(json.messages[1].content).toBe('Halo, saya Nanda siap membantu.');
+  });
+});
+

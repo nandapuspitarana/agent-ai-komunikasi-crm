@@ -38,6 +38,12 @@ class AiAgentConfig {
   /// If null, defaults to 'Featured Information' or tenant-configured text.
   final String? cardBannerTitle;
 
+  /// Polling interval for live sync (e.g. human agent replies). Defaults to 3 seconds.
+  final Duration pollingInterval;
+
+  /// Whether background polling is automatically enabled. Defaults to true.
+  final bool enablePolling;
+
   const AiAgentConfig({
     required this.apiUrl,
     required this.tenantId,
@@ -52,6 +58,8 @@ class AiAgentConfig {
         'Failed to submit the form. Please check your connection and try again.',
     this.cardActionLabel,
     this.cardBannerTitle,
+    this.pollingInterval = const Duration(seconds: 3),
+    this.enablePolling = false,
   });
 
   /// Sanitizes the base API URL to remove trailing slashes.

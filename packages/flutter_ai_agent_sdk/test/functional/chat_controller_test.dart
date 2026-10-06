@@ -219,5 +219,49 @@ void main() {
         'Btw password wifi di sana apa ya?',
       ]));
     });
+
+    test('TEST-AI-U18: syncMessages fetches human agent reply and updates status and responder name', () async {
+      when(() => mockApiClient.syncMessages(sessionId: any(named: 'sessionId'))).thenAnswer(
+        (_) async => {
+          'success': true,
+          'sessionId': 'canonical_session_uuid_123',
+          'status': 'agent',
+          'assignedAgentName': 'Nanda Support',
+          'messages': [
+            {
+              'id': 'agent_msg_1',
+              'senderType': 'agent',
+              'senderName': 'Nanda Support',
+              'content': 'Halo kak, ada yang bisa kami bantu?',
+              'createdAt': DateTime.now().toIso8601String(),
+            }
+          ]
+        },
+      );
+
+      // Set serverSessionId via restoreMessages
+      controller.restoreMessages([
+        ChatMessage(
+          id: 'user_1',
+          sender: MessageSender.user,
+          text: 'Halo',
+          timestamp: DateTime.now(),
+          sessionId: 'canonical_session_uuid_123',
+        )
+      ], sessionId: 'canonical_session_uuid_123');
+
+      expect(controller.messages.length, equals(1));
+      expect(controller.isHandoff, isFalse);
+
+      await controller.syncMessages();
+
+      expect(controller.isHandoff, isTrue);
+      expect(controller.currentAgentName, equals('Nanda Support'));
+      expect(controller.activeResponderName, equals('Nanda Support'));
+      expect(controller.messages.length, equals(2));
+      expect(controller.messages.last.sender, equals(MessageSender.agent));
+      expect(controller.messages.last.senderName, equals('Nanda Support'));
+      expect(controller.messages.last.text, equals('Halo kak, ada yang bisa kami bantu?'));
+    });
   });
 }

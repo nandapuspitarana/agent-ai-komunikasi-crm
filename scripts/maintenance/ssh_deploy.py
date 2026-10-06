@@ -6,11 +6,11 @@ sys.stdout.reconfigure(encoding='utf-8')
 host = "192.168.20.242"
 username = "nanda"
 password = "Sinau314"
-path = "/opt/agent-ai-komunikasi-crm"
+path = "/opt/crm-custom-dashboard"
 
 files_to_upload = [
-    ("src/app/[lang]/(dashboard)/agent/builder/page.tsx", "/tmp/page_builder.tsx"),
-    ("src/components/Providers.tsx", "/tmp/Providers.tsx"),
+    ("src/app/api/widget/message/route.ts", "/tmp/widget_message_route.ts"),
+    ("src/app/api/widget/messages/route.ts", "/tmp/widget_messages_route.ts"),
 ]
 
 try:
@@ -30,8 +30,9 @@ try:
 
     # Move files to correct locations with sudo
     move_cmds = [
-        f"echo {password} | sudo -S mv /tmp/page_builder.tsx \"{path}/src/app/[lang]/(dashboard)/agent/builder/page.tsx\"",
-        f"echo {password} | sudo -S mv /tmp/Providers.tsx \"{path}/src/components/Providers.tsx\"",
+        f"echo {password} | sudo -S mv /tmp/widget_message_route.ts \"{path}/src/app/api/widget/message/route.ts\"",
+        f"echo {password} | sudo -S mkdir -p \"{path}/src/app/api/widget/messages\"",
+        f"echo {password} | sudo -S mv /tmp/widget_messages_route.ts \"{path}/src/app/api/widget/messages/route.ts\"",
     ]
 
     print("\n--- Moving files into place ---")

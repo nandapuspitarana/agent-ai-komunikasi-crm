@@ -1,7 +1,7 @@
 /// Version of this SDK. Released builds are stamped with the CRM's version by the
 /// backend (scripts/build-sdk-package.js); the value here is only the fallback and
 /// must equal `version:` in pubspec.yaml (a test enforces it).
-const String aiAgentSdkVersion = '1.0.26';
+const String aiAgentSdkVersion = '1.0.27';
 
 /// How this SDK compares with what the server considers current.
 enum SdkStatus {

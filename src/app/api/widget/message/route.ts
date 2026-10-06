@@ -32,6 +32,82 @@ function corsResponse(data: any, init?: ResponseInit) {
 
 
 /**
+ * GET /api/widget/message?sessionId=xxx&after=xxx
+ * 
+ * Public endpoint for chat clients (Mobile App SDK, Widget) to poll and sync messages.
+ * Allows asynchronous delivery of human agent replies and session updates.
+ */
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const sessionId = searchParams.get('sessionId');
+    const after = searchParams.get('after');
+
+    if (!sessionId) {
+      return corsResponse(
+        { error: 'Missing required query parameter: sessionId' },
+        { status: 400 }
+      );
+    }
+
+    const session = await prisma.chatSession.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session) {
+      return corsResponse(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    let agentName: string | null = null;
+    if (session.assignedAgentId) {
+      const agentUser = await prisma.user.findUnique({
+        where: { id: session.assignedAgentId },
+        select: { name: true }
+      });
+      agentName = agentUser?.name || 'Agent';
+    }
+
+    const whereClause: any = { sessionId };
+    if (after) {
+      const afterDate = new Date(after);
+      if (!isNaN(afterDate.getTime())) {
+        whereClause.createdAt = { gt: afterDate };
+      }
+    }
+
+    const messages = await prisma.message.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return corsResponse({
+      success: true,
+      sessionId: session.id,
+      status: session.status,
+      handoffRequested: session.handoffRequested,
+      assignedAgentId: session.assignedAgentId,
+      assignedAgentName: agentName,
+      messages: messages.map((m) => ({
+        id: m.id,
+        senderType: m.senderType,
+        senderName: m.senderType === 'agent' ? agentName : (m.senderType === 'bot' ? 'Claire' : undefined),
+        content: m.content,
+        createdAt: m.createdAt.toISOString(),
+      })),
+    });
+  } catch (error) {
+    console.error('[Widget Message Sync API] Error:', error);
+    return corsResponse(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * POST /api/widget/message
  * 
  * Endpoint utama yang menerima pesan dari widget chat.

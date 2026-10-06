@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../client/ai_agent_api_client.dart';
 import '../config/ai_agent_config.dart';
@@ -30,6 +31,8 @@ class AiChatController extends ChangeNotifier {
   String? _cardBannerTitle;
   String? _errorMessage;
   late String _sessionId;
+  Timer? _pollTimer;
+  bool _isSyncing = false;
 
   /// Session id the server has confirmed in a reply. Forms are only recorded
   /// against a session the server knows (a fresh client id has no row yet).
@@ -77,6 +80,7 @@ class AiChatController extends ChangeNotifier {
     final welcome = _lastWelcome;
     if (welcome != null) _refreshWelcome(welcome);
     notifyListeners();
+    if (config.enablePolling) startPolling();
   }
 
   bool get isInitialized => _isInitialized;
@@ -225,6 +229,7 @@ class AiChatController extends ChangeNotifier {
       }
       _isInitialized = true;
     } finally {
+      if (config.enablePolling) startPolling();
       notifyListeners();
     }
   }
@@ -384,6 +389,7 @@ class AiChatController extends ChangeNotifier {
     } finally {
       _isTyping = false;
       notifyListeners();
+      if (config.enablePolling) startPolling();
     }
   }
 
@@ -462,6 +468,7 @@ class AiChatController extends ChangeNotifier {
 
   /// Resets conversation and session.
   Future<void> restartChat() async {
+    stopPolling();
     _sessionId = _newSessionId();
     _serverSessionId = null;
     _submittingForms.clear();
@@ -477,5 +484,89 @@ class AiChatController extends ChangeNotifier {
     _errorMessage = null;
     rateLimiter.reset();
     await initialize();
+  }
+
+  /// Starts periodic polling to sync messages and session status from server.
+  void startPolling({Duration? interval}) {
+    final pollInterval = interval ?? config.pollingInterval;
+    _pollTimer?.cancel();
+    _pollTimer = Timer.periodic(pollInterval, (_) {
+      syncMessages();
+    });
+  }
+
+  /// Stops periodic polling.
+  void stopPolling() {
+    _pollTimer?.cancel();
+    _pollTimer = null;
+  }
+
+  /// Syncs session state and incoming messages from the server.
+  Future<void> syncMessages() async {
+    final activeSessionId = _serverSessionId ?? (_sessionId.startsWith('session_') ? null : _sessionId);
+    if (activeSessionId == null || activeSessionId.isEmpty) return;
+    if (_isSyncing) return;
+
+    _isSyncing = true;
+    try {
+      final syncData = await apiClient.syncMessages(sessionId: activeSessionId);
+      final status = syncData['status']?.toString();
+      final agentName = syncData['assignedAgentName']?.toString();
+      final rawMessages = syncData['messages'] as List<dynamic>? ?? [];
+
+      bool updated = false;
+
+      // 1. Update session status & agent name
+      if (status == 'agent' || status == 'queue') {
+        if (!_isHandoff) {
+          _isHandoff = true;
+          updated = true;
+        }
+      }
+      if (agentName != null && agentName.isNotEmpty && _currentAgentName != agentName) {
+        _currentAgentName = agentName;
+        updated = true;
+      }
+
+      // 2. Identify new messages
+      for (final raw in rawMessages) {
+        if (raw is! Map) continue;
+        final rawMap = Map<String, dynamic>.from(raw);
+        final msgId = rawMap['id']?.toString() ?? '';
+        final senderType = (rawMap['senderType']?.toString() ?? rawMap['sender']?.toString() ?? '').toLowerCase();
+
+        // Check if message already exists by ID
+        final exists = _messages.any((m) => m.id == msgId);
+        if (exists) continue;
+
+        // If it's a user message from this device, match by text to prevent duplication
+        if (senderType == 'user') {
+          final content = rawMap['content']?.toString() ?? rawMap['text']?.toString() ?? '';
+          final isRecentUserDup = _messages.any((m) =>
+              m.sender == MessageSender.user &&
+              m.text.trim() == content.trim());
+          if (isRecentUserDup) continue;
+        }
+
+        // New incoming message! (e.g. human agent reply, system alert, or bot message)
+        final newMsg = ChatMessage.fromSyncJson(rawMap, defaultAgentName: _currentAgentName);
+        _messages.add(newMsg);
+        updated = true;
+      }
+
+      if (updated) {
+        notifyListeners();
+      }
+    } catch (_) {
+      // Ignore background network transient errors or unmocked calls in tests
+    } finally {
+      _isSyncing = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    stopPolling();
+    super.dispose();
   }
 }

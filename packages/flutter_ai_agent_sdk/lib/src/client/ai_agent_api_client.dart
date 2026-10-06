@@ -67,6 +67,37 @@ class AiAgentApiClient {
         jsonDecode(res.body) as Map<String, dynamic>);
   }
 
+  /// Fetches session details and message history from `GET /api/widget/message`.
+  /// Allows the client to receive human agent replies and status updates asynchronously.
+  Future<Map<String, dynamic>> syncMessages({
+    required String sessionId,
+    String? after,
+  }) async {
+    final uri = Uri.parse('${config.sanitizedApiUrl}/api/widget/message').replace(
+      queryParameters: {
+        'sessionId': sessionId,
+        if (after != null && after.isNotEmpty) 'after': after,
+      },
+    );
+
+    final http.Response res;
+    try {
+      res = await _httpClient.get(uri, headers: _headers).timeout(config.timeout);
+    } catch (e) {
+      throw AiAgentApiException('Network connection failure: $e');
+    }
+
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw AiAgentApiException(
+        'Server returned error: ${res.statusCode}',
+        statusCode: res.statusCode,
+        details: res.body,
+      );
+    }
+
+    return jsonDecode(res.body) as Map<String, dynamic>;
+  }
+
   /// Sends a chat message to the agent.
   /// Returns the bot reply as a [ChatMessage].
   Future<ChatMessage> sendMessage({
