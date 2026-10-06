@@ -32,11 +32,28 @@
           "pertanyaan umum",
           "help faq",
           "list of questions",
-          "CS: FAQ Menu"
+          "CS: FAQ Menu",
+          "FAQ Menu"
         ],
         "responseType": "options",
-        "response": "Here are our most frequently asked questions. Select a topic below to see answers:",
-        "options": "What is a Serviced Office|FAQ: What is a Serviced Office, Coworking vs Dedicated Desk|FAQ: Coworking vs Dedicated Desk, What is a Virtual Office|FAQ: What is a Virtual Office, How to book a Meeting Room|FAQ: How to Book a Meeting Room, Upgrade or Downgrade Plan|FAQ: Upgrade or Downgrade Plan, Wi-Fi & Internet Support|Facilities: Wi-Fi & Internet Connectivity, Main Menu|Start / Main Menu",
+        "response": "Here are the most frequently asked questions about CEO SUITE services, workspaces, and facilities. Please choose a topic below:",
+        "options": "What is a Serviced Office|FAQ: What is a Serviced Office, Coworking & Shared Office|FAQ: What is a Coworking Space, What is a Virtual Office|FAQ: What is a Virtual Office, Book a Meeting Room|FAQ: How to Book a Meeting Room, Event Staff & Catering|FAQ: Event Staffing & Meeting Assistance, Why Choose CEO SUITE|FAQ: Why Choose CEO SUITE, More FAQ Topics|CS: FAQ More Topics, Main Menu|Start / Main Menu",
+        "metadata": {
+          "category": "FAQ"
+        }
+      },
+      {
+        "name": "CS: FAQ More Topics",
+        "trainingPhrases": [
+          "more faq topics",
+          "other faqs",
+          "more questions",
+          "additional faq",
+          "CS: FAQ More Topics"
+        ],
+        "responseType": "options",
+        "response": "Here are additional frequently asked questions from our official FAQ knowledge base:",
+        "options": "Why Need Serviced Office|FAQ: Why Would I Need a Serviced Office, Serviced vs Traditional Lease|FAQ: Why Serviced Office vs Traditional, Why Need Virtual Office|FAQ: Why Would I Need a Virtual Office, Upgrade or Downgrade Plan|FAQ: Upgrade or Downgrade Plan, Early Setup & After-Hours|FAQ: Early Setup & After-Hours Meeting, Meeting AV & Equipment|FAQ: Presentation Equipment & Technical Assistance, Wi-Fi & Internet Support|Facilities: Wi-Fi & Internet Connectivity, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -141,8 +158,27 @@
           "FAQ: What is a Serviced Office"
         ],
         "responseType": "options",
-        "response": "<b>What is a Serviced Office?</b><br/><br/>Also known as managed offices, business centers, or executive suites, serviced offices provide fully-equipped, ready-to-use office facilities managed by CEO SUITE. They empower businesses—from solo entrepreneurs to SMEs and multinational corporations—to rent workspace customizable to their exact size, accommodating from 1 to 50+ persons with flexible terms.",
-        "options": "Why Serviced Office vs Traditional|FAQ: Why Serviced Office vs Traditional, Other Centres & Locations|Locations: Select City, Main Menu|Start / Main Menu",
+        "response": "<b>What is a serviced office?</b><br/><br/>Also known as managed offices, business centers and executive suites, serviced offices provide fully-equipped facilities managed by a service facility management company. They empower businesses, from start-ups to small-, medium-sized enterprises and large-scale companies to rent office spaces that are suitable and customizable to their needs. Naturally, a serviced office room can cater to as few as one individual and as many as 20 persons.",
+        "options": "Why Need Serviced Office|FAQ: Why Would I Need a Serviced Office, Value vs Traditional Office|FAQ: Why Serviced Office vs Traditional, Explore Private Offices|Direct: Private Office, FAQ Menu|CS: FAQ Menu",
+        "metadata": {
+          "category": "FAQ"
+        }
+      },
+      {
+        "name": "FAQ: Why Would I Need a Serviced Office",
+        "trainingPhrases": [
+          "why would i need a serviced office",
+          "why do i need a serviced office",
+          "kenapa butuh serviced office",
+          "benefits of serviced office",
+          "keuntungan serviced office",
+          "why choose serviced office",
+          "FAQ: Why Would I Need a Serviced Office",
+          "Why Need Serviced Office"
+        ],
+        "responseType": "options",
+        "response": "<b>Why would I need a serviced office?</b><br/><br/>With minimal to no capital investment needed in leasing a serviced office, you can enjoy immediate access to fully furnished and well-equipped office without losing time and focus on growing your business. This modern approach to office space provides a complete business solution, and is increasingly popular with small firms and start-ups. However, due to serviced offices’ complete and fully-equipped nature, even large-scale companies find that business support services have considerable appeal.",
+        "options": "Value vs Traditional Office|FAQ: Why Serviced Office vs Traditional, What is a Serviced Office|FAQ: What is a Serviced Office, Explore Private Offices|Direct: Private Office, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -157,11 +193,13 @@
           "perbedaan serviced office dan kantor biasa",
           "kenapa serviced office lebih hemat",
           "traditional office comparison",
-          "FAQ: Why Serviced Office vs Traditional"
+          "FAQ: Why Serviced Office vs Traditional",
+          "Serviced vs Traditional Lease",
+          "Value vs Traditional Office"
         ],
         "responseType": "options",
-        "response": "<b>Are serviced offices better value than traditional office space?</b><br/><br/>Traditional office leases often require heavy capital expenditure: interior renovation, furniture, IT infrastructure, phone lines, and ongoing utility bills.<br/><br/>A CEO SUITE serviced office eliminates upfront capital investment. Rent includes high-speed internet, premium ergonomic furniture, utilities, daily cleaning, front desk receptionist services, and business lounge access, saving both time and money.",
-        "options": "What is a Serviced Office|FAQ: What is a Serviced Office, Explore Private Offices|Direct: Private Office, Main Menu|Start / Main Menu",
+        "response": "<b>Are serviced offices better value than traditional office space?</b><br/><br/>This really depends on several varying factors, such as location, building facilities and the included amenities. On its own, traditional office space may be less expensive than serviced offices but you’d only be getting an empty space.<br/><br/>Additional expenses with traditional office space usually include overheads such as building dues, electricity, office space set-up, IT set-up, office furniture, telephone lines and office space interiors. Serviced office spaces are offered at a higher price because they already include all of these costs. Most importantly, serviced office spaces buy you more time for your business so you can focus on the more important matters and keep your business running smoothly.",
+        "options": "What is a Serviced Office|FAQ: What is a Serviced Office, Why Choose CEO SUITE|FAQ: Why Choose CEO SUITE, Explore Private Offices|Direct: Private Office, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -178,8 +216,31 @@
           "FAQ: Why Choose CEO SUITE"
         ],
         "responseType": "options",
-        "response": "<b>Why Choose CEO SUITE?</b><br/><br/>CEO SUITE is Asia’s only one-stop Serviced Office Provider run by multicultural industry experts for over 29 years. Located in the most prestigious Grade-A landmark buildings across 9 Asian countries, we provide an unparalleled range of services—from premium workspace to company registration, accounting, and IT support. Joining one CEO SUITE centre gives you access across our regional network.",
-        "options": "Our Centres & Locations|Locations: Select City, Business Support Services|Services: Business Support Overview, Main Menu|Start / Main Menu",
+        "response": "<b>Why choose CEO SUITE?</b><br/><br/>We’re Asia’s only one-stop Serviced Office Provider, run by multi-cultural industry experts. For more than 29 years, our predominantly female team have provided premium workplace solutions at reasonable rates, helping businesses of all sizes to expand throughout Asia with a minimum of culture shock.<br/><br/>Located in some of the most prestigious buildings in the Asia-Pacific region, we offer an unparalleled range of services, from sourcing the right local business partners to legal accounting, payroll and IT. We leverage our broad connections and experience to enable you to make an impact in a region where every city has its own regulations, culture and ways of conducting business. By joining one CEO SUITE location, you are supported at our premium locations across Asia.",
+        "options": "Our Centres & Locations|Locations: Select City, Business Support Services|Services: Business Support Overview, FAQ Menu|CS: FAQ Menu",
+        "metadata": {
+          "category": "FAQ"
+        }
+      },
+      {
+        "name": "FAQ: What is a Coworking Space",
+        "trainingPhrases": [
+          "what is a co-working space, or shared office",
+          "what is a coworking space, or shared office",
+          "what is a coworking space",
+          "what is a co-working space",
+          "what is shared office",
+          "apa itu coworking space",
+          "do i need a co-working space",
+          "do i need a coworking space",
+          "why choose coworking",
+          "FAQ: What is a Coworking Space",
+          "Coworking & Shared Office",
+          "What is Coworking Space"
+        ],
+        "responseType": "options",
+        "response": "<b>What is a co-working space, or shared office?</b><br/><br/>In a nutshell, the term refers to a space that provides fully equipped and fully furnished workstations that are ready for use and perfect for entrepreneurs and freelancers who choose not to work from home, and/or branch office/s. Co-working spaces are offered at a much lower price than traditional working spaces and offer more flexibility with daily, weekly and monthly access. Facilities such as mail handling, telephone, internet and admin support can all be made available.<br/><br/><b>Do I need a co-working space?</b><br/>For many entrepreneurs, working from home can be a lonely experience. Co-working environments provide networking opportunities with other business owners and professional freelancers, resource sharing, and cost-effective flexibility to scale up or down without long-term commitments.",
+        "options": "Coworking vs Dedicated Desk|FAQ: Coworking vs Dedicated Desk, Explore Coworking|Direct: Coworking, Explore Dedicated Desk|Direct: Dedicated Workstation, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -187,17 +248,18 @@
       {
         "name": "FAQ: Coworking vs Dedicated Desk",
         "trainingPhrases": [
+          "what are the differences between standard co-working space and a dedicated workstation",
+          "what are the differences between standard coworking space and a dedicated workstation",
           "what is the difference between standard coworking space and a dedicated workstation",
           "coworking vs dedicated workstation",
           "coworking vs dedicated desk",
           "hot desk vs dedicated desk",
           "perbedaan coworking dan dedicated desk",
-          "apa itu shared office",
           "FAQ: Coworking vs Dedicated Desk"
         ],
         "responseType": "options",
-        "response": "<b>Coworking Space vs Dedicated Workstation:</b><br/><br/>• <b>Coworking (Hot Desk):</b> Access to unassigned work desks in shared business lounges during office hours. Flexible by day, week, or month.<br/>• <b>Dedicated Workstation:</b> Greater exclusivity with an assigned personal desk reserved just for you, including 24/7 access, locking storage, and permanent setup.",
-        "options": "Coworking Details|Direct: Coworking, Dedicated Desk Details|Direct: Dedicated Workstation, Main Menu|Start / Main Menu",
+        "response": "<b>What are the differences between standard co-working space and a dedicated workstation?</b><br/><br/>• <b>Co-working Space:</b> Available by the day, week and month during office hours. A co-working client has access to either an unassigned work desk or workspace in a common area such as a business lounge with high-speed internet access.<br/>• <b>Dedicated Workstation:</b> Offers greater exclusivity, with <b>24/7 access</b> to their own assigned workspace, personal storage, and permanent setup.",
+        "options": "What is Coworking Space|FAQ: What is a Coworking Space, Dedicated Desk Details|Direct: Dedicated Workstation, Coworking Details|Direct: Coworking, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -213,8 +275,27 @@
           "FAQ: What is a Virtual Office"
         ],
         "responseType": "options",
-        "response": "<b>What is a Virtual Office?</b><br/><br/>A virtual office gives your company a prestigious CBD business address and complete administrative support without renting physical office space. It includes mail & package handling, dedicated telephone answering by our professional team, and member discounts on meeting room bookings.",
-        "options": "Company Registration FAQ|FAQ: Virtual Office Company Registration, Upgrade or Downgrade Plan|FAQ: Upgrade or Downgrade Plan, Explore Virtual Office|Direct: Virtual Office, Main Menu|Start / Main Menu",
+        "response": "<b>What is a virtual office?</b><br/><br/>A virtual office is a substitute for the traditional work environment, and delivers results through the web, telephone and other technologies. Virtual offices operate without any actual physical office space; all operations (whether internal or external business processes and communication) are performed via the Internet and phone lines. Employee(s) work remotely and perform daily office tasks with the use of software and application tools dependent on the Internet. Most virtual offices offer a prestigious business address for postal communication and secretarial support.",
+        "options": "Why Need Virtual Office|FAQ: Why Would I Need a Virtual Office, Company Registration FAQ|FAQ: Virtual Office Company Registration, Upgrade or Downgrade Plan|FAQ: Upgrade or Downgrade Plan, Explore Virtual Office|Direct: Virtual Office, FAQ Menu|CS: FAQ Menu",
+        "metadata": {
+          "category": "FAQ"
+        }
+      },
+      {
+        "name": "FAQ: Why Would I Need a Virtual Office",
+        "trainingPhrases": [
+          "why would i need a virtual office",
+          "why do i need a virtual office",
+          "kenapa butuh virtual office",
+          "manfaat virtual office",
+          "reasons for virtual office",
+          "virtual office benefits",
+          "FAQ: Why Would I Need a Virtual Office",
+          "Why Need Virtual Office"
+        ],
+        "responseType": "options",
+        "response": "<b>Why would I need a virtual office?</b><br/><br/>Although a virtual office is not a universal solution for every business, there are many good reasons why it makes sense to consider getting one:<br/><br/>• <b>Lean Start-ups:</b> Testing the waters with minimal capital. Establishing a virtual office gives you the advantage of a prestigious CBD business address to present to clients and prospects.<br/>• <b>SMEs:</b> Helps lower overheads by eliminating the cost of a physical office for small teams.<br/>• <b>International Expansion:</b> When exploring a new market across Asia, a virtual office provides an instant local presence with zero operational friction.",
+        "options": "Company Registration FAQ|FAQ: Virtual Office Company Registration, What is a Virtual Office|FAQ: What is a Virtual Office, Explore Virtual Office|Direct: Virtual Office, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -228,12 +309,12 @@
           "incorporation with virtual office",
           "domisili perusahaan virtual office",
           "register business address",
-          "FAQ: Virtual Office Company Registration",
-          "Company Registration FAQ"
+          "Company Registration FAQ",
+          "FAQ: Virtual Office Company Registration"
         ],
         "responseType": "options",
         "response": "<b>Can I use a Virtual Office for Company Registration?</b><br/><br/>Yes, in many jurisdictions CEO SUITE virtual office addresses can be utilized as a registered business address or domicile for company incorporation, subject to local statutory guidelines.<br/><br/>Our professional Corporate Services team also assists with company registration, licensing, tax registration, and legal compliance across Asia.",
-        "options": "Company Registration Services|Services: Professional Services & Company Registration, Virtual Office Plans|Direct: Virtual Office, Main Menu|Start / Main Menu",
+        "options": "Corporate Services|Services: Professional Services & Company Registration, Explore Virtual Office|Direct: Virtual Office, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -241,18 +322,18 @@
       {
         "name": "FAQ: Upgrade or Downgrade Plan",
         "trainingPhrases": [
+          "can i upgrade my virtual office to a serviced office with ceo suite",
           "can i upgrade my virtual office to a serviced office",
           "can i upgrade or downgrade my plan",
           "upgrade or downgrade plan",
           "package change & flexibility",
           "bisakah upgrade paket",
-          "ubah sewa kantor",
           "switch from virtual office to serviced office",
           "FAQ: Upgrade or Downgrade Plan"
         ],
         "responseType": "options",
-        "response": "<b>Can I upgrade or customize my package?</b><br/><br/>Yes, absolutely! CEO SUITE welcomes package upgrades, additions, or adjustments as your business requirements evolve. You can easily transition from a Virtual Office to a Dedicated Desk or Private Office, or scale up your team capacity with minimal administrative hassle.",
-        "options": "Speak to CS Agent|CS: Speak to Human Agent / Live Support, Billing & Payments|CS: Billing & Payment Overview, Main Menu|Start / Main Menu",
+        "response": "<b>Can I upgrade my virtual office to a serviced office with CEO SUITE?</b><br/><br/>Yes, you can. In fact, CEO SUITE welcomes upgrades and downgrades of your availed package. One of the things that separates us from our competitors is that our clients can customize their office solutions in accordance with their changing requirements.",
+        "options": "Speak to CS Agent|CS: Speak to Human Agent / Live Support, Billing & Payments|CS: Billing & Payment Overview, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -266,11 +347,13 @@
           "book conference room",
           "meeting room reservation",
           "sewa ruang rapat",
-          "FAQ: How to Book a Meeting Room"
+          "FAQ: How to Book a Meeting Room",
+          "Book a Meeting Room",
+          "How to Book Meeting Room"
         ],
         "responseType": "options",
-        "response": "<b>How can I book a Meeting Room?</b><br/><br/>You can reserve meeting rooms and conference facilities through:<br/>1. Online portal at <a href='https://booking.ceosuite.com' target='_blank'>booking.ceosuite.com</a><br/>2. Contacting your local CEO SUITE centre reception directly via phone or WhatsApp.<br/>3. WeChat (China locations).<br/><br/>Please inform our team of your preferred date, time, participant headcount, and AV/catering needs.",
-        "options": "Meeting Room AV & Equipment|FAQ: Presentation Equipment & Technical Assistance, Early Setup & After-Hours Meeting|FAQ: Early Setup & After-Hours Meeting, Meeting Facilities|Direct: Meeting Room, Main Menu|Start / Main Menu",
+        "response": "<b>How can I book a venue?</b><br/><br/>There are several different ways to book a venue with us:<br/>• <b>Online:</b> Via our booking portal at <a href='https://booking.ceosuite.com' target='_blank'>booking.ceosuite.com</a><br/>• <b>Phone or Email:</b> Contact our business center reception directly.<br/>• <b>WeChat:</b> (China locations only)<br/><br/><b>When making your booking, please tell us:</b><br/>• Your name and business name<br/>• Date and time of event<br/>• Number of participants<br/>• Equipment and setup requirements<br/>• Any other pertinent information regarding your event.",
+        "options": "Early Setup & After-Hours|FAQ: Early Setup & After-Hours Meeting, Meeting AV & Equipment|FAQ: Presentation Equipment & Technical Assistance, Event Staff & Catering|FAQ: Event Staffing & Meeting Assistance, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -279,17 +362,19 @@
         "name": "FAQ: Early Setup & After-Hours Meeting",
         "trainingPhrases": [
           "can i get access to the venue early to set-up",
-          "early setup meeting room",
+          "can i get access to the venue early to setup",
+          "can my event go beyond the business hours of your center",
           "can my event go beyond the business hours",
-          "early setup & after-hours meeting",
+          "early setup meeting room",
           "after hours meeting",
           "meeting malam hari ac gedung",
           "setup time meeting room",
-          "FAQ: Early Setup & After-Hours Meeting"
+          "FAQ: Early Setup & After-Hours Meeting",
+          "Early Setup & After-Hours"
         ],
         "responseType": "options",
-        "response": "<b>Meeting Room Leeway & After-Hours Access:</b><br/><br/>• <b>Early Setup:</b> We extend a complimentary <b>30-minute leeway</b> prior to your booking start time for preparation.<br/>• <b>After-Hours Events:</b> Events can extend beyond standard centre hours. Note that centralized building air-conditioning may incur additional building management extension charges after regular hours.",
-        "options": "Meeting Room AV & Equipment|FAQ: Presentation Equipment & Technical Assistance, Catering & Outside Food Policy|FAQ: Catering & Outside Food Policy, Main Menu|Start / Main Menu",
+        "response": "<b>Venue Access: Early Setup & After-Hours Events:</b><br/><br/>• <b>Early Setup:</b> Yes, we extend a complimentary <b>30-minute leeway</b> for all clients. Beyond that, we charge a small one-time admin fee that varies for each center.<br/>• <b>After-Hours Events:</b> Yes. Please note that some of our centers are in buildings with centralized AC systems that automatically turn off after business hours, and additional charges may apply to turn on the AC.",
+        "options": "Meeting AV & Equipment|FAQ: Presentation Equipment & Technical Assistance, Catering & Outside Food Policy|FAQ: Catering & Outside Food Policy, Event Staff & Catering|FAQ: Event Staffing & Meeting Assistance, How to Book Meeting Room|FAQ: How to Book a Meeting Room, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -299,17 +384,19 @@
         "trainingPhrases": [
           "does ceo suite rent out presentation equipment",
           "do you provide technical assistance",
+          "rent presentation equipment",
           "meeting room av & equipment",
           "presentation equipment & av",
           "sewa proyektor layar",
           "av equipment rental",
           "bantuan teknis meeting",
           "it specialist on site",
-          "FAQ: Presentation Equipment & Technical Assistance"
+          "FAQ: Presentation Equipment & Technical Assistance",
+          "Meeting AV & Equipment"
         ],
         "responseType": "options",
-        "response": "<b>Presentation Equipment & Technical Support:</b><br/><br/>• <b>Equipment Rental:</b> High-definition displays, projectors, conference speakerphones, video conferencing cameras, and flipcharts/whiteboards are available in-house.<br/>• <b>Technical Assistance:</b> Our on-site IT specialists and assistants are available to help configure presentation gear, connect laptops, and test video calls prior to your event.",
-        "options": "Wi-Fi & Internet Support|Facilities: Wi-Fi & Internet Connectivity, Catering & Outside Food Policy|FAQ: Catering & Outside Food Policy, Main Menu|Start / Main Menu",
+        "response": "<b>Presentation Equipment & Technical Assistance:</b><br/><br/>• <b>Equipment Rental:</b> Yes, we have in-house presentation equipment available for rent (projectors, large screens, conference speakerphones, video conferencing).<br/>• <b>Technical Assistance:</b> Yes, we’ll help out in whatever way we can to make your event a success. Our IT specialists and/or office assistants can help in setting-up any presentation equipment.",
+        "options": "Wi-Fi & Internet Support|Facilities: Wi-Fi & Internet Connectivity, Event Staff & Catering|FAQ: Event Staffing & Meeting Assistance, Early Setup & After-Hours|FAQ: Early Setup & After-Hours Meeting, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -324,11 +411,33 @@
           "bawa makanan dari luar",
           "corkage fee",
           "snack meeting",
-          "FAQ: Catering & Outside Food Policy"
+          "FAQ: Catering & Outside Food Policy",
+          "Catering & Outside Food"
         ],
         "responseType": "options",
-        "response": "<b>Catering & Beverage Policy:</b><br/><br/>• <b>In-House Catering:</b> Our team can coordinate gourmet coffee breaks, lunches, and snack menus tailored to your preferences.<br/>• <b>Outside Food:</b> You may bring your own catering or beverages; nominal service or corkage fees may apply if assistance with serving or cleanup is required.<br/>• <b>Complimentary:</b> Fresh fruit-infused water, gourmet coffee, and premium teas are always available in the lounge.",
-        "options": "Pantry & Refreshments|Facilities: Pantry & Refreshments, How to book a Meeting Room|FAQ: How to Book a Meeting Room, Main Menu|Start / Main Menu",
+        "response": "<b>Catering Services & Outside Food Policy:</b><br/><br/>• <b>Catering Services:</b> Yes, we do. Once you get in touch with us, our manager can send you a list of food items and cuisines to choose from. If you would prefer food from a specific establishment, we can order it for you (a service charge on top of your food bill may be applicable).<br/>• <b>Outside Food & Beverages:</b> Yes, with applicable service and corkage fees depending on your food items and if you require assistance on food service or beverage refills.<br/>• <b>Lounge Refreshments:</b> Fresh fruit-infused water, gourmet coffee, and tea are always available.",
+        "options": "Event Staffing & Support|FAQ: Event Staffing & Meeting Assistance, Pantry & Refreshments|Facilities: Pantry & Refreshments, How to Book Meeting Room|FAQ: How to Book a Meeting Room, FAQ Menu|CS: FAQ Menu",
+        "metadata": {
+          "category": "FAQ"
+        }
+      },
+      {
+        "name": "FAQ: Event Staffing & Meeting Assistance",
+        "trainingPhrases": [
+          "are you able to provide staff for my event",
+          "event staff",
+          "can you provide waiters for meeting",
+          "meeting minutes secretary",
+          "staf untuk acara rapat",
+          "notulensi rapat sekretaris",
+          "office assistant event support",
+          "FAQ: Event Staffing & Meeting Assistance",
+          "Event Staff & Catering",
+          "Event Staffing & Support"
+        ],
+        "responseType": "options",
+        "response": "<b>Are you able to provide staff for my event?</b><br/><br/>• <b>Waiters:</b> You can request for waiters to be assigned to your event if you select a catering package.<br/>• <b>Office Assistants:</b> You can ask our office assistants for occasional tasks, but they can’t be assigned for the whole duration of the event as they need to attend to other clients within our business centers.<br/>• <b>Meeting Minutes:</b> You can also request for our secretaries to record minutes of the meeting on your behalf for a small fee.",
+        "options": "Catering & Outside Food|FAQ: Catering & Outside Food Policy, Meeting AV & Equipment|FAQ: Presentation Equipment & Technical Assistance, How to Book Meeting Room|FAQ: How to Book a Meeting Room, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "FAQ"
         }
@@ -336,6 +445,7 @@
       {
         "name": "Facilities: Wi-Fi & Internet Connectivity",
         "trainingPhrases": [
+          "is wired/wireless internet access available",
           "is wired wireless internet access available",
           "wi-fi access",
           "wi-fi & internet support",
@@ -347,8 +457,8 @@
           "Facilities: Wi-Fi & Internet Connectivity"
         ],
         "responseType": "options",
-        "response": "<b>Wi-Fi & Internet Infrastructure:</b><br/><br/>• All CEO SUITE facilities feature high-speed enterprise-grade Wi-Fi and wired Ethernet ports.<br/>• Secure separate networks for members and guests.<br/>• Dedicated bandwidth, private VLANs, static IPs, and server rack hosting are available upon request.<br/>• If you experience connection issues, our on-site IT team is ready to assist.",
-        "options": "Building Access & Access Cards|Facilities: Building Access & Access Cards, Business-Class Printing|Facilities: Business-Class Printing & Scanning, Speak to CS Agent|CS: Speak to Human Agent / Live Support, Main Menu|Start / Main Menu",
+        "response": "<b>Is wired/wireless internet access available?</b><br/><br/>Yes, all CEO SUITE facilities are equipped with both enterprise-grade wired Ethernet and high-speed secure wireless (Wi-Fi) internet access.<br/><br/>Dedicated private bandwidth, VLANs, static IPs, and server rack hosting are also available for enterprise members upon request. Our on-site IT team is available to assist.",
+        "options": "Building Access & Cards|Facilities: Building Access & Access Cards, Meeting AV & Equipment|FAQ: Presentation Equipment & Technical Assistance, Speak to CS Agent|CS: Speak to Human Agent / Live Support, FAQ Menu|CS: FAQ Menu",
         "metadata": {
           "category": "Facilities"
         }
@@ -365,7 +475,8 @@
           "access card replacement",
           "how to enter after hours",
           "office hours",
-          "Facilities: Building Access & Access Cards"
+          "Facilities: Building Access & Access Cards",
+          "Building Access & Cards"
         ],
         "responseType": "options",
         "response": "<b>Access Hours & Building Security:</b><br/><br/>• <b>Reception Hours:</b> Front desk staff are on duty Monday to Friday, 8:30 AM – 6:00 PM.<br/>• <b>Member Access:</b> Private Office and Dedicated Desk members enjoy <b>24/7 secure card/key access</b>.<br/>• <b>Lost Card:</b> If you lose your access card, notify reception immediately for temporary access and card re-issuance.<br/>• <b>Visitors:</b> Guests must sign in at the front desk reception upon arrival.",
@@ -498,7 +609,8 @@
           "pembukuan pajak",
           "hr recruitment support",
           "tax consultation",
-          "Services: Professional Services & Company Registration"
+          "Services: Professional Services & Company Registration",
+          "Corporate Services"
         ],
         "responseType": "options",
         "response": "<b>Professional Corporate Services:</b><br/><br/>• <b>Company Registration:</b> Entity incorporation, business licensing, and legal permits across Asia.<br/>• <b>Accounting & Bookkeeping:</b> Monthly financial records and statutory reporting.<br/>• <b>Payroll Management:</b> Monthly salary disbursement, social security, and tax filings.<br/>• <b>Tax Consultation:</b> Corporate tax filing and compliance advisory.<br/>• <b>HR & Recruitment:</b> Executive search and talent acquisition support.",
@@ -1428,8 +1540,7 @@
           "I want a virtual office",
           "Business address",
           "Direct: Virtual Office",
-          "Explore Virtual Office",
-          "Virtual Office Plans"
+          "Explore Virtual Office"
         ],
         "responseType": "options",
         "response": "Virtual Office\nEstablish a prestigious CBD business address without physical overhead. Includes mail & package handling, dedicated local phone line with professional multilingual receptionist call answering, and member rates for meeting room bookings.\n\nWhich city are you inquiring about?",
@@ -1444,6 +1555,7 @@
           "I need a dedicated desk",
           "Direct: Dedicated Workstation",
           "Dedicated Desk",
+          "Explore Dedicated Desk",
           "Dedicated Desk Details"
         ],
         "responseType": "options",
@@ -1459,6 +1571,7 @@
           "Hot desking",
           "Direct: Coworking",
           "Coworking Space",
+          "Explore Coworking",
           "Coworking Details"
         ],
         "responseType": "options",

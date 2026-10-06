@@ -5,7 +5,9 @@ const path = require('path');
 const prisma = new PrismaClient();
 
 async function main() {
-  const filePath = path.join(__dirname, 'UserJourney-Agent.json');
+  const csSupportPath = path.join(__dirname, '../../userjourney/UserJourney-CS-Support.json');
+  const filePath = fs.existsSync(csSupportPath) ? csSupportPath : path.join(__dirname, 'UserJourney-Agent.json');
+  console.log(`Reading intents from: ${filePath}`);
   const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   const intents = data.data.intents;
 

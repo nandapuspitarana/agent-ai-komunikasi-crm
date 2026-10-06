@@ -38,7 +38,7 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
   it('TEST-CS-01 Flow metadata and intent counts are valid', () => {
     expect(flowData.type).toBe('agent_flow');
     expect(flowData.data.name).toBe('CEO SUITE Customer Service & Support Flow');
-    expect(intents.length).toBe(215);
+    expect(intents.length).toBe(220);
 
     // Verify all sales forms are removed
     const formIntents = intents.filter((i: any) => i.responseType === 'form');
@@ -279,4 +279,38 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
     expect(escalate?.name).toBe('CS: Speak to Human Agent / Live Support');
     expect(escalate?.response).toContain('[HANDOFF_REQUESTED]');
   });
+
+  it('TEST-CS-10 All 19 official website FAQ questions match their respective intents from ceosuite.com', () => {
+    const websiteQuestions = [
+      { q: 'What is a serviced office?', intent: 'FAQ: What is a Serviced Office' },
+      { q: 'Why would I need a serviced office?', intent: 'FAQ: Why Would I Need a Serviced Office' },
+      { q: 'Are serviced offices better value than traditional office space?', intent: 'FAQ: Why Serviced Office vs Traditional' },
+      { q: 'Why choose CEO SUITE?', intent: 'FAQ: Why Choose CEO SUITE' },
+      { q: 'What is a co-working space, or shared office?', intent: 'FAQ: What is a Coworking Space' },
+      { q: 'Do I need a co-working space?', intent: 'FAQ: What is a Coworking Space' },
+      { q: 'What are the differences between standard co-working space and a dedicated workstation?', intent: 'FAQ: Coworking vs Dedicated Desk' },
+      { q: 'What is a virtual office?', intent: 'FAQ: What is a Virtual Office' },
+      { q: 'Why would I need a virtual office?', intent: 'FAQ: Why Would I Need a Virtual Office' },
+      { q: 'Can I upgrade my virtual office to a serviced office with CEO SUITE?', intent: 'FAQ: Upgrade or Downgrade Plan' },
+      { q: 'How can I book a venue?', intent: 'FAQ: How to Book a Meeting Room' },
+      { q: 'Can I get access to the venue early to set-up?', intent: 'FAQ: Early Setup & After-Hours Meeting' },
+      { q: 'Can my event go beyond the business hours of your center?', intent: 'FAQ: Early Setup & After-Hours Meeting' },
+      { q: 'Does CEO SUITE rent out presentation equipment?', intent: 'FAQ: Presentation Equipment & Technical Assistance' },
+      { q: 'Do you provide technical assistance?', intent: 'FAQ: Presentation Equipment & Technical Assistance' },
+      { q: 'Does CEO SUITE provide catering services?', intent: 'FAQ: Catering & Outside Food Policy' },
+      { q: 'Can we bring in our own food and beverages?', intent: 'FAQ: Catering & Outside Food Policy' },
+      { q: 'Are you able to provide staff for my event?', intent: 'FAQ: Event Staffing & Meeting Assistance' },
+      { q: 'Is wired/wireless internet access available?', intent: 'Facilities: Wi-Fi & Internet Connectivity' }
+    ];
+
+    for (const item of websiteQuestions) {
+      let matched = matchMessage(item.q);
+      if (!matched) {
+        matched = matchMessage(item.q.replace(/[?]/g, ''));
+      }
+      expect(matched).toBeDefined();
+      expect(matched?.name).toBe(item.intent);
+    }
+  });
 });
+
