@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch all ready documents for this tenant
     // Use distinct on proxyDocId so we don't list duplicates if a document is used in multiple flows
-    const documents = await prisma.knowledgeDocument.findMany({
+    let documents = await prisma.knowledgeDocument.findMany({
       where: {
         tenantId: tenantId,
         status: 'ready',
@@ -29,6 +29,38 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
       distinct: ['proxyDocId']
     });
+
+    // Fallback: If no documents found in KnowledgeDocument, load from public.crm_documents
+    if (documents.length === 0) {
+      try {
+        const crmDocs = await prisma.$queryRawUnsafe<any[]>(`
+          SELECT id, filename, file_type, metadata, status, chunk_count, created_at
+          FROM public.crm_documents
+          WHERE status = 'ready'
+          ORDER BY created_at DESC
+        `);
+        documents = crmDocs.map(cd => {
+          const meta = typeof cd.metadata === 'string' ? JSON.parse(cd.metadata) : (cd.metadata || {});
+          return {
+            id: cd.id,
+            tenantId: tenantId,
+            metaName: meta.name || cd.filename,
+            description: meta.description || null,
+            category: meta.category || 'Knowledge Base',
+            tags: Array.isArray(meta.tags) ? meta.tags : [],
+            filename: cd.filename,
+            fileType: cd.file_type || 'md',
+            status: cd.status,
+            chunkCount: cd.chunk_count || 0,
+            proxyDocId: cd.id,
+            createdAt: cd.created_at,
+            updatedAt: cd.created_at,
+          } as any;
+        });
+      } catch (err: any) {
+        console.error('[API/Agent/Documents/Tenant] Fallback error:', err?.message);
+      }
+    }
 
     return NextResponse.json({ documents, count: documents.length });
   } catch (error: any) {

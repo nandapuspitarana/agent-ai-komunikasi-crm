@@ -23,13 +23,52 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Tenant ID missing' }, { status: 400 });
     }
 
-    // Verify the source document belongs to the tenant
-    const sourceDoc = await prisma.knowledgeDocument.findFirst({
+    // Verify the source document belongs to the tenant or fallback to public.crm_documents
+    let sourceDoc = await prisma.knowledgeDocument.findFirst({
       where: {
         id: sourceDocumentId,
         tenantId: tenantId,
       }
     });
+
+    if (!sourceDoc) {
+      sourceDoc = await prisma.knowledgeDocument.findFirst({
+        where: {
+          proxyDocId: sourceDocumentId,
+          tenantId: tenantId,
+        }
+      });
+    }
+
+    if (!sourceDoc) {
+      try {
+        const crmDocs = await prisma.$queryRawUnsafe<any[]>(`
+          SELECT id, filename, file_type, metadata, status, chunk_count
+          FROM public.crm_documents
+          WHERE id = $1::uuid AND status = 'ready'
+        `, sourceDocumentId);
+
+        if (crmDocs.length > 0) {
+          const cd = crmDocs[0];
+          const meta = typeof cd.metadata === 'string' ? JSON.parse(cd.metadata) : (cd.metadata || {});
+          sourceDoc = {
+            id: cd.id,
+            tenantId: tenantId,
+            metaName: meta.name || cd.filename,
+            description: meta.description || null,
+            category: meta.category || 'Knowledge Base',
+            tags: Array.isArray(meta.tags) ? meta.tags : [],
+            filename: cd.filename,
+            fileType: cd.file_type || 'md',
+            status: cd.status || 'ready',
+            chunkCount: cd.chunk_count || 0,
+            proxyDocId: cd.id,
+          } as any;
+        }
+      } catch (err: any) {
+        console.error('[API/Agent/Documents/Link] Lookup fallback error:', err?.message);
+      }
+    }
 
     if (!sourceDoc) {
       return NextResponse.json({ error: 'Source document not found' }, { status: 404 });
