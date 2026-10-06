@@ -392,8 +392,12 @@ export async function POST(req: NextRequest) {
       : textReply;
     const structuredOptions = !useLegacyHtml ? quickOptions : [];
     const matchedType: string = qnaMatch?.responseType ?? '';
-    const responseType = ['card', 'form'].includes(matchedType)
-      ? matchedType
+    const isCard = matchedType === 'card' || cleanReply.includes("class='card'") || cleanReply.includes('class="card"');
+    const isForm = matchedType === 'form' || cleanReply.includes("class='form-card'") || cleanReply.includes('class="form-card"');
+    const responseType = isCard
+      ? 'card'
+      : isForm
+      ? 'form'
       : quickOptions.length > 0 ? 'options' : 'text';
 
     let triggerLeadForm = false;

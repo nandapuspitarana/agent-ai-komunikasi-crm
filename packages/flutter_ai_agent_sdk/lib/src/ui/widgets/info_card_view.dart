@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/card_payload.dart';
 import '../theme/ai_chat_theme.dart';
+import 'rich_message_text.dart';
 
 /// User-facing strings of [InfoCardView]; override them to localise or customize per tenant.
 class InfoCardStrings {
@@ -109,8 +110,10 @@ class InfoCardView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    card.description,
+                  RichMessageText(
+                    text: card.description,
+                    onLaunchUrl: onLaunchUrl,
+                    linkColor: theme.primaryColor,
                     style: TextStyle(
                       fontSize: 12,
                       color: descColor,

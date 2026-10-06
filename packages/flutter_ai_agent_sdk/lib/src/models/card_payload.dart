@@ -20,10 +20,10 @@ class CardPayload {
 
   factory CardPayload.fromJson(Map<String, dynamic> json) {
     return CardPayload(
-      title: json['title'] ?? json['cardTitle'] ?? '',
-      description: json['description'] ?? json['desc'] ?? '',
+      title: _stripHtmlAndDecode(json['title'] ?? json['cardTitle'] ?? ''),
+      description: _convertHtmlToMarkdown(json['description'] ?? json['desc'] ?? ''),
       linkUrl: json['linkUrl'] ?? json['url'],
-      ctaNote: json['ctaNote'] ?? json['cta'],
+      ctaNote: json['ctaNote'] != null ? _stripHtmlAndDecode(json['ctaNote']) : json['cta'],
       imageUrl: json['imageUrl'] ?? json['image'],
       actionLabel: json['actionLabel'] ?? json['action_label'] ?? json['buttonText'],
       bannerTitle: json['bannerTitle'] ?? json['banner_title'] ?? json['headerTitle'],
@@ -44,36 +44,59 @@ class CardPayload {
     String? actionLabel;
     String? bannerTitle;
 
-    final titleMatch = RegExp(r"class=['\x22]card-title['\x22]>([^<]+)<").firstMatch(html);
+    final titleMatch = RegExp(r"class=['\x22]card-title['\x22][^>]*>([\s\S]*?)<\/div>", caseSensitive: false).firstMatch(html) ??
+        RegExp(r"class=['\x22]card-title['\x22][^>]*>([^<]+)<", caseSensitive: false).firstMatch(html);
     if (titleMatch != null) {
-      title = titleMatch.group(1) ?? '';
+      title = _stripHtmlAndDecode(titleMatch.group(1) ?? '');
     }
 
-    final smallMatch = RegExp(r"class=['\x22]small['\x22]>([\s\S]*?)<\/div>").firstMatch(html);
+    final bannerMatch = RegExp(r"class=['\x22](?:card-banner|banner-title)['\x22][^>]*>([\s\S]*?)<\/div>", caseSensitive: false).firstMatch(html) ??
+        RegExp(r"class=['\x22](?:card-banner|banner-title)['\x22][^>]*>([^<]+)<", caseSensitive: false).firstMatch(html);
+    if (bannerMatch != null) {
+      bannerTitle = _stripHtmlAndDecode(bannerMatch.group(1) ?? '');
+    }
+
+    final actionMatch = RegExp(r"class=['\x22](?:card-action|action-label|card-btn)['\x22][^>]*>([\s\S]*?)<\/div>", caseSensitive: false).firstMatch(html) ??
+        RegExp(r"class=['\x22](?:card-action|action-label|card-btn)['\x22][^>]*>([^<]+)<", caseSensitive: false).firstMatch(html);
+    if (actionMatch != null) {
+      actionLabel = _stripHtmlAndDecode(actionMatch.group(1) ?? '');
+    }
+
+    final ctaMatch = RegExp(r"class=['\x22]cta-note['\x22][^>]*>([\s\S]*?)<\/div>", caseSensitive: false).firstMatch(html) ??
+        RegExp(r"class=['\x22]cta-note['\x22][^>]*>([^<]+)<", caseSensitive: false).firstMatch(html);
+    if (ctaMatch != null) {
+      ctaNote = _stripHtmlAndDecode(ctaMatch.group(1) ?? '');
+    }
+
+    final smallMatch = RegExp(r"class=['\x22]small['\x22]>([\s\S]*?)<\/div>", caseSensitive: false).firstMatch(html);
     if (smallMatch != null) {
       String rawDesc = smallMatch.group(1) ?? '';
-      // Extract link if present
-      final urlMatch = RegExp(r'https?:\/\/[^\s<]+').firstMatch(rawDesc);
-      if (urlMatch != null) {
-        linkUrl = urlMatch.group(0);
-        rawDesc = rawDesc.replaceAll(RegExp(r'Explore this space in detail here:\s*https?:\/\/[^\s<]+'), '');
+
+      // Extract all URLs cleanly (without quotes or brackets)
+      final allUrls = <String>[];
+      for (final m in RegExp(r'''https?://[^\s<>'")\]]+''').allMatches(rawDesc)) {
+        allUrls.add(m.group(0)!);
       }
-      description = rawDesc.replaceAll('<br/>', '\n').replaceAll('<br>', '\n').trim();
-    }
 
-    final ctaMatch = RegExp(r"class=['\x22]cta-note['\x22]>([^<]+)<").firstMatch(html);
-    if (ctaMatch != null) {
-      ctaNote = ctaMatch.group(1);
-    }
+      // Prioritize web/explore link over wa.me link for the main action button
+      final primaryWebUrl = allUrls.firstWhere(
+        (u) => !u.contains('wa.me') && !u.contains('whatsapp'),
+        orElse: () => '',
+      );
 
-    final actionMatch = RegExp(r"class=['\x22](?:card-action|action-label|card-btn)['\x22][^>]*>([^<]+)<").firstMatch(html);
-    if (actionMatch != null) {
-      actionLabel = actionMatch.group(1)?.trim();
-    }
+      if (primaryWebUrl.isNotEmpty) {
+        linkUrl = primaryWebUrl;
+      } else if (allUrls.isNotEmpty) {
+        linkUrl = allUrls.first;
+      }
 
-    final bannerMatch = RegExp(r"class=['\x22](?:card-banner|banner-title)['\x22][^>]*>([^<]+)<").firstMatch(html);
-    if (bannerMatch != null) {
-      bannerTitle = bannerMatch.group(1)?.trim();
+      // Strip redundant "Explore space details" text prefix from description
+      rawDesc = rawDesc.replaceAll(
+        RegExp(r'''(?:<br\s*/?>\s*)*Explore\s+(?:this\s+space\s+in\s+detail\s+here|space\s+details)[^:]*:\s*(?:<a\b[^>]*?>.*?</a>|https?://[^\s<>'")\]]+)''', caseSensitive: false),
+        '',
+      );
+
+      description = _convertHtmlToMarkdown(rawDesc);
     }
 
     if (title.isEmpty && description.isEmpty) return null;
@@ -86,6 +109,72 @@ class CardPayload {
       actionLabel: actionLabel,
       bannerTitle: bannerTitle,
     );
+  }
+
+  /// Converts inner HTML formatting in cards (bold, links, breaks) into native Markdown
+  /// and strips all lingering HTML tags so no raw markup leaks into the UI.
+  static String _convertHtmlToMarkdown(String html) {
+    if (html.isEmpty) return '';
+
+    // Convert anchors to markdown: [label](url)
+    var text = html.replaceAllMapped(
+      RegExp(r'''<a\b[^>]*?href\s*=\s*['"]([^'"]+)['"][^>]*>([\s\S]*?)</a>''', caseSensitive: false),
+      (m) {
+        final href = (m.group(1) ?? '').trim();
+        final label = _stripHtmlAndDecode(m.group(2) ?? '').trim();
+        if (href.isEmpty) return label;
+        if (label.isEmpty || label == href) return href;
+        return '[$label]($href)';
+      },
+    );
+
+    // Convert bold / strong to markdown **
+    text = text
+        .replaceAll(RegExp(r'<\s*(?:b|strong)\b[^>]*>', caseSensitive: false), '**')
+        .replaceAll(RegExp(r'<\s*/\s*(?:b|strong)\s*>', caseSensitive: false), '**');
+
+    // Convert italic / em to markdown *
+    text = text
+        .replaceAll(RegExp(r'<\s*(?:i|em)\b[^>]*>', caseSensitive: false), '*')
+        .replaceAll(RegExp(r'<\s*/\s*(?:i|em)\s*>', caseSensitive: false), '*');
+
+    // Convert line breaks and paragraph ends
+    text = text
+        .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</p\s*>', caseSensitive: false), '\n\n')
+        .replaceAll(RegExp(r'<li\b[^>]*>', caseSensitive: false), '• ')
+        .replaceAll(RegExp(r'</li\s*>', caseSensitive: false), '\n');
+
+    // Strip any remaining HTML tags
+    text = text.replaceAll(RegExp(r'</?[a-zA-Z][a-zA-Z0-9:-]*\b[^>]*>', dotAll: true), '');
+
+    // Decode HTML entities
+    text = _decodeHtmlEntities(text);
+
+    // Normalize spacing and newlines
+    text = text
+        .replaceAll(RegExp(r'[ \t]+\n'), '\n')
+        .replaceAll(RegExp(r'\n{3,}'), '\n\n')
+        .trim();
+
+    return text;
+  }
+
+  static String _stripHtmlAndDecode(String s) {
+    final stripped = s.replaceAll(RegExp(r'<[^>]+>', dotAll: true), '').trim();
+    return _decodeHtmlEntities(stripped);
+  }
+
+  static String _decodeHtmlEntities(String s) {
+    if (!s.contains('&')) return s;
+    return s
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&apos;', "'")
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>');
   }
 
   Map<String, dynamic> toJson() => {

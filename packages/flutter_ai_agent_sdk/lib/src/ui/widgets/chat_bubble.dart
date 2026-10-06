@@ -83,6 +83,12 @@ class ChatBubble extends StatelessWidget {
     final bubbleColor = isUser ? theme.userBubbleColor : theme.botBubbleColor;
     final textColor = isUser ? theme.userTextColor : theme.botTextColor;
 
+    final isRedundantCardText = message.type == ResponseType.card &&
+        message.card != null &&
+        (message.text == message.card?.title ||
+            message.text.contains("class='card'") ||
+            message.text.contains('class="card"'));
+
     final bubble = Container(
       constraints: BoxConstraints(maxWidth: maxBubbleWidth),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -109,7 +115,7 @@ class ChatBubble extends StatelessWidget {
         crossAxisAlignment:
             isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          if (message.text.isNotEmpty || !_hasForm)
+          if (message.text.isNotEmpty && !isRedundantCardText)
             RichMessageText(
               text: message.text,
               onLaunchUrl: onLaunchUrl,

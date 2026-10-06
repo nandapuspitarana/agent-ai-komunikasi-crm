@@ -93,5 +93,63 @@ void main() {
       expect(ResponseType.fromString('invalid_type'), equals(ResponseType.text));
       expect(ResponseType.fromString(null), equals(ResponseType.text));
     });
+
+    test('TEST-AI-U06: Should parse real CRM centre card HTML into clean markdown without raw tags', () {
+      const html =
+          "<div class='card'><div class='card-title'>Vietcombank Tower (Ho Chi Minh City) - Meeting Room</div><div class='small'><b>Address:</b> Level 21, No. 5 Me Linh Square, Ben Nghe Ward, District 1, Ho Chi Minh City 70000, Vietnam<br/><b>Phone:</b> +84 (28) 3827 1988 | <b>WhatsApp:</b> <a href='https://wa.me/84837048668'>+84 83 704 8668</a><br/><b>Transport:</b> Prime District 1 waterfront location on Me Linh Square, near Bach Dang pier.<br/><b>Facilities:</b> Grade A Waterfront Tower, 24/7 Member Access, Executive Boardrooms, High-Speed Wi-Fi, Reception Concierge, Mail & Parcel Handling.<br/><br/>Explore space details: <a href='https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/' target='_blank'>https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>";
+
+      final card = CardPayload.parseFromHtmlOrText(html);
+      expect(card, isNotNull);
+      expect(card!.title, equals('Vietcombank Tower (Ho Chi Minh City) - Meeting Room'));
+      expect(card.linkUrl, equals('https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/'));
+
+      // Check description is clean Markdown without raw tags
+      expect(card.description, contains('**Address:**'));
+      expect(card.description, contains('**Phone:**'));
+      expect(card.description, contains('**WhatsApp:**'));
+      expect(card.description, contains('[+84 83 704 8668](https://wa.me/84837048668)'));
+      expect(card.description, isNot(contains('<div')));
+      expect(card.description, isNot(contains('<b>')));
+      expect(card.description, isNot(contains('</b>')));
+      expect(card.description, isNot(contains('<br')));
+      expect(card.description, isNot(contains('<a href')));
+
+      // Check ctaNote is clean
+      expect(card.ctaNote, equals('Have a question about this location? Select an option below or type your inquiry anytime.'));
+    });
+
+    test('TEST-AI-U07: Should parse Front Desk reception card with WhatsApp cleanly', () {
+      const html =
+          '<div class="card"><div class="card-title">Front Desk &amp; Reception - Axiata Tower</div><div class="small"><b>Address:</b> 27th Floor, KL Sentral<br/><b>WhatsApp:</b> <a href="https://wa.me/60123608913">+60 12 360 8913</a><br/><b>Reception Hours:</b> Mon - Fri</div></div>';
+
+      final card = CardPayload.parseFromHtmlOrText(html);
+      expect(card, isNotNull);
+      expect(card!.title, equals('Front Desk & Reception - Axiata Tower'));
+      expect(card.description, contains('**Address:** 27th Floor, KL Sentral'));
+      expect(card.description, contains('**WhatsApp:** [+60 12 360 8913](https://wa.me/60123608913)'));
+      expect(card.description, contains('**Reception Hours:** Mon - Fri'));
+      expect(card.description, isNot(contains('<')));
+    });
+
+    test('TEST-AI-U08: Should convert HTML FAQ reply to clean markdown via ChatMessage.fromApiResponse', () {
+      const rawFaq =
+          '<b>What is a Serviced Office?</b><br/><br/>Also known as managed offices, serviced offices provide:<br/>• <b>Plug & Play:</b> Ready to move in.<br/>• <b>All-Inclusive:</b> Utilities included.<br/><br/>Explore: <a href="https://www.ceosuite.com">CEO SUITE</a>';
+
+      final msg = ChatMessage.fromApiResponse(
+        id: 'faq_01',
+        rawReply: rawFaq,
+        responseType: 'options',
+        rawOptions: ['Book Tour', 'Contact Us'],
+      );
+
+      expect(msg.type, equals(ResponseType.options));
+      expect(msg.text, contains('**What is a Serviced Office?**'));
+      expect(msg.text, contains('• **Plug & Play:** Ready to move in.'));
+      expect(msg.text, contains('• **All-Inclusive:** Utilities included.'));
+      expect(msg.text, isNot(contains('<b>')));
+      expect(msg.text, isNot(contains('</b>')));
+      expect(msg.text, isNot(contains('<br')));
+      expect(msg.options.length, equals(2));
+    });
   });
 }

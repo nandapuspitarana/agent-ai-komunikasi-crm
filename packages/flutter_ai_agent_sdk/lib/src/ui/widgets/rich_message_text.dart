@@ -32,7 +32,38 @@ final RegExp _trailingRe = RegExp(r'[.,;:!?]+$');
 
 /// Splits [text] into runs: `**bold**`, `[label](url)` and bare `http(s)` URLs
 /// are recognised, everything else is plain. Pure so it can be tested directly.
-List<MessageRun> parseMessageRuns(String text) {
+List<MessageRun> parseMessageRuns(String rawText) {
+  var text = rawText;
+  if (text.contains('<')) {
+    text = text
+        .replaceAllMapped(
+          RegExp(r'''<a\b[^>]*?href\s*=\s*['"]([^'"]+)['"][^>]*>([\s\S]*?)</a>''', caseSensitive: false),
+          (m) {
+            final href = (m.group(1) ?? '').trim();
+            final label = (m.group(2) ?? '').replaceAll(RegExp(r'<[^>]+>'), '').trim();
+            if (href.isEmpty) return label;
+            if (label.isEmpty || label == href) return href;
+            return '[$label]($href)';
+          },
+        )
+        .replaceAll(RegExp(r'<\s*(?:b|strong)\b[^>]*>', caseSensitive: false), '**')
+        .replaceAll(RegExp(r'<\s*/\s*(?:b|strong)\s*>', caseSensitive: false), '**')
+        .replaceAll(RegExp(r'<\s*(?:i|em)\b[^>]*>', caseSensitive: false), '*')
+        .replaceAll(RegExp(r'<\s*/\s*(?:i|em)\s*>', caseSensitive: false), '*')
+        .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</p\s*>', caseSensitive: false), '\n\n')
+        .replaceAll(RegExp(r'<li\b[^>]*>', caseSensitive: false), '• ')
+        .replaceAll(RegExp(r'</li\s*>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</?[a-zA-Z][a-zA-Z0-9:-]*\b[^>]*>', dotAll: true), '')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&apos;', "'")
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>');
+  }
+
   final runs = <MessageRun>[];
   var cursor = 0;
 

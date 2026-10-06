@@ -39,8 +39,9 @@ class HtmlReplyParser {
   // Only well known presentational tags are stripped, so text such as
   // "if a < b and c > d" is left alone.
   static final RegExp _knownTagRe = RegExp(
-    r'</?(?:div|span|p|br|button|b|i|u|strong|em|a|ul|ol|li|img|h[1-6]|hr|table|thead|tbody|tr|td|th)\b[^>]*>',
+    r'</?[a-zA-Z][a-zA-Z0-9:-]*\b[^>]*>',
     caseSensitive: false,
+    dotAll: true,
   );
 
   static ParsedReply parse(String input) {
@@ -65,6 +66,16 @@ class HtmlReplyParser {
       if (!(href.startsWith('http://') || href.startsWith('https://'))) return label;
       return label.isEmpty ? href : '$label ($href)';
     });
+
+    // Convert bold and strong to markdown **
+    text = text
+        .replaceAll(RegExp(r'<\s*(?:b|strong)\b[^>]*>', caseSensitive: false), '**')
+        .replaceAll(RegExp(r'<\s*/\s*(?:b|strong)\s*>', caseSensitive: false), '**');
+
+    // Convert italic and em to markdown *
+    text = text
+        .replaceAll(RegExp(r'<\s*(?:i|em)\b[^>]*>', caseSensitive: false), '*')
+        .replaceAll(RegExp(r'<\s*/\s*(?:i|em)\s*>', caseSensitive: false), '*');
 
     text = text
         .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')

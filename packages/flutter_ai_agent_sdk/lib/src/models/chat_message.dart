@@ -80,7 +80,9 @@ class ChatMessage {
 
     // Check for Info Card HTML
     CardPayload? card;
-    if (parsedType == ResponseType.card || cleanText.contains("class='card'")) {
+    if (parsedType == ResponseType.card ||
+        cleanText.contains("class='card'") ||
+        cleanText.contains('class="card"')) {
       card = CardPayload.parseFromHtmlOrText(cleanText);
       if (card != null) {
         parsedType = ResponseType.card;
@@ -90,7 +92,9 @@ class ChatMessage {
 
     // Check for Lead Form HTML
     FormPayload? form;
-    if (parsedType == ResponseType.form || cleanText.contains("class='form-card'")) {
+    if (parsedType == ResponseType.form ||
+        cleanText.contains("class='form-card'") ||
+        cleanText.contains('class="form-card"')) {
       form = FormPayload.parseFromHtml(cleanText);
       if (form != null) {
         parsedType = ResponseType.form;
@@ -157,6 +161,19 @@ class ChatMessage {
   }
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    var rawText = json['text'] as String? ?? '';
+    final card = json['card'] != null
+        ? CardPayload.fromJson(Map<String, dynamic>.from(json['card'] as Map))
+        : null;
+    final form = json['form'] != null
+        ? FormPayload.fromJson(Map<String, dynamic>.from(json['form'] as Map))
+        : null;
+
+    if (card == null && form == null && rawText.contains('<')) {
+      final parsed = HtmlReplyParser.parse(rawText);
+      rawText = parsed.text;
+    }
+
     return ChatMessage(
       id: json['id'] as String? ?? 'msg_${DateTime.now().millisecondsSinceEpoch}',
       sender: MessageSender.values.firstWhere(
@@ -164,18 +181,14 @@ class ChatMessage {
         orElse: () => MessageSender.bot,
       ),
       senderName: json['senderName'] as String?,
-      text: json['text'] as String? ?? '',
+      text: rawText,
       type: ResponseType.fromString(json['type'] as String?),
       options: (json['options'] as List<dynamic>?)
               ?.map((o) => QuickReplyOption.fromJson(Map<String, dynamic>.from(o as Map)))
               .toList() ??
           const [],
-      card: json['card'] != null
-          ? CardPayload.fromJson(Map<String, dynamic>.from(json['card'] as Map))
-          : null,
-      form: json['form'] != null
-          ? FormPayload.fromJson(Map<String, dynamic>.from(json['form'] as Map))
-          : null,
+      card: card,
+      form: form,
       timestamp: json['timestamp'] != null
           ? DateTime.tryParse(json['timestamp'] as String) ?? DateTime.now()
           : DateTime.now(),
