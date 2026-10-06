@@ -108,10 +108,46 @@ describe('POST /api/widget/message — quick reply options', () => {
     expect(json.responseType).toBe('card');
   });
 
-  it('TEST-AI-F04 handoff keyword short-circuits to queue', async () => {
-    prismaMock.tenant.findUnique.mockResolvedValue(tenant());
-    const json = await (await send('saya mau bicara dengan agen', 'mobile_app')).json();
+  it('TEST-AI-F04 handoff keyword short-circuits to queue in English when flow is English', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(
+      tenant({
+        activeFlow: { id: 'f1', name: 'Claire', config: { language: 'English' }, intents: [] },
+      })
+    );
+    const json = await (await send('talk to a human agent', 'mobile_app')).json();
     expect(json.status).toBe('queue');
     expect(json.handoffOccurred).toBe(true);
+    expect(json.reply).toContain('Sure, I will connect you with our customer support team');
+  });
+
+  it('TEST-AI-F04b structured flow command starting with CS: does not trigger handoff', async () => {
+    const contactIntent = intent({
+      name: 'CS: Contact Directory All Locations',
+      trainingPhrases: ['CS: Contact Directory All Locations'],
+      response: 'Regional Directory:',
+      responseType: 'options',
+      options: 'Jakarta|jkt, KL|kl',
+    });
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant({}, [contactIntent]));
+    const json = await (await send('CS: Contact Directory All Locations', 'mobile_app')).json();
+    expect(json.status).toBe('bot');
+    expect(json.handoffOccurred).toBe(false);
+    expect(json.reply).toBe('Regional Directory:');
+  });
+
+  it('TEST-AI-F04c explicit handoff intent with hotlines bypasses LLM and returns custom response', async () => {
+    const handoffIntent = intent({
+      name: 'CS: Speak to Human Agent / Live Support',
+      trainingPhrases: ['CS: Speak to Human Agent / Live Support'],
+      response: '[HANDOFF_REQUESTED]\nOur team has been notified. Hotlines: +62 8111 508 481',
+      responseType: 'text',
+      options: '',
+    });
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant({ aiEnabled: true }, [handoffIntent]));
+    const json = await (await send('CS: Speak to Human Agent / Live Support', 'mobile_app')).json();
+    expect(json.status).toBe('queue');
+    expect(json.handoffOccurred).toBe(true);
+    expect(json.reply).toContain('Our team has been notified. Hotlines: +62 8111 508 481');
+    expect(json.reply).not.toContain('[HANDOFF_REQUESTED]');
   });
 });

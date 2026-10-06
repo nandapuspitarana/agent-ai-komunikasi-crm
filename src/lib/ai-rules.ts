@@ -18,7 +18,13 @@ const HANDOFF_KEYWORDS_ID = [
   'operator',
   'staff',
   'customer service',
-  'cs',
+  'speak to cs',
+  'talk to cs',
+  'hubungi cs',
+  'kontak cs',
+  'chat cs',
+  'panggil cs',
+  'bantuan cs',
   'manusia',
   'orang asli',
   'talk to human',
@@ -60,6 +66,16 @@ export type RuleCheckResult = {
  */
 export function checkHandoffIntent(message: string): RuleCheckResult {
   const normalized = message.toLowerCase().trim();
+
+  // Ignore structured flow navigation payloads (e.g. "cs: faq menu", "cs: contact directory")
+  // unless they explicitly request speaking to a human/agent
+  if (normalized.startsWith('cs:') && !normalized.includes('speak') && !normalized.includes('human') && !normalized.includes('agent') && !normalized.includes('live support')) {
+    return {
+      intent: 'continue_ai',
+      confidence: 1.0,
+      reason: 'Structured flow navigation command',
+    };
+  }
 
   // Check explicit handoff keywords
   for (const keyword of HANDOFF_KEYWORDS_ID) {

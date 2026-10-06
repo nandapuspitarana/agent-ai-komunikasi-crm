@@ -166,78 +166,18 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // === SESI DALAM MODE BOT — JALANKAN AI ===
-
-    // Step 1: Quick keyword check untuk handoff (tanpa harus panggil LLM dulu)
-    const ruleCheck = checkHandoffIntent(message);
-
-    if (ruleCheck.intent === 'handoff_requested') {
-      // Update session status ke 'queue' untuk diambil agent
-      await prisma.chatSession.update({
-        where: { id: currentSessionId },
-        data: { status: 'queue' },
-      });
-
-      const agentName = tenant.handoffAgent?.name ? ` bernama ${tenant.handoffAgent.name}` : '';
-      const handoffMessage =
-        `Baik, saya akan segera menghubungkan Anda dengan agen kami${agentName}. Mohon tunggu sebentar ya! 😊`;
-
-      await prisma.message.create({
-        data: {
-          sessionId: currentSessionId,
-          senderType: 'bot',
-          content: handoffMessage,
-        },
-      });
-
-      // Notify agent dashboard
-      // Supabase Realtime handles this automatically.
-
-      return corsResponse({
-        sessionId: currentSessionId,
-        status: 'queue',
-        reply: handoffMessage,
-        handoffOccurred: true,
-        handoffReason: ruleCheck.reason,
-      });
-    }
-
     // Fetch active flow config if present (falling back to flows[0] if activeFlowId is not set)
     const effectiveFlow = tenant.activeFlow || tenant.flows?.[0];
     const flowConfig: any = effectiveFlow?.config || {};
     const flowSystemPrompt = flowConfig.systemPrompt;
     const flowHumanPromptTemplate = flowConfig.humanPrompt;
+    const isEn = (flowConfig?.language || '').toLowerCase().startsWith('en') ||
+                 (effectiveFlow?.name || '').toLowerCase().includes('ceosuite');
 
-    let finalCustomInstructions = tenant.aiSystemPrompt || '';
-    if (flowSystemPrompt) {
-      finalCustomInstructions += `\n\n[Specific Agent Instructions]\n${flowSystemPrompt}`;
-    }
+    // === SESI DALAM MODE BOT — JALANKAN AI ===
 
-    // Tell the LLM how to parse the UI pipe syntax if it reads it from RAG documents
-    finalCustomInstructions += `\n\n[IMPORTANT UI FORMATTING RULE]\nIf you read options or locations from your knowledge base that contain a pipe character (e.g. 'Bangkok|Bangkok Private Office'), DO NOT output the pipe or the value after it. ONLY output the friendly label before the pipe (e.g. 'Bangkok'). Never output 'Label|Value' in your response.`;
-
-    // Build full prompt with context (We only need the system prompt, AI proxy handles history natively)
-    const systemPrompt = buildSystemPrompt({
-      tenantName: tenant.name,
-      botName: effectiveFlow?.name || 'Claire',
-      customInstructions: finalCustomInstructions.trim() || undefined,
-      handoffAgentName: tenant.handoffAgent?.name,
-      language: flowConfig.language,
-      speakingStyle: flowConfig.speakingStyle,
-      businessNeeds: flowConfig.businessNeeds,
-      enableClassification: visitorConfig.enabled && visitorConfig.layer4_classification,
-      enableExtraction: visitorConfig.enabled && visitorConfig.layer2_nlp,
-    });
-
-    let formattedMessage = message;
-    if (flowHumanPromptTemplate) {
-      formattedMessage = flowHumanPromptTemplate.replace('{input}', message);
-    }
-
-    // Step 2: Check QnA (Intents)
+    // Step 1: Check QnA (Intents) from flow builder first
     let qnaMatch = null;
-    
-    // 2a. Check DB Intents first
     if (effectiveFlow && effectiveFlow.intents) {
       const userMsgLower = message.toLowerCase().trim();
       let maxMatchLength = 0;
@@ -269,6 +209,67 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Step 2: Quick keyword check untuk handoff jika tidak cocok dengan intent flow spesifik
+    if (!qnaMatch) {
+      const ruleCheck = checkHandoffIntent(message);
+
+      if (ruleCheck.intent === 'handoff_requested') {
+        // Update session status ke 'queue' untuk diambil agent
+        await prisma.chatSession.update({
+          where: { id: currentSessionId },
+          data: { status: 'queue' },
+        });
+
+        const agentName = tenant.handoffAgent?.name
+          ? (isEn ? `, ${tenant.handoffAgent.name}` : ` bernama ${tenant.handoffAgent.name}`)
+          : '';
+        const handoffMessage = isEn
+          ? `Sure, I will connect you with our customer support team${agentName} right away. Please wait a moment! 😊`
+          : `Baik, saya akan segera menghubungkan Anda dengan agen kami${agentName}. Mohon tunggu sebentar ya! 😊`;
+
+        await prisma.message.create({
+          data: {
+            sessionId: currentSessionId,
+            senderType: 'bot',
+            content: handoffMessage,
+          },
+        });
+
+        return corsResponse({
+          sessionId: currentSessionId,
+          status: 'queue',
+          reply: handoffMessage,
+          handoffOccurred: true,
+          handoffReason: ruleCheck.reason,
+        });
+      }
+    }
+
+    let finalCustomInstructions = tenant.aiSystemPrompt || '';
+    if (flowSystemPrompt) {
+      finalCustomInstructions += `\n\n[Specific Agent Instructions]\n${flowSystemPrompt}`;
+    }
+
+    // Tell the LLM how to parse the UI pipe syntax if it reads it from RAG documents
+    finalCustomInstructions += `\n\n[IMPORTANT UI FORMATTING RULE]\nIf you read options or locations from your knowledge base that contain a pipe character (e.g. 'Bangkok|Bangkok Private Office'), DO NOT output the pipe or the value after it. ONLY output the friendly label before the pipe (e.g. 'Bangkok'). Never output 'Label|Value' in your response.`;
+
+    // Build full prompt with context (We only need the system prompt, AI proxy handles history natively)
+    const systemPrompt = buildSystemPrompt({
+      tenantName: tenant.name,
+      botName: effectiveFlow?.name || 'Claire',
+      customInstructions: finalCustomInstructions.trim() || undefined,
+      handoffAgentName: tenant.handoffAgent?.name,
+      language: flowConfig.language,
+      speakingStyle: flowConfig.speakingStyle,
+      businessNeeds: flowConfig.businessNeeds,
+      enableClassification: visitorConfig.enabled && visitorConfig.layer4_classification,
+      enableExtraction: visitorConfig.enabled && visitorConfig.layer2_nlp,
+    });
+
+    let formattedMessage = message;
+    if (flowHumanPromptTemplate) {
+      formattedMessage = flowHumanPromptTemplate.replace('{input}', message);
+    }
 
     let aiReplyRaw = '';
     let handoffOccurred = false;
@@ -289,8 +290,11 @@ export async function POST(req: NextRequest) {
       let bypassLLM = false;
 
       if (qnaMatch) {
-        if (['form', 'options', 'card'].includes(qnaMatch.responseType)) {
-          // Bypass LLM for rich UI responses to prevent HTML stripping
+        const isRichOrHandoff =
+          ['form', 'options', 'card', 'handoff'].includes(qnaMatch.responseType) ||
+          qnaMatch.response.includes('[HANDOFF_REQUESTED]');
+        if (isRichOrHandoff) {
+          // Bypass LLM for rich UI responses and direct handoff messages to preserve formatting and hotlines
           bypassLLM = true;
           aiReplyRaw = qnaMatch.response;
           if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {

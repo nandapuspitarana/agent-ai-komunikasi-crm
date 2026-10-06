@@ -47,6 +47,9 @@ class AiChatView extends StatefulWidget {
   final String? talkToAgentLabel;
   final String talkToAgentMessage;
 
+  /// Optional message shown in the top banner when a human agent is active.
+  final String? handoffBannerMessage;
+
   const AiChatView({
     super.key,
     required this.controller,
@@ -65,6 +68,7 @@ class AiChatView extends StatefulWidget {
     this.conversationStartedLabel,
     this.talkToAgentLabel,
     this.talkToAgentMessage = 'Saya ingin bicara dengan agen manusia',
+    this.handoffBannerMessage,
   });
 
   @override
@@ -194,7 +198,7 @@ class _AiChatViewState extends State<AiChatView> {
     final bodyContent = Column(
         children: [
           // Human handoff banner if active
-          if (controller.isHandoff) HandoffBanner(isDark: isDark),
+          if (controller.isHandoff) HandoffBanner(isDark: isDark, message: widget.handoffBannerMessage),
 
           // Error notification banner if any
           if (controller.errorMessage != null)

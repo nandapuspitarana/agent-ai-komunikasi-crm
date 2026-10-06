@@ -1,6 +1,6 @@
 name: flutter_ai_agent_sdk
 description: "Production-ready AI Agent & CRM Chat Client SDK for Flutter (CEO Suite Portal & Mobile Apps)"
-version: 1.0.25
+version: 1.0.26
 homepage: https://ceosuite.com
 
 environment:
