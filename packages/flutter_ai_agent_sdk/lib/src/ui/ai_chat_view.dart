@@ -43,9 +43,22 @@ class AiChatView extends StatefulWidget {
 
   /// When set, a "talk to a human" button is shown above the input while the
   /// bot is answering (web: `talkToAgentBtn`). Tapping it sends
-  /// [talkToAgentMessage].
+  /// [talkToAgentMessage] if human handoff is enabled, or redirects to
+  /// email if human handoff is disabled.
   final String? talkToAgentLabel;
   final String talkToAgentMessage;
+
+  /// Optional email address to direct users to when human handoff is disabled.
+  /// If null, resolved dynamically from [controller.fallbackEmail].
+  final String? talkToAgentEmail;
+
+  /// Optional label override for the button when redirected to email.
+  /// If null, defaults to [talkToAgentLabel] or 'Contact Support via Email'.
+  final String? talkToAgentEmailLabel;
+
+  /// Optional callback executed when redirected to email.
+  /// If null, triggers [onLaunchUrl] with `mailto:<email>`.
+  final ValueChanged<String>? onEmailRedirect;
 
   /// Optional message shown in the top banner when a human agent is active.
   final String? handoffBannerMessage;
@@ -68,6 +81,9 @@ class AiChatView extends StatefulWidget {
     this.conversationStartedLabel,
     this.talkToAgentLabel,
     this.talkToAgentMessage = 'Saya ingin bicara dengan agen manusia',
+    this.talkToAgentEmail,
+    this.talkToAgentEmailLabel,
+    this.onEmailRedirect,
     this.handoffBannerMessage,
   });
 
@@ -126,6 +142,7 @@ class _AiChatViewState extends State<AiChatView> {
   }
 
   void _handleSend() {
+    if (widget.controller.isTyping) return;
     final text = _inputController.text.trim();
     if (text.isEmpty) return;
     _inputController.clear();
@@ -307,7 +324,7 @@ class _AiChatViewState extends State<AiChatView> {
               onOptionSelected: (opt) => controller.selectOption(opt),
             ),
 
-          // "Talk to a human": only while the bot is answering, like the web widget
+          // "Talk to a human / Email support": only while the bot is answering, like the web widget
           if (widget.talkToAgentLabel != null && !controller.isHandoff)
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
@@ -317,9 +334,32 @@ class _AiChatViewState extends State<AiChatView> {
                   key: const ValueKey('talk_to_agent'),
                   onPressed: controller.isTyping
                       ? null
-                      : () => controller.sendMessage(widget.talkToAgentMessage),
-                  icon: const Icon(Icons.phone_in_talk_outlined, size: 14),
-                  label: Text(widget.talkToAgentLabel!),
+                      : () {
+                          if (!controller.humanHandoffEnabled) {
+                            final targetEmail =
+                                widget.talkToAgentEmail ?? controller.fallbackEmail;
+                            if (targetEmail != null && targetEmail.isNotEmpty) {
+                              if (widget.onEmailRedirect != null) {
+                                widget.onEmailRedirect!(targetEmail);
+                                return;
+                              }
+                              final mailtoUri =
+                                  'mailto:$targetEmail?subject=${Uri.encodeComponent("Support Request")}';
+                              if (widget.onLaunchUrl != null) {
+                                widget.onLaunchUrl!(mailtoUri);
+                                return;
+                              }
+                            }
+                          }
+                          controller.sendMessage(widget.talkToAgentMessage);
+                        },
+                  icon: Icon(
+                    !controller.humanHandoffEnabled
+                        ? Icons.mail_outline_rounded
+                        : Icons.phone_in_talk_outlined,
+                    size: 14,
+                  ),
+                  label: Text(_talkToAgentLabel(controller)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                     backgroundColor: isDark ? const Color(0xFF1E1E20) : Colors.white,
@@ -384,7 +424,7 @@ class _AiChatViewState extends State<AiChatView> {
                     ValueListenableBuilder<TextEditingValue>(
                       valueListenable: _inputController,
                       builder: (context, value, _) {
-                        final canSend = value.text.trim().isNotEmpty;
+                        final canSend = value.text.trim().isNotEmpty && !controller.isTyping;
                         return Opacity(
                           opacity: canSend ? 1 : 0.5,
                           child: InkWell(
@@ -508,5 +548,18 @@ class _AiChatViewState extends State<AiChatView> {
       ),
       body: bodyContent,
     );
+  }
+
+  String _talkToAgentLabel(AiChatController controller) {
+    if (!controller.humanHandoffEnabled) {
+      if (widget.talkToAgentEmailLabel != null) {
+        return widget.talkToAgentEmailLabel!;
+      }
+      final email = widget.talkToAgentEmail ?? controller.fallbackEmail;
+      if (email != null && email.isNotEmpty) {
+        return 'Contact via Email ($email)';
+      }
+    }
+    return widget.talkToAgentLabel!;
   }
 }

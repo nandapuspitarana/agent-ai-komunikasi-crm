@@ -83,6 +83,8 @@
     "errorOccurred": "Sorry, an error occurred. Please try again.",
     "noConnection": "Cannot connect to server. Check your connection.",
     "talkToAgentBtn": "Talk to Human Agent",
+    "contactViaEmailBtn": "Contact via Email",
+    "redirectingToEmail": "Redirecting to support email...",
     "queueMessage": "⏳ You are in the queue. Our agent will join shortly...",
     "reviewPrompt": "How was our service?",
     "reviewPlaceholder": "Write your thoughts (optional)...",

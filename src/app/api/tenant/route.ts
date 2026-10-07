@@ -68,13 +68,30 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, aiSystemPrompt, handoffAgentId, activeFlowId, themeBrandColor, themeUserBubbleColor, themeBotBubbleColor, themeBrandLogo, botAvatarUrl, widgetPosition, widgetIconUrl, visitorConfig } = body;
+    const {
+      name,
+      aiSystemPrompt,
+      humanHandoffEnabled,
+      fallbackEmail,
+      handoffAgentId,
+      activeFlowId,
+      themeBrandColor,
+      themeUserBubbleColor,
+      themeBotBubbleColor,
+      themeBrandLogo,
+      botAvatarUrl,
+      widgetPosition,
+      widgetIconUrl,
+      visitorConfig,
+    } = body;
 
     const updatedTenant = await prisma.tenant.update({
       where: { id: tenantId },
       data: {
         name,
         aiSystemPrompt,
+        ...(humanHandoffEnabled !== undefined && { humanHandoffEnabled }),
+        ...(fallbackEmail !== undefined && { fallbackEmail }),
         handoffAgentId,
         activeFlowId,
         themeBrandColor,

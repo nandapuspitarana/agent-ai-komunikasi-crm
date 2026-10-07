@@ -56,6 +56,8 @@ export async function GET(request: Request) {
     botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,
     position: tenant.widgetPosition || 'right',
     widgetIconUrl: tenant.widgetIconUrl || null,
+    humanHandoffEnabled: tenant.humanHandoffEnabled ?? true,
+    fallbackEmail: tenant.fallbackEmail || null,
     layer1_geolocation: visitorConfig.layer1_geolocation ?? true
   };
 

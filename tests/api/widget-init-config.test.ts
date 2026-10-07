@@ -87,6 +87,18 @@ describe('POST /api/widget/init', () => {
     expect(config.botName).toBe('Claire');
   });
 
+  it('TEST-AI-F50 returns humanHandoffEnabled and fallbackEmail from tenant', async () => {
+    findUnique.mockResolvedValue(
+      baseTenant({
+        humanHandoffEnabled: false,
+        fallbackEmail: 'support@ceosuite.com',
+      })
+    );
+    const { config } = await (await initPost(initReq({ tenantId: 't1' }))).json();
+    expect(config.humanHandoffEnabled).toBe(false);
+    expect(config.fallbackEmail).toBe('support@ceosuite.com');
+  });
+
   it('400 without tenantId, 404 for unknown tenant', async () => {
     expect((await initPost(initReq({}))).status).toBe(400);
     findUnique.mockResolvedValue(null);
@@ -115,5 +127,17 @@ describe('GET /api/widget/config', () => {
     );
     const json = await (await configGet(cfgReq())).json();
     expect(json.welcomeMessageOptions).toEqual([]);
+  });
+
+  it('returns humanHandoffEnabled and fallbackEmail from tenant', async () => {
+    findUnique.mockResolvedValue(
+      baseTenant({
+        humanHandoffEnabled: false,
+        fallbackEmail: 'support@ceosuite.com',
+      })
+    );
+    const json = await (await configGet(cfgReq())).json();
+    expect(json.humanHandoffEnabled).toBe(false);
+    expect(json.fallbackEmail).toBe('support@ceosuite.com');
   });
 });

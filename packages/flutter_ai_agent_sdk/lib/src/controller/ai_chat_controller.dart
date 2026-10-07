@@ -24,6 +24,8 @@ class AiChatController extends ChangeNotifier {
   ServerVersionInfo? _versionInfo;
   bool _isTyping = false;
   bool _isHandoff = false;
+  bool _humanHandoffEnabled = true;
+  String? _fallbackEmail;
   String? _tenantName;
   String? _botName;
   String? _currentAgentName;
@@ -50,6 +52,8 @@ class AiChatController extends ChangeNotifier {
         rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
         _sessionId = initialSessionId ?? _newSessionId(),
         _messages = initialMessages != null ? List.from(initialMessages) : [],
+        _humanHandoffEnabled = config.humanHandoffEnabled ?? true,
+        _fallbackEmail = config.fallbackEmail,
         _isInitialized = initialMessages != null && initialMessages.isNotEmpty;
 
   static int _sessionSeq = 0;
@@ -113,6 +117,8 @@ class AiChatController extends ChangeNotifier {
   bool get needsRetry => _initFailed;
   bool get isTyping => _isTyping;
   bool get isHandoff => _isHandoff;
+  bool get humanHandoffEnabled => _humanHandoffEnabled;
+  String? get fallbackEmail => _fallbackEmail ?? config.fallbackEmail;
   String? get tenantName => _tenantName ?? config.tenantName;
   String get botName => _botName ?? config.botName;
   String? get currentAgentName => _currentAgentName;
@@ -196,6 +202,17 @@ class AiChatController extends ChangeNotifier {
           tenantConfig['infoCardBannerTitle']?.toString();
       if (fetchedBannerTitle != null && fetchedBannerTitle.isNotEmpty) {
         _cardBannerTitle = fetchedBannerTitle;
+      }
+
+      if (tenantConfig.containsKey('humanHandoffEnabled')) {
+        _humanHandoffEnabled = tenantConfig['humanHandoffEnabled'] as bool? ?? true;
+      } else if (config.humanHandoffEnabled != null) {
+        _humanHandoffEnabled = config.humanHandoffEnabled!;
+      }
+
+      final fetchedFallbackEmail = tenantConfig['fallbackEmail']?.toString();
+      if (fetchedFallbackEmail != null && fetchedFallbackEmail.isNotEmpty) {
+        _fallbackEmail = fetchedFallbackEmail;
       }
 
       final welcome =
@@ -315,7 +332,7 @@ class AiChatController extends ChangeNotifier {
   /// Sends a text message from the user.
   Future<void> sendMessage(String text) async {
     final trimmed = text.trim();
-    if (trimmed.isEmpty) return;
+    if (trimmed.isEmpty || _isTyping) return;
 
     // Rate limiter anti-flood check
     if (!rateLimiter.allowAction()) {
@@ -552,13 +569,31 @@ class AiChatController extends ChangeNotifier {
         final exists = _messages.any((m) => m.id == msgId);
         if (exists) continue;
 
-        // If it's a user message from this device, match by text to prevent duplication
+        final rawText = (rawMap['content']?.toString() ?? rawMap['text']?.toString() ?? '')
+            .replaceAll('[HANDOFF_REQUESTED]', '')
+            .trim();
+
+        // 1. If it's a user message from this device, match by text to prevent duplication
         if (senderType == 'user') {
-          final content = rawMap['content']?.toString() ?? rawMap['text']?.toString() ?? '';
           final isRecentUserDup = _messages.any((m) =>
               m.sender == MessageSender.user &&
-              m.text.trim() == content.trim());
+              m.text.trim() == rawText);
           if (isRecentUserDup) continue;
+        }
+
+        // 2. If it's a bot or agent message, match by text against existing bot/agent messages
+        // to avoid duplicating messages already delivered via the immediate POST response
+        if (senderType == 'bot' || senderType == 'agent') {
+          final existingIdx = _messages.indexWhere((m) =>
+              (m.sender == MessageSender.bot || m.sender == MessageSender.agent) &&
+              m.text.trim() == rawText);
+          if (existingIdx != -1) {
+            // Update temporary/local ID with confirmed DB ID
+            if (_messages[existingIdx].id != msgId && msgId.isNotEmpty) {
+              _messages[existingIdx] = _messages[existingIdx].copyWith(id: msgId);
+            }
+            continue;
+          }
         }
 
         // New incoming message! (e.g. human agent reply, system alert, or bot message)

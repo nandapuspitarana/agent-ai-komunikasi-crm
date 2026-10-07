@@ -99,6 +99,8 @@ model Tenant {
   subscription String        @default("free")
   aiEnabled    Boolean       @default(true)
   aiSystemPrompt String?
+  humanHandoffEnabled Boolean   @default(true)
+  fallbackEmail       String?
   handoffAgentId String?
   handoffAgent   User?         @relation("TenantHandoffAgent", fields: [handoffAgentId], references: [id])
   activeFlowId   String?

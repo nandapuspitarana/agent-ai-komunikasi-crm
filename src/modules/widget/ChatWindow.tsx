@@ -71,7 +71,9 @@ export function ChatWindow({
     tenantName: 'CRM Support',
     primaryColor: primaryColor,
     logo: botLogo,
-    botAvatarUrl: null as string | null
+    botAvatarUrl: null as string | null,
+    humanHandoffEnabled: true,
+    fallbackEmail: null as string | null,
   });
 
   useEffect(() => {
@@ -85,7 +87,9 @@ export function ChatWindow({
             tenantName: data.tenantName || prev.tenantName,
             primaryColor: data.primaryColor || prev.primaryColor,
             logo: data.logoUrl || prev.logo,
-            botAvatarUrl: data.botAvatarUrl || null
+            botAvatarUrl: data.botAvatarUrl || null,
+            humanHandoffEnabled: data.humanHandoffEnabled ?? true,
+            fallbackEmail: data.fallbackEmail || null,
           }));
           
           if (data.welcomeMessage) {
@@ -264,6 +268,11 @@ export function ChatWindow({
 
   const handleRequestHumanAgent = () => {
     if (sessionStatus !== 'bot') return;
+    if (widgetConfig.humanHandoffEnabled === false && widgetConfig.fallbackEmail) {
+      window.location.href = `mailto:${widgetConfig.fallbackEmail}?subject=${encodeURIComponent('Support Request')}`;
+      addMessage(t('chatWidget', 'redirectingToEmail', `Mengarahkan ke email support: ${widgetConfig.fallbackEmail}`), 'system');
+      return;
+    }
     sendMessage('Saya ingin bicara dengan agen manusia');
   };
 

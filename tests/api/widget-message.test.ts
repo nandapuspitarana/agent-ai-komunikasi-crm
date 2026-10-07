@@ -121,6 +121,23 @@ describe('POST /api/widget/message — quick reply options', () => {
     expect(json.reply).toContain('Sure, I will connect you with our customer support team');
   });
 
+  it('TEST-AI-F04-EMAIL when humanHandoffEnabled is false, redirects to fallback email without queueing', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(
+      tenant({
+        humanHandoffEnabled: false,
+        fallbackEmail: 'support@ceosuite.com',
+        activeFlow: { id: 'f1', name: 'Claire', config: { language: 'English' }, intents: [] },
+      })
+    );
+    const json = await (await send('talk to a human agent', 'mobile_app')).json();
+    expect(json.status).toBe('bot');
+    expect(json.handoffOccurred).toBe(false);
+    expect(json.humanHandoffEnabled).toBe(false);
+    expect(json.fallbackEmail).toBe('support@ceosuite.com');
+    expect(json.reply).toContain('support@ceosuite.com');
+    expect(prismaMock.chatSession.update).not.toHaveBeenCalled();
+  });
+
   it('TEST-AI-F04b structured flow command starting with CS: does not trigger handoff', async () => {
     const contactIntent = intent({
       name: 'CS: Contact Directory All Locations',

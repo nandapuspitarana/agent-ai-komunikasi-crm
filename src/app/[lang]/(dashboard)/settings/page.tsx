@@ -18,6 +18,8 @@ import {
   AlertCircle,
   LogOut,
   UserSearch,
+  Mail,
+  Headphones,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import ImageUpload from '@/components/ImageUpload';
@@ -132,6 +134,8 @@ export default function SettingsPage() {
         body: JSON.stringify({
           name: tenant.name,
           aiSystemPrompt: tenant.aiSystemPrompt,
+          humanHandoffEnabled: tenant.humanHandoffEnabled !== undefined ? tenant.humanHandoffEnabled : true,
+          fallbackEmail: tenant.fallbackEmail || null,
           handoffAgentId: tenant.handoffAgentId,
           activeFlowId: tenant.activeFlowId,
           themeBrandColor: tenant.themeBrandColor,
@@ -894,26 +898,83 @@ export default function SettingsPage() {
                   </div>
 
 
-                  {/* Handoff Agent */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Default Handoff Agent (Human Queue)
-                    </label>
-                    <p className="text-xs text-slate-500 mb-2">
-                      Who will be assigned (or whose name will be mentioned by AI) when the user asks for human help?
-                    </p>
-                    <select
-                      value={tenant.handoffAgentId || ''}
-                      onChange={(e) => setTenant({ ...tenant, handoffAgentId: e.target.value || null })}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
-                    >
-                      <option value="">-- No specific agent (Queue) --</option>
-                      {users.map((user) => (
-                        <option key={user.id} value={user.id}>
-                          {user.name || user.email} ({user.role})
-                        </option>
-                      ))}
-                    </select>
+                  {/* Human Handoff & Talk to CS Settings */}
+                  <div className="p-4 border border-slate-200 rounded-xl bg-slate-50/60 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <Headphones className="w-4 h-4 text-brand" />
+                          <label className="text-sm font-semibold text-slate-800">
+                            Bantuan Agen Manusia / Talk to CS
+                          </label>
+                        </div>
+                        <p className="text-xs text-slate-500 max-w-xl">
+                          Toggle untuk mengaktifkan opsi &quot;Bicara dengan Agen&quot;. Matikan jika workspace tidak memiliki agen manusia standby, sehingga pengguna langsung diarahkan ke email.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={tenant.humanHandoffEnabled ?? true}
+                        onClick={() =>
+                          setTenant({
+                            ...tenant,
+                            humanHandoffEnabled: !(tenant.humanHandoffEnabled ?? true),
+                          })
+                        }
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 ${
+                          (tenant.humanHandoffEnabled ?? true) ? 'bg-brand' : 'bg-slate-300'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            (tenant.humanHandoffEnabled ?? true) ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Fallback Email Input */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-slate-500" />
+                        Default Support Email (Fallback Tenant Email)
+                      </label>
+                      <p className="text-xs text-slate-500 mb-2">
+                        Alamat email tujuan ketika pengguna widget/SDK mengklik &quot;Talk to Agent&quot; saat toggle OFF atau dialihkan secara otomatis.
+                      </p>
+                      <input
+                        type="email"
+                        value={tenant.fallbackEmail || ''}
+                        onChange={(e) => setTenant({ ...tenant, fallbackEmail: e.target.value })}
+                        placeholder="support@domain.com"
+                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
+                      />
+                    </div>
+
+                    {/* Handoff Agent Queue - Visible if toggle ON */}
+                    {(tenant.humanHandoffEnabled ?? true) && (
+                      <div className="pt-2 border-t border-slate-200">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Default Handoff Agent (Human Queue)
+                        </label>
+                        <p className="text-xs text-slate-500 mb-2">
+                          Siapa yang akan ditugaskan (atau namanya disebut AI) saat pengguna dialihkan ke antrean agen manusia.
+                        </p>
+                        <select
+                          value={tenant.handoffAgentId || ''}
+                          onChange={(e) => setTenant({ ...tenant, handoffAgentId: e.target.value || null })}
+                          className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
+                        >
+                          <option value="">-- Tidak ada agen spesifik (Antrean Umum) --</option>
+                          {users.map((user) => (
+                            <option key={user.id} value={user.id}>
+                              {user.name || user.email} ({user.role})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                   </div>
                 </div>
 

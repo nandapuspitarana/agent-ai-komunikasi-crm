@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { Send, Bot, User, MoreVertical, UserCheck, Loader2, PhoneCall, RotateCcw } from 'lucide-react';
+import { Send, Bot, User, MoreVertical, UserCheck, Loader2, PhoneCall, RotateCcw, Mail } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
 export type MessageSender = 'user' | 'bot' | 'agent' | 'system';
@@ -22,6 +22,8 @@ export interface ChatUIConfig {
   primaryColor: string;
   logo?: string | null;
   botAvatarUrl?: string | null;
+  humanHandoffEnabled?: boolean;
+  fallbackEmail?: string | null;
 }
 
 export interface ChatUIProps {
@@ -299,7 +301,7 @@ export function ChatUI({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Talk to Human Button — hanya tampil jika masih mode bot */}
+      {/* Talk to Human / Contact via Email Button — hanya tampil jika masih mode bot */}
       {status === 'bot' && onTalkToAgent && (
         <div className="px-3 pt-2">
           <button
@@ -307,8 +309,21 @@ export function ChatUI({
             disabled={isTyping}
             className="w-full flex items-center justify-center gap-2 text-xs py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-50"
           >
-            <PhoneCall size={13} />
-            {t('chatWidget', 'talkToAgentBtn')}
+            {config.humanHandoffEnabled === false ? (
+              <>
+                <Mail size={13} className="text-brand" />
+                <span>
+                  {config.fallbackEmail
+                    ? `${t('chatWidget', 'contactViaEmailBtn', 'Hubungi via Email')} (${config.fallbackEmail})`
+                    : t('chatWidget', 'contactViaEmailBtn', 'Hubungi via Email')}
+                </span>
+              </>
+            ) : (
+              <>
+                <PhoneCall size={13} />
+                <span>{t('chatWidget', 'talkToAgentBtn')}</span>
+              </>
+            )}
           </button>
         </div>
       )}

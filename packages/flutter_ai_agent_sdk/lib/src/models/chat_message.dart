@@ -140,7 +140,7 @@ class ChatMessage {
     final rawText = json['content']?.toString() ?? json['text']?.toString() ?? '';
     final createdAtStr = json['createdAt']?.toString() ?? json['timestamp']?.toString();
     final timestamp = createdAtStr != null
-        ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+        ? (DateTime.tryParse(createdAtStr)?.toLocal() ?? DateTime.now())
         : DateTime.now();
 
     final MessageSender sender;
@@ -170,6 +170,7 @@ class ChatMessage {
 
   /// Creates a copy of this message with updated status.
   ChatMessage copyWith({
+    String? id,
     String? text,
     MessageStatus? status,
     bool? isHandoff,
@@ -178,7 +179,7 @@ class ChatMessage {
     bool? formSubmitted,
   }) {
     return ChatMessage(
-      id: id,
+      id: id ?? this.id,
       sender: sender,
       senderName: senderName ?? this.senderName,
       text: text ?? this.text,

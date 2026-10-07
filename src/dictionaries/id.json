@@ -83,6 +83,8 @@
     "errorOccurred": "Maaf, terjadi kesalahan. Silakan coba lagi.",
     "noConnection": "Tidak dapat terhubung ke server. Periksa koneksi Anda.",
     "talkToAgentBtn": "Bicara dengan Agen Manusia",
+    "contactViaEmailBtn": "Hubungi via Email",
+    "redirectingToEmail": "Mengarahkan ke email support...",
     "queueMessage": "⏳ Anda berada dalam antrean. Agen kami akan segera bergabung...",
     "reviewPrompt": "Bagaimana layanan kami?",
     "reviewPlaceholder": "Tulis pendapat Anda (opsional)...",

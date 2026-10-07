@@ -303,6 +303,36 @@ export async function POST(req: NextRequest) {
       const ruleCheck = checkHandoffIntent(message);
 
       if (ruleCheck.intent === 'handoff_requested') {
+        const isHandoffEnabled = tenant.humanHandoffEnabled ?? true;
+
+        if (!isHandoffEnabled) {
+          const fallbackEmail = tenant.fallbackEmail;
+          const noAgentMsg = fallbackEmail
+            ? (isEn
+                ? `Our customer support team is currently not available. Please reach out to us via email at ${fallbackEmail}.`
+                : `Saat ini tim customer support kami tidak sedang standby. Silakan hubungi kami melalui email di ${fallbackEmail}.`)
+            : (isEn
+                ? 'Our customer support team is currently not available. Please leave a message or reach out via email.'
+                : 'Saat ini tim customer support kami tidak sedang standby. Silakan tinggalkan pesan atau hubungi kami melalui email.');
+
+          await prisma.message.create({
+            data: {
+              sessionId: currentSessionId,
+              senderType: 'bot',
+              content: noAgentMsg,
+            },
+          });
+
+          return corsResponse({
+            sessionId: currentSessionId,
+            status: 'bot',
+            reply: noAgentMsg,
+            handoffOccurred: false,
+            humanHandoffEnabled: false,
+            fallbackEmail: fallbackEmail || null,
+          });
+        }
+
         // Update session status ke 'queue' untuk diambil agent
         await prisma.chatSession.update({
           where: { id: currentSessionId },
@@ -316,7 +346,7 @@ export async function POST(req: NextRequest) {
           ? `Sure, I will connect you with our customer support team${agentName} right away. Please wait a moment! 😊`
           : `Baik, saya akan segera menghubungkan Anda dengan agen kami${agentName}. Mohon tunggu sebentar ya! 😊`;
 
-        await prisma.message.create({
+        const savedHandoffMsg = await prisma.message.create({
           data: {
             sessionId: currentSessionId,
             senderType: 'bot',
@@ -326,6 +356,7 @@ export async function POST(req: NextRequest) {
 
         return corsResponse({
           sessionId: currentSessionId,
+          messageId: savedHandoffMsg.id,
           status: 'queue',
           reply: handoffMessage,
           handoffOccurred: true,
@@ -348,6 +379,8 @@ export async function POST(req: NextRequest) {
       botName: effectiveFlow?.name || 'Claire',
       customInstructions: finalCustomInstructions.trim() || undefined,
       handoffAgentName: tenant.handoffAgent?.name,
+      humanHandoffEnabled: tenant.humanHandoffEnabled ?? true,
+      fallbackEmail: tenant.fallbackEmail || undefined,
       language: flowConfig.language,
       speakingStyle: flowConfig.speakingStyle,
       businessNeeds: flowConfig.businessNeeds,
@@ -480,7 +513,7 @@ export async function POST(req: NextRequest) {
     //  - every other channel (e.g. mobile_app) gets clean text plus a structured `options` array
     const quickOptions = qnaMatch?.options ? parseOptions(qnaMatch.options) : [];
     const useLegacyHtml = channel === 'widget';
-    const cleanReply = useLegacyHtml && quickOptions.length > 0
+    let cleanReply = useLegacyHtml && quickOptions.length > 0
       ? textReply + toLegacyHtml(quickOptions)
       : textReply;
     const structuredOptions = !useLegacyHtml ? quickOptions : [];
@@ -531,15 +564,26 @@ export async function POST(req: NextRequest) {
     }
 
     if (handoffRequested) {
-      // Update session status
-      await prisma.chatSession.update({
-        where: { id: currentSessionId },
-        data: { status: 'queue' },
-      });
-      handoffOccurred = true;
+      if (tenant.humanHandoffEnabled ?? true) {
+        // Update session status
+        await prisma.chatSession.update({
+          where: { id: currentSessionId },
+          data: { status: 'queue' },
+        });
+        handoffOccurred = true;
 
-      // Notify agent dashboard
-      // Supabase Realtime handles this automatically.
+        // Notify agent dashboard
+        // Supabase Realtime handles this automatically.
+      } else {
+        handoffOccurred = false;
+        if (tenant.fallbackEmail && !cleanReply.toLowerCase().includes(tenant.fallbackEmail.toLowerCase())) {
+          const isEn = (flowConfig?.language || '').toLowerCase().startsWith('en');
+          const emailNotice = isEn
+            ? `\n\n(Customer support team is currently not on standby. You can reach us via email at ${tenant.fallbackEmail})`
+            : `\n\n(Tim customer support kami sedang tidak standby. Anda dapat menghubungi kami via email di ${tenant.fallbackEmail})`;
+          cleanReply += emailNotice;
+        }
+      }
     }
 
     // Step 5: Save AI reply to database
@@ -557,6 +601,7 @@ export async function POST(req: NextRequest) {
 
     return corsResponse({
       sessionId: currentSessionId,
+      messageId: savedBotMessage.id,
       status: handoffOccurred ? 'queue' : 'bot',
       reply: cleanReply,
       responseType,

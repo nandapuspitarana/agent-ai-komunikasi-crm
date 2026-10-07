@@ -266,5 +266,45 @@ void main() {
       expect(controller.messages.last.senderName, equals('Nanda Support'));
       expect(controller.messages.last.text, equals('Halo kak, ada yang bisa kami bantu?'));
     });
+
+    test('TEST-AI-U19: syncMessages deduplicates bot and agent replies already present locally', () async {
+      when(() => mockApiClient.syncMessages(
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+          )).thenAnswer(
+        (_) async => {
+          'success': true,
+          'sessionId': 'canonical_session_uuid_123',
+          'status': 'queue',
+          'messages': [
+            {
+              'id': 'db_msg_uuid_999',
+              'senderType': 'bot',
+              'content': 'Sure, I will connect you with our customer support team right away. Please wait a moment! 😊',
+              'createdAt': DateTime.now().toUtc().toIso8601String(),
+            }
+          ]
+        },
+      );
+
+      // Simulate local message already added from immediate HTTP POST response
+      controller.restoreMessages([
+        ChatMessage(
+          id: 'bot_temporary_timestamp_id',
+          sender: MessageSender.agent,
+          text: 'Sure, I will connect you with our customer support team right away. Please wait a moment! 😊',
+          timestamp: DateTime.now(),
+          sessionId: 'canonical_session_uuid_123',
+        )
+      ], sessionId: 'canonical_session_uuid_123');
+
+      expect(controller.messages.length, equals(1));
+
+      await controller.syncMessages();
+
+      // Must NOT add duplicate message! Must remain 1 message and sync DB ID.
+      expect(controller.messages.length, equals(1));
+      expect(controller.messages.first.id, equals('db_msg_uuid_999'));
+    });
   });
 }

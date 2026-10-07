@@ -119,6 +119,8 @@ export function buildSystemPrompt(options: {
   botName?: string;
   customInstructions?: string;
   handoffAgentName?: string;
+  humanHandoffEnabled?: boolean;
+  fallbackEmail?: string;
   language?: string;
   speakingStyle?: string;
   businessNeeds?: string;
@@ -130,6 +132,8 @@ export function buildSystemPrompt(options: {
     botName = 'Asisten AI', 
     customInstructions, 
     handoffAgentName,
+    humanHandoffEnabled = true,
+    fallbackEmail,
     language = 'Bahasa Indonesia',
     speakingStyle = 'ramah dan profesional',
     businessNeeds = '',
@@ -139,21 +143,34 @@ export function buildSystemPrompt(options: {
 
   const isEnglish = (language || '').toLowerCase().startsWith('en');
 
-  let handoffInstruction = isEnglish
-    ? '4. If the user requests to speak with a human or an agent, immediately flag the conversation for handoff.'
-    : '4. Jika pengguna meminta untuk berbicara dengan manusia/agen, segera tandai percakapan untuk dialihkan.';
-  let exampleHandoff = isEnglish
-    ? 'For example: "Sure, I will connect you with our team right away. Please hold on a moment. [HANDOFF_REQUESTED]"'
-    : 'Misalnya: "Tentu, saya akan menghubungkan Anda dengan agen kami sekarang. Mohon tunggu sebentar. [HANDOFF_REQUESTED]"';
+  let handoffInstruction = '';
+  let exampleHandoff = '';
 
-  if (handoffAgentName) {
+  if (!humanHandoffEnabled) {
+    handoffInstruction = isEnglish
+      ? `4. Live human agents are NOT currently available. If the user asks to speak with a human or customer support agent, inform them that human agents are not currently on standby, and direct them to contact us via email${fallbackEmail ? ` at ${fallbackEmail}` : ''}. Do NOT include [HANDOFF_REQUESTED].`
+      : `4. Agen manusia saat ini TIDAK standby. Jika pengguna meminta untuk berbicara dengan manusia atau agen CS, beri tahu bahwa tim agen manusia sedang tidak standby, dan arahkan mereka untuk menghubungi melalui email${fallbackEmail ? ` di ${fallbackEmail}` : ''}. JANGAN menyertakan [HANDOFF_REQUESTED].`;
+  } else if (handoffAgentName) {
     handoffInstruction = isEnglish
       ? `4. If the user requests to speak with a human or an agent, inform them that they will be connected to our team member ${handoffAgentName}, and immediately flag the conversation for handoff.`
       : `4. Jika pengguna meminta untuk berbicara dengan manusia/agen, beri tahu bahwa mereka akan dihubungkan dengan agen manusia kami bernama ${handoffAgentName}, dan segera tandai percakapan untuk dialihkan.`;
     exampleHandoff = isEnglish
       ? `For example: "Sure, I will connect you with ${handoffAgentName} right away. Please hold on a moment! [HANDOFF_REQUESTED]"`
       : `Misalnya: "Tentu, saya akan segera menghubungkan Anda dengan agen kami, ${handoffAgentName}. Mohon tunggu sebentar ya! [HANDOFF_REQUESTED]"`;
+  } else {
+    handoffInstruction = isEnglish
+      ? '4. If the user requests to speak with a human or an agent, immediately flag the conversation for handoff.'
+      : '4. Jika pengguna meminta untuk berbicara dengan manusia/agen, segera tandai percakapan untuk dialihkan.';
+    exampleHandoff = isEnglish
+      ? 'For example: "Sure, I will connect you with our team right away. Please hold on a moment. [HANDOFF_REQUESTED]"'
+      : 'Misalnya: "Tentu, saya akan menghubungkan Anda dengan agen kami sekarang. Mohon tunggu sebentar. [HANDOFF_REQUESTED]"';
   }
+
+  const handoffFormatSection = humanHandoffEnabled
+    ? (isEnglish
+        ? `\n\nHANDOFF FORMAT:\nIf you detect that the user wants to speak with a human, append this exact tag at the end of your response:\n[HANDOFF_REQUESTED]\n\n${exampleHandoff}`
+        : `\n\nFORMAT HANDOFF:\nJika Anda mendeteksi bahwa pengguna ingin berbicara dengan manusia, sertakan tag berikut di akhir respons Anda:\n[HANDOFF_REQUESTED]\n\n${exampleHandoff}`)
+    : '';
 
   const base = isEnglish
     ? `You are ${botName}, a customer support AI assistant who is ${speakingStyle || 'helpful and professional'} for ${tenantName}.
@@ -164,13 +181,7 @@ PRIMARY RULES:
 3. NEVER provide false or speculative information.
 ${handoffInstruction}
 5. Keep answers short and to-the-point (maximum 3-4 sentences unless more details are specifically requested).
-${businessNeeds ? `\nBUSINESS CONTEXT:\n${businessNeeds}\nUse the above information as the primary context when responding to users.` : ''}
-
-HANDOFF FORMAT:
-If you detect that the user wants to speak with a human, append this exact tag at the end of your response:
-[HANDOFF_REQUESTED]
-
-${exampleHandoff}`
+${businessNeeds ? `\nBUSINESS CONTEXT:\n${businessNeeds}\nUse the above information as the primary context when responding to users.` : ''}${handoffFormatSection}`
     : `Anda adalah ${botName}, asisten layanan pelanggan AI yang ${speakingStyle} untuk ${tenantName}.
 
 ATURAN UTAMA:
@@ -179,13 +190,7 @@ ATURAN UTAMA:
 3. JANGAN pernah memberikan informasi palsu atau spekulatif.
 ${handoffInstruction}
 5. Jaga agar balasan singkat dan to-the-point (maks 3-4 kalimat kecuali diminta lebih panjang).
-${businessNeeds ? `\nKEBUTUHAN USAHA (Konteks Layanan):\n${businessNeeds}\nGunakan informasi di atas sebagai konteks utama saat membalas pengguna.` : ''}
-
-FORMAT HANDOFF:
-Jika Anda mendeteksi bahwa pengguna ingin berbicara dengan manusia, sertakan tag berikut di akhir respons Anda:
-[HANDOFF_REQUESTED]
-
-${exampleHandoff}`;
+${businessNeeds ? `\nKEBUTUHAN USAHA (Konteks Layanan):\n${businessNeeds}\nGunakan informasi di atas sebagai konteks utama saat membalas pengguna.` : ''}${handoffFormatSection}`;
 
   let finalPrompt = base;
 

@@ -44,6 +44,14 @@ class AiAgentConfig {
   /// Whether background polling is automatically enabled. Defaults to true.
   final bool enablePolling;
 
+  /// Whether human agent handoff is enabled on this client.
+  /// If null, resolved dynamically from CRM tenant configuration.
+  final bool? humanHandoffEnabled;
+
+  /// Fallback support email when human agent is off / not on standby.
+  /// If null, resolved dynamically from CRM tenant configuration.
+  final String? fallbackEmail;
+
   const AiAgentConfig({
     required this.apiUrl,
     required this.tenantId,
@@ -60,6 +68,8 @@ class AiAgentConfig {
     this.cardBannerTitle,
     this.pollingInterval = const Duration(seconds: 3),
     this.enablePolling = false,
+    this.humanHandoffEnabled,
+    this.fallbackEmail,
   });
 
   /// Sanitizes the base API URL to remove trailing slashes.
