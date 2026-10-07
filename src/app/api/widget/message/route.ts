@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
       agentName = agentUser?.name || 'Agent';
     }
 
-    const whereClause: any = { sessionId };
+    const whereClause: any = { sessionId: session.id };
     if (after) {
       const afterDate = new Date(after);
       if (!isNaN(afterDate.getTime())) {
@@ -197,6 +197,56 @@ export async function POST(req: NextRequest) {
     const currentSessionId = chatSession.id;
     const resolvedContactId = contactId || chatSession.contactId;
 
+    // Deduplication check: ignore rapid duplicate messages sent within 2 seconds
+    if (typeof prisma.message?.findFirst === 'function') {
+      const twoSecondsAgo = new Date(Date.now() - 2000);
+      const recentDuplicate = await prisma.message.findFirst({
+        where: {
+          sessionId: currentSessionId,
+          senderType: 'user',
+          content: message,
+          createdAt: { gte: twoSecondsAgo },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (recentDuplicate) {
+        // Check if a bot reply was already generated for this duplicate
+        let recentBotReply = null;
+        for (let i = 0; i < 4; i++) {
+          recentBotReply = await prisma.message.findFirst({
+            where: {
+              sessionId: currentSessionId,
+              senderType: 'bot',
+              createdAt: { gte: recentDuplicate.createdAt },
+            },
+            orderBy: { createdAt: 'desc' },
+          });
+          if (recentBotReply) break;
+          await new Promise((resolve) => setTimeout(resolve, 250));
+        }
+
+        if (recentBotReply) {
+          return corsResponse({
+            sessionId: currentSessionId,
+            messageId: recentBotReply.id,
+            status: chatSession.status,
+            reply: recentBotReply.content,
+            handoffOccurred: false,
+            senderName: tenant.activeFlow?.name || 'Claire',
+            botName: tenant.activeFlow?.name || 'Claire',
+          });
+        }
+
+        return corsResponse({
+          sessionId: currentSessionId,
+          status: chatSession.status,
+          reply: '',
+          handoffOccurred: false,
+        });
+      }
+    }
+
     // Save incoming user message
     const savedUserMsg = await prisma.message.create({
       data: {
@@ -309,11 +359,11 @@ export async function POST(req: NextRequest) {
           const fallbackEmail = tenant.fallbackEmail;
           const noAgentMsg = fallbackEmail
             ? (isEn
-                ? `Our customer support team is currently not available. Please reach out to us via email at ${fallbackEmail}.`
-                : `Saat ini tim customer support kami tidak sedang standby. Silakan hubungi kami melalui email di ${fallbackEmail}.`)
+                ? `For further assistance, our team would be pleased to assist you directly via email at ${fallbackEmail}.`
+                : `Untuk bantuan lebih lanjut, tim kami siap membantu Anda secara langsung melalui email di ${fallbackEmail}.`)
             : (isEn
-                ? 'Our customer support team is currently not available. Please leave a message or reach out via email.'
-                : 'Saat ini tim customer support kami tidak sedang standby. Silakan tinggalkan pesan atau hubungi kami melalui email.');
+                ? 'For further assistance, our team would be pleased to assist you directly via email. Please leave a message with your contact details.'
+                : 'Untuk bantuan lebih lanjut, tim kami siap membantu Anda secara langsung via email. Silakan tinggalkan pesan beserta kontak Anda.');
 
           await prisma.message.create({
             data: {
@@ -579,8 +629,8 @@ export async function POST(req: NextRequest) {
         if (tenant.fallbackEmail && !cleanReply.toLowerCase().includes(tenant.fallbackEmail.toLowerCase())) {
           const isEn = (flowConfig?.language || '').toLowerCase().startsWith('en');
           const emailNotice = isEn
-            ? `\n\n(Customer support team is currently not on standby. You can reach us via email at ${tenant.fallbackEmail})`
-            : `\n\n(Tim customer support kami sedang tidak standby. Anda dapat menghubungi kami via email di ${tenant.fallbackEmail})`;
+            ? `\n\n(For further personal assistance, our team is at your service via email at ${tenant.fallbackEmail})`
+            : `\n\n(Untuk bantuan lebih lanjut, tim kami siap membantu Anda via email di ${tenant.fallbackEmail})`;
           cleanReply += emailNotice;
         }
       }

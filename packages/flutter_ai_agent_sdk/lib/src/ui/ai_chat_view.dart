@@ -141,12 +141,23 @@ class _AiChatViewState extends State<AiChatView> {
     });
   }
 
-  void _handleSend() {
-    if (widget.controller.isTyping) return;
+  bool _isSubmitting = false;
+
+  Future<void> _handleSend() async {
+    if (_isSubmitting || widget.controller.isTyping) return;
     final text = _inputController.text.trim();
     if (text.isEmpty) return;
+    _isSubmitting = true;
     _inputController.clear();
-    widget.controller.sendMessage(text);
+    try {
+      await widget.controller.sendMessage(text);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   Widget _buildTypingIndicator(AiChatTheme theme, bool isDark) {
@@ -424,11 +435,11 @@ class _AiChatViewState extends State<AiChatView> {
                     ValueListenableBuilder<TextEditingValue>(
                       valueListenable: _inputController,
                       builder: (context, value, _) {
-                        final canSend = value.text.trim().isNotEmpty && !controller.isTyping;
+                        final canSend = value.text.trim().isNotEmpty && !controller.isTyping && !_isSubmitting;
                         return Opacity(
                           opacity: canSend ? 1 : 0.5,
                           child: InkWell(
-                            onTap: _handleSend,
+                            onTap: canSend ? _handleSend : null,
                             borderRadius: BorderRadius.circular(24),
                             child: Container(
                               padding: const EdgeInsets.all(9),

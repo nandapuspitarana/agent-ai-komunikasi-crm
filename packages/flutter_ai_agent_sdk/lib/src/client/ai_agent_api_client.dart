@@ -123,7 +123,23 @@ class AiAgentApiClient {
       'channel': channel,
     };
 
-    final res = await _postWithRetry(uri, jsonEncode(payload));
+    // Not retried: a second POST could deliver the user message and generate AI replies twice.
+    final http.Response res;
+    try {
+      res = await _httpClient
+          .post(uri, headers: _headers, body: jsonEncode(payload))
+          .timeout(config.timeout);
+    } catch (e) {
+      throw AiAgentApiException('Network connection failure: $e');
+    }
+
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw AiAgentApiException(
+        'Server returned error: ${res.statusCode}',
+        statusCode: res.statusCode,
+        details: res.body,
+      );
+    }
     final data = jsonDecode(res.body) as Map<String, dynamic>;
 
     final replyText = data['reply']?.toString() ?? '';

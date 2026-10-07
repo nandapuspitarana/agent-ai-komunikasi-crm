@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 const prismaMock = vi.hoisted(() => ({
   tenant: { findUnique: vi.fn() },
   chatSession: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
-  message: { create: vi.fn(), findMany: vi.fn() },
+  message: { create: vi.fn(), findMany: vi.fn(), findFirst: vi.fn() },
   knowledgeDocument: { findMany: vi.fn() },
   visitorProfile: { update: vi.fn() },
   user: { findUnique: vi.fn() },
@@ -56,6 +56,7 @@ beforeEach(() => {
   prismaMock.chatSession.create.mockResolvedValue({ id: 's1', contactId: 'c1', status: 'bot' });
   prismaMock.message.create.mockImplementation(async ({ data }: any) => ({ id: 'm', ...data }));
   prismaMock.message.findMany.mockResolvedValue([]);
+  prismaMock.message.findFirst.mockResolvedValue(null);
   prismaMock.knowledgeDocument.findMany.mockResolvedValue([]);
 });
 
@@ -135,6 +136,7 @@ describe('POST /api/widget/message — quick reply options', () => {
     expect(json.humanHandoffEnabled).toBe(false);
     expect(json.fallbackEmail).toBe('support@ceosuite.com');
     expect(json.reply).toContain('support@ceosuite.com');
+    expect(json.reply.toLowerCase()).not.toContain('standby');
     expect(prismaMock.chatSession.update).not.toHaveBeenCalled();
   });
 
@@ -220,6 +222,31 @@ describe('GET /api/widget/message — polling and sync', () => {
     expect(json.messages[1].senderType).toBe('agent');
     expect(json.messages[1].senderName).toBe('Nanda Support');
     expect(json.messages[1].content).toBe('Halo, saya Nanda siap membantu.');
+  });
+
+  it('TEST-AI-DEDUP prevents duplicate processing when identical user message arrives within 2 seconds', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant());
+    prismaMock.message.findFirst
+      .mockResolvedValueOnce({
+        id: 'user_prev',
+        sessionId: 's1',
+        senderType: 'user',
+        content: 'rooms',
+        createdAt: new Date(),
+      })
+      .mockResolvedValueOnce({
+        id: 'bot_prev',
+        sessionId: 's1',
+        senderType: 'bot',
+        content: 'Pilih tipe ruang:',
+        createdAt: new Date(),
+      });
+
+    const json = await (await send('rooms', 'mobile_app')).json();
+    expect(json.messageId).toBe('bot_prev');
+    expect(json.reply).toBe('Pilih tipe ruang:');
+    // Ensure message.create was not called again for the duplicate
+    expect(prismaMock.message.create).not.toHaveBeenCalled();
   });
 });
 

@@ -909,7 +909,7 @@ export default function SettingsPage() {
                           </label>
                         </div>
                         <p className="text-xs text-slate-500 max-w-xl">
-                          Toggle untuk mengaktifkan opsi &quot;Bicara dengan Agen&quot;. Matikan jika workspace tidak memiliki agen manusia standby, sehingga pengguna langsung diarahkan ke email.
+                          Toggle untuk mengaktifkan opsi &quot;Bicara dengan Agen&quot;. Matikan jika dukungan langsung dialihkan secara eksklusif ke email resmi customer support.
                         </p>
                       </div>
                       <button

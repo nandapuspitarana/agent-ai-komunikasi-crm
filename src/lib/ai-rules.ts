@@ -148,8 +148,8 @@ export function buildSystemPrompt(options: {
 
   if (!humanHandoffEnabled) {
     handoffInstruction = isEnglish
-      ? `4. Live human agents are NOT currently available. If the user asks to speak with a human or customer support agent, inform them that human agents are not currently on standby, and direct them to contact us via email${fallbackEmail ? ` at ${fallbackEmail}` : ''}. Do NOT include [HANDOFF_REQUESTED].`
-      : `4. Agen manusia saat ini TIDAK standby. Jika pengguna meminta untuk berbicara dengan manusia atau agen CS, beri tahu bahwa tim agen manusia sedang tidak standby, dan arahkan mereka untuk menghubungi melalui email${fallbackEmail ? ` di ${fallbackEmail}` : ''}. JANGAN menyertakan [HANDOFF_REQUESTED].`;
+      ? `4. Live human agent chat is not active for this channel. If the user asks to speak with a human or customer support representative, politely explain that support is handled via email and direct them to contact our team${fallbackEmail ? ` at ${fallbackEmail}` : ''}. Maintain an executive, courteous tone without saying support is "not on standby" or using informal excuses. Do NOT include [HANDOFF_REQUESTED].`
+      : `4. Layanan percakapan langsung dengan agen manusia tidak aktif untuk saluran ini. Jika pengguna meminta untuk berbicara dengan staf atau perwakilan customer support, sampaikan dengan ramah dan profesional bahwa bantuan resmi dilayani melalui email${fallbackEmail ? ` di ${fallbackEmail}` : ''}. Gunakan bahasa yang sopan dan profesional, hindari kata-kata seperti "tidak sedang standby" atau alasan informal lainnya. JANGAN menyertakan [HANDOFF_REQUESTED].`;
   } else if (handoffAgentName) {
     handoffInstruction = isEnglish
       ? `4. If the user requests to speak with a human or an agent, inform them that they will be connected to our team member ${handoffAgentName}, and immediately flag the conversation for handoff.`

@@ -48,7 +48,7 @@ class AiAgentConfig {
   /// If null, resolved dynamically from CRM tenant configuration.
   final bool? humanHandoffEnabled;
 
-  /// Fallback support email when human agent is off / not on standby.
+  /// Fallback support email when live human chat is disabled or routed to email.
   /// If null, resolved dynamically from CRM tenant configuration.
   final String? fallbackEmail;
 

@@ -5,6 +5,7 @@ import '../config/ai_agent_config.dart';
 import '../models/chat_message.dart';
 import '../models/quick_reply_option.dart';
 import '../models/response_type.dart';
+import '../models/html_reply_parser.dart';
 import '../security/rate_limiter.dart';
 import '../version.dart';
 
@@ -23,6 +24,7 @@ class AiChatController extends ChangeNotifier {
   ChatMessage? _lastWelcome;
   ServerVersionInfo? _versionInfo;
   bool _isTyping = false;
+  bool _isSending = false;
   bool _isHandoff = false;
   bool _humanHandoffEnabled = true;
   String? _fallbackEmail;
@@ -116,6 +118,7 @@ class AiChatController extends ChangeNotifier {
   /// can offer a retry. [initialize] can be called again to retry.
   bool get needsRetry => _initFailed;
   bool get isTyping => _isTyping;
+  bool get isSending => _isSending;
   bool get isHandoff => _isHandoff;
   bool get humanHandoffEnabled => _humanHandoffEnabled;
   String? get fallbackEmail => _fallbackEmail ?? config.fallbackEmail;
@@ -332,7 +335,8 @@ class AiChatController extends ChangeNotifier {
   /// Sends a text message from the user.
   Future<void> sendMessage(String text) async {
     final trimmed = text.trim();
-    if (trimmed.isEmpty || _isTyping) return;
+    if (trimmed.isEmpty || _isTyping || _isSending) return;
+    _isSending = true;
 
     // Rate limiter anti-flood check
     if (!rateLimiter.allowAction()) {
@@ -407,6 +411,7 @@ class AiChatController extends ChangeNotifier {
 
       _errorMessage = 'Failed to send message: ${e.toString()}';
     } finally {
+      _isSending = false;
       _isTyping = false;
       notifyListeners();
       if (config.enablePolling) startPolling();
@@ -575,18 +580,32 @@ class AiChatController extends ChangeNotifier {
 
         // 1. If it's a user message from this device, match by text to prevent duplication
         if (senderType == 'user') {
-          final isRecentUserDup = _messages.any((m) =>
+          final existingUserIdx = _messages.indexWhere((m) =>
               m.sender == MessageSender.user &&
-              m.text.trim() == rawText);
-          if (isRecentUserDup) continue;
+              (m.text.trim() == rawText || (m.id.startsWith('user_') && m.text.trim() == rawText)));
+          if (existingUserIdx != -1) {
+            // Update local optimistic ID with the confirmed DB ID
+            if (msgId.isNotEmpty && _messages[existingUserIdx].id != msgId) {
+              _messages[existingUserIdx] = _messages[existingUserIdx].copyWith(id: msgId);
+            }
+            continue;
+          }
         }
 
         // 2. If it's a bot or agent message, match by text against existing bot/agent messages
         // to avoid duplicating messages already delivered via the immediate POST response
         if (senderType == 'bot' || senderType == 'agent') {
-          final existingIdx = _messages.indexWhere((m) =>
-              (m.sender == MessageSender.bot || m.sender == MessageSender.agent) &&
-              m.text.trim() == rawText);
+          final existingIdx = _messages.indexWhere((m) {
+            if (m.sender != MessageSender.bot && m.sender != MessageSender.agent) return false;
+            if (m.text.trim() == rawText) return true;
+            if (m.card != null && (rawText.contains(m.card!.title) || m.card!.title == rawText)) return true;
+            if (m.form != null && (rawText.contains(m.form!.introMessage) || m.form!.introMessage == rawText)) return true;
+            if (rawText.contains('<')) {
+              final parsed = HtmlReplyParser.parse(rawText);
+              if (parsed.text.trim() == m.text.trim()) return true;
+            }
+            return false;
+          });
           if (existingIdx != -1) {
             // Update temporary/local ID with confirmed DB ID
             if (_messages[existingIdx].id != msgId && msgId.isNotEmpty) {

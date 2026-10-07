@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_ai_agent_sdk/flutter_ai_agent_sdk.dart';
@@ -305,6 +306,75 @@ void main() {
       // Must NOT add duplicate message! Must remain 1 message and sync DB ID.
       expect(controller.messages.length, equals(1));
       expect(controller.messages.first.id, equals('db_msg_uuid_999'));
+    });
+
+    test('TEST-AI-U20: sendMessage blocks duplicate/concurrent sends while in-flight', () async {
+      final completer = Completer<ChatMessage>();
+      when(() => mockApiClient.sendMessage(
+            sessionId: any(named: 'sessionId'),
+            message: any(named: 'message'),
+            contactId: any(named: 'contactId'),
+          )).thenAnswer((_) => completer.future);
+
+      // Start first send
+      final firstSend = controller.sendMessage('First message');
+      expect(controller.isSending, isTrue);
+
+      // Attempt second send while first is still in flight
+      await controller.sendMessage('Second concurrent message');
+
+      // The second send should be ignored
+      expect(controller.messages.where((m) => m.text == 'Second concurrent message').isEmpty, isTrue);
+
+      completer.complete(ChatMessage(
+        id: 'bot_resp_1',
+        sender: MessageSender.bot,
+        text: 'Reply to first',
+        timestamp: DateTime.now(),
+      ));
+      await firstSend;
+
+      expect(controller.isSending, isFalse);
+    });
+
+    test('TEST-AI-U21: syncMessages deduplicates cards and HTML replies against local messages', () async {
+      const cardHtml = "<div class='card'><div class='card-title'>Executive Suite</div><div class='small'>Description</div></div>";
+      when(() => mockApiClient.syncMessages(
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+          )).thenAnswer(
+        (_) async => {
+          'success': true,
+          'sessionId': 'canonical_session_uuid_123',
+          'status': 'bot',
+          'messages': [
+            {
+              'id': 'db_msg_card_1',
+              'senderType': 'bot',
+              'content': cardHtml,
+              'createdAt': DateTime.now().toUtc().toIso8601String(),
+            }
+          ]
+        },
+      );
+
+      // Restore existing local message with card parsed
+      controller.restoreMessages([
+        ChatMessage.fromApiResponse(
+          id: 'local_card_id',
+          rawReply: cardHtml,
+          sessionId: 'canonical_session_uuid_123',
+        )
+      ], sessionId: 'canonical_session_uuid_123');
+
+      expect(controller.messages.length, equals(1));
+      expect(controller.messages.first.card?.title, equals('Executive Suite'));
+
+      await controller.syncMessages();
+
+      // Should deduplicate and not add a second card or raw HTML message
+      expect(controller.messages.length, equals(1));
+      expect(controller.messages.first.id, equals('db_msg_card_1'));
     });
   });
 }

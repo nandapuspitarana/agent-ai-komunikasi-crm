@@ -71,6 +71,7 @@ class ChatMessage {
     bool handoffOccurred = false,
     String? senderName,
     String? sessionId,
+    DateTime? timestamp,
   }) {
     ResponseType parsedType = ResponseType.fromString(responseType);
 
@@ -126,7 +127,7 @@ class ChatMessage {
       options: options,
       card: card,
       form: form,
-      timestamp: DateTime.now(),
+      timestamp: timestamp ?? DateTime.now(),
       status: MessageStatus.sent,
       isHandoff: isHandoff,
       sessionId: sessionId,
@@ -156,6 +157,17 @@ class ChatMessage {
     final senderName = json['senderName']?.toString() ??
         (sender == MessageSender.agent ? (defaultAgentName ?? 'Live Support') : null);
 
+    if (sender == MessageSender.bot) {
+      return ChatMessage.fromApiResponse(
+        id: id,
+        rawReply: rawText,
+        handoffOccurred: isHandoff,
+        senderName: senderName,
+        sessionId: json['sessionId']?.toString(),
+        timestamp: timestamp,
+      );
+    }
+
     return ChatMessage(
       id: id,
       sender: sender,
@@ -177,6 +189,7 @@ class ChatMessage {
     String? senderName,
     String? sessionId,
     bool? formSubmitted,
+    DateTime? timestamp,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -187,7 +200,7 @@ class ChatMessage {
       options: options,
       card: card,
       form: form,
-      timestamp: timestamp,
+      timestamp: timestamp ?? this.timestamp,
       status: status ?? this.status,
       isHandoff: isHandoff ?? this.isHandoff,
       sessionId: sessionId ?? this.sessionId,
