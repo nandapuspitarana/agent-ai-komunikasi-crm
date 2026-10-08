@@ -25,11 +25,12 @@ import {
 import { useSession } from 'next-auth/react';
 import ImageUpload from '@/components/ImageUpload';
 import VisitorConfigPanel from '@/components/settings/VisitorConfigPanel';
-import { getVisitorConfig, VisitorConfig } from '@/lib/visitor-config';
+import EmailSmtpConfigPanel from '@/components/settings/EmailSmtpConfigPanel';
+import { getVisitorConfig, VisitorConfig, DEFAULT_EMAIL_CONFIG } from '@/lib/visitor-config';
 
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
-type TabType = 'account' | 'users' | 'audit-logs' | 'tenant' | 'visitors-config';
+type TabType = 'account' | 'users' | 'audit-logs' | 'tenant' | 'email-smtp' | 'visitors-config';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
@@ -99,7 +100,7 @@ export default function SettingsPage() {
 
   // Fetch tenant settings
   useEffect(() => {
-    if (activeTab === 'tenant' || activeTab === 'visitors-config') {
+    if (activeTab === 'tenant' || activeTab === 'visitors-config' || activeTab === 'email-smtp') {
       fetchTenantSettings();
     }
   }, [activeTab]);
@@ -297,6 +298,7 @@ export default function SettingsPage() {
     { id: 'users', label: t('settings', 'tabUsers'), icon: Users },
     { id: 'audit-logs', label: t('settings', 'tabAudit'), icon: LogOut },
     { id: 'tenant', label: t('settings', 'tabTenant'), icon: Building2 },
+    { id: 'email-smtp', label: t('settings', 'tabEmail', 'Email & SMTP'), icon: Mail },
     { id: 'visitors-config', label: 'Prospek', icon: UserSearch },
   ];
 
@@ -977,10 +979,19 @@ export default function SettingsPage() {
 
                         {/* Fallback Email Input */}
                         <div>
-                          <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-                            <Mail className="w-3.5 h-3.5 text-slate-500" />
-                            Default Support Email (Email Tujuan Laporan)
-                          </label>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                              <Mail className="w-3.5 h-3.5 text-slate-500" />
+                              Default Support Email (Email Tujuan Laporan)
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab('email-smtp')}
+                              className="text-[11px] text-brand hover:underline font-semibold flex items-center gap-1"
+                            >
+                              Konfigurasi Gateway SMTP / Azure &rarr;
+                            </button>
+                          </div>
                           <p className="text-xs text-slate-500 mb-2">
                             Alamat email resmi perusahaan yang menerima laporan kendala dari pengguna.
                           </p>
@@ -1001,17 +1012,18 @@ export default function SettingsPage() {
                             </label>
                             <input
                               type="text"
-                              value={visitorConfig.contactForm?.buttonLabel || ''}
-                              onChange={(e) =>
+                              value={visitorConfig?.contactForm?.buttonLabel || ''}
+                              onChange={(e) => {
+                                const base = visitorConfig || getVisitorConfig({});
                                 setVisitorConfig({
-                                  ...visitorConfig,
+                                  ...base,
                                   contactForm: {
-                                    ...visitorConfig.contactForm,
-                                    enabled: visitorConfig.contactForm?.enabled ?? true,
+                                    ...base.contactForm,
+                                    enabled: base.contactForm?.enabled ?? true,
                                     buttonLabel: e.target.value,
                                   },
-                                })
-                              }
+                                });
+                              }}
                               placeholder="Send Email to Company"
                               className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                             />
@@ -1025,17 +1037,18 @@ export default function SettingsPage() {
                             </label>
                             <input
                               type="text"
-                              value={visitorConfig.contactForm?.formTitle || ''}
-                              onChange={(e) =>
+                              value={visitorConfig?.contactForm?.formTitle || ''}
+                              onChange={(e) => {
+                                const base = visitorConfig || getVisitorConfig({});
                                 setVisitorConfig({
-                                  ...visitorConfig,
+                                  ...base,
                                   contactForm: {
-                                    ...visitorConfig.contactForm,
-                                    enabled: visitorConfig.contactForm?.enabled ?? true,
+                                    ...base.contactForm,
+                                    enabled: base.contactForm?.enabled ?? true,
                                     formTitle: e.target.value,
                                   },
-                                })
-                              }
+                                });
+                              }}
                               placeholder="Hubungi Perusahaan / Laporan"
                               className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                             />
@@ -1055,15 +1068,16 @@ export default function SettingsPage() {
                           </p>
                           <input
                             type="text"
-                            value={(visitorConfig.contactForm?.categories || []).join(', ')}
+                            value={(visitorConfig?.contactForm?.categories || []).join(', ')}
                             onChange={(e) => {
                               const raw = e.target.value;
                               const cats = raw.split(',').map((s) => s.trim()).filter(Boolean);
+                              const base = visitorConfig || getVisitorConfig({});
                               setVisitorConfig({
-                                ...visitorConfig,
+                                ...base,
                                 contactForm: {
-                                  ...visitorConfig.contactForm,
-                                  enabled: visitorConfig.contactForm?.enabled ?? true,
+                                  ...base.contactForm,
+                                  enabled: base.contactForm?.enabled ?? true,
                                   categories: cats,
                                 },
                               });
@@ -1083,17 +1097,18 @@ export default function SettingsPage() {
                           </p>
                           <textarea
                             rows={2}
-                            value={visitorConfig.contactForm?.autoReplyTemplate || ''}
-                            onChange={(e) =>
+                            value={visitorConfig?.contactForm?.autoReplyTemplate || ''}
+                            onChange={(e) => {
+                              const base = visitorConfig || getVisitorConfig({});
                               setVisitorConfig({
-                                ...visitorConfig,
+                                ...base,
                                 contactForm: {
-                                  ...visitorConfig.contactForm,
-                                  enabled: visitorConfig.contactForm?.enabled ?? true,
+                                  ...base.contactForm,
+                                  enabled: base.contactForm?.enabled ?? true,
                                   autoReplyTemplate: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                            }}
                             placeholder="Terima kasih {name}! Pesan dan laporan Anda terkait {category} telah kami teruskan ke tim perusahaan. Kami akan segera menindaklanjuti melalui email ({email})."
                             className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white resize-none"
                           />
@@ -1111,16 +1126,17 @@ export default function SettingsPage() {
                           </div>
                           <input
                             type="checkbox"
-                            checked={visitorConfig.contactForm?.enabled ?? true}
-                            onChange={(e) =>
+                            checked={visitorConfig?.contactForm?.enabled ?? true}
+                            onChange={(e) => {
+                              const base = visitorConfig || getVisitorConfig({});
                               setVisitorConfig({
-                                ...visitorConfig,
+                                ...base,
                                 contactForm: {
-                                  ...visitorConfig.contactForm,
+                                  ...base.contactForm,
                                   enabled: e.target.checked,
                                 },
-                              })
-                            }
+                              });
+                            }}
                             className="w-4 h-4 text-brand rounded border-slate-300 focus:ring-brand cursor-pointer"
                           />
                         </div>
@@ -1227,6 +1243,43 @@ export default function SettingsPage() {
                   </button>
                 </div>
               </form>
+            )}
+          </div>
+        )}
+
+        {/* Email & SMTP Settings Tab */}
+        {activeTab === 'email-smtp' && (
+          <div className="p-8">
+            <h2 className="text-xl font-bold text-slate-900 mb-6">Pengaturan Email & SMTP</h2>
+
+            {tenantLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
+                <p className="text-slate-600 mt-3">Memuat konfigurasi email...</p>
+              </div>
+            ) : visitorConfig && tenant && (
+              <div className="max-w-4xl">
+                <EmailSmtpConfigPanel
+                  emailConfig={visitorConfig.emailConfig || DEFAULT_EMAIL_CONFIG}
+                  fallbackEmail={tenant.fallbackEmail || ''}
+                  onEmailConfigChange={(newEmailConfig) =>
+                    setVisitorConfig({
+                      ...visitorConfig,
+                      emailConfig: newEmailConfig,
+                    })
+                  }
+                  onFallbackEmailChange={(newEmail) =>
+                    setTenant({
+                      ...tenant,
+                      fallbackEmail: newEmail,
+                    })
+                  }
+                  onSave={async () => {
+                    await handleTenantSave({ preventDefault: () => {} } as any);
+                  }}
+                  isSaving={tenantSaveLoading}
+                />
+              </div>
             )}
           </div>
         )}

@@ -169,6 +169,7 @@
     "tabUsers": "Pengguna",
     "tabAudit": "Log Audit",
     "tabTenant": "Pengaturan Penyewa",
+    "tabEmail": "Email & SMTP",
     "changePassword": "Ubah Kata Sandi",
     "currentPassword": "Kata Sandi Saat Ini",
     "newPassword": "Kata Sandi Baru",

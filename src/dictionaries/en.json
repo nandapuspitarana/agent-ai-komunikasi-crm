@@ -169,6 +169,7 @@
     "tabUsers": "Users",
     "tabAudit": "Audit Logs",
     "tabTenant": "Tenant Settings",
+    "tabEmail": "Email & SMTP",
     "changePassword": "Change Password",
     "currentPassword": "Current Password",
     "newPassword": "New Password",

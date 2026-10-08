@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { upsertVisitorProfile, updateVisitorClassification } from '@/lib/visitor-service';
 import { getVisitorConfig } from '@/lib/visitor-config';
+import { sendInquiryNotificationToTenant } from '@/lib/email-service';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -185,15 +186,18 @@ export async function POST(req: NextRequest) {
       console.error('[Contact Submit API] Error updating visitor profile:', vErr);
     }
 
-    // 6. Notify Company via fallbackEmail (logged or SMTP)
+    // 6. Notify Company via fallbackEmail (using configured Email Service: Azure, Gmail, or Custom SMTP)
     if (tenant.fallbackEmail) {
-      console.log(`[Contact Submit API] Notification dispatched to company email: ${tenant.fallbackEmail}`, {
-        tenantId,
+      console.log(`[Contact Submit API] Dispatching notification to tenant email: ${tenant.fallbackEmail}`);
+      sendInquiryNotificationToTenant(tenant, {
         category,
         description,
         email,
         name,
         company,
+        sessionId: actualSessionId,
+      }).catch((emailErr) => {
+        console.error('[Contact Submit API] Error dispatching email notification:', emailErr);
       });
     }
 

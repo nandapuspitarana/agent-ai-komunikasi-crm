@@ -91,6 +91,47 @@ export interface ContactFormConfig {
 - **`GET /api/widget/config` & `POST /api/widget/init`**: Mengirimkan properti `humanHandoffEnabled`, `fallbackEmail`, dan `contactForm` ke klien Web & Mobile SDK.
 - **`POST /api/widget/contact-submit`**: Menerima pengiriman form, menyimpan percakapan laporan pengguna, memperbarui data prospek di `VisitorProfile`, dan menghasilkan balasan bot instan berdasarkan `autoReplyTemplate`.
 
+### 5. Alur Penyimpanan Data Funnel & Kontak Pengunjung (Lead Profile)
+Saat form funnel in-app dikirim oleh pengunjung melalui endpoint `POST /api/widget/contact-submit`:
+
+1. **Tabel `ChatSession`**:
+   - Jika sesi belum ada, sistem membuat sesi chat baru dengan status `"bot"` dan channel `"widget"`.
+2. **Tabel `Message`**:
+   - **Pesan User**: Menyimpan pesan ringkasan laporan ke riwayat chat:
+     ```
+     📝 [Laporan Masalah ke Perusahaan]
+     • Kategori: <category>
+     • Perusahaan: <company>
+     • Nama: <name>
+     • Email: <email>
+     • Deskripsi: <description>
+     ```
+   - **Pesan Balasan Bot**: Menyimpan respons konfirmasi bot instan (berdasarkan `contactForm.autoReplyTemplate`).
+3. **Tabel `VisitorProfile` (Penyimpanan Data Funnel & Lead Utama)**:
+   - Data pengunjung di-upsert menggunakan relasi komposit `[tenantId, contactId]`:
+     - `name`: Nama lengkap pengunjung.
+     - `email`: Alamat email pengunjung.
+     - `lastIntent`: Kategori masalah/inquiry yang dipilih (contoh: *"Pertanyaan Umum"*, *"Kendala Teknis"*).
+     - `leadClassification`: Jika sebelumnya berstatus `"cold"`, otomatis dipromosikan ke `"support"`.
+     - `leadScore`: Skor prospek otomatis ditingkatkan (+25 poin) untuk menandakan pengunjung aktif berinteraksi.
+     - `sessions` & `messageCount`: Dihitung dan ditambah secara berkesinambungan (+2 pesan).
+     - `lastSeenAt`: Dicatat waktu interaksi saat ini.
+     - **Field `metadata` (JSON)**:
+       - `company`: Nama perusahaan pengunjung.
+       - `lastInquiryCategory`: Kategori masalah terakhir.
+       - `lastInquiryDescription`: Teks lengkap detail deskripsi masalah yang dilaporkan.
+       - `lastInquirySubmittedAt`: Timestamp ISO saat form dikirim.
+4. **Notifikasi Internal Perusahaan (`fallbackEmail`) & Gateway Email**:
+   - Sistem mengirimkan email ringkasan laporan ke alamat email resmi perusahaan yang ditentukan di `tenant.fallbackEmail`.
+   - Pengiriman email diproses oleh **Email Service Gateway** ([src/lib/email-service.ts](file:///c:/Users/nanda/Documents/aiagent/agent-ai-komunikasi-crm/src/lib/email-service.ts)) dengan 3 opsi provider yang dapat dikonfigurasi di menu **Pengaturan > Email & SMTP**:
+     1. **Microsoft Azure (Office 365 / Graph API OAuth2)**: Menggunakan Azure App Registration (`AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SENDER_EMAIL`, `AZURE_SENDER_NAME`, `AZURE_EMAIL_SUBJECT_PREFIX`).
+     2. **Gmail SMTP**: Menggunakan akun Gmail / Google Workspace dengan Google App Password 16-karakter via `smtp.gmail.com`.
+     3. **Custom SMTP Server**: Server SMTP standar (Mailgun, SendGrid, Amazon SES, dsb.) dengan konfigurasi host, port (587/465), enkripsi SSL/TLS, username, password, dan sender name.
+     4. **Nonaktif / Simulasi (`none`)**: Mencatat pesan di server log tanpa pengiriman keluar.
+   - Admin dapat melakukan uji coba pengiriman email langsung di dashboard melalui fitur **"Uji Coba Pengiriman Email (Live Test)"** (`POST /api/email/test`).
+5. **Visibilitas di Dashboard CRM**:
+   - Data profil pengunjung dan rekam jejak funnel dapat langsung dipantau di halaman **Pengunjung (Visitors)** (`/visitors`) dan halaman detail profil pengunjung (`/visitors/[id]`).
+
 ---
 
 ## 🤖 Rules Engine & Deteksi Handoff

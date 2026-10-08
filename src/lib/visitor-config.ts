@@ -38,6 +38,66 @@ export const DEFAULT_CONTACT_FORM_CONFIG: ContactFormConfig = {
   autoReplyTemplate: '',
 };
 
+export type EmailProvider = 'azure' | 'gmail' | 'custom' | 'none';
+
+export interface AzureEmailConfig {
+  tenantId: string;
+  clientId: string;
+  clientSecret: string;
+  senderEmail: string;
+  senderName?: string;
+  subjectPrefix?: string;
+}
+
+export interface GmailEmailConfig {
+  user: string;
+  appPassword: string;
+  senderName?: string;
+}
+
+export interface CustomSmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  pass: string;
+  senderEmail: string;
+  senderName?: string;
+}
+
+export interface EmailConfig {
+  provider: EmailProvider;
+  azure?: AzureEmailConfig;
+  gmail?: GmailEmailConfig;
+  custom?: CustomSmtpConfig;
+}
+
+export const DEFAULT_EMAIL_CONFIG: EmailConfig = {
+  provider: 'azure',
+  azure: {
+    tenantId: process.env.AZURE_TENANT_ID || 'e204d887-6ff5-46af-a043-bd9e4a04de3c',
+    clientId: process.env.AZURE_CLIENT_ID || 'ae1c234e-c8a8-436c-bcb5-ce871186cc0e',
+    clientSecret: process.env.AZURE_CLIENT_SECRET || 'b1l8Q~7RJwkYfzaC_c_qw6g-0xVscH0.gfx0GbYM',
+    senderEmail: process.env.AZURE_SENDER_EMAIL || 'uat-noreply@ceosuite.com',
+    senderName: process.env.AZURE_SENDER_NAME || 'UAT-APP',
+    subjectPrefix: process.env.AZURE_EMAIL_SUBJECT_PREFIX || 'UAT-APP',
+  },
+  gmail: {
+    user: '',
+    appPassword: '',
+    senderName: 'CEO SUITE Support',
+  },
+  custom: {
+    host: '',
+    port: 587,
+    secure: false,
+    user: '',
+    pass: '',
+    senderEmail: '',
+    senderName: 'CEO SUITE Support',
+  },
+};
+
 export interface VisitorConfig {
   enabled: boolean;
   layer1_passive: boolean;
@@ -63,6 +123,7 @@ export interface VisitorConfig {
   hotLeadThreshold: number;
   retentionDays: number;
   contactForm?: ContactFormConfig;
+  emailConfig?: EmailConfig;
 }
 
 export const DEFAULT_VISITOR_CONFIG: VisitorConfig = {
@@ -84,6 +145,7 @@ export const DEFAULT_VISITOR_CONFIG: VisitorConfig = {
   hotLeadThreshold: 50,
   retentionDays: 90,
   contactForm: DEFAULT_CONTACT_FORM_CONFIG,
+  emailConfig: DEFAULT_EMAIL_CONFIG,
 };
 
 export function getVisitorConfig(tenantVisitorConfig: any): VisitorConfig {
@@ -117,6 +179,22 @@ export function getVisitorConfig(tenantVisitorConfig: any): VisitorConfig {
       categories: parsedConfig.contactForm?.categories && parsedConfig.contactForm.categories.length > 0
         ? parsedConfig.contactForm.categories
         : DEFAULT_CONTACT_FORM_CONFIG.categories,
+    },
+    emailConfig: {
+      ...DEFAULT_EMAIL_CONFIG,
+      ...(parsedConfig.emailConfig || {}),
+      azure: {
+        ...DEFAULT_EMAIL_CONFIG.azure!,
+        ...(parsedConfig.emailConfig?.azure || {}),
+      },
+      gmail: {
+        ...DEFAULT_EMAIL_CONFIG.gmail!,
+        ...(parsedConfig.emailConfig?.gmail || {}),
+      },
+      custom: {
+        ...DEFAULT_EMAIL_CONFIG.custom!,
+        ...(parsedConfig.emailConfig?.custom || {}),
+      },
     },
   };
 }
