@@ -56,6 +56,7 @@ export async function POST(request: Request) {
         welcomeOptions: welcome.options,
         humanHandoffEnabled: tenant.humanHandoffEnabled ?? true,
         fallbackEmail: tenant.fallbackEmail || null,
+        contactForm: vConfig.contactForm || null,
         visitorCollection: {
           enabled: vConfig.enabled,
           layer1_passive: vConfig.layer1_passive,

@@ -491,6 +491,92 @@ class AiChatController extends ChangeNotifier {
       '\u{1F4DD} [Form Submitted]\n'
       '${values.entries.map((e) => '- ${e.key}: ${e.value}').join('\n')}';
 
+  /// Submits the contact / report problem funnel form to the CRM backend (`/api/widget/contact-submit`).
+  /// Adds the user submission summary and bot reply to the chat messages.
+  Future<bool> submitContactForm({
+    required String category,
+    required String description,
+    String? email,
+    String? name,
+    String? company,
+  }) async {
+    final trimmedCategory = category.trim();
+    final trimmedDesc = description.trim();
+    if (trimmedCategory.isEmpty || trimmedDesc.isEmpty || _isSending) return false;
+
+    _isSending = true;
+    _isTyping = true;
+    _errorMessage = null;
+
+    final userSummary = [
+      '📝 [Laporan Masalah ke Perusahaan]',
+      '• Kategori: $trimmedCategory',
+      if (company != null && company.trim().isNotEmpty) '• Perusahaan: ${company.trim()}',
+      if (name != null && name.trim().isNotEmpty) '• Nama: ${name.trim()}',
+      if (email != null && email.trim().isNotEmpty) '• Email: ${email.trim()}',
+      '• Deskripsi: $trimmedDesc',
+    ].join('\n');
+
+    final userMsgId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+    final userMsg = ChatMessage(
+      id: userMsgId,
+      sender: MessageSender.user,
+      text: userSummary,
+      timestamp: DateTime.now(),
+      status: MessageStatus.sending,
+    );
+
+    _messages.add(userMsg);
+    notifyListeners();
+
+    try {
+      final res = await apiClient.submitContactForm(
+        category: trimmedCategory,
+        description: trimmedDesc,
+        sessionId: _serverSessionId ?? (_sessionId.startsWith('session_') ? null : _sessionId),
+        contactId: contactId,
+        email: email,
+        name: name,
+        company: company,
+      );
+
+      final userIdx = _messages.indexWhere((m) => m.id == userMsgId);
+      if (userIdx != -1) {
+        _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.sent);
+      }
+
+      final serverSession = res['sessionId']?.toString();
+      if (serverSession != null && serverSession.isNotEmpty) {
+        _sessionId = serverSession;
+        _serverSessionId = serverSession;
+      }
+
+      final botReplyText = res['botReply']?.toString() ??
+          'Terima kasih! Pesan dan laporan Anda telah kami teruskan ke tim perusahaan.';
+      final botMsg = ChatMessage(
+        id: 'bot_${DateTime.now().millisecondsSinceEpoch}',
+        sender: MessageSender.bot,
+        senderName: botName,
+        text: botReplyText,
+        timestamp: DateTime.now(),
+      );
+      _messages.add(botMsg);
+      return true;
+    } catch (e) {
+      final userIdx = _messages.indexWhere((m) => m.id == userMsgId);
+      if (userIdx != -1) {
+        _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.error);
+      }
+      _errorMessage = 'Failed to submit contact form: $e';
+      return false;
+    } finally {
+      _isSending = false;
+      _isTyping = false;
+      notifyListeners();
+      if (config.enablePolling) startPolling();
+    }
+  }
+
   /// Resets conversation and session.
   Future<void> restartChat() async {
     stopPolling();

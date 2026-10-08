@@ -112,6 +112,40 @@ describe('POST /api/widget/contact-submit', () => {
     );
   });
 
+  it('uses custom autoReplyTemplate with dynamic variable substitution', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue({
+      id: 't1',
+      name: 'CEO SUITE',
+      fallbackEmail: 'support@ceosuite.com',
+      visitorConfig: {
+        contactForm: {
+          enabled: true,
+          autoReplyTemplate: 'Hai {name} dari {company}! Laporan kategori {category} telah kami terima. Kami akan follow up ke {email}.',
+        },
+      },
+    });
+    prismaMock.visitorProfile.findUnique.mockResolvedValue(null);
+    prismaMock.visitorProfile.create.mockResolvedValue({ id: 'vp1' });
+
+    const payload = {
+      tenantId: 't1',
+      category: 'Billing & Pembayaran',
+      description: 'Invoice belum diterima.',
+      email: 'jane@initech.com',
+      name: 'Jane Smith',
+      company: 'Initech',
+    };
+
+    const res = await send(payload);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.botReply).toBe(
+      'Hai Jane Smith dari Initech! Laporan kategori Billing & Pembayaran telah kami terima. Kami akan follow up ke jane@initech.com.'
+    );
+  });
+
   it('handles preflight OPTIONS request with CORS headers', async () => {
     const res = await OPTIONS();
     expect(res.status).toBe(204);

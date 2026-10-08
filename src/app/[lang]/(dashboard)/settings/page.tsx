@@ -20,6 +20,7 @@ import {
   UserSearch,
   Mail,
   Headphones,
+  FileText,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import ImageUpload from '@/components/ImageUpload';
@@ -934,24 +935,6 @@ export default function SettingsPage() {
                       </button>
                     </div>
 
-                    {/* Fallback Email Input */}
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-slate-500" />
-                        Default Support Email (Fallback Tenant Email)
-                      </label>
-                      <p className="text-xs text-slate-500 mb-2">
-                        Alamat email tujuan ketika pengguna widget/SDK mengklik &quot;Talk to Agent&quot; saat toggle OFF atau dialihkan secara otomatis.
-                      </p>
-                      <input
-                        type="email"
-                        value={tenant.fallbackEmail || ''}
-                        onChange={(e) => setTenant({ ...tenant, fallbackEmail: e.target.value })}
-                        placeholder="support@domain.com"
-                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
-                      />
-                    </div>
-
                     {/* Handoff Agent Queue - Visible if toggle ON */}
                     {(tenant.humanHandoffEnabled ?? true) && (
                       <div className="pt-2 border-t border-slate-200">
@@ -973,6 +956,174 @@ export default function SettingsPage() {
                             </option>
                           ))}
                         </select>
+                      </div>
+                    )}
+
+                    {/* Settings Form - Visible if toggle OFF (nonaktif) */}
+                    {!(tenant.humanHandoffEnabled ?? true) && (
+                      <div className="pt-4 border-t border-slate-200 space-y-4 animate-in fade-in duration-200">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-brand" />
+                          <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                            Pengaturan Form Funnel & Laporan (Saat Agen Nonaktif)
+                          </h4>
+                          <span className="text-[10px] bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">
+                            Mode Form Funnel
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          Konfigurasi formulir pengumpulan keluhan & kebutuhan (funnel) yang ditampilkan kepada pengguna ketika opsi bantuan agen manusia dinonaktifkan.
+                        </p>
+
+                        {/* Fallback Email Input */}
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                            <Mail className="w-3.5 h-3.5 text-slate-500" />
+                            Default Support Email (Email Tujuan Laporan)
+                          </label>
+                          <p className="text-xs text-slate-500 mb-2">
+                            Alamat email resmi perusahaan yang menerima laporan kendala dari pengguna.
+                          </p>
+                          <input
+                            type="email"
+                            value={tenant.fallbackEmail || ''}
+                            onChange={(e) => setTenant({ ...tenant, fallbackEmail: e.target.value })}
+                            placeholder="support@domain.com"
+                            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
+                          />
+                        </div>
+
+                        {/* Button Label & Modal Form Title */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Label Tombol (Button Label)
+                            </label>
+                            <input
+                              type="text"
+                              value={visitorConfig.contactForm?.buttonLabel || ''}
+                              onChange={(e) =>
+                                setVisitorConfig({
+                                  ...visitorConfig,
+                                  contactForm: {
+                                    ...visitorConfig.contactForm,
+                                    enabled: visitorConfig.contactForm?.enabled ?? true,
+                                    buttonLabel: e.target.value,
+                                  },
+                                })
+                              }
+                              placeholder="Send Email to Company"
+                              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
+                            />
+                            <span className="text-[11px] text-slate-400 mt-1 block">
+                              Contoh: Send Email to Company / Hubungi via Email
+                            </span>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Judul Modal Form (Form Title)
+                            </label>
+                            <input
+                              type="text"
+                              value={visitorConfig.contactForm?.formTitle || ''}
+                              onChange={(e) =>
+                                setVisitorConfig({
+                                  ...visitorConfig,
+                                  contactForm: {
+                                    ...visitorConfig.contactForm,
+                                    enabled: visitorConfig.contactForm?.enabled ?? true,
+                                    formTitle: e.target.value,
+                                  },
+                                })
+                              }
+                              placeholder="Hubungi Perusahaan / Laporan"
+                              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
+                            />
+                            <span className="text-[11px] text-slate-400 mt-1 block">
+                              Contoh: Hubungi Perusahaan / Laporan Masalah
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Kategori Masalah (Pilihan Dropdown) */}
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Daftar Kategori Masalah (Pisahkan dengan koma)
+                          </label>
+                          <p className="text-xs text-slate-500 mb-2">
+                            Pilihan kategori yang akan muncul di form funnel laporan pengguna.
+                          </p>
+                          <input
+                            type="text"
+                            value={(visitorConfig.contactForm?.categories || []).join(', ')}
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              const cats = raw.split(',').map((s) => s.trim()).filter(Boolean);
+                              setVisitorConfig({
+                                ...visitorConfig,
+                                contactForm: {
+                                  ...visitorConfig.contactForm,
+                                  enabled: visitorConfig.contactForm?.enabled ?? true,
+                                  categories: cats,
+                                },
+                              });
+                            }}
+                            placeholder="Pertanyaan Umum, Layanan & Fasilitas, Kendala Teknis, Billing & Pembayaran, Kemitraan, Lainnya"
+                            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
+                          />
+                        </div>
+
+                        {/* Template Balasan Konfirmasi Bot (Auto-Reply) */}
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Template Balasan Konfirmasi AI (Auto-Reply Bot)
+                          </label>
+                          <p className="text-xs text-slate-500 mb-2">
+                            Pesan konfirmasi otomatis setelah pengguna submit form. Tag yang didukung: <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{name}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{category}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{company}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{email}"}</code>.
+                          </p>
+                          <textarea
+                            rows={2}
+                            value={visitorConfig.contactForm?.autoReplyTemplate || ''}
+                            onChange={(e) =>
+                              setVisitorConfig({
+                                ...visitorConfig,
+                                contactForm: {
+                                  ...visitorConfig.contactForm,
+                                  enabled: visitorConfig.contactForm?.enabled ?? true,
+                                  autoReplyTemplate: e.target.value,
+                                },
+                              })
+                            }
+                            placeholder="Terima kasih {name}! Pesan dan laporan Anda terkait {category} telah kami teruskan ke tim perusahaan. Kami akan segera menindaklanjuti melalui email ({email})."
+                            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white resize-none"
+                          />
+                        </div>
+
+                        {/* In-App Form vs Direct Mailto Toggle */}
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white">
+                          <div className="pr-4">
+                            <span className="text-xs font-semibold text-slate-700 block">
+                              Gunakan Formulir Funnel In-App
+                            </span>
+                            <span className="text-[11px] text-slate-500">
+                              Jika aktif, pengguna mengisi kategori dan deskripsi langsung di dalam widget/SDK. Jika nonaktif, mengklik tombol akan membuka aplikasi email (mailto).
+                            </span>
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={visitorConfig.contactForm?.enabled ?? true}
+                            onChange={(e) =>
+                              setVisitorConfig({
+                                ...visitorConfig,
+                                contactForm: {
+                                  ...visitorConfig.contactForm,
+                                  enabled: e.target.checked,
+                                },
+                              })
+                            }
+                            className="w-4 h-4 text-brand rounded border-slate-300 focus:ring-brand cursor-pointer"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>

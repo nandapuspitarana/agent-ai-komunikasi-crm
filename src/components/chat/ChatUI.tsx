@@ -35,6 +35,13 @@ export interface ChatUIConfig {
   botAvatarUrl?: string | null;
   humanHandoffEnabled?: boolean;
   fallbackEmail?: string | null;
+  contactForm?: {
+    enabled?: boolean;
+    buttonLabel?: string;
+    formTitle?: string;
+    categories?: string[];
+    autoReplyTemplate?: string;
+  } | null;
 }
 
 export interface ChatUIProps {
@@ -104,8 +111,28 @@ export function ChatUI({
   const { t } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const [formCategory, setFormCategory] = useState('Pertanyaan Umum');
+  const defaultCategories = [
+    'Pertanyaan Umum',
+    'Layanan & Fasilitas',
+    'Kendala Teknis',
+    'Billing & Pembayaran',
+    'Kemitraan',
+    'Lainnya',
+  ];
+  const categoriesList =
+    config.contactForm?.categories && config.contactForm.categories.length > 0
+      ? config.contactForm.categories
+      : defaultCategories;
+
+  const [formCategory, setFormCategory] = useState(categoriesList[0] || 'Pertanyaan Umum');
   const [formDescription, setFormDescription] = useState('');
+
+  // Sync category if categoriesList updates
+  useEffect(() => {
+    if (categoriesList.length > 0 && !categoriesList.includes(formCategory)) {
+      setFormCategory(categoriesList[0]);
+    }
+  }, [categoriesList, formCategory]);
 
   // Auto-scroll ke pesan terbaru
   useEffect(() => {
@@ -242,7 +269,7 @@ export function ChatUI({
             <div>
               <h3 className="text-sm font-bold flex items-center gap-1.5">
                 <Mail size={16} />
-                {t('chatWidget', 'inquiryFormTitle', 'Kirim Pesan ke Perusahaan')}
+                {config.contactForm?.formTitle || t('chatWidget', 'inquiryFormTitle', 'Kirim Pesan ke Perusahaan')}
               </h3>
               <p className="text-[11px] text-white/80">
                 {t('chatWidget', 'inquiryFormDesc', 'Tim kami akan segera menindaklanjuti kendala atau pertanyaan Anda.')}
@@ -288,12 +315,11 @@ export function ChatUI({
                 disabled={isSubmittingContactForm}
                 className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all"
               >
-                <option value="Pertanyaan Umum">Pertanyaan Umum</option>
-                <option value="Layanan & Fasilitas">Layanan & Fasilitas</option>
-                <option value="Kendala Teknis">Kendala Teknis</option>
-                <option value="Billing & Pembayaran">Billing & Pembayaran</option>
-                <option value="Kemitraan">Kemitraan / Kerjasama</option>
-                <option value="Lainnya">Lainnya</option>
+                {categoriesList.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -463,9 +489,10 @@ export function ChatUI({
               <>
                 <Mail size={13} className="text-brand" />
                 <span>
-                  {config.fallbackEmail
-                    ? `${t('chatWidget', 'contactViaEmailBtn', 'Hubungi via Email')} (${config.fallbackEmail})`
-                    : t('chatWidget', 'contactViaEmailBtn', 'Hubungi via Email')}
+                  {config.contactForm?.buttonLabel ||
+                    (config.fallbackEmail
+                      ? `${t('chatWidget', 'contactViaEmailBtn', 'Hubungi via Email')} (${config.fallbackEmail})`
+                      : t('chatWidget', 'contactViaEmailBtn', 'Hubungi via Email'))}
                 </span>
               </>
             ) : (

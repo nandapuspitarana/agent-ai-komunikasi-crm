@@ -194,10 +194,48 @@ class AiAgentApiClient {
     } catch (e) {
       throw AiAgentApiException('Network connection failure: $e');
     }
-    if (res.statusCode < 200 || res.statusCode >= 300) {
-      throw AiAgentApiException('Server returned error: ${res.statusCode}',
-          statusCode: res.statusCode, details: res.body);
+  }
+
+  /// Submits the contact / report problem funnel form to `/api/widget/contact-submit`.
+  Future<Map<String, dynamic>> submitContactForm({
+    required String category,
+    required String description,
+    String? sessionId,
+    String? contactId,
+    String? email,
+    String? name,
+    String? company,
+  }) async {
+    final uri = Uri.parse('${config.sanitizedApiUrl}/api/widget/contact-submit');
+    final payload = {
+      'tenantId': config.tenantId,
+      'category': category,
+      'description': description,
+      if (sessionId != null && sessionId.isNotEmpty) 'sessionId': sessionId,
+      if (contactId != null && contactId.isNotEmpty) 'contactId': contactId,
+      if (email != null && email.isNotEmpty) 'email': email,
+      if (name != null && name.isNotEmpty) 'name': name,
+      if (company != null && company.isNotEmpty) 'company': company,
+    };
+
+    final http.Response res;
+    try {
+      res = await _httpClient
+          .post(uri, headers: _headers, body: jsonEncode(payload))
+          .timeout(config.timeout);
+    } catch (e) {
+      throw AiAgentApiException('Network connection failure: $e');
     }
+
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw AiAgentApiException(
+        'Server returned error: ${res.statusCode}',
+        statusCode: res.statusCode,
+        details: res.body,
+      );
+    }
+
+    return jsonDecode(res.body) as Map<String, dynamic>;
   }
 
   /// Internal POST with 1-time retry for transient network drops.

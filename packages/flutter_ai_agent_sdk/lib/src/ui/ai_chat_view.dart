@@ -4,6 +4,7 @@ import '../models/quick_reply_option.dart';
 import 'quick_reply_style.dart';
 import 'theme/ai_chat_theme.dart';
 import 'widgets/chat_bubble.dart';
+import 'widgets/contact_funnel_modal.dart';
 import 'widgets/handoff_banner.dart';
 import 'widgets/info_card_view.dart';
 import 'widgets/lead_form_view.dart';
@@ -63,6 +64,22 @@ class AiChatView extends StatefulWidget {
   /// Optional message shown in the top banner when a human agent is active.
   final String? handoffBannerMessage;
 
+  /// Optional logged-in user profile attributes for the in-app support/contact funnel.
+  final String? userName;
+  final String? userEmail;
+  final String? userCompany;
+
+  /// Whether tapping the fallback email/support button opens an in-app funnel form
+  /// instead of launching an external mail client. Defaults to true.
+  final bool enableContactFunnel;
+
+  /// Localization/customization strings for the contact funnel form modal.
+  final ContactFunnelStrings contactFunnelStrings;
+
+  /// Optional custom submission handler for the contact funnel. If null, delegates
+  /// to [controller.submitContactForm].
+  final Future<bool> Function(String category, String description)? onContactFormSubmit;
+
   const AiChatView({
     super.key,
     required this.controller,
@@ -85,6 +102,12 @@ class AiChatView extends StatefulWidget {
     this.talkToAgentEmailLabel,
     this.onEmailRedirect,
     this.handoffBannerMessage,
+    this.userName,
+    this.userEmail,
+    this.userCompany,
+    this.enableContactFunnel = true,
+    this.contactFunnelStrings = const ContactFunnelStrings(),
+    this.onContactFormSubmit,
   });
 
   @override
@@ -345,15 +368,25 @@ class _AiChatViewState extends State<AiChatView> {
                   key: const ValueKey('talk_to_agent'),
                   onPressed: controller.isTyping
                       ? null
-                      : () {
+                      : () async {
                           if (!controller.humanHandoffEnabled) {
-                            final targetEmail =
-                                widget.talkToAgentEmail ?? controller.fallbackEmail;
-                            if (targetEmail != null && targetEmail.isNotEmpty) {
-                              if (widget.onEmailRedirect != null) {
+                            if (widget.onEmailRedirect != null) {
+                              final targetEmail =
+                                  widget.talkToAgentEmail ?? controller.fallbackEmail;
+                              if (targetEmail != null && targetEmail.isNotEmpty) {
                                 widget.onEmailRedirect!(targetEmail);
                                 return;
                               }
+                            }
+
+                            if (widget.enableContactFunnel) {
+                              await _showContactFunnelModal(context);
+                              return;
+                            }
+
+                            final targetEmail =
+                                widget.talkToAgentEmail ?? controller.fallbackEmail;
+                            if (targetEmail != null && targetEmail.isNotEmpty) {
                               final mailtoUri =
                                   'mailto:$targetEmail?subject=${Uri.encodeComponent("Support Request")}';
                               if (widget.onLaunchUrl != null) {
@@ -572,5 +605,29 @@ class _AiChatViewState extends State<AiChatView> {
       }
     }
     return widget.talkToAgentLabel!;
+  }
+
+  Future<void> _showContactFunnelModal(BuildContext context) async {
+    final activeTheme = widget.theme;
+    await ContactFunnelModal.show(
+      context,
+      theme: activeTheme,
+      strings: widget.contactFunnelStrings,
+      userName: widget.userName,
+      userEmail: widget.userEmail ?? widget.talkToAgentEmail ?? widget.controller.fallbackEmail,
+      userCompany: widget.userCompany,
+      onSubmit: (category, description) async {
+        if (widget.onContactFormSubmit != null) {
+          return await widget.onContactFormSubmit!(category, description);
+        }
+        return await widget.controller.submitContactForm(
+          category: category,
+          description: description,
+          email: widget.userEmail ?? widget.talkToAgentEmail ?? widget.controller.fallbackEmail,
+          name: widget.userName,
+          company: widget.userCompany,
+        );
+      },
+    );
   }
 }

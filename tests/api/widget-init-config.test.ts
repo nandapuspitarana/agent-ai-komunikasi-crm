@@ -99,6 +99,30 @@ describe('POST /api/widget/init', () => {
     expect(config.fallbackEmail).toBe('support@ceosuite.com');
   });
 
+  it('TEST-AI-F51 returns contactForm configuration when present in visitorConfig', async () => {
+    findUnique.mockResolvedValue(
+      baseTenant({
+        humanHandoffEnabled: false,
+        fallbackEmail: 'support@ceosuite.com',
+        visitorConfig: {
+          contactForm: {
+            enabled: true,
+            buttonLabel: 'Lapor Kendala',
+            formTitle: 'Form Laporan',
+            categories: ['Kendala AC', 'Layanan'],
+            autoReplyTemplate: 'Halo {name}, laporan {category} diterima.',
+          },
+        },
+      })
+    );
+    const { config } = await (await initPost(initReq({ tenantId: 't1' }))).json();
+    expect(config.contactForm).toBeDefined();
+    expect(config.contactForm.buttonLabel).toBe('Lapor Kendala');
+    expect(config.contactForm.formTitle).toBe('Form Laporan');
+    expect(config.contactForm.categories).toEqual(['Kendala AC', 'Layanan']);
+    expect(config.contactForm.autoReplyTemplate).toBe('Halo {name}, laporan {category} diterima.');
+  });
+
   it('400 without tenantId, 404 for unknown tenant', async () => {
     expect((await initPost(initReq({}))).status).toBe(400);
     findUnique.mockResolvedValue(null);
@@ -139,5 +163,25 @@ describe('GET /api/widget/config', () => {
     const json = await (await configGet(cfgReq())).json();
     expect(json.humanHandoffEnabled).toBe(false);
     expect(json.fallbackEmail).toBe('support@ceosuite.com');
+  });
+
+  it('returns contactForm from visitorConfig in config endpoint', async () => {
+    findUnique.mockResolvedValue(
+      baseTenant({
+        humanHandoffEnabled: false,
+        fallbackEmail: 'support@ceosuite.com',
+        visitorConfig: {
+          contactForm: {
+            enabled: true,
+            buttonLabel: 'Hubungi Kami',
+          },
+        },
+      })
+    );
+    const json = await (await configGet(cfgReq())).json();
+    expect(json.contactForm).toEqual({
+      enabled: true,
+      buttonLabel: 'Hubungi Kami',
+    });
   });
 });

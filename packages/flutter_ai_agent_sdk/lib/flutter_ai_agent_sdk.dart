@@ -21,5 +21,6 @@ export 'src/ui/widgets/lead_form_view.dart';
 export 'src/ui/widgets/rich_message_text.dart';
 export 'src/ui/widgets/quick_reply_bar.dart';
 export 'src/ui/widgets/handoff_banner.dart';
+export 'src/ui/widgets/contact_funnel_modal.dart';
 export 'src/ui/quick_reply_style.dart';
 export 'src/ui/ai_chat_view.dart';

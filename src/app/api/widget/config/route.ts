@@ -58,6 +58,7 @@ export async function GET(request: Request) {
     widgetIconUrl: tenant.widgetIconUrl || null,
     humanHandoffEnabled: tenant.humanHandoffEnabled ?? true,
     fallbackEmail: tenant.fallbackEmail || null,
+    contactForm: visitorConfig.contactForm || null,
     layer1_geolocation: visitorConfig.layer1_geolocation ?? true
   };
 

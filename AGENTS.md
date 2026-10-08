@@ -36,6 +36,9 @@ Field berikut ditambahkan untuk melacak aktivasi AI dan permintaan pengalihan pe
 Menyimpan konfigurasi AI untuk setiap unit bisnis (tenant):
 - `aiEnabled` (Boolean, default: `true`): Mengaktifkan/menonaktifkan auto-reply AI untuk tenant.
 - `aiSystemPrompt` (String, opsional): Instruksi khusus (system prompt) untuk personalisasi respons AI.
+- `humanHandoffEnabled` (Boolean, default: `true`): Toggle mengaktifkan/menonaktifkan transfer percakapan ke agen manusia.
+- `fallbackEmail` (String, opsional): Email resmi perusahaan penerima laporan kendala ketika handoff dinonaktifkan.
+- `visitorConfig` (Json): Menyimpan aturan ekstraksi prospek dan konfigurasi form funnel `contactForm`.
 
 ### Model `ChatSession`
 Melacak status alur percakapan:
@@ -43,6 +46,50 @@ Melacak status alur percakapan:
 - `handoffRequested` (Boolean, default: `false`): Menandakan jika pengguna widget meminta berbicara dengan manusia.
 - `assignedAgentId` (String, opsional): ID Agen manusia yang mengambil alih percakapan.
 - `updatedAt` (DateTime): Waktu pembaruan sesi (otomatis menggunakan `@updatedAt`).
+
+---
+
+## 🎛️ Pengaturan Tenant: Human Handoff & Form Funnel (Saat Toggle Nonaktif)
+
+Pada menu **Pengaturan > Pengaturan Penyewa (Tenant)** di Dashboard (`src/app/[lang]/(dashboard)/settings/page.tsx`), terdapat switch kendali **"Bantuan Agen Manusia / Talk to CS"** (`humanHandoffEnabled`):
+
+### 1. Saat Toggle Aktif (`humanHandoffEnabled: true`)
+- **UI Dashboard**: Menampilkan pilihan **Default Handoff Agent (Human Queue)** (`handoffAgentId`).
+- **UI Widget & SDK Mobile**: Tombol menampilkan opsi *"Bicara dengan Agen"*.
+- **Alur**: Permintaan transfer akan memasukkan percakapan ke antrean agen (`status: "queue"`).
+
+### 2. Saat Toggle Dinonaktifkan (`humanHandoffEnabled: false`)
+Jika bisnis tidak memiliki tim customer support live atau ingin mengalihkan laporan secara asinkron, sistem menampilkan **Form Pengaturan Funnel & Laporan (Saat Agen Nonaktif)**:
+
+- **Default Support Email (`fallbackEmail`)**: Alamat email resmi tujuan pengiriman ringkasan kendala (contoh: `support@domain.com`).
+- **Label Tombol (`contactForm.buttonLabel`)**: Teks tombol pemicu pada widget (default: *"Send Email to Company"* atau kustom seperti *"Kirim Email / Laporan"*).
+- **Judul Modal Form (`contactForm.formTitle`)**: Judul header pada formulir in-app (default: *"Hubungi Perusahaan / Laporan"*).
+- **Daftar Kategori Masalah (`contactForm.categories`)**: Daftar pilihan dropdown kategori kendala yang dapat diisi pengguna (dipisahkan koma).
+- **Template Balasan Konfirmasi AI (`contactForm.autoReplyTemplate`)**: Format pesan bot otomatis setelah formulir dikirim. Mendukung variabel dinamis:
+  - `{name}`: Nama pengunjung (dari parameter widget/profil)
+  - `{category}`: Kategori kendala yang dipilih
+  - `{company}`: Nama perusahaan pengunjung
+  - `{email}`: Email kontak pengunjung
+- **Gunakan Formulir Funnel In-App (`contactForm.enabled`)**:
+  - `true` (*Default*): Membuka form modal minimalis langsung di dalam widget / SDK tanpa meninggalkan aplikasi.
+  - `false`: Mengarahkan tombol langsung ke klien email eksternal pengguna (`mailto:${fallbackEmail}`).
+
+### 3. Skema Data `ContactFormConfig`
+Didefinisikan pada [src/lib/visitor-config.ts](file:///c:/Users/nanda/Documents/aiagent/agent-ai-komunikasi-crm/src/lib/visitor-config.ts):
+```typescript
+export interface ContactFormConfig {
+  enabled: boolean;
+  buttonLabel?: string;
+  formTitle?: string;
+  categories?: string[];
+  autoReplyTemplate?: string;
+}
+```
+
+### 4. API Endpoints Terkait
+- **`PUT /api/tenant`**: Menyimpan status toggle `humanHandoffEnabled`, `fallbackEmail`, dan objek `visitorConfig.contactForm`.
+- **`GET /api/widget/config` & `POST /api/widget/init`**: Mengirimkan properti `humanHandoffEnabled`, `fallbackEmail`, dan `contactForm` ke klien Web & Mobile SDK.
+- **`POST /api/widget/contact-submit`**: Menerima pengiriman form, menyimpan percakapan laporan pengguna, memperbarui data prospek di `VisitorProfile`, dan menghasilkan balasan bot instan berdasarkan `autoReplyTemplate`.
 
 ---
 

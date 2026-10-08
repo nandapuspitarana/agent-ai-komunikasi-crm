@@ -150,6 +150,7 @@ void main() {
           body: AiChatView(
             controller: controller,
             talkToAgentLabel: 'Talk to Human Agent',
+            enableContactFunnel: false,
             onLaunchUrl: (url) => launchedUrl = url,
           ),
         ),
@@ -207,6 +208,97 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(redirectedEmail, 'sdk-fallback@domain.com');
+    });
+
+    testWidgets('TEST-AI-F65 when humanHandoffEnabled is false, button opens contact funnel modal and submits', (tester) async {
+      when(() => api.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {
+          'status': 'success',
+          'config': {
+            'welcomeMessage': 'Halo, ada yang bisa dibantu?',
+            'botName': 'Claire',
+            'humanHandoffEnabled': false,
+            'fallbackEmail': 'support@ceosuite.com',
+          },
+        },
+      );
+
+      when(() => api.submitContactForm(
+            category: any(named: 'category'),
+            description: any(named: 'description'),
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+            email: any(named: 'email'),
+            name: any(named: 'name'),
+            company: any(named: 'company'),
+          )).thenAnswer(
+        (_) async => {
+          'success': true,
+          'sessionId': 'server_session_123',
+          'botReply': 'Laporan Anda telah diterima.',
+        },
+      );
+
+      final controller = AiChatController(
+        apiClient: api,
+        config: const AiAgentConfig(
+          apiUrl: 'http://localhost',
+          tenantId: 't1',
+        ),
+      );
+
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: AiChatView(
+            controller: controller,
+            talkToAgentLabel: 'Talk to Human Agent',
+            talkToAgentEmailLabel: 'Send Email to Company',
+            userName: 'HC Leman',
+            userEmail: 'leman@ceosuite.com',
+            userCompany: 'CEO SUITE',
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Send Email to Company'), findsOneWidget);
+
+      // Tap Send Email to Company -> opens ContactFunnelModal
+      await tester.tap(find.byKey(const ValueKey('talk_to_agent')));
+      await tester.pumpAndSettle();
+
+      // Check modal components
+      expect(find.byType(ContactFunnelModal), findsOneWidget);
+      expect(find.text('Hubungi Perusahaan / Laporan'), findsOneWidget);
+      expect(find.text('HC Leman'), findsOneWidget);
+      expect(find.text('CEO SUITE'), findsOneWidget);
+
+      // Enter description
+      await tester.enterText(find.byType(TextFormField), 'AC ruang rapat tidak dingin');
+      await tester.pumpAndSettle();
+
+      // Tap submit button
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Kirim Laporan'));
+      await tester.pumpAndSettle();
+
+      // Verify submitContactForm was called with user profile parameters
+      verify(() => api.submitContactForm(
+            category: 'Pertanyaan Umum',
+            description: 'AC ruang rapat tidak dingin',
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+            email: 'leman@ceosuite.com',
+            name: 'HC Leman',
+            company: 'CEO SUITE',
+          )).called(1);
+
+      // Modal should be closed
+      expect(find.byType(ContactFunnelModal), findsNothing);
+
+      // Chat should show user summary and bot reply
+      expect(find.textContaining('📝 [Laporan Masalah ke Perusahaan]'), findsOneWidget);
+      expect(find.textContaining('AC ruang rapat tidak dingin'), findsOneWidget);
+      expect(find.text('Laporan Anda telah diterima.'), findsOneWidget);
     });
   });
 }

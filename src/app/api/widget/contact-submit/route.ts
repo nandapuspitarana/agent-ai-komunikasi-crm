@@ -104,7 +104,15 @@ export async function POST(req: NextRequest) {
     });
 
     // 4. Create Bot Confirmation Message
-    const botReply = `Terima kasih${name ? ` ${name}` : ''}! Pesan dan laporan Anda terkait "${category}" telah kami teruskan ke tim perusahaan. Kami akan segera menindaklanjuti${email ? ` melalui email (${email})` : ''}.`;
+    const visitorConfig = getVisitorConfig(tenant.visitorConfig);
+    const customTemplate = visitorConfig.contactForm?.autoReplyTemplate?.trim();
+    const botReply = customTemplate
+      ? customTemplate
+          .replace(/\{name\}/g, name || '')
+          .replace(/\{category\}/g, category)
+          .replace(/\{company\}/g, company || '')
+          .replace(/\{email\}/g, email || '')
+      : `Terima kasih${name ? ` ${name}` : ''}! Pesan dan laporan Anda terkait "${category}" telah kami teruskan ke tim perusahaan. Kami akan segera menindaklanjuti${email ? ` melalui email (${email})` : ''}.`;
 
     const botMsg = await prisma.message.create({
       data: {
@@ -115,7 +123,6 @@ export async function POST(req: NextRequest) {
     });
 
     // 5. Update Funnel Data in VisitorProfile
-    const visitorConfig = getVisitorConfig(tenant.visitorConfig);
     try {
       // Ensure profile exists
       const existingProfile = await prisma.visitorProfile.findUnique({

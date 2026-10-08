@@ -15,6 +15,29 @@ export interface CustomExtractor {
   storeValue?: string;            // Only for contains_keyword / exact_match
 }
 
+export interface ContactFormConfig {
+  enabled: boolean;
+  buttonLabel?: string;
+  formTitle?: string;
+  categories?: string[];
+  autoReplyTemplate?: string;
+}
+
+export const DEFAULT_CONTACT_FORM_CONFIG: ContactFormConfig = {
+  enabled: true,
+  buttonLabel: 'Send Email to Company',
+  formTitle: 'Hubungi Perusahaan / Laporan',
+  categories: [
+    'Pertanyaan Umum',
+    'Layanan & Fasilitas',
+    'Kendala Teknis',
+    'Billing & Pembayaran',
+    'Kemitraan',
+    'Lainnya',
+  ],
+  autoReplyTemplate: '',
+};
+
 export interface VisitorConfig {
   enabled: boolean;
   layer1_passive: boolean;
@@ -39,6 +62,7 @@ export interface VisitorConfig {
   };
   hotLeadThreshold: number;
   retentionDays: number;
+  contactForm?: ContactFormConfig;
 }
 
 export const DEFAULT_VISITOR_CONFIG: VisitorConfig = {
@@ -59,6 +83,7 @@ export const DEFAULT_VISITOR_CONFIG: VisitorConfig = {
   scoreWeights: { cold: 1, warm: 5, hot_lead: 15, booking: 30, support: 0 },
   hotLeadThreshold: 50,
   retentionDays: 90,
+  contactForm: DEFAULT_CONTACT_FORM_CONFIG,
 };
 
 export function getVisitorConfig(tenantVisitorConfig: any): VisitorConfig {
@@ -86,5 +111,12 @@ export function getVisitorConfig(tenantVisitorConfig: any): VisitorConfig {
     },
     // Migrate old customNlpPatterns to empty customExtractors
     customExtractors: parsedConfig.customExtractors || [],
+    contactForm: {
+      ...DEFAULT_CONTACT_FORM_CONFIG,
+      ...(parsedConfig.contactForm || {}),
+      categories: parsedConfig.contactForm?.categories && parsedConfig.contactForm.categories.length > 0
+        ? parsedConfig.contactForm.categories
+        : DEFAULT_CONTACT_FORM_CONFIG.categories,
+    },
   };
 }

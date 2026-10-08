@@ -101,6 +101,7 @@ export function ChatWindow({
     botAvatarUrl: null as string | null,
     humanHandoffEnabled: true,
     fallbackEmail: null as string | null,
+    contactForm: null as any,
   });
 
   useEffect(() => {
@@ -117,6 +118,7 @@ export function ChatWindow({
             botAvatarUrl: data.botAvatarUrl || null,
             humanHandoffEnabled: data.humanHandoffEnabled ?? true,
             fallbackEmail: data.fallbackEmail || null,
+            contactForm: data.contactForm || null,
           }));
           
           if (data.welcomeMessage) {
@@ -295,9 +297,15 @@ export function ChatWindow({
 
   const handleRequestHumanAgent = () => {
     if (sessionStatus !== 'bot') return;
-    if (widgetConfig.humanHandoffEnabled === false && widgetConfig.fallbackEmail) {
-      setShowContactForm(true);
-      return;
+    if (widgetConfig.humanHandoffEnabled === false) {
+      if (widgetConfig.contactForm?.enabled === false && widgetConfig.fallbackEmail) {
+        window.location.href = `mailto:${widgetConfig.fallbackEmail}`;
+        return;
+      }
+      if (widgetConfig.fallbackEmail || widgetConfig.contactForm) {
+        setShowContactForm(true);
+        return;
+      }
     }
     sendMessage('Saya ingin bicara dengan agen manusia');
   };
