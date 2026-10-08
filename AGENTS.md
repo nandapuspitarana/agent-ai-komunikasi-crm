@@ -115,12 +115,43 @@ Sistem mendukung lokalisasi dinamis untuk formulir funnel / modal laporan masala
   - Menggunakan factory `ContactFunnelStrings.fromConfig(contactFormConfig, language: controller.tenantLanguage)`.
   - Terintegrasi otomatis di `AiChatController` dan `AiChatView` tanpa perlu konfigurasi manual dari klien mobile.
 
-### 5. API Endpoints Terkait
+### 5. Lokalisasi Antarmuka Dashboard CRM (i18n Settings & Email Gateway)
+Seluruh antarmuka pada menu **Pengaturan (Settings)** dan **Panel Gateway Email & SMTP** telah terintegrasi dengan arsitektur i18n berbasis rute `src/app/[lang]/(dashboard)/settings/page.tsx` dan kamus dictionary (`src/dictionaries/en.json` & `src/dictionaries/id.json`).
+
+Ketika rute dibuka dengan bahasa Inggris (contoh: `http://192.168.20.242:8201/en/settings`):
+- **Toggle Bantuan Agen Manusia**:
+  - Label: *"Human Agent Support / Talk to CS"*
+  - Keterangan: *"Toggle to enable \"Talk to Agent\" option. Disable if live support is exclusively routed to official customer support email."*
+- **Antrean Agen Default (Saat Toggle Aktif)**:
+  - Label: *"Default Handoff Agent (Human Queue)"*
+  - Keterangan: *"Who will be assigned (or named by AI) when users are transferred to human agent queue."*
+  - Opsi Antrean Umum: *"-- No specific agent (General Queue) --"*
+- **Form Funnel & Laporan (Saat Toggle Nonaktif)**:
+  - Header: *"Funnel Form & Issue Report Settings (When Agent is Disabled)"*
+  - Badge Mode: *"Funnel Form Mode"*
+  - Deskripsi: *"Configure inquiry and issue collection form (funnel) displayed to users when human agent option is disabled."*
+  - Email Tujuan Laporan: *"Default Support Email (Report Destination)"*
+  - Navigasi Gateway: *"Configure SMTP / Azure Gateway →"*
+  - Label Tombol: *"Button Label"* (Placeholder: *"Send Email to Company"*, Hint: *"Example: Send Email to Company / Contact via Email"*)
+  - Judul Form Modal: *"Form Modal Title"* (Placeholder: *"Contact Company / Report Issue"*, Hint: *"Example: Contact Company / Report Issue"*)
+  - Daftar Kategori: *"Issue Categories List (Comma-separated)"* (Placeholder: *"General Inquiry, Services & Facilities, Technical Issue, Billing & Payment, Partnership, Other"*)
+  - Template Auto-Reply: *"AI Confirmation Auto-Reply Template (Bot Auto-Reply)"*
+  - Toggle Form In-App: *"Use In-App Funnel Form"*
+- **Tab Layanan Email & SMTP (`EmailSmtpConfigPanel`)**:
+  - Header: *"Email & SMTP Service Settings"*
+  - Pilihan Gateway: *"1. Select Email Gateway / Provider"* (Microsoft Azure, Gmail SMTP, Custom SMTP)
+  - Formulir Kredensial: Label kredensial Azure (Tenant ID, Client ID, Client Secret), Gmail (App Password), dan Custom SMTP (Host, Port, SSL Encryption).
+  - Email Resmi Tenant: *"Recipient Support Email (Tenant Official Email)"*
+  - Pengujian Langsung: *"Email Delivery Test (Live Test)"*, status pengiriman, dan tombol *"Save Email & SMTP Settings"*.
+
+Ketika rute dibuka dengan Bahasa Indonesia (`/id/settings`), seluruh antarmuka tetap dirender dalam Bahasa Indonesia secara konsisten.
+
+### 6. API Endpoints Terkait
 - **`PUT /api/tenant`**: Menyimpan status toggle `humanHandoffEnabled`, `fallbackEmail`, bahasa tenant (`visitorConfig.language`), dan objek `visitorConfig.contactForm`.
 - **`GET /api/widget/config` & `POST /api/widget/init`**: Mengirimkan properti `language`, `humanHandoffEnabled`, `fallbackEmail`, dan `contactForm` ke klien Web & Mobile SDK.
 - **`POST /api/widget/contact-submit`**: Menerima pengiriman form, menyimpan percakapan laporan pengguna (dalam bahasa yang sesuai), memperbarui data prospek di `VisitorProfile`, dan menghasilkan balasan bot instan berdasarkan `autoReplyTemplate`.
 
-### 6. Alur Penyimpanan Data Funnel & Kontak Pengunjung (Lead Profile)
+### 7. Alur Penyimpanan Data Funnel & Kontak Pengunjung (Lead Profile)
 Saat form funnel in-app dikirim oleh pengunjung melalui endpoint `POST /api/widget/contact-submit`:
 
 1. **Tabel `ChatSession`**:
@@ -152,6 +183,20 @@ Saat form funnel in-app dikirim oleh pengunjung melalui endpoint `POST /api/widg
        - `lastInquirySubmittedAt`: Timestamp ISO saat form dikirim.
 4. **Notifikasi Internal Perusahaan (`fallbackEmail`) & Gateway Email**:
    - Sistem mengirimkan email ringkasan laporan ke alamat email resmi perusahaan yang ditentukan di `tenant.fallbackEmail`.
+   - **Template Email Multibahasa (Berdasarkan `visitorConfig.language`)**:
+     - **Bahasa Inggris (`en`, Default)**:
+       - Subjek: `New Visitor Inquiry / Issue Report: [<category>] - <name>`
+       - Header: *Visitor Inquiry & Issue Report*
+       - Subtitle: *Received via CS Portal Widget & Mobile Funnel*
+       - Salam: *Hello <Company> Support Team,*
+       - Pengantar: *An application visitor has submitted an issue or inquiry report while live agent assistance is routed:*
+       - Label Rincian: *Issue Category*, *Visitor Name*, *Company*, *Contact Email*, *Issue Description*, *Submission Time*.
+       - Callout: *You can review the conversation history and this lead profile directly in the CRM Dashboard.*
+       - Footer: *This email was sent automatically by CEOSUITE CS Portal AI Concierge (<PROVIDER>).*
+     - **Bahasa Indonesia (`id`)**:
+       - Subjek: `Laporan Baru Pengunjung: [<category>] - <name>`
+       - Header: *Laporan Masalah / Kebutuhan Pengunjung*
+       - Label Rincian: *Kategori Masalah*, *Nama Pengunjung*, *Perusahaan*, *Email Kontak*, *Deskripsi Masalah*, *Waktu Pengiriman*.
    - Pengiriman email diproses oleh **Email Service Gateway** ([src/lib/email-service.ts](file:///c:/Users/nanda/Documents/aiagent/agent-ai-komunikasi-crm/src/lib/email-service.ts)) dengan 3 opsi provider yang dapat dikonfigurasi di menu **Pengaturan > Email & SMTP**:
      1. **Microsoft Azure (Office 365 / Graph API OAuth2)**: Menggunakan Azure App Registration (`AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SENDER_EMAIL`, `AZURE_SENDER_NAME`, `AZURE_EMAIL_SUBJECT_PREFIX`).
      2. **Gmail SMTP**: Menggunakan akun Gmail / Google Workspace dengan Google App Password 16-karakter via `smtp.gmail.com`.

@@ -99,4 +99,54 @@ describe('email-service and EmailConfig', () => {
 
     expect(result).toBeNull();
   });
+
+  it('formats inquiry email notification in English by default or when language is en', async () => {
+    const result = await sendInquiryNotificationToTenant(
+      {
+        id: 't-1',
+        name: 'CEO SUITE Singapore',
+        fallbackEmail: 'support@ceosuite.com',
+        visitorConfig: {
+          language: 'en',
+          emailConfig: { provider: 'none' },
+        },
+      },
+      {
+        category: 'Technical Issues',
+        description: 'WiFi unstable in room 402',
+        name: 'Airin nanda',
+        company: 'CEO SUITE Singapore',
+        email: 'nandapuspitarana@gmail.com',
+      }
+    );
+
+    expect(result).not.toBeNull();
+    expect(result?.success).toBe(true);
+    expect(result?.provider).toBe('none');
+  });
+
+  it('formats inquiry email notification in Indonesian when tenant language is id', async () => {
+    const result = await sendInquiryNotificationToTenant(
+      {
+        id: 't-1',
+        name: 'CEO SUITE Jakarta',
+        fallbackEmail: 'support@ceosuite.com',
+        visitorConfig: {
+          language: 'id',
+          emailConfig: { provider: 'none' },
+        },
+      },
+      {
+        category: 'Kendala Teknis',
+        description: 'Lampu meeting room padam',
+        name: 'Budi Santoso',
+        company: 'PT Maju Bersama',
+        email: 'budi@domain.com',
+      }
+    );
+
+    expect(result).not.toBeNull();
+    expect(result?.success).toBe(true);
+    expect(result?.provider).toBe('none');
+  });
 });

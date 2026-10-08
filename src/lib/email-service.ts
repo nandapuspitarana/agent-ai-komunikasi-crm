@@ -258,29 +258,58 @@ export async function sendInquiryNotificationToTenant(
 
   const vConfig = getVisitorConfig(tenant.visitorConfig);
   const emailConfig = vConfig.emailConfig;
+  const isId = String(vConfig.language || '').toLowerCase().startsWith('id');
 
-  const subject = `Laporan Baru Pengunjung: [${inquiry.category}] - ${inquiry.name || 'Pengunjung'}`;
+  const subject = isId
+    ? `Laporan Baru Pengunjung: [${inquiry.category}] - ${inquiry.name || 'Pengunjung'}`
+    : `New Visitor Inquiry / Issue Report: [${inquiry.category}] - ${inquiry.name || 'Visitor'}`;
+
+  const headerTitle = isId ? 'Laporan Masalah / Kebutuhan Pengunjung' : 'Visitor Inquiry & Issue Report';
+  const headerSubtitle = isId
+    ? 'Diterima melalui CS Portal Widget & Mobile Funnel'
+    : 'Received via CS Portal Widget & Mobile Funnel';
+  const greeting = isId
+    ? `Halo Tim Support <strong>${tenant.name || 'Perusahaan'}</strong>,`
+    : `Hello <strong>${tenant.name || 'Company'}</strong> Support Team,`;
+  const intro = isId
+    ? 'Pengunjung aplikasi telah mengirimkan formulir laporan kendala saat bantuan live agen sedang dialihkan:'
+    : 'An application visitor has submitted an issue or inquiry report while live agent assistance is routed:';
+  const categoryLabel = isId ? 'Kategori Masalah:' : 'Issue Category:';
+  const nameLabel = isId ? 'Nama Pengunjung:' : 'Visitor Name:';
+  const companyLabel = isId ? 'Perusahaan:' : 'Company:';
+  const emailLabel = isId ? 'Email Kontak:' : 'Contact Email:';
+  const descLabel = isId ? 'Deskripsi Masalah:' : 'Issue Description:';
+  const timeLabel = isId ? 'Waktu Pengiriman:' : 'Submission Time:';
+  const timeFormatted = isId
+    ? `${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB`
+    : `${new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' })} WIB`;
+  const ctaNote = isId
+    ? 'Anda dapat meninjau riwayat percakapan dan profil prospek ini langsung di Dashboard CRM.'
+    : 'You can review the conversation history and this lead profile directly in the CRM Dashboard.';
+  const footerNote = isId
+    ? `Email ini dikirim otomatis oleh CEOSUITE CS Portal AI Concierge (${emailConfig?.provider ? emailConfig.provider.toUpperCase() : 'EMAIL SERVICE'}).`
+    : `This email was sent automatically by CEOSUITE CS Portal AI Concierge (${emailConfig?.provider ? emailConfig.provider.toUpperCase() : 'EMAIL SERVICE'}).`;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
       <div style="background-color: #801517; padding: 20px; color: #ffffff;">
-        <h2 style="margin: 0; font-size: 20px;">Laporan Masalah / Kebutuhan Pengunjung</h2>
-        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">Diterima melalui CS Portal Widget & Mobile Funnel</p>
+        <h2 style="margin: 0; font-size: 20px;">${headerTitle}</h2>
+        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">${headerSubtitle}</p>
       </div>
       <div style="padding: 24px; background-color: #ffffff; color: #1e293b;">
-        <p style="font-size: 15px; margin-top: 0;">Halo Tim Support <strong>${tenant.name || 'Perusahaan'}</strong>,</p>
-        <p style="font-size: 14px; line-height: 1.5;">Pengunjung aplikasi telah mengirimkan formulir laporan kendala saat bantuan live agen sedang dialihkan:</p>
+        <p style="font-size: 15px; margin-top: 0;">${greeting}</p>
+        <p style="font-size: 14px; line-height: 1.5;">${intro}</p>
         
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 10px 0; font-weight: bold; width: 140px; color: #64748b;">Kategori Masalah:</td>
+            <td style="padding: 10px 0; font-weight: bold; width: 140px; color: #64748b;">${categoryLabel}</td>
             <td style="padding: 10px 0; font-weight: bold; color: #801517;"><span style="background-color: #fef2f2; color: #991b1b; padding: 4px 8px; border-radius: 4px;">${inquiry.category}</span></td>
           </tr>
           ${
             inquiry.name
               ? `
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">Nama Pengunjung:</td>
+            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">${nameLabel}</td>
             <td style="padding: 10px 0; color: #0f172a;">${inquiry.name}</td>
           </tr>`
               : ''
@@ -289,7 +318,7 @@ export async function sendInquiryNotificationToTenant(
             inquiry.company
               ? `
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">Perusahaan:</td>
+            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">${companyLabel}</td>
             <td style="padding: 10px 0; color: #0f172a;">${inquiry.company}</td>
           </tr>`
               : ''
@@ -298,36 +327,59 @@ export async function sendInquiryNotificationToTenant(
             inquiry.email
               ? `
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">Email Kontak:</td>
+            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">${emailLabel}</td>
             <td style="padding: 10px 0; color: #0f172a;"><a href="mailto:${inquiry.email}" style="color: #2563eb; text-decoration: none;">${inquiry.email}</a></td>
           </tr>`
               : ''
           }
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 10px 0; font-weight: bold; color: #64748b; vertical-align: top;">Deskripsi Masalah:</td>
+            <td style="padding: 10px 0; font-weight: bold; color: #64748b; vertical-align: top;">${descLabel}</td>
             <td style="padding: 10px 0; color: #0f172a; white-space: pre-wrap; line-height: 1.5;">${inquiry.description}</td>
           </tr>
           <tr>
-            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">Waktu Pengiriman:</td>
-            <td style="padding: 10px 0; color: #64748b;">${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB</td>
+            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">${timeLabel}</td>
+            <td style="padding: 10px 0; color: #64748b;">${timeFormatted}</td>
           </tr>
         </table>
 
         <div style="margin-top: 24px; padding: 14px; background-color: #f8fafc; border-radius: 6px; text-align: center;">
-          <p style="margin: 0; font-size: 13px; color: #64748b;">Anda dapat meninjau riwayat percakapan dan profil prospek ini langsung di Dashboard CRM.</p>
+          <p style="margin: 0; font-size: 13px; color: #64748b;">${ctaNote}</p>
         </div>
       </div>
       <div style="background-color: #f8fafc; padding: 14px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
-        Email ini dikirim otomatis oleh CEOSUITE CS Portal AI Concierge (${emailConfig?.provider ? emailConfig.provider.toUpperCase() : 'EMAIL SERVICE'}).
+        ${footerNote}
       </div>
     </div>
   `;
+
+  const text = isId
+    ? `[${headerTitle}]\n\n` +
+      `${greeting.replace(/<[^>]*>/g, '')}\n` +
+      `${intro}\n\n` +
+      `${categoryLabel} ${inquiry.category}\n` +
+      (inquiry.name ? `${nameLabel} ${inquiry.name}\n` : '') +
+      (inquiry.company ? `${companyLabel} ${inquiry.company}\n` : '') +
+      (inquiry.email ? `${emailLabel} ${inquiry.email}\n` : '') +
+      `${descLabel} ${inquiry.description}\n` +
+      `${timeLabel} ${timeFormatted}\n\n` +
+      `${ctaNote}`
+    : `[${headerTitle}]\n\n` +
+      `${greeting.replace(/<[^>]*>/g, '')}\n` +
+      `${intro}\n\n` +
+      `${categoryLabel} ${inquiry.category}\n` +
+      (inquiry.name ? `${nameLabel} ${inquiry.name}\n` : '') +
+      (inquiry.company ? `${companyLabel} ${inquiry.company}\n` : '') +
+      (inquiry.email ? `${emailLabel} ${inquiry.email}\n` : '') +
+      `${descLabel} ${inquiry.description}\n` +
+      `${timeLabel} ${timeFormatted}\n\n` +
+      `${ctaNote}`;
 
   try {
     const result = await sendEmail({
       to: targetEmail,
       subject,
       html,
+      text,
       config: emailConfig,
     });
     console.log(
