@@ -94,7 +94,6 @@ void main() {
       );
 
       String? redirectedEmail;
-      String? launchedUrl;
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -102,7 +101,7 @@ void main() {
             controller: controller,
             talkToAgentLabel: 'Talk to Human Agent',
             onEmailRedirect: (email) => redirectedEmail = email,
-            onLaunchUrl: (url) => launchedUrl = url,
+            onLaunchUrl: (_) {},
           ),
         ),
       ));

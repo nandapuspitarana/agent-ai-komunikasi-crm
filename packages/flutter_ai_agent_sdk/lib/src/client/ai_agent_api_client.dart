@@ -194,6 +194,14 @@ class AiAgentApiClient {
     } catch (e) {
       throw AiAgentApiException('Network connection failure: $e');
     }
+
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw AiAgentApiException(
+        'Server returned error: ${res.statusCode}',
+        statusCode: res.statusCode,
+        details: res.body,
+      );
+    }
   }
 
   /// Submits the contact / report problem funnel form to `/api/widget/contact-submit`.
