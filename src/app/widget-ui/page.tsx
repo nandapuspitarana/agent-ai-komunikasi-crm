@@ -17,6 +17,11 @@ function WidgetUIRenderer() {
   // Customization params
   const position = searchParams?.get('position') || 'right'; // 'left' | 'right'
   const iconParam = searchParams?.get('icon') || '';
+
+  // User Profile params (parsed from widget invocation)
+  const userEmail = searchParams?.get('email') || searchParams?.get('userEmail') || '';
+  const userName = searchParams?.get('userName') || searchParams?.get('name') || '';
+  const userCompany = searchParams?.get('company') || searchParams?.get('companyName') || '';
   
   const [config, setConfig] = useState({
     color: color,
@@ -74,7 +79,10 @@ function WidgetUIRenderer() {
         <ChatWindow 
           tenantId={tenantId} 
           primaryColor={config.color} 
-          botName={config.name} 
+          botName={config.name}
+          userEmail={userEmail}
+          userName={userName}
+          userCompany={userCompany}
         />
       </div>
     );
@@ -183,7 +191,10 @@ function WidgetUIRenderer() {
           <ChatWindow 
             tenantId={tenantId} 
             primaryColor={config.color} 
-            botName={config.name} 
+            botName={config.name}
+            userEmail={userEmail}
+            userName={userName}
+            userCompany={userCompany}
           />
         </div>
 

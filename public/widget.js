@@ -119,8 +119,18 @@
     iframeContainer.className = 'widget-iframe-container';
     
     const apiUrl = window.CRM_AGENT_CONFIG?.apiUrl || CRM_HOST;
+    const cfg = window.CRM_AGENT_CONFIG || {};
+    const userEmail = cfg.userEmail || cfg.email || scriptTag?.getAttribute('data-user-email') || scriptTag?.getAttribute('data-email') || '';
+    const userName = cfg.userName || cfg.name || scriptTag?.getAttribute('data-user-name') || scriptTag?.getAttribute('data-name') || '';
+    const userCompany = cfg.company || cfg.companyName || scriptTag?.getAttribute('data-company') || '';
+
+    let iframeSrc = `${apiUrl}/widget-ui?mode=iframe&tenantId=${tenantId}&color=${encodeURIComponent(config.primaryColor)}&name=${encodeURIComponent(config.botName)}&position=${encodeURIComponent(config.position || 'right')}&icon=${encodeURIComponent(config.widgetIconUrl || '')}`;
+    if (userEmail) iframeSrc += `&email=${encodeURIComponent(userEmail)}`;
+    if (userName) iframeSrc += `&userName=${encodeURIComponent(userName)}`;
+    if (userCompany) iframeSrc += `&company=${encodeURIComponent(userCompany)}`;
+
     const iframe = document.createElement('iframe');
-    iframe.src = `${apiUrl}/widget-ui?mode=iframe&tenantId=${tenantId}&color=${encodeURIComponent(config.primaryColor)}&name=${encodeURIComponent(config.botName)}&position=${encodeURIComponent(config.position || 'right')}&icon=${encodeURIComponent(config.widgetIconUrl || '')}`;
+    iframe.src = iframeSrc;
     iframe.allow = "geolocation";
     iframeContainer.appendChild(iframe);
     shadowRoot.appendChild(iframeContainer);

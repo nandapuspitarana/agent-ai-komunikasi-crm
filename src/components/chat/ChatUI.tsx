@@ -1,11 +1,22 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
-import { Send, Bot, User, MoreVertical, UserCheck, Loader2, PhoneCall, RotateCcw, Mail } from 'lucide-react';
+import React, { useRef, useEffect, useState } from 'react';
+import { Send, Bot, User, MoreVertical, UserCheck, Loader2, PhoneCall, RotateCcw, Mail, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
 export type MessageSender = 'user' | 'bot' | 'agent' | 'system';
 export type SessionStatus = 'bot' | 'agent' | 'queue' | 'connecting' | 'closed';
+
+export interface UserProfileState {
+  email?: string;
+  name?: string;
+  company?: string;
+}
+
+export interface ContactFormData {
+  category: string;
+  description: string;
+}
 
 export interface ChatMessageData {
   id: number | string;
@@ -50,6 +61,14 @@ export interface ChatUIProps {
   reviewText?: string;
   onReviewTextChange?: (text: string) => void;
   onSubmitReview?: () => void;
+
+  // Minimal Contact / Funnel Form
+  showContactForm?: boolean;
+  onOpenContactForm?: () => void;
+  onCloseContactForm?: () => void;
+  onSubmitContactForm?: (data: ContactFormData) => Promise<void> | void;
+  userProfile?: UserProfileState;
+  isSubmittingContactForm?: boolean;
   
   // Layout Options
   height?: string; // e.g., '100%', '400px'
@@ -74,11 +93,19 @@ export function ChatUI({
   reviewText,
   onReviewTextChange,
   onSubmitReview,
+  showContactForm = false,
+  onCloseContactForm,
+  onSubmitContactForm,
+  userProfile,
+  isSubmittingContactForm = false,
   height = '100%',
   hideHeaderMoreOptions = false,
 }: ChatUIProps) {
   const { t } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const [formCategory, setFormCategory] = useState('Pertanyaan Umum');
+  const [formDescription, setFormDescription] = useState('');
 
   // Auto-scroll ke pesan terbaru
   useEffect(() => {
@@ -89,6 +116,18 @@ export function ChatUI({
     e.preventDefault();
     if (inputValue.trim() && !isTyping) {
       onSendMessage(inputValue);
+    }
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formDescription.trim() || isSubmittingContactForm) return;
+    if (onSubmitContactForm) {
+      await onSubmitContactForm({
+        category: formCategory,
+        description: formDescription.trim(),
+      });
+      setFormDescription('');
     }
   };
 
@@ -192,6 +231,117 @@ export function ChatUI({
           )}
         </div>
       </div>
+
+      {/* Inquiry / Contact Form Overlay (Minimalist: Category & Description, auto-profile state) */}
+      {showContactForm && (
+        <div className="absolute inset-0 bg-white z-30 flex flex-col animate-in fade-in slide-in-from-bottom-4">
+          <div 
+            className="p-3.5 text-white flex items-center justify-between shadow-sm relative flex-shrink-0"
+            style={{ backgroundColor: config.primaryColor }}
+          >
+            <div>
+              <h3 className="text-sm font-bold flex items-center gap-1.5">
+                <Mail size={16} />
+                {t('chatWidget', 'inquiryFormTitle', 'Kirim Pesan ke Perusahaan')}
+              </h3>
+              <p className="text-[11px] text-white/80">
+                {t('chatWidget', 'inquiryFormDesc', 'Tim kami akan segera menindaklanjuti kendala atau pertanyaan Anda.')}
+              </p>
+            </div>
+            {onCloseContactForm && (
+              <button
+                type="button"
+                onClick={onCloseContactForm}
+                disabled={isSubmittingContactForm}
+                className="p-1.5 rounded-full text-white/80 hover:text-white hover:bg-black/10 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
+
+          <form onSubmit={handleContactSubmit} className="flex-1 flex flex-col p-4 overflow-y-auto">
+            {/* Minimalist Profile info indicator (parsed from parameters) */}
+            {(userProfile?.email || userProfile?.name || userProfile?.company) && (
+              <div className="mb-3.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600">
+                <span className="text-slate-400 font-medium block text-[10px] uppercase tracking-wider mb-0.5">
+                  {t('chatWidget', 'sendingAs', 'Mengirim sebagai')}
+                </span>
+                <span className="font-semibold text-slate-800">
+                  {userProfile.name || userProfile.email}
+                  {userProfile.company ? ` (${userProfile.company})` : ''}
+                </span>
+                {userProfile.name && userProfile.email && (
+                  <span className="text-slate-400 block text-[11px]">{userProfile.email}</span>
+                )}
+              </div>
+            )}
+
+            {/* Field 1: Category */}
+            <div className="mb-3.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                {t('chatWidget', 'categoryLabel', 'Kategori Masalah')}
+              </label>
+              <select
+                value={formCategory}
+                onChange={(e) => setFormCategory(e.target.value)}
+                disabled={isSubmittingContactForm}
+                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all"
+              >
+                <option value="Pertanyaan Umum">Pertanyaan Umum</option>
+                <option value="Layanan & Fasilitas">Layanan & Fasilitas</option>
+                <option value="Kendala Teknis">Kendala Teknis</option>
+                <option value="Billing & Pembayaran">Billing & Pembayaran</option>
+                <option value="Kemitraan">Kemitraan / Kerjasama</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+
+            {/* Field 2: Description */}
+            <div className="flex-1 flex flex-col mb-4 min-h-[110px]">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                {t('chatWidget', 'descriptionLabel', 'Deskripsi Masalah')}
+              </label>
+              <textarea
+                value={formDescription}
+                onChange={(e) => setFormDescription(e.target.value)}
+                disabled={isSubmittingContactForm}
+                placeholder={t('chatWidget', 'descriptionPlaceholder', 'Jelaskan kendala atau kebutuhan Anda secara singkat...')}
+                className="w-full flex-1 min-h-[110px] text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all resize-none placeholder:text-slate-400"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="mt-auto pt-3 border-t border-slate-100 flex items-center gap-2">
+              {onCloseContactForm && (
+                <button
+                  type="button"
+                  onClick={onCloseContactForm}
+                  disabled={isSubmittingContactForm}
+                  className="flex-1 py-2.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                >
+                  {t('chatWidget', 'cancelBtn', 'Batal')}
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={!formDescription.trim() || isSubmittingContactForm}
+                className="flex-1 py-2.5 text-xs font-semibold text-white rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm"
+                style={{ backgroundColor: config.primaryColor }}
+              >
+                {isSubmittingContactForm ? (
+                  <>
+                    <Loader2 size={13} className="animate-spin" />
+                    <span>{t('chatWidget', 'submitting', 'Mengirim...')}</span>
+                  </>
+                ) : (
+                  <span>{t('chatWidget', 'submitBtn', 'Kirim Laporan')}</span>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Chat History Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

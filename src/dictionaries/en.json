@@ -95,7 +95,17 @@
     "writeMessage": "Write your message...",
     "botReplied": "🤖 Answered by AI",
     "agentActiveLabel": "👤 Agent Active",
-    "doneLabel": "✓ Done"
+    "doneLabel": "✓ Done",
+    "inquiryFormTitle": "Send Message to Company",
+    "inquiryFormDesc": "Our team will promptly follow up on your issue or inquiry.",
+    "categoryLabel": "Problem Category",
+    "categoryPlaceholder": "Select problem category",
+    "descriptionLabel": "Problem Description",
+    "descriptionPlaceholder": "Briefly describe your issue or inquiry...",
+    "submitting": "Submitting...",
+    "submitBtn": "Submit Report",
+    "cancelBtn": "Cancel",
+    "sendingAs": "Sending as"
   },
   "agentBuilder": {
     "saveAgentFirst": "Save Agent First",

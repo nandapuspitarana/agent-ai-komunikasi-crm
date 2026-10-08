@@ -95,7 +95,17 @@
     "writeMessage": "Tulis pesan Anda...",
     "botReplied": "🤖 Dijawab oleh AI",
     "agentActiveLabel": "👤 Agen Aktif",
-    "doneLabel": "✓ Selesai"
+    "doneLabel": "✓ Selesai",
+    "inquiryFormTitle": "Kirim Pesan ke Perusahaan",
+    "inquiryFormDesc": "Tim kami akan segera menindaklanjuti kendala atau pertanyaan Anda.",
+    "categoryLabel": "Kategori Masalah",
+    "categoryPlaceholder": "Pilih kategori masalah",
+    "descriptionLabel": "Deskripsi Masalah",
+    "descriptionPlaceholder": "Jelaskan kendala atau kebutuhan Anda secara singkat...",
+    "submitting": "Mengirim...",
+    "submitBtn": "Kirim Laporan",
+    "cancelBtn": "Batal",
+    "sendingAs": "Mengirim sebagai"
   },
   "agentBuilder": {
     "saveAgentFirst": "Simpan Agen Terlebih Dahulu",

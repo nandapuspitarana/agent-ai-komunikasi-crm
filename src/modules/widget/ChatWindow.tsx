@@ -10,6 +10,9 @@ interface ChatWindowProps {
   primaryColor?: string;
   botName?: string;
   botLogo?: string | null;
+  userEmail?: string;
+  userName?: string;
+  userCompany?: string;
 }
 
 export function ChatWindow({ 
@@ -17,6 +20,9 @@ export function ChatWindow({
   primaryColor = '#2563eb', 
   botName = 'Support Bot',
   botLogo = null,
+  userEmail: propUserEmail,
+  userName: propUserName,
+  userCompany: propUserCompany,
 }: ChatWindowProps) {
   const { t } = useTranslation();
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
@@ -29,8 +35,29 @@ export function ChatWindow({
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [isSubmittingContactForm, setIsSubmittingContactForm] = useState(false);
 
   const localSessionId = useRef<string>(`widget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  
+  const getUserProfile = () => {
+    if (typeof window === 'undefined') {
+      return {
+        email: propUserEmail || '',
+        name: propUserName || '',
+        company: propUserCompany || '',
+      };
+    }
+    const params = new URLSearchParams(window.location.search);
+    const cfg = (window as any).CRM_AGENT_CONFIG || {};
+    return {
+      email: propUserEmail || params.get('email') || params.get('userEmail') || cfg.email || cfg.userEmail || '',
+      name: propUserName || params.get('userName') || params.get('name') || cfg.name || cfg.userName || '',
+      company: propUserCompany || params.get('company') || params.get('companyName') || cfg.company || cfg.companyName || '',
+    };
+  };
+
+  const [userProfile, setUserProfile] = useState(getUserProfile);
   
   const getTenantId = () => {
     if (typeof window === 'undefined') return propTenantId;
@@ -269,11 +296,55 @@ export function ChatWindow({
   const handleRequestHumanAgent = () => {
     if (sessionStatus !== 'bot') return;
     if (widgetConfig.humanHandoffEnabled === false && widgetConfig.fallbackEmail) {
-      window.location.href = `mailto:${widgetConfig.fallbackEmail}?subject=${encodeURIComponent('Support Request')}`;
-      addMessage(t('chatWidget', 'redirectingToEmail', `Mengarahkan ke email support: ${widgetConfig.fallbackEmail}`), 'system');
+      setShowContactForm(true);
       return;
     }
     sendMessage('Saya ingin bicara dengan agen manusia');
+  };
+
+  const handleSubmitContactForm = async ({ category, description }: { category: string; description: string }) => {
+    setIsSubmittingContactForm(true);
+    try {
+      const res = await fetch(`${apiBase}/api/widget/contact-submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenantId,
+          sessionId: serverSessionId,
+          contactId: localSessionId.current,
+          category,
+          description,
+          email: userProfile.email,
+          name: userProfile.name,
+          company: userProfile.company,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        if (data.sessionId && !serverSessionId) {
+          setServerSessionId(data.sessionId);
+        }
+        setShowContactForm(false);
+        const userSummary = [
+          `📝 [Laporan Masalah ke Perusahaan]`,
+          `• Kategori: ${category}`,
+          userProfile.company ? `• Perusahaan: ${userProfile.company}` : null,
+          `• Deskripsi: ${description}`,
+        ].filter(Boolean).join('\n');
+        addMessage(userSummary, 'user');
+
+        const botReply = data.botReply || t('chatWidget', 'formSuccess', 'Terima kasih! Pesan dan laporan Anda telah kami teruskan ke tim perusahaan.');
+        addMessage(botReply, 'bot');
+      } else {
+        addMessage(t('chatWidget', 'errorOccurred'), 'system');
+      }
+    } catch (err) {
+      console.error('[ChatWindow] Error submitting contact form:', err);
+      addMessage(t('chatWidget', 'noConnection'), 'system');
+    } finally {
+      setIsSubmittingContactForm(false);
+    }
   };
 
   const sendMessageRef = useRef(sendMessage);
@@ -360,6 +431,11 @@ export function ChatWindow({
       reviewText={reviewText}
       onReviewTextChange={setReviewText}
       onSubmitReview={submitReview}
+      showContactForm={showContactForm}
+      onCloseContactForm={() => setShowContactForm(false)}
+      onSubmitContactForm={handleSubmitContactForm}
+      userProfile={userProfile}
+      isSubmittingContactForm={isSubmittingContactForm}
     />
   );
 }
