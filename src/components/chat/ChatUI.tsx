@@ -30,6 +30,7 @@ export interface ChatMessageData {
 export interface ChatUIConfig {
   name: string;
   tenantName: string;
+  language?: string;
   primaryColor: string;
   logo?: string | null;
   botAvatarUrl?: string | null;
@@ -111,20 +112,32 @@ export function ChatUI({
   const { t } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const defaultCategories = [
-    'Pertanyaan Umum',
-    'Layanan & Fasilitas',
-    'Kendala Teknis',
-    'Billing & Pembayaran',
-    'Kemitraan',
-    'Lainnya',
-  ];
+  const isEn = (config.language || '').toLowerCase().startsWith('en');
+  const defaultCategories = isEn
+    ? [
+        'General Inquiry',
+        'Services & Facilities',
+        'Technical Issue',
+        'Billing & Payment',
+        'Partnership',
+        'Other',
+      ]
+    : [
+        'Pertanyaan Umum',
+        'Layanan & Fasilitas',
+        'Kendala Teknis',
+        'Billing & Pembayaran',
+        'Kemitraan',
+        'Lainnya',
+      ];
   const categoriesList =
     config.contactForm?.categories && config.contactForm.categories.length > 0
       ? config.contactForm.categories
       : defaultCategories;
 
-  const [formCategory, setFormCategory] = useState(categoriesList[0] || 'Pertanyaan Umum');
+  const [formCategory, setFormCategory] = useState(
+    categoriesList[0] || (isEn ? 'General Inquiry' : 'Pertanyaan Umum')
+  );
   const [formDescription, setFormDescription] = useState('');
 
   // Sync category if categoriesList updates
@@ -269,10 +282,19 @@ export function ChatUI({
             <div>
               <h3 className="text-sm font-bold flex items-center gap-1.5">
                 <Mail size={16} />
-                {config.contactForm?.formTitle || t('chatWidget', 'inquiryFormTitle', 'Kirim Pesan ke Perusahaan')}
+                {config.contactForm?.formTitle ||
+                  (isEn
+                    ? 'Contact Company / Report Issue'
+                    : t('chatWidget', 'inquiryFormTitle', 'Kirim Pesan ke Perusahaan'))}
               </h3>
               <p className="text-[11px] text-white/80">
-                {t('chatWidget', 'inquiryFormDesc', 'Tim kami akan segera menindaklanjuti kendala atau pertanyaan Anda.')}
+                {t(
+                  'chatWidget',
+                  'inquiryFormDesc',
+                  isEn
+                    ? 'Our team will promptly follow up on your issue or inquiry.'
+                    : 'Tim kami akan segera menindaklanjuti kendala atau pertanyaan Anda.'
+                )}
               </p>
             </div>
             {onCloseContactForm && (
@@ -292,7 +314,7 @@ export function ChatUI({
             {(userProfile?.email || userProfile?.name || userProfile?.company) && (
               <div className="mb-3.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600">
                 <span className="text-slate-400 font-medium block text-[10px] uppercase tracking-wider mb-0.5">
-                  {t('chatWidget', 'sendingAs', 'Mengirim sebagai')}
+                  {t('chatWidget', 'sendingAs', isEn ? 'Sending as' : 'Mengirim sebagai')}
                 </span>
                 <span className="font-semibold text-slate-800">
                   {userProfile.name || userProfile.email}
@@ -307,7 +329,7 @@ export function ChatUI({
             {/* Field 1: Category */}
             <div className="mb-3.5">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                {t('chatWidget', 'categoryLabel', 'Kategori Masalah')}
+                {t('chatWidget', 'categoryLabel', isEn ? 'Issue Category' : 'Kategori Masalah')}
               </label>
               <select
                 value={formCategory}
@@ -326,13 +348,19 @@ export function ChatUI({
             {/* Field 2: Description */}
             <div className="flex-1 flex flex-col mb-4 min-h-[110px]">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                {t('chatWidget', 'descriptionLabel', 'Deskripsi Masalah')}
+                {t('chatWidget', 'descriptionLabel', isEn ? 'Issue Description' : 'Deskripsi Masalah')}
               </label>
               <textarea
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 disabled={isSubmittingContactForm}
-                placeholder={t('chatWidget', 'descriptionPlaceholder', 'Jelaskan kendala atau kebutuhan Anda secara singkat...')}
+                placeholder={t(
+                  'chatWidget',
+                  'descriptionPlaceholder',
+                  isEn
+                    ? 'Briefly describe your issue or inquiry...'
+                    : 'Jelaskan kendala atau kebutuhan Anda secara singkat...'
+                )}
                 className="w-full flex-1 min-h-[110px] text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all resize-none placeholder:text-slate-400"
               />
             </div>
@@ -346,7 +374,7 @@ export function ChatUI({
                   disabled={isSubmittingContactForm}
                   className="flex-1 py-2.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
                 >
-                  {t('chatWidget', 'cancelBtn', 'Batal')}
+                  {t('chatWidget', 'cancelBtn', isEn ? 'Cancel' : 'Batal')}
                 </button>
               )}
               <button
@@ -358,10 +386,10 @@ export function ChatUI({
                 {isSubmittingContactForm ? (
                   <>
                     <Loader2 size={13} className="animate-spin" />
-                    <span>{t('chatWidget', 'submitting', 'Mengirim...')}</span>
+                    <span>{t('chatWidget', 'submitting', isEn ? 'Submitting...' : 'Mengirim...')}</span>
                   </>
                 ) : (
-                  <span>{t('chatWidget', 'submitBtn', 'Kirim Laporan')}</span>
+                  <span>{t('chatWidget', 'submitBtn', isEn ? 'Submit Report' : 'Kirim Laporan')}</span>
                 )}
               </button>
             </div>

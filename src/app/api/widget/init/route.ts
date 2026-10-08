@@ -32,7 +32,16 @@ export async function POST(request: Request) {
     const flowConfig = (flow?.config || {}) as any;
     const dynamicBotName = flowConfig?.name || flow?.name || 'Claire';
     const welcome = readWelcomeConfig(flowConfig);
-    const vConfig = getVisitorConfig(tenant.visitorConfig);
+
+    const tenantVConfig = (tenant.visitorConfig || {}) as any;
+    const rawLang =
+      tenantVConfig?.language ||
+      flowConfig?.language ||
+      ((flow?.name || '').toLowerCase().includes('ceosuite') ? 'en' : 'en');
+    const isId = String(rawLang).toLowerCase().startsWith('id');
+    const effectiveLang = isId ? 'id' : 'en';
+
+    const vConfig = getVisitorConfig(tenant.visitorConfig, effectiveLang);
 
     return NextResponse.json({
       status: 'success',
@@ -42,6 +51,7 @@ export async function POST(request: Request) {
         name: tenant.name,
         tenantName: tenant.name,
         botName: dynamicBotName,
+        language: effectiveLang,
         primaryColor: tenant.themeBrandColor || '#2563eb', // Use tenant color
         logo: tenant.themeBrandLogo || null,
         botAvatarUrl: flowConfig?.botAvatarUrl || tenant.botAvatarUrl || null,

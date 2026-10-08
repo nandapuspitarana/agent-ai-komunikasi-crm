@@ -84,17 +84,33 @@ export async function POST(req: NextRequest) {
     const actualSessionId = currentSession.id;
     const finalContactId = currentSession.contactId;
 
+    // Resolve language setting from tenant
+    const tenantVConfig = (tenant.visitorConfig || {}) as any;
+    const isId = String(tenantVConfig?.language || '').toLowerCase().startsWith('id');
+    const visitorConfig = getVisitorConfig(tenant.visitorConfig, isId ? 'id' : 'en');
+
     // 3. Save User Submission Message to Chat
-    const userMessageContent = [
-      `📝 [Laporan Masalah ke Perusahaan]`,
-      `• Kategori: ${category}`,
-      company ? `• Perusahaan: ${company}` : null,
-      name ? `• Nama: ${name}` : null,
-      email ? `• Email: ${email}` : null,
-      `• Deskripsi: ${description}`,
-    ]
-      .filter(Boolean)
-      .join('\n');
+    const userMessageContent = isId
+      ? [
+          `📝 [Laporan Masalah ke Perusahaan]`,
+          `• Kategori: ${category}`,
+          company ? `• Perusahaan: ${company}` : null,
+          name ? `• Nama: ${name}` : null,
+          email ? `• Email: ${email}` : null,
+          `• Deskripsi: ${description}`,
+        ]
+          .filter(Boolean)
+          .join('\n')
+      : [
+          `📝 [Inquiry / Issue Report to Company]`,
+          `• Category: ${category}`,
+          company ? `• Company: ${company}` : null,
+          name ? `• Name: ${name}` : null,
+          email ? `• Email: ${email}` : null,
+          `• Description: ${description}`,
+        ]
+          .filter(Boolean)
+          .join('\n');
 
     await prisma.message.create({
       data: {
@@ -105,15 +121,18 @@ export async function POST(req: NextRequest) {
     });
 
     // 4. Create Bot Confirmation Message
-    const visitorConfig = getVisitorConfig(tenant.visitorConfig);
     const customTemplate = visitorConfig.contactForm?.autoReplyTemplate?.trim();
+    const defaultBotReply = isId
+      ? `Terima kasih${name ? ` ${name}` : ''}! Pesan dan laporan Anda terkait "${category}" telah kami teruskan ke tim perusahaan. Kami akan segera menindaklanjuti${email ? ` melalui email (${email})` : ''}.`
+      : `Thank you${name ? ` ${name}` : ''}! Your message and report regarding "${category}" has been forwarded to our team. We will follow up with you shortly${email ? ` via email (${email})` : ''}.`;
+
     const botReply = customTemplate
       ? customTemplate
           .replace(/\{name\}/g, name || '')
           .replace(/\{category\}/g, category)
           .replace(/\{company\}/g, company || '')
           .replace(/\{email\}/g, email || '')
-      : `Terima kasih${name ? ` ${name}` : ''}! Pesan dan laporan Anda terkait "${category}" telah kami teruskan ke tim perusahaan. Kami akan segera menindaklanjuti${email ? ` melalui email (${email})` : ''}.`;
+      : defaultBotReply;
 
     const botMsg = await prisma.message.create({
       data: {

@@ -846,11 +846,100 @@ export default function SettingsPage() {
                   />
                 </div>
 
+                {/* Tenant Primary Language */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {t('settings', 'tenantLanguage', 'Tenant Primary Language')}
+                  </label>
+                  <p className="text-xs text-slate-500 mb-2">
+                    {t('settings', 'tenantLanguageDesc', 'Select tenant primary language. Bot auto-replies, issue report forms, and mobile SDK will automatically use this language.')}
+                  </p>
+                  <select
+                    value={visitorConfig?.language || 'en'}
+                    onChange={(e) => {
+                      const newLang = e.target.value;
+                      const base = visitorConfig || getVisitorConfig({});
+                      const isId = newLang.startsWith('id');
+                      const currTitle = base.contactForm?.formTitle;
+                      const isDefaultTitle =
+                        !currTitle ||
+                        currTitle === 'Contact Company / Report Issue' ||
+                        currTitle === 'Hubungi Perusahaan / Laporan';
+                      const isDefaultButton =
+                        !base.contactForm?.buttonLabel ||
+                        base.contactForm?.buttonLabel === 'Send Email to Company' ||
+                        base.contactForm?.buttonLabel === 'Kirim Email ke Perusahaan';
+
+                      setVisitorConfig({
+                        ...base,
+                        language: newLang,
+                        contactForm: {
+                          ...base.contactForm,
+                          enabled: base.contactForm?.enabled ?? true,
+                          formTitle: isDefaultTitle
+                            ? isId
+                              ? 'Hubungi Perusahaan / Laporan'
+                              : 'Contact Company / Report Issue'
+                            : currTitle,
+                          buttonLabel: isDefaultButton
+                            ? isId
+                              ? 'Kirim Email ke Perusahaan'
+                              : 'Send Email to Company'
+                            : base.contactForm?.buttonLabel,
+                          categories:
+                            !base.contactForm?.categories ||
+                            base.contactForm.categories.length === 0 ||
+                            JSON.stringify(base.contactForm.categories) ===
+                              JSON.stringify([
+                                'Pertanyaan Umum',
+                                'Layanan & Fasilitas',
+                                'Kendala Teknis',
+                                'Billing & Pembayaran',
+                                'Kemitraan',
+                                'Lainnya',
+                              ]) ||
+                            JSON.stringify(base.contactForm.categories) ===
+                              JSON.stringify([
+                                'General Inquiry',
+                                'Services & Facilities',
+                                'Technical Issue',
+                                'Billing & Payment',
+                                'Partnership',
+                                'Other',
+                              ])
+                              ? isId
+                                ? [
+                                    'Pertanyaan Umum',
+                                    'Layanan & Fasilitas',
+                                    'Kendala Teknis',
+                                    'Billing & Pembayaran',
+                                    'Kemitraan',
+                                    'Lainnya',
+                                  ]
+                                : [
+                                    'General Inquiry',
+                                    'Services & Facilities',
+                                    'Technical Issue',
+                                    'Billing & Payment',
+                                    'Partnership',
+                                    'Other',
+                                  ]
+                              : base.contactForm.categories,
+                        },
+                      });
+                    }}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white text-sm"
+                  >
+                    <option value="en">English (Default)</option>
+                    <option value="id">Bahasa Indonesia</option>
+                  </select>
+                </div>
+
                 <div className="pt-6 border-t border-slate-200">
-                  <h3 className="text-lg font-bold text-slate-800 mb-4">Brand Logo</h3>
+                  <h3 className="text-lg font-bold text-slate-800 mb-4">{t('settings', 'brandLogo', 'Brand Logo')}</h3>
                   <ImageUpload
-                    label="Widget Brand Logo"
-                    description="Upload your company logo. It will be cropped to a square and displayed in the widget header."
+                    label={t('settings', 'widgetBrandLogo', 'Widget Brand Logo')}
+                    description={t('settings', 'widgetBrandLogoDesc', 'Upload your company logo. It will be cropped to a square and displayed in the widget header.')}
                     currentImage={tenant.themeBrandLogo}
                     onImageCropped={(base64) => setTenant({ ...tenant, themeBrandLogo: base64 })}
                     targetSize={256}
@@ -859,22 +948,22 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="pt-6 border-t border-slate-200">
-                  <h3 className="text-lg font-bold text-slate-800 mb-4">Global AI Rules</h3>
+                  <h3 className="text-lg font-bold text-slate-800 mb-4">{t('settings', 'globalAiRules', 'Global AI Rules')}</h3>
                   
                   {/* Active AI Agent */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Active AI Agent (Flow)
+                      {t('settings', 'activeAiAgent', 'Active AI Agent (Flow)')}
                     </label>
                     <p className="text-xs text-slate-500 mb-2">
-                      Select which AI Agent (Flow) will reply to incoming messages from users.
+                      {t('settings', 'activeAiAgentDesc', 'Select which AI Agent (Flow) will reply to incoming messages from users.')}
                     </p>
                     <select
                       value={tenant.activeFlowId || ''}
                       onChange={(e) => setTenant({ ...tenant, activeFlowId: e.target.value || null })}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                     >
-                      <option value="">-- Use global settings (Default) --</option>
+                      <option value="">{t('settings', 'useGlobalSettings', '-- Use global settings (Default) --')}</option>
                       {tenant?.flows?.map((flow: any) => (
                         <option key={flow.id} value={flow.id}>
                           {flow.name}
@@ -886,10 +975,10 @@ export default function SettingsPage() {
                   {/* AI System Prompt */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Global AI System Prompt
+                      {t('settings', 'globalAiSystemPrompt', 'Global AI System Prompt')}
                     </label>
                     <p className="text-xs text-slate-500 mb-2">
-                      Global instructions for AI that apply to all agents in this tenant.
+                      {t('settings', 'globalAiSystemPromptDesc', 'Global instructions for AI that apply to all agents in this tenant.')}
                     </p>
                     <textarea
                       value={tenant.aiSystemPrompt || ''}
@@ -908,11 +997,11 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-2">
                           <Headphones className="w-4 h-4 text-brand" />
                           <label className="text-sm font-semibold text-slate-800">
-                            Bantuan Agen Manusia / Talk to CS
+                            {t('settings', 'humanHandoffTitle', 'Human Agent Support / Talk to CS')}
                           </label>
                         </div>
                         <p className="text-xs text-slate-500 max-w-xl">
-                          Toggle untuk mengaktifkan opsi &quot;Bicara dengan Agen&quot;. Matikan jika dukungan langsung dialihkan secara eksklusif ke email resmi customer support.
+                          {t('settings', 'humanHandoffDesc', 'Toggle to enable "Talk to Agent" option. Disable if live support is exclusively routed to official customer support email.')}
                         </p>
                       </div>
                       <button
@@ -941,17 +1030,17 @@ export default function SettingsPage() {
                     {(tenant.humanHandoffEnabled ?? true) && (
                       <div className="pt-2 border-t border-slate-200">
                         <label className="block text-xs font-semibold text-slate-700 mb-1">
-                          Default Handoff Agent (Human Queue)
+                          {t('settings', 'defaultHandoffAgent', 'Default Handoff Agent (Human Queue)')}
                         </label>
                         <p className="text-xs text-slate-500 mb-2">
-                          Siapa yang akan ditugaskan (atau namanya disebut AI) saat pengguna dialihkan ke antrean agen manusia.
+                          {t('settings', 'defaultHandoffAgentDesc', 'Who will be assigned (or named by AI) when users are transferred to human agent queue.')}
                         </p>
                         <select
                           value={tenant.handoffAgentId || ''}
                           onChange={(e) => setTenant({ ...tenant, handoffAgentId: e.target.value || null })}
                           className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                         >
-                          <option value="">-- Tidak ada agen spesifik (Antrean Umum) --</option>
+                          <option value="">{t('settings', 'noSpecificAgent', '-- No specific agent (General Queue) --')}</option>
                           {users.map((user) => (
                             <option key={user.id} value={user.id}>
                               {user.name || user.email} ({user.role})
@@ -967,14 +1056,14 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-brand" />
                           <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                            Pengaturan Form Funnel & Laporan (Saat Agen Nonaktif)
+                            {t('settings', 'formFunnelSettings', 'Funnel Form & Issue Report Settings (When Agent is Disabled)')}
                           </h4>
                           <span className="text-[10px] bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">
-                            Mode Form Funnel
+                            {t('settings', 'formFunnelMode', 'Funnel Form Mode')}
                           </span>
                         </div>
                         <p className="text-xs text-slate-500">
-                          Konfigurasi formulir pengumpulan keluhan & kebutuhan (funnel) yang ditampilkan kepada pengguna ketika opsi bantuan agen manusia dinonaktifkan.
+                          {t('settings', 'formFunnelDesc', 'Configure inquiry and issue collection form (funnel) displayed to users when human agent option is disabled.')}
                         </p>
 
                         {/* Fallback Email Input */}
@@ -982,18 +1071,18 @@ export default function SettingsPage() {
                           <div className="flex items-center justify-between mb-1">
                             <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                               <Mail className="w-3.5 h-3.5 text-slate-500" />
-                              Default Support Email (Email Tujuan Laporan)
+                              {t('settings', 'defaultSupportEmail', 'Default Support Email (Report Destination)')}
                             </label>
                             <button
                               type="button"
                               onClick={() => setActiveTab('email-smtp')}
                               className="text-[11px] text-brand hover:underline font-semibold flex items-center gap-1"
                             >
-                              Konfigurasi Gateway SMTP / Azure &rarr;
+                              {t('settings', 'configSmtpGateway', 'Configure SMTP / Azure Gateway →')}
                             </button>
                           </div>
                           <p className="text-xs text-slate-500 mb-2">
-                            Alamat email resmi perusahaan yang menerima laporan kendala dari pengguna.
+                            {t('settings', 'defaultSupportEmailDesc', 'Official company email address that receives issue reports from users.')}
                           </p>
                           <input
                             type="email"
@@ -1008,7 +1097,7 @@ export default function SettingsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Label Tombol (Button Label)
+                              {t('settings', 'buttonLabel', 'Button Label')}
                             </label>
                             <input
                               type="text"
@@ -1024,16 +1113,16 @@ export default function SettingsPage() {
                                   },
                                 });
                               }}
-                              placeholder="Send Email to Company"
+                              placeholder={t('settings', 'buttonLabelPlaceholder', 'Send Email to Company')}
                               className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                             />
                             <span className="text-[11px] text-slate-400 mt-1 block">
-                              Contoh: Send Email to Company / Hubungi via Email
+                              {t('settings', 'buttonLabelHint', 'Example: Send Email to Company / Contact via Email')}
                             </span>
                           </div>
                           <div>
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Judul Modal Form (Form Title)
+                              {t('settings', 'formTitle', 'Form Modal Title')}
                             </label>
                             <input
                               type="text"
@@ -1049,11 +1138,11 @@ export default function SettingsPage() {
                                   },
                                 });
                               }}
-                              placeholder="Hubungi Perusahaan / Laporan"
+                              placeholder={t('settings', 'formTitlePlaceholder', 'Contact Company / Report Issue')}
                               className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                             />
                             <span className="text-[11px] text-slate-400 mt-1 block">
-                              Contoh: Hubungi Perusahaan / Laporan Masalah
+                              {t('settings', 'formTitleHint', 'Example: Contact Company / Report Issue')}
                             </span>
                           </div>
                         </div>
@@ -1061,10 +1150,10 @@ export default function SettingsPage() {
                         {/* Kategori Masalah (Pilihan Dropdown) */}
                         <div>
                           <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Daftar Kategori Masalah (Pisahkan dengan koma)
+                            {t('settings', 'issueCategories', 'Issue Categories List (Comma-separated)')}
                           </label>
                           <p className="text-xs text-slate-500 mb-2">
-                            Pilihan kategori yang akan muncul di form funnel laporan pengguna.
+                            {t('settings', 'issueCategoriesDesc', 'Category choices that will appear in user report funnel form.')}
                           </p>
                           <input
                             type="text"
@@ -1082,7 +1171,7 @@ export default function SettingsPage() {
                                 },
                               });
                             }}
-                            placeholder="Pertanyaan Umum, Layanan & Fasilitas, Kendala Teknis, Billing & Pembayaran, Kemitraan, Lainnya"
+                            placeholder={t('settings', 'issueCategoriesPlaceholder', 'General Inquiry, Services & Facilities, Technical Issue, Billing & Payment, Partnership, Other')}
                             className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white"
                           />
                         </div>
@@ -1090,10 +1179,10 @@ export default function SettingsPage() {
                         {/* Template Balasan Konfirmasi Bot (Auto-Reply) */}
                         <div>
                           <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Template Balasan Konfirmasi AI (Auto-Reply Bot)
+                            {t('settings', 'autoReplyTemplate', 'AI Confirmation Auto-Reply Template (Bot Auto-Reply)')}
                           </label>
                           <p className="text-xs text-slate-500 mb-2">
-                            Pesan konfirmasi otomatis setelah pengguna submit form. Tag yang didukung: <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{name}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{category}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{company}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{email}"}</code>.
+                            {t('settings', 'autoReplyTemplateDesc', 'Automatic confirmation message after form submission. Supported tags:')} <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{name}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{category}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{company}"}</code>, <code className="bg-slate-200 px-1 py-0.5 rounded text-[11px] text-slate-800 font-mono">{"{email}"}</code>.
                           </p>
                           <textarea
                             rows={2}
@@ -1109,7 +1198,7 @@ export default function SettingsPage() {
                                 },
                               });
                             }}
-                            placeholder="Terima kasih {name}! Pesan dan laporan Anda terkait {category} telah kami teruskan ke tim perusahaan. Kami akan segera menindaklanjuti melalui email ({email})."
+                            placeholder={t('settings', 'autoReplyPlaceholder', 'Thank you {name}! Your message and report regarding {category} has been forwarded to our team. We will follow up via email ({email}) shortly.')}
                             className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none transition-all bg-white resize-none"
                           />
                         </div>
@@ -1118,10 +1207,10 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white">
                           <div className="pr-4">
                             <span className="text-xs font-semibold text-slate-700 block">
-                              Gunakan Formulir Funnel In-App
+                              {t('settings', 'inAppFormToggle', 'Use In-App Funnel Form')}
                             </span>
                             <span className="text-[11px] text-slate-500">
-                              Jika aktif, pengguna mengisi kategori dan deskripsi langsung di dalam widget/SDK. Jika nonaktif, mengklik tombol akan membuka aplikasi email (mailto).
+                              {t('settings', 'inAppFormToggleDesc', 'If enabled, users fill category and description directly inside widget/SDK. If disabled, clicking button opens email client (mailto).')}
                             </span>
                           </div>
                           <input
@@ -1250,12 +1339,12 @@ export default function SettingsPage() {
         {/* Email & SMTP Settings Tab */}
         {activeTab === 'email-smtp' && (
           <div className="p-8">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Pengaturan Email & SMTP</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-6">{t('settings', 'emailSmtpTabTitle', 'Email & SMTP Settings')}</h2>
 
             {tenantLoading ? (
               <div className="text-center py-8">
                 <div className="inline-block w-8 h-8 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
-                <p className="text-slate-600 mt-3">Memuat konfigurasi email...</p>
+                <p className="text-slate-600 mt-3">{t('settings', 'loadingEmailConfig', 'Loading email settings...')}</p>
               </div>
             ) : visitorConfig && tenant && (
               <div className="max-w-4xl">

@@ -51,4 +51,16 @@ describe('visitor-config (ContactFormConfig)', () => {
     expect(result.contactForm?.buttonLabel).toBe('Custom Contact');
     expect(result.contactForm?.autoReplyTemplate).toBe('Custom reply template');
   });
+
+  it('selects English or Indonesian defaults depending on language setting', () => {
+    const configEn = getVisitorConfig({ language: 'en' });
+    expect(configEn.contactForm?.formTitle).toBe('Contact Company / Report Issue');
+    expect(configEn.contactForm?.buttonLabel).toBe('Send Email to Company');
+    expect(configEn.contactForm?.categories).toContain('General Inquiry');
+
+    const configId = getVisitorConfig({ language: 'id' });
+    expect(configId.contactForm?.formTitle).toBe('Hubungi Perusahaan / Laporan');
+    expect(configId.contactForm?.buttonLabel).toBe('Kirim Email ke Perusahaan');
+    expect(configId.contactForm?.categories).toContain('Pertanyaan Umum');
+  });
 });

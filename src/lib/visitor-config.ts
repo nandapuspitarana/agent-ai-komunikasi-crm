@@ -23,9 +23,24 @@ export interface ContactFormConfig {
   autoReplyTemplate?: string;
 }
 
-export const DEFAULT_CONTACT_FORM_CONFIG: ContactFormConfig = {
+export const DEFAULT_CONTACT_FORM_CONFIG_EN: ContactFormConfig = {
   enabled: true,
   buttonLabel: 'Send Email to Company',
+  formTitle: 'Contact Company / Report Issue',
+  categories: [
+    'General Inquiry',
+    'Services & Facilities',
+    'Technical Issue',
+    'Billing & Payment',
+    'Partnership',
+    'Other',
+  ],
+  autoReplyTemplate: '',
+};
+
+export const DEFAULT_CONTACT_FORM_CONFIG_ID: ContactFormConfig = {
+  enabled: true,
+  buttonLabel: 'Kirim Email ke Perusahaan',
   formTitle: 'Hubungi Perusahaan / Laporan',
   categories: [
     'Pertanyaan Umum',
@@ -37,6 +52,8 @@ export const DEFAULT_CONTACT_FORM_CONFIG: ContactFormConfig = {
   ],
   autoReplyTemplate: '',
 };
+
+export const DEFAULT_CONTACT_FORM_CONFIG: ContactFormConfig = DEFAULT_CONTACT_FORM_CONFIG_EN;
 
 export type EmailProvider = 'azure' | 'gmail' | 'custom' | 'none';
 
@@ -122,6 +139,7 @@ export interface VisitorConfig {
   };
   hotLeadThreshold: number;
   retentionDays: number;
+  language?: 'en' | 'id' | string;
   contactForm?: ContactFormConfig;
   emailConfig?: EmailConfig;
 }
@@ -144,12 +162,22 @@ export const DEFAULT_VISITOR_CONFIG: VisitorConfig = {
   scoreWeights: { cold: 1, warm: 5, hot_lead: 15, booking: 30, support: 0 },
   hotLeadThreshold: 50,
   retentionDays: 90,
+  language: 'en',
   contactForm: DEFAULT_CONTACT_FORM_CONFIG,
   emailConfig: DEFAULT_EMAIL_CONFIG,
 };
 
-export function getVisitorConfig(tenantVisitorConfig: any): VisitorConfig {
-  if (!tenantVisitorConfig) return DEFAULT_VISITOR_CONFIG;
+export function getVisitorConfig(tenantVisitorConfig: any, preferredLang?: string): VisitorConfig {
+  if (!tenantVisitorConfig) {
+    if (preferredLang && preferredLang.toLowerCase().startsWith('id')) {
+      return {
+        ...DEFAULT_VISITOR_CONFIG,
+        language: 'id',
+        contactForm: DEFAULT_CONTACT_FORM_CONFIG_ID,
+      };
+    }
+    return DEFAULT_VISITOR_CONFIG;
+  }
   
   let parsedConfig = tenantVisitorConfig;
   if (typeof tenantVisitorConfig === 'string') {
@@ -161,12 +189,25 @@ export function getVisitorConfig(tenantVisitorConfig: any): VisitorConfig {
   }
 
   if (Object.keys(parsedConfig).length === 0) {
+    if (preferredLang && preferredLang.toLowerCase().startsWith('id')) {
+      return {
+        ...DEFAULT_VISITOR_CONFIG,
+        language: 'id',
+        contactForm: DEFAULT_CONTACT_FORM_CONFIG_ID,
+      };
+    }
     return DEFAULT_VISITOR_CONFIG;
   }
+
+  const effectiveLang = (parsedConfig.language || preferredLang || 'en').toLowerCase();
+  const defaultContactForm = effectiveLang.startsWith('id')
+    ? DEFAULT_CONTACT_FORM_CONFIG_ID
+    : DEFAULT_CONTACT_FORM_CONFIG_EN;
 
   return {
     ...DEFAULT_VISITOR_CONFIG,
     ...parsedConfig,
+    language: parsedConfig.language || (effectiveLang.startsWith('id') ? 'id' : 'en'),
     scoreWeights: {
       ...DEFAULT_VISITOR_CONFIG.scoreWeights,
       ...(parsedConfig.scoreWeights || {})
@@ -174,11 +215,11 @@ export function getVisitorConfig(tenantVisitorConfig: any): VisitorConfig {
     // Migrate old customNlpPatterns to empty customExtractors
     customExtractors: parsedConfig.customExtractors || [],
     contactForm: {
-      ...DEFAULT_CONTACT_FORM_CONFIG,
+      ...defaultContactForm,
       ...(parsedConfig.contactForm || {}),
       categories: parsedConfig.contactForm?.categories && parsedConfig.contactForm.categories.length > 0
         ? parsedConfig.contactForm.categories
-        : DEFAULT_CONTACT_FORM_CONFIG.categories,
+        : defaultContactForm.categories,
     },
     emailConfig: {
       ...DEFAULT_EMAIL_CONFIG,

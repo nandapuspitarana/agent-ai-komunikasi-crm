@@ -96,6 +96,7 @@ export function ChatWindow({
   const [widgetConfig, setWidgetConfig] = useState({
     name: botName,
     tenantName: 'CRM Support',
+    language: 'en',
     primaryColor: primaryColor,
     logo: botLogo,
     botAvatarUrl: null as string | null,
@@ -113,6 +114,7 @@ export function ChatWindow({
             ...prev,
             name: data.botName || prev.name,
             tenantName: data.tenantName || prev.tenantName,
+            language: data.language || prev.language || 'en',
             primaryColor: data.primaryColor || prev.primaryColor,
             logo: data.logoUrl || prev.logo,
             botAvatarUrl: data.botAvatarUrl || null,

@@ -20,6 +20,8 @@ import {
   Cloud,
 } from 'lucide-react';
 
+import { useTranslation } from '@/lib/i18n/I18nContext';
+
 interface EmailSmtpConfigPanelProps {
   emailConfig: EmailConfig;
   fallbackEmail: string;
@@ -37,6 +39,7 @@ export default function EmailSmtpConfigPanel({
   onSave,
   isSaving,
 }: EmailSmtpConfigPanelProps) {
+  const { t } = useTranslation();
   const currentProvider = emailConfig.provider || 'azure';
   const azure = emailConfig.azure || DEFAULT_EMAIL_CONFIG.azure!;
   const gmail = emailConfig.gmail || DEFAULT_EMAIL_CONFIG.gmail!;
@@ -112,7 +115,7 @@ export default function EmailSmtpConfigPanel({
     if (!testRecipient || !testRecipient.includes('@')) {
       setTestStatus({
         type: 'error',
-        message: 'Masukkan alamat email tujuan uji coba yang valid.',
+        message: t('settings', 'invalidTestEmail', 'Please enter a valid test recipient email address.'),
       });
       return;
     }
@@ -134,18 +137,18 @@ export default function EmailSmtpConfigPanel({
       if (res.ok && data.success) {
         setTestStatus({
           type: 'success',
-          message: data.message || `Email uji coba berhasil dikirim ke ${testRecipient}!`,
+          message: data.message || `Test email successfully sent to ${testRecipient}!`,
         });
       } else {
         setTestStatus({
           type: 'error',
-          message: data.error || 'Pengiriman email uji coba gagal. Periksa kembali kredensial Anda.',
+          message: data.error || t('settings', 'testEmailFailed', 'Failed to send test email. Please check your credentials.'),
         });
       }
     } catch (err: any) {
       setTestStatus({
         type: 'error',
-        message: `Terjadi kesalahan koneksi: ${err.message || String(err)}`,
+        message: `Connection error: ${err.message || String(err)}`,
       });
     } finally {
       setIsTesting(false);
@@ -159,11 +162,10 @@ export default function EmailSmtpConfigPanel({
         <div>
           <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Mail className="w-5 h-5 text-brand" />
-            Pengaturan Layanan Email & SMTP
+            {t('settings', 'emailSmtpServiceSettings', 'Email & SMTP Service Settings')}
           </h3>
           <p className="text-xs text-slate-500 mt-1 max-w-2xl">
-            Konfigurasikan gateway pengiriman email untuk notifikasi formulir keluhan/kendala pengunjung
-            dari aplikasi mobile dan widget chat ke email resmi perusahaan (tenant).
+            {t('settings', 'emailSmtpServiceDesc', 'Configure email delivery gateway for visitor inquiry/issue report notifications from mobile app and chat widget to company\'s official email (tenant).')}
           </p>
         </div>
       </div>
@@ -171,7 +173,7 @@ export default function EmailSmtpConfigPanel({
       {/* 1. Pilih Provider Email */}
       <div>
         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-          1. Pilih Gateway / Provider Email
+          {t('settings', 'selectGatewayTitle', '1. Select Email Gateway / Provider')}
         </label>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Azure Card */}
@@ -193,7 +195,7 @@ export default function EmailSmtpConfigPanel({
             </div>
             <h4 className="font-bold text-sm text-slate-900">Azure / Graph API</h4>
             <p className="text-xs text-slate-500 mt-1">
-              Office 365 OAuth2 Client Credentials. Lebih aman tanpa port SMTP klasik.
+              {t('settings', 'azureDesc', 'Office 365 OAuth2 Client Credentials. More secure without legacy SMTP ports.')}
             </p>
           </div>
 
@@ -216,7 +218,7 @@ export default function EmailSmtpConfigPanel({
             </div>
             <h4 className="font-bold text-sm text-slate-900">Gmail SMTP</h4>
             <p className="text-xs text-slate-500 mt-1">
-              Gunakan akun Gmail / Google Workspace dengan Sandi Aplikasi (App Password).
+              {t('settings', 'gmailDesc', 'Use Gmail / Google Workspace account with App Password.')}
             </p>
           </div>
 
@@ -239,7 +241,7 @@ export default function EmailSmtpConfigPanel({
             </div>
             <h4 className="font-bold text-sm text-slate-900">Custom SMTP Server</h4>
             <p className="text-xs text-slate-500 mt-1">
-              Hubungkan ke server SMTP Mailgun, SendGrid, Amazon SES, atau server mandiri.
+              {t('settings', 'customDesc', 'Connect to Mailgun, SendGrid, Amazon SES, or custom SMTP server.')}
             </p>
           </div>
         </div>
@@ -254,10 +256,10 @@ export default function EmailSmtpConfigPanel({
               <div>
                 <h4 className="font-bold text-sm text-slate-800 flex items-center gap-1.5">
                   <Cloud className="w-4 h-4 text-blue-600" />
-                  Konfigurasi Microsoft Azure (Microsoft Graph API)
+                  {t('settings', 'azureConfigTitle', 'Microsoft Azure Configuration (Microsoft Graph API)')}
                 </h4>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Menggunakan kredensial Azure App Registration (OAuth2 Client Credentials Flow).
+                  {t('settings', 'azureConfigDesc', 'Using Azure App Registration credentials (OAuth2 Client Credentials Flow).')}
                 </p>
               </div>
               <button
@@ -265,14 +267,14 @@ export default function EmailSmtpConfigPanel({
                 onClick={handleFillAzurePreset}
                 className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
               >
-                Gunakan Preset UAT Azure (.env)
+                {t('settings', 'useAzurePreset', 'Use Azure UAT Preset (.env)')}
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Azure Tenant ID (Directory ID) *
+                  {t('settings', 'azureTenantIdLabel', 'Azure Tenant ID (Directory ID) *')}
                 </label>
                 <input
                   type="text"
@@ -285,7 +287,7 @@ export default function EmailSmtpConfigPanel({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Azure Client ID (Application ID) *
+                  {t('settings', 'azureClientIdLabel', 'Azure Client ID (Application ID) *')}
                 </label>
                 <input
                   type="text"
@@ -298,14 +300,14 @@ export default function EmailSmtpConfigPanel({
 
               <div className="md:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
-                  <span>Azure Client Secret *</span>
+                  <span>{t('settings', 'azureClientSecretLabel', 'Azure Client Secret *')}</span>
                   <button
                     type="button"
                     onClick={() => setShowAzureSecret(!showAzureSecret)}
                     className="text-[11px] text-slate-500 hover:text-slate-800 flex items-center gap-1 font-normal"
                   >
                     {showAzureSecret ? <EyeOff size={12} /> : <Eye size={12} />}
-                    {showAzureSecret ? 'Sembunyikan' : 'Tampilkan'}
+                    {showAzureSecret ? t('settings', 'hideText', 'Hide') : t('settings', 'showText', 'Show')}
                   </button>
                 </label>
                 <input
@@ -319,7 +321,7 @@ export default function EmailSmtpConfigPanel({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Alamat Email Pengirim (Sender Email) *
+                  {t('settings', 'senderEmailLabel', 'Official Sender Email (Sender Email) *')}
                 </label>
                 <input
                   type="email"
@@ -332,7 +334,7 @@ export default function EmailSmtpConfigPanel({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Nama Tampilan Pengirim (Sender Name)
+                  {t('settings', 'senderNameLabel', 'Sender Display Name (Sender Name)')}
                 </label>
                 <input
                   type="text"
@@ -345,7 +347,7 @@ export default function EmailSmtpConfigPanel({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Subject Prefix
+                  {t('settings', 'subjectPrefixLabel', 'Subject Prefix')}
                 </label>
                 <input
                   type="text"
@@ -355,7 +357,7 @@ export default function EmailSmtpConfigPanel({
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none bg-white"
                 />
                 <span className="text-[11px] text-slate-400 mt-1 block">
-                  Akan muncul sebagai awalan subjek: [UAT-APP] Subjek Email
+                  {t('settings', 'subjectPrefixHint', 'Will appear as prefix in email subject: [UAT-APP] Email Subject')}
                 </span>
               </div>
             </div>
@@ -368,46 +370,44 @@ export default function EmailSmtpConfigPanel({
             <div className="border-b border-slate-200 pb-3">
               <h4 className="font-bold text-sm text-slate-800 flex items-center gap-1.5">
                 <Mail className="w-4 h-4 text-red-600" />
-                Konfigurasi Gmail SMTP
+                {t('settings', 'gmailConfigTitle', 'Gmail SMTP Configuration')}
               </h4>
               <p className="text-xs text-slate-500 mt-0.5">
-                Menggunakan host resmi Google (smtp.gmail.com).
+                {t('settings', 'gmailConfigDesc', 'Using official Google host (smtp.gmail.com).')}
               </p>
             </div>
 
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-2">
               <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <strong>Petunjuk Keamanan Google:</strong> Gunakan{' '}
-                <strong>Google App Password (16 karakter)</strong> yang dibuat di menu Akun Google &gt; Keamanan &gt;
-                Verifikasi 2 Langkah &gt; Sandi Aplikasi. Jangan gunakan password login biasa.
+                {t('settings', 'gmailSecurityWarning', 'Google Security Note: Use a 16-character Google App Password created in Google Account > Security > 2-Step Verification > App Passwords. Do not use your regular login password.')}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Email Akun Gmail *
+                  {t('settings', 'gmailUserLabel', 'Gmail Account Email *')}
                 </label>
                 <input
                   type="email"
                   value={gmail.user || ''}
                   onChange={(e) => handleGmailChange('user', e.target.value)}
-                  placeholder="support@domain.com atau yourname@gmail.com"
+                  placeholder="support@domain.com / yourname@gmail.com"
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none bg-white"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
-                  <span>Google App Password (16 karakter) *</span>
+                  <span>{t('settings', 'gmailAppPasswordLabel', 'Google App Password (16 characters) *')}</span>
                   <button
                     type="button"
                     onClick={() => setShowGmailPass(!showGmailPass)}
                     className="text-[11px] text-slate-500 hover:text-slate-800 flex items-center gap-1 font-normal"
                   >
                     {showGmailPass ? <EyeOff size={12} /> : <Eye size={12} />}
-                    {showGmailPass ? 'Sembunyikan' : 'Tampilkan'}
+                    {showGmailPass ? t('settings', 'hideText', 'Hide') : t('settings', 'showText', 'Show')}
                   </button>
                 </label>
                 <input
@@ -421,7 +421,7 @@ export default function EmailSmtpConfigPanel({
 
               <div className="md:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Nama Tampilan Pengirim (Sender Name)
+                  {t('settings', 'senderNameLabel', 'Sender Display Name (Sender Name)')}
                 </label>
                 <input
                   type="text"
@@ -441,17 +441,17 @@ export default function EmailSmtpConfigPanel({
             <div className="border-b border-slate-200 pb-3">
               <h4 className="font-bold text-sm text-slate-800 flex items-center gap-1.5">
                 <Server className="w-4 h-4 text-emerald-600" />
-                Konfigurasi Custom SMTP Server
+                {t('settings', 'customSmtpTitle', 'Custom SMTP Server Configuration')}
               </h4>
               <p className="text-xs text-slate-500 mt-0.5">
-                Mendukung SMTP server standar dengan port 587 (TLS/STARTTLS) atau 465 (SSL).
+                {t('settings', 'customSmtpDesc', 'Supports standard SMTP servers with port 587 (TLS/STARTTLS) or 465 (SSL).')}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  SMTP Host *
+                  {t('settings', 'smtpHostLabel', 'SMTP Host *')}
                 </label>
                 <input
                   type="text"
@@ -464,7 +464,7 @@ export default function EmailSmtpConfigPanel({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Port *
+                  {t('settings', 'portLabel', 'Port *')}
                 </label>
                 <input
                   type="number"
@@ -477,7 +477,7 @@ export default function EmailSmtpConfigPanel({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Username SMTP *
+                  {t('settings', 'smtpUsernameLabel', 'SMTP Username *')}
                 </label>
                 <input
                   type="text"
@@ -490,14 +490,14 @@ export default function EmailSmtpConfigPanel({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
-                  <span>Password SMTP *</span>
+                  <span>{t('settings', 'smtpPasswordLabel', 'SMTP Password *')}</span>
                   <button
                     type="button"
                     onClick={() => setShowCustomPass(!showCustomPass)}
                     className="text-[11px] text-slate-500 hover:text-slate-800 flex items-center gap-1 font-normal"
                   >
                     {showCustomPass ? <EyeOff size={12} /> : <Eye size={12} />}
-                    {showCustomPass ? 'Sembunyikan' : 'Tampilkan'}
+                    {showCustomPass ? t('settings', 'hideText', 'Hide') : t('settings', 'showText', 'Show')}
                   </button>
                 </label>
                 <input
@@ -517,13 +517,13 @@ export default function EmailSmtpConfigPanel({
                     onChange={(e) => handleCustomChange('secure', e.target.checked)}
                     className="rounded border-slate-300 text-brand focus:ring-brand"
                   />
-                  <span>Gunakan Enkripsi SSL (Port 465)</span>
+                  <span>{t('settings', 'useSslEncryption', 'Use SSL Encryption (Port 465)')}</span>
                 </label>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Alamat Email Pengirim (From Email)
+                  {t('settings', 'fromEmailLabel', 'From Email Address')}
                 </label>
                 <input
                   type="email"
@@ -536,7 +536,7 @@ export default function EmailSmtpConfigPanel({
 
               <div className="md:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Nama Tampilan Pengirim (From Name)
+                  {t('settings', 'fromNameLabel', 'From Display Name')}
                 </label>
                 <input
                   type="text"
@@ -556,17 +556,16 @@ export default function EmailSmtpConfigPanel({
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-brand" />
           <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-            Email Resmi Tenant Penerima Laporan (Recipient Support Email)
+            {t('settings', 'recipientSupportEmailTitle', 'Recipient Support Email (Tenant Official Email)')}
           </h4>
         </div>
         <p className="text-xs text-slate-500">
-          Setiap kali pengunjung widget atau mobile mengirimkan formulir laporan masalah (saat human handoff dialihkan),
-          sistem akan mengirimkan email ringkasan ke alamat ini menggunakan provider di atas.
+          {t('settings', 'recipientSupportEmailDesc', 'Whenever visitors in widget or mobile app submit issue report forms (when human handoff is routed), system sends summary emails to this address using the provider above.')}
         </p>
 
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Email Resmi Customer Support / Tenant *
+            {t('settings', 'officialSupportEmailLabel', 'Official Customer Support / Tenant Email *')}
           </label>
           <input
             type="email"
@@ -587,16 +586,16 @@ export default function EmailSmtpConfigPanel({
           <div className="flex items-center gap-2">
             <Send className="w-4 h-4 text-slate-700" />
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-              Uji Coba Pengiriman Email (Live Test)
+              {t('settings', 'emailDeliveryTestTitle', 'Email Delivery Test (Live Test)')}
             </h4>
           </div>
           <span className="text-[11px] text-slate-500">
-            Provider Aktif: <strong>{currentProvider.toUpperCase()}</strong>
+            {t('settings', 'activeProviderLabel', 'Active Provider:')} <strong>{currentProvider.toUpperCase()}</strong>
           </span>
         </div>
 
         <p className="text-xs text-slate-500">
-          Kirimkan email uji coba sekarang untuk memverifikasi bahwa kredensial Anda valid dan dapat mengirimkan email ke kotak masuk.
+          {t('settings', 'emailDeliveryTestDesc', 'Send a test email now to verify your credentials are valid and can deliver to inbox.')}
         </p>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-xl">
@@ -604,7 +603,7 @@ export default function EmailSmtpConfigPanel({
             type="email"
             value={testRecipient}
             onChange={(e) => setTestRecipient(e.target.value)}
-            placeholder="Ketik email penerima uji coba..."
+            placeholder={t('settings', 'testRecipientPlaceholder', 'Type test recipient email...')}
             className="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none bg-white"
           />
           <button
@@ -616,12 +615,12 @@ export default function EmailSmtpConfigPanel({
             {isTesting ? (
               <>
                 <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Mengirim...</span>
+                <span>{t('settings', 'sending', 'Sending...')}</span>
               </>
             ) : (
               <>
                 <Send size={13} />
-                <span>Kirim Email Tes</span>
+                <span>{t('settings', 'sendTestEmail', 'Send Test Email')}</span>
               </>
             )}
           </button>
@@ -643,7 +642,7 @@ export default function EmailSmtpConfigPanel({
             )}
             <div>
               <p className="font-semibold">
-                {testStatus.type === 'success' ? 'Verifikasi Berhasil!' : 'Gagal Mengirim Email'}
+                {testStatus.type === 'success' ? t('settings', 'verificationSuccess', 'Verification Successful!') : t('settings', 'deliveryFailed', 'Email Delivery Failed')}
               </p>
               <p className="mt-0.5 whitespace-pre-wrap">{testStatus.message}</p>
             </div>
@@ -662,12 +661,12 @@ export default function EmailSmtpConfigPanel({
           {isSaving ? (
             <>
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>Menyimpan...</span>
+              <span>{t('settings', 'saving', 'Saving...')}</span>
             </>
           ) : (
             <>
               <CheckCircle2 size={16} />
-              <span>Simpan Pengaturan Email & SMTP</span>
+              <span>{t('settings', 'saveEmailConfigBtn', 'Save Email & SMTP Settings')}</span>
             </>
           )}
         </button>

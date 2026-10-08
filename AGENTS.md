@@ -86,12 +86,41 @@ export interface ContactFormConfig {
 }
 ```
 
-### 4. API Endpoints Terkait
-- **`PUT /api/tenant`**: Menyimpan status toggle `humanHandoffEnabled`, `fallbackEmail`, dan objek `visitorConfig.contactForm`.
-- **`GET /api/widget/config` & `POST /api/widget/init`**: Mengirimkan properti `humanHandoffEnabled`, `fallbackEmail`, dan `contactForm` ke klien Web & Mobile SDK.
-- **`POST /api/widget/contact-submit`**: Menerima pengiriman form, menyimpan percakapan laporan pengguna, memperbarui data prospek di `VisitorProfile`, dan menghasilkan balasan bot instan berdasarkan `autoReplyTemplate`.
+### 4. Pengaturan Bahasa Tenant & Lokalisasi Modal Popup
+Sistem mendukung lokalisasi dinamis untuk formulir funnel / modal laporan masalah (`ContactFunnelModal` di mobile SDK & `ChatUI` web overlay) berdasarkan pengaturan bahasa tenant:
+- **Pengaturan Bahasa Tenant (`tenant.visitorConfig.language`)**:
+  - Dapat dikonfigurasi melalui menu **Pengaturan > Pengaturan Penyewa (Tenant)** di dropdown **Tenant Primary Language**.
+  - Opsi: `en` (*English*, Default) atau `id` (*Bahasa Indonesia*).
+- **Penyesuaian Teks Modal Berdasarkan Bahasa**:
+  - **Bahasa Inggris (`en`)**:
+    - Judul Modal: *"Contact Company / Report Issue"*
+    - Label Kategori: *"Issue Category"*
+    - Dropdown Kategori: `['General Inquiry', 'Services & Facilities', 'Technical Issue', 'Billing & Payment', 'Partnership', 'Other']`
+    - Label Deskripsi: *"Issue Description"*
+    - Placeholder Deskripsi: *"Briefly describe your issue or inquiry..."*
+    - Tombol Batal: *"Cancel"*
+    - Tombol Submit: *"Submit Report"*
+    - Status Mengirim: *"Submitting..."*
+    - Validasi: *"This field is required"*
+    - Pesan Ringkasan di Chat: `📝 [Inquiry / Issue Report to Company]`
+    - Balasan Bot Standar: *"Thank you {name}! Your message and report regarding "{category}" has been forwarded to our team..."*
+  - **Bahasa Indonesia (`id`)**:
+    - Judul Modal: *"Hubungi Perusahaan / Laporan"*
+    - Label Kategori: *"Kategori Masalah"*
+    - Dropdown Kategori: `['Pertanyaan Umum', 'Layanan & Fasilitas', 'Kendala Teknis', 'Billing & Pembayaran', 'Kemitraan', 'Lainnya']`
+    - Label Deskripsi: *"Deskripsi Masalah"*
+    - Tombol Submit: *"Kirim Laporan"*
+    - Pesan Ringkasan di Chat: `📝 [Laporan Masalah ke Perusahaan]`
+- **Di Flutter SDK (`ContactFunnelStrings`)**:
+  - Menggunakan factory `ContactFunnelStrings.fromConfig(contactFormConfig, language: controller.tenantLanguage)`.
+  - Terintegrasi otomatis di `AiChatController` dan `AiChatView` tanpa perlu konfigurasi manual dari klien mobile.
 
-### 5. Alur Penyimpanan Data Funnel & Kontak Pengunjung (Lead Profile)
+### 5. API Endpoints Terkait
+- **`PUT /api/tenant`**: Menyimpan status toggle `humanHandoffEnabled`, `fallbackEmail`, bahasa tenant (`visitorConfig.language`), dan objek `visitorConfig.contactForm`.
+- **`GET /api/widget/config` & `POST /api/widget/init`**: Mengirimkan properti `language`, `humanHandoffEnabled`, `fallbackEmail`, dan `contactForm` ke klien Web & Mobile SDK.
+- **`POST /api/widget/contact-submit`**: Menerima pengiriman form, menyimpan percakapan laporan pengguna (dalam bahasa yang sesuai), memperbarui data prospek di `VisitorProfile`, dan menghasilkan balasan bot instan berdasarkan `autoReplyTemplate`.
+
+### 6. Alur Penyimpanan Data Funnel & Kontak Pengunjung (Lead Profile)
 Saat form funnel in-app dikirim oleh pengunjung melalui endpoint `POST /api/widget/contact-submit`:
 
 1. **Tabel `ChatSession`**:

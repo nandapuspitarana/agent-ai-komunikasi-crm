@@ -43,8 +43,16 @@ export async function GET(request: Request) {
     ? tenant.visitorConfig as any 
     : {};
 
+  const rawLang =
+    visitorConfig?.language ||
+    flowConfig?.language ||
+    ((flow?.name || '').toLowerCase().includes('ceosuite') ? 'en' : 'en');
+  const isId = String(rawLang).toLowerCase().startsWith('id');
+  const effectiveLang = isId ? 'id' : 'en';
+
   const settings = {
     tenantId,
+    language: effectiveLang,
     primaryColor: tenant.themeBrandColor || '#2563eb',
     welcomeMessage: welcome.message || '',
     welcomeMessageType: welcome.type,
