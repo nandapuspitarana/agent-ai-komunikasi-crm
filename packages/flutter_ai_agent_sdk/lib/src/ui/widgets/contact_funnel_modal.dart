@@ -11,9 +11,55 @@ class ContactFunnelStrings {
   final String submit;
   final String submitting;
   final String required;
+  final String failedSubmit;
+  final String genericError;
   final List<String> categories;
 
   const ContactFunnelStrings({
+    this.title = 'Contact Company / Report Issue',
+    this.categoryLabel = 'Issue Category',
+    this.descriptionLabel = 'Issue Description',
+    this.descriptionPlaceholder =
+        'Briefly describe your issue or inquiry...',
+    this.cancel = 'Cancel',
+    this.submit = 'Submit Report',
+    this.submitting = 'Submitting...',
+    this.required = 'This field is required',
+    this.failedSubmit = 'Failed to submit report. Please try again.',
+    this.genericError = 'An error occurred: ',
+    this.categories = const [
+      'General Inquiry',
+      'Services & Facilities',
+      'Technical Issue',
+      'Billing & Payment',
+      'Partnership',
+      'Other',
+    ],
+  });
+
+  const ContactFunnelStrings.en({
+    this.title = 'Contact Company / Report Issue',
+    this.categoryLabel = 'Issue Category',
+    this.descriptionLabel = 'Issue Description',
+    this.descriptionPlaceholder =
+        'Briefly describe your issue or inquiry...',
+    this.cancel = 'Cancel',
+    this.submit = 'Submit Report',
+    this.submitting = 'Submitting...',
+    this.required = 'This field is required',
+    this.failedSubmit = 'Failed to submit report. Please try again.',
+    this.genericError = 'An error occurred: ',
+    this.categories = const [
+      'General Inquiry',
+      'Services & Facilities',
+      'Technical Issue',
+      'Billing & Payment',
+      'Partnership',
+      'Other',
+    ],
+  });
+
+  const ContactFunnelStrings.id({
     this.title = 'Hubungi Perusahaan / Laporan',
     this.categoryLabel = 'Kategori Masalah',
     this.descriptionLabel = 'Deskripsi Masalah',
@@ -23,6 +69,8 @@ class ContactFunnelStrings {
     this.submit = 'Kirim Laporan',
     this.submitting = 'Mengirim...',
     this.required = 'Bidang ini wajib diisi',
+    this.failedSubmit = 'Gagal mengirim laporan. Silakan coba lagi.',
+    this.genericError = 'Terjadi kesalahan: ',
     this.categories = const [
       'Pertanyaan Umum',
       'Layanan & Fasilitas',
@@ -32,6 +80,48 @@ class ContactFunnelStrings {
       'Lainnya',
     ],
   });
+
+  /// Factory resolving strings based on locale code ('en', 'id', etc.)
+  factory ContactFunnelStrings.fromLocale(String? locale) {
+    if (locale != null && locale.toLowerCase().startsWith('id')) {
+      return const ContactFunnelStrings.id();
+    }
+    return const ContactFunnelStrings.en();
+  }
+
+  /// Factory merging tenant contactForm config with base locale strings.
+  factory ContactFunnelStrings.fromConfig({
+    Map<String, dynamic>? contactFormConfig,
+    String? language,
+  }) {
+    final base = ContactFunnelStrings.fromLocale(language);
+    final formTitle = contactFormConfig?['formTitle']?.toString();
+    final buttonLabel = contactFormConfig?['buttonLabel']?.toString();
+    final rawCats = contactFormConfig?['categories'];
+    List<String>? parsedCats;
+    if (rawCats is List && rawCats.isNotEmpty) {
+      parsedCats = rawCats.map((c) => c.toString()).toList();
+    }
+
+    return ContactFunnelStrings(
+      title: (formTitle != null && formTitle.trim().isNotEmpty) ? formTitle : base.title,
+      categoryLabel: base.categoryLabel,
+      descriptionLabel: base.descriptionLabel,
+      descriptionPlaceholder: base.descriptionPlaceholder,
+      cancel: base.cancel,
+      submit: (buttonLabel != null &&
+              buttonLabel.trim().isNotEmpty &&
+              buttonLabel != 'Send Email to Company' &&
+              buttonLabel != 'Kirim Email ke Perusahaan')
+          ? buttonLabel
+          : base.submit,
+      submitting: base.submitting,
+      required: base.required,
+      failedSubmit: base.failedSubmit,
+      genericError: base.genericError,
+      categories: parsedCats ?? base.categories,
+    );
+  }
 }
 
 /// Native Modal Bottom Sheet for collecting support/contact funnel inquiries in-app.
@@ -93,7 +183,7 @@ class _ContactFunnelModalState extends State<ContactFunnelModal> {
     super.initState();
     _selectedCategory = widget.strings.categories.isNotEmpty
         ? widget.strings.categories.first
-        : 'Pertanyaan Umum';
+        : 'General Inquiry';
   }
 
   @override
@@ -136,7 +226,7 @@ class _ContactFunnelModalState extends State<ContactFunnelModal> {
         } else {
           setState(() {
             _isSubmitting = false;
-            _errorMessage = 'Gagal mengirim laporan. Silakan coba lagi.';
+            _errorMessage = widget.strings.failedSubmit;
           });
         }
       }
@@ -144,7 +234,7 @@ class _ContactFunnelModalState extends State<ContactFunnelModal> {
       if (mounted) {
         setState(() {
           _isSubmitting = false;
-          _errorMessage = 'Terjadi kesalahan: $e';
+          _errorMessage = '${widget.strings.genericError}$e';
         });
       }
     }

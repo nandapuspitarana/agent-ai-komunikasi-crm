@@ -609,10 +609,12 @@ class _AiChatViewState extends State<AiChatView> {
 
   Future<void> _showContactFunnelModal(BuildContext context) async {
     final activeTheme = widget.theme;
+    final resolvedStrings =
+        widget.controller.resolveContactFunnelStrings(widget.contactFunnelStrings);
     await ContactFunnelModal.show(
       context,
       theme: activeTheme,
-      strings: widget.contactFunnelStrings,
+      strings: resolvedStrings,
       userName: widget.userName,
       userEmail: widget.userEmail ?? widget.talkToAgentEmail ?? widget.controller.fallbackEmail,
       userCompany: widget.userCompany,

@@ -7,6 +7,7 @@ import '../models/quick_reply_option.dart';
 import '../models/response_type.dart';
 import '../models/html_reply_parser.dart';
 import '../security/rate_limiter.dart';
+import '../ui/widgets/contact_funnel_modal.dart';
 import '../version.dart';
 
 /// State Controller for the AI Chat Widget.
@@ -33,6 +34,8 @@ class AiChatController extends ChangeNotifier {
   String? _currentAgentName;
   String? _cardActionLabel;
   String? _cardBannerTitle;
+  String? _tenantLanguage;
+  Map<String, dynamic>? _contactFormConfig;
   String? _errorMessage;
   late String _sessionId;
   Timer? _pollTimer;
@@ -127,6 +130,8 @@ class AiChatController extends ChangeNotifier {
   String? get currentAgentName => _currentAgentName;
   String? get cardActionLabel => _cardActionLabel ?? config.cardActionLabel;
   String? get cardBannerTitle => _cardBannerTitle ?? config.cardBannerTitle;
+  String? get tenantLanguage => _tenantLanguage;
+  Map<String, dynamic>? get contactFormConfig => _contactFormConfig;
 
   /// Dynamic responder name:
   /// - When in handoff mode: returns the human agent's name (or 'Live Support' fallback).
@@ -138,6 +143,17 @@ class AiChatController extends ChangeNotifier {
           : 'Live Support';
     }
     return botName;
+  }
+
+  /// Resolves contact funnel strings using tenant language and contactForm settings.
+  ContactFunnelStrings resolveContactFunnelStrings([ContactFunnelStrings? custom]) {
+    if (custom != null && custom != const ContactFunnelStrings()) {
+      return custom;
+    }
+    return ContactFunnelStrings.fromConfig(
+      contactFormConfig: _contactFormConfig,
+      language: _tenantLanguage,
+    );
   }
 
   String? get errorMessage => _errorMessage;
@@ -216,6 +232,16 @@ class AiChatController extends ChangeNotifier {
       final fetchedFallbackEmail = tenantConfig['fallbackEmail']?.toString();
       if (fetchedFallbackEmail != null && fetchedFallbackEmail.isNotEmpty) {
         _fallbackEmail = fetchedFallbackEmail;
+      }
+
+      final fetchedLanguage = tenantConfig['language']?.toString();
+      if (fetchedLanguage != null && fetchedLanguage.isNotEmpty) {
+        _tenantLanguage = fetchedLanguage;
+      }
+
+      if (tenantConfig['contactForm'] is Map) {
+        _contactFormConfig =
+            Map<String, dynamic>.from(tenantConfig['contactForm'] as Map);
       }
 
       final welcome =
