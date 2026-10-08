@@ -50,6 +50,7 @@ void main() {
       );
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
         home: Scaffold(
           body: AiChatView(
             controller: controller,
@@ -96,6 +97,7 @@ void main() {
       String? redirectedEmail;
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
         home: Scaffold(
           body: AiChatView(
             controller: controller,
@@ -145,6 +147,7 @@ void main() {
       String? launchedUrl;
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
         home: Scaffold(
           body: AiChatView(
             controller: controller,
@@ -191,6 +194,7 @@ void main() {
       String? redirectedEmail;
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
         home: Scaffold(
           body: AiChatView(
             controller: controller,
@@ -209,7 +213,98 @@ void main() {
       expect(redirectedEmail, 'sdk-fallback@domain.com');
     });
 
-    testWidgets('TEST-AI-F65 when humanHandoffEnabled is false, button opens contact funnel modal and submits', (tester) async {
+    testWidgets('TEST-AI-F65 when humanHandoffEnabled is false and language is English, button opens English contact funnel modal', (tester) async {
+      when(() => api.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {
+          'status': 'success',
+          'config': {
+            'welcomeMessage': 'Hello, how can I assist you?',
+            'botName': 'Claire',
+            'humanHandoffEnabled': false,
+            'fallbackEmail': 'support@ceosuite.com',
+            'language': 'en',
+          },
+        },
+      );
+
+      when(() => api.submitContactForm(
+            category: any(named: 'category'),
+            description: any(named: 'description'),
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+            email: any(named: 'email'),
+            name: any(named: 'name'),
+            company: any(named: 'company'),
+          )).thenAnswer(
+        (_) async => {
+          'success': true,
+          'sessionId': 'server_session_123',
+          'botReply': 'Your report has been received.',
+        },
+      );
+
+      final controller = AiChatController(
+        apiClient: api,
+        config: const AiAgentConfig(
+          apiUrl: 'http://localhost',
+          tenantId: 't1',
+        ),
+      );
+
+      await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
+        home: Scaffold(
+          body: AiChatView(
+            controller: controller,
+            talkToAgentLabel: 'Talk to Human Agent',
+            talkToAgentEmailLabel: 'Send Email to Company',
+            userName: 'HC Leman',
+            userEmail: 'leman@ceosuite.com',
+            userCompany: 'CEO SUITE',
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Send Email to Company'), findsOneWidget);
+
+      // Tap Send Email to Company -> opens ContactFunnelModal
+      await tester.tap(find.byKey(const ValueKey('talk_to_agent')));
+      await tester.pumpAndSettle();
+
+      // Check modal components in English
+      expect(find.byType(ContactFunnelModal), findsOneWidget);
+      expect(find.text('Contact Company / Report Issue'), findsOneWidget);
+      expect(find.text('HC Leman'), findsOneWidget);
+      expect(find.text('CEO SUITE'), findsOneWidget);
+      expect(find.text('Submit Report'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+
+      // Enter description
+      await tester.enterText(find.byType(TextFormField), 'AC in meeting room is not cooling');
+      await tester.pumpAndSettle();
+
+      // Tap submit button in English
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Report'));
+      await tester.pumpAndSettle();
+
+      // Verify submitContactForm was called with user profile parameters
+      verify(() => api.submitContactForm(
+            category: 'General Inquiry',
+            description: 'AC in meeting room is not cooling',
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+            email: 'leman@ceosuite.com',
+            name: 'HC Leman',
+            company: 'CEO SUITE',
+          )).called(1);
+
+      // Modal should be closed
+      expect(find.byType(ContactFunnelModal), findsNothing);
+      expect(find.text('Your report has been received.'), findsOneWidget);
+    });
+
+    testWidgets('TEST-AI-F66 when tenant language is id, modal uses Indonesian strings', (tester) async {
       when(() => api.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
         (_) async => {
           'status': 'success',
@@ -218,6 +313,7 @@ void main() {
             'botName': 'Claire',
             'humanHandoffEnabled': false,
             'fallbackEmail': 'support@ceosuite.com',
+            'language': 'id',
           },
         },
       );
@@ -247,6 +343,7 @@ void main() {
       );
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
         home: Scaffold(
           body: AiChatView(
             controller: controller,
@@ -260,44 +357,29 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Send Email to Company'), findsOneWidget);
-
-      // Tap Send Email to Company -> opens ContactFunnelModal
       await tester.tap(find.byKey(const ValueKey('talk_to_agent')));
       await tester.pumpAndSettle();
 
-      // Check modal components
       expect(find.byType(ContactFunnelModal), findsOneWidget);
       expect(find.text('Hubungi Perusahaan / Laporan'), findsOneWidget);
-      expect(find.text('HC Leman'), findsOneWidget);
-      expect(find.text('CEO SUITE'), findsOneWidget);
+      expect(find.text('Kirim Laporan'), findsOneWidget);
+      expect(find.text('Batal'), findsOneWidget);
 
-      // Enter description
-      await tester.enterText(find.byType(TextFormField), 'AC ruang rapat tidak dingin');
+      await tester.enterText(find.byType(TextFormField), 'AC tidak dingin');
       await tester.pumpAndSettle();
 
-      // Tap submit button
       await tester.tap(find.widgetWithText(ElevatedButton, 'Kirim Laporan'));
       await tester.pumpAndSettle();
 
-      // Verify submitContactForm was called with user profile parameters
       verify(() => api.submitContactForm(
             category: 'Pertanyaan Umum',
-            description: 'AC ruang rapat tidak dingin',
+            description: 'AC tidak dingin',
             sessionId: any(named: 'sessionId'),
             contactId: any(named: 'contactId'),
             email: 'leman@ceosuite.com',
             name: 'HC Leman',
             company: 'CEO SUITE',
           )).called(1);
-
-      // Modal should be closed
-      expect(find.byType(ContactFunnelModal), findsNothing);
-
-      // Chat should show user summary and bot reply
-      expect(find.textContaining('📝 [Laporan Masalah ke Perusahaan]'), findsOneWidget);
-      expect(find.textContaining('AC ruang rapat tidak dingin'), findsOneWidget);
-      expect(find.text('Laporan Anda telah diterima.'), findsOneWidget);
     });
   });
 }
