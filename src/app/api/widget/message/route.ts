@@ -310,8 +310,11 @@ export async function POST(req: NextRequest) {
     const flowConfig: any = effectiveFlow?.config || {};
     const flowSystemPrompt = flowConfig.systemPrompt;
     const flowHumanPromptTemplate = flowConfig.humanPrompt;
-    const isEn = (flowConfig?.language || '').toLowerCase().startsWith('en') ||
-                 (effectiveFlow?.name || '').toLowerCase().includes('ceosuite');
+    const rawLang =
+      (tenant.visitorConfig as any)?.language ||
+      flowConfig?.language ||
+      ((effectiveFlow?.name || '').toLowerCase().includes('ceosuite') ? 'en' : 'en');
+    const isEn = !String(rawLang || '').toLowerCase().startsWith('id');
 
     // === SESI DALAM MODE BOT — JALANKAN AI ===
 
@@ -513,7 +516,6 @@ export async function POST(req: NextRequest) {
         }
 
         // Step 3: Call AI Engine (Session, RAG, etc)
-        const isEn = (flowConfig?.language || '').toLowerCase().startsWith('en');
         const defaultUnavailableMsg = isEn
           ? 'Sorry, I am unable to answer at the moment.'
           : 'Maaf, saya tidak bisa menjawab saat ini.';
@@ -627,7 +629,6 @@ export async function POST(req: NextRequest) {
       } else {
         handoffOccurred = false;
         if (tenant.fallbackEmail && !cleanReply.toLowerCase().includes(tenant.fallbackEmail.toLowerCase())) {
-          const isEn = (flowConfig?.language || '').toLowerCase().startsWith('en');
           const emailNotice = isEn
             ? `\n\n(For further personal assistance, our team is at your service via email at ${tenant.fallbackEmail})`
             : `\n\n(Untuk bantuan lebih lanjut, tim kami siap membantu Anda via email di ${tenant.fallbackEmail})`;

@@ -395,7 +395,15 @@ class _AiChatViewState extends State<AiChatView> {
                               }
                             }
                           }
-                          controller.sendMessage(widget.talkToAgentMessage);
+
+                          final isId = (controller.tenantLanguage ?? '').toLowerCase().startsWith('id');
+                          final defaultMsg = isId
+                              ? 'Saya ingin bicara dengan agen manusia'
+                              : 'I would like to speak with a human agent';
+                          controller.sendMessage(
+                              widget.talkToAgentMessage != 'Saya ingin bicara dengan agen manusia'
+                                  ? widget.talkToAgentMessage
+                                  : defaultMsg);
                         },
                   icon: Icon(
                     !controller.humanHandoffEnabled
@@ -595,16 +603,17 @@ class _AiChatViewState extends State<AiChatView> {
   }
 
   String _talkToAgentLabel(AiChatController controller) {
+    final isId = (controller.tenantLanguage ?? '').toLowerCase().startsWith('id');
     if (!controller.humanHandoffEnabled) {
       if (widget.talkToAgentEmailLabel != null) {
         return widget.talkToAgentEmailLabel!;
       }
       final email = widget.talkToAgentEmail ?? controller.fallbackEmail;
       if (email != null && email.isNotEmpty) {
-        return 'Contact via Email ($email)';
+        return isId ? 'Hubungi via Email ($email)' : 'Contact via Email ($email)';
       }
     }
-    return widget.talkToAgentLabel!;
+    return widget.talkToAgentLabel ?? (isId ? 'Bicara dengan Agen' : 'Talk to Human Agent');
   }
 
   Future<void> _showContactFunnelModal(BuildContext context) async {

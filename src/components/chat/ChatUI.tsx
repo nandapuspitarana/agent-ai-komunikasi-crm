@@ -112,7 +112,8 @@ export function ChatUI({
   const { t } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const isEn = (config.language || '').toLowerCase().startsWith('en');
+  const isId = (config.language || '').toLowerCase().startsWith('id');
+  const isEn = !isId;
   const defaultCategories = isEn
     ? [
         'General Inquiry',

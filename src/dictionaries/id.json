@@ -105,7 +105,8 @@
     "submitting": "Mengirim...",
     "submitBtn": "Kirim Laporan",
     "cancelBtn": "Batal",
-    "sendingAs": "Mengirim sebagai"
+    "sendingAs": "Mengirim sebagai",
+    "formSuccess": "Terima kasih! Pesan dan laporan Anda telah kami teruskan ke tim perusahaan."
   },
   "agentBuilder": {
     "saveAgentFirst": "Simpan Agen Terlebih Dahulu",

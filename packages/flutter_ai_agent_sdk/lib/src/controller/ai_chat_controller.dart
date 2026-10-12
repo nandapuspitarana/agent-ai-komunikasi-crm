@@ -534,14 +534,24 @@ class AiChatController extends ChangeNotifier {
     _isTyping = true;
     _errorMessage = null;
 
-    final userSummary = [
-      '📝 [Laporan Masalah ke Perusahaan]',
-      '• Kategori: $trimmedCategory',
-      if (company != null && company.trim().isNotEmpty) '• Perusahaan: ${company.trim()}',
-      if (name != null && name.trim().isNotEmpty) '• Nama: ${name.trim()}',
-      if (email != null && email.trim().isNotEmpty) '• Email: ${email.trim()}',
-      '• Deskripsi: $trimmedDesc',
-    ].join('\n');
+    final isId = (_tenantLanguage ?? '').toLowerCase().startsWith('id');
+    final userSummary = isId
+        ? [
+            '📝 [Laporan Masalah ke Perusahaan]',
+            '• Kategori: $trimmedCategory',
+            if (company != null && company.trim().isNotEmpty) '• Perusahaan: ${company.trim()}',
+            if (name != null && name.trim().isNotEmpty) '• Nama: ${name.trim()}',
+            if (email != null && email.trim().isNotEmpty) '• Email: ${email.trim()}',
+            '• Deskripsi: $trimmedDesc',
+          ].join('\n')
+        : [
+            '📝 [Inquiry / Issue Report to Company]',
+            '• Category: $trimmedCategory',
+            if (company != null && company.trim().isNotEmpty) '• Company: ${company.trim()}',
+            if (name != null && name.trim().isNotEmpty) '• Name: ${name.trim()}',
+            if (email != null && email.trim().isNotEmpty) '• Email: ${email.trim()}',
+            '• Description: $trimmedDesc',
+          ].join('\n');
 
     final userMsgId = 'user_${DateTime.now().millisecondsSinceEpoch}';
     final userMsg = ChatMessage(
@@ -564,11 +574,19 @@ class AiChatController extends ChangeNotifier {
         email: email,
         name: name,
         company: company,
+        language: _tenantLanguage,
       );
 
+      final serverUserMsg = res['userMessage']?.toString();
+      final finalUserText = (serverUserMsg != null && serverUserMsg.isNotEmpty)
+          ? serverUserMsg
+          : userSummary;
       final userIdx = _messages.indexWhere((m) => m.id == userMsgId);
       if (userIdx != -1) {
-        _messages[userIdx] = _messages[userIdx].copyWith(status: MessageStatus.sent);
+        _messages[userIdx] = _messages[userIdx].copyWith(
+          text: finalUserText,
+          status: MessageStatus.sent,
+        );
       }
 
       final serverSession = res['sessionId']?.toString();
@@ -578,7 +596,9 @@ class AiChatController extends ChangeNotifier {
       }
 
       final botReplyText = res['botReply']?.toString() ??
-          'Terima kasih! Pesan dan laporan Anda telah kami teruskan ke tim perusahaan.';
+          (isId
+              ? 'Terima kasih! Pesan dan laporan Anda telah kami teruskan ke tim perusahaan.'
+              : 'Thank you! Your message and report has been forwarded to our team.');
       final botMsg = ChatMessage(
         id: 'bot_${DateTime.now().millisecondsSinceEpoch}',
         sender: MessageSender.bot,

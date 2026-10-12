@@ -94,7 +94,7 @@ export const DEFAULT_EMAIL_CONFIG: EmailConfig = {
   azure: {
     tenantId: process.env.AZURE_TENANT_ID || 'e204d887-6ff5-46af-a043-bd9e4a04de3c',
     clientId: process.env.AZURE_CLIENT_ID || 'ae1c234e-c8a8-436c-bcb5-ce871186cc0e',
-    clientSecret: process.env.AZURE_CLIENT_SECRET || 'b1l8Q~7RJwkYfzaC_c_qw6g-0xVscH0.gfx0GbYM',
+    clientSecret: process.env.AZURE_CLIENT_SECRET || '',
     senderEmail: process.env.AZURE_SENDER_EMAIL || 'uat-noreply@ceosuite.com',
     senderName: process.env.AZURE_SENDER_NAME || 'UAT-APP',
     subjectPrefix: process.env.AZURE_EMAIL_SUBJECT_PREFIX || 'UAT-APP',
@@ -156,7 +156,7 @@ export const DEFAULT_VISITOR_CONFIG: VisitorConfig = {
   layer3_leadform: true,
   leadFormTrigger: 'booking',
   leadFormFields: ['name', 'email', 'phone'],
-  leadFormTitle: 'Boleh kami tahu sedikit tentang Anda?',
+  leadFormTitle: 'May we know a little about you?',
   leadFormSkippable: true,
   layer4_classification: true,
   scoreWeights: { cold: 1, warm: 5, hot_lead: 15, booking: 30, support: 0 },
@@ -208,6 +208,7 @@ export function getVisitorConfig(tenantVisitorConfig: any, preferredLang?: strin
     ...DEFAULT_VISITOR_CONFIG,
     ...parsedConfig,
     language: parsedConfig.language || (effectiveLang.startsWith('id') ? 'id' : 'en'),
+    leadFormTitle: parsedConfig.leadFormTitle || (effectiveLang.startsWith('id') ? 'Boleh kami tahu sedikit tentang Anda?' : 'May we know a little about you?'),
     scoreWeights: {
       ...DEFAULT_VISITOR_CONFIG.scoreWeights,
       ...(parsedConfig.scoreWeights || {})

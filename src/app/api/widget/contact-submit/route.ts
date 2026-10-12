@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       email,
       name,
       company,
+      language,
     } = body;
 
     if (!tenantId || !category || !description) {
@@ -84,10 +85,12 @@ export async function POST(req: NextRequest) {
     const actualSessionId = currentSession.id;
     const finalContactId = currentSession.contactId;
 
-    // Resolve language setting from tenant
+    // Resolve language setting: priority = body.language > tenant.visitorConfig.language > 'en'
     const tenantVConfig = (tenant.visitorConfig || {}) as any;
-    const isId = String(tenantVConfig?.language || '').toLowerCase().startsWith('id');
-    const visitorConfig = getVisitorConfig(tenant.visitorConfig, isId ? 'id' : 'en');
+    const requestedLang = String(language || tenantVConfig?.language || '').trim().toLowerCase();
+    const isId = requestedLang.startsWith('id');
+    const effectiveLang = isId ? 'id' : 'en';
+    const visitorConfig = getVisitorConfig(tenant.visitorConfig, effectiveLang);
 
     // 3. Save User Submission Message to Chat
     const userMessageContent = isId
@@ -223,6 +226,7 @@ export async function POST(req: NextRequest) {
     return corsResponse({
       success: true,
       sessionId: actualSessionId,
+      userMessage: userMessageContent,
       botReply,
       botMessageId: botMsg.id,
       summary: {

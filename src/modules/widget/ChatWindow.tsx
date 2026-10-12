@@ -309,11 +309,13 @@ export function ChatWindow({
         return;
       }
     }
-    sendMessage('Saya ingin bicara dengan agen manusia');
+    const isId = String(widgetConfig.language || '').toLowerCase().startsWith('id');
+    sendMessage(isId ? 'Saya ingin bicara dengan agen manusia' : 'I would like to speak with a human agent');
   };
 
   const handleSubmitContactForm = async ({ category, description }: { category: string; description: string }) => {
     setIsSubmittingContactForm(true);
+    const isId = String(widgetConfig.language || '').toLowerCase().startsWith('id');
     try {
       const res = await fetch(`${apiBase}/api/widget/contact-submit`, {
         method: 'POST',
@@ -327,6 +329,7 @@ export function ChatWindow({
           email: userProfile.email,
           name: userProfile.name,
           company: userProfile.company,
+          language: widgetConfig.language,
         }),
       });
 
@@ -336,15 +339,24 @@ export function ChatWindow({
           setServerSessionId(data.sessionId);
         }
         setShowContactForm(false);
-        const userSummary = [
-          `📝 [Laporan Masalah ke Perusahaan]`,
-          `• Kategori: ${category}`,
-          userProfile.company ? `• Perusahaan: ${userProfile.company}` : null,
-          `• Deskripsi: ${description}`,
-        ].filter(Boolean).join('\n');
+        const userSummary = data.userMessage || (isId
+          ? [
+              `📝 [Laporan Masalah ke Perusahaan]`,
+              `• Kategori: ${category}`,
+              userProfile.company ? `• Perusahaan: ${userProfile.company}` : null,
+              `• Deskripsi: ${description}`,
+            ].filter(Boolean).join('\n')
+          : [
+              `📝 [Inquiry / Issue Report to Company]`,
+              `• Category: ${category}`,
+              userProfile.company ? `• Company: ${userProfile.company}` : null,
+              `• Description: ${description}`,
+            ].filter(Boolean).join('\n'));
         addMessage(userSummary, 'user');
 
-        const botReply = data.botReply || t('chatWidget', 'formSuccess', 'Terima kasih! Pesan dan laporan Anda telah kami teruskan ke tim perusahaan.');
+        const botReply = data.botReply || (isId
+          ? t('chatWidget', 'formSuccess', 'Terima kasih! Pesan dan laporan Anda telah kami teruskan ke tim perusahaan.')
+          : t('chatWidget', 'formSuccessEn', 'Thank you! Your message and report has been forwarded to our team.'));
         addMessage(botReply, 'bot');
       } else {
         addMessage(t('chatWidget', 'errorOccurred'), 'system');

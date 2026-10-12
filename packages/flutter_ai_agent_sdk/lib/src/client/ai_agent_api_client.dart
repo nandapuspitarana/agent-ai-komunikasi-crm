@@ -213,6 +213,7 @@ class AiAgentApiClient {
     String? email,
     String? name,
     String? company,
+    String? language,
   }) async {
     final uri = Uri.parse('${config.sanitizedApiUrl}/api/widget/contact-submit');
     final payload = {
@@ -224,6 +225,7 @@ class AiAgentApiClient {
       if (email != null && email.isNotEmpty) 'email': email,
       if (name != null && name.isNotEmpty) 'name': name,
       if (company != null && company.isNotEmpty) 'company': company,
+      if (language != null && language.isNotEmpty) 'language': language,
     };
 
     final http.Response res;

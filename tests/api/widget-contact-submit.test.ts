@@ -146,6 +146,70 @@ describe('POST /api/widget/contact-submit', () => {
     );
   });
 
+  it('formats userMessage and botReply in English when language is en or default', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue({
+      id: 't1',
+      name: 'CEO SUITE Singapore',
+      fallbackEmail: 'support@ceosuite.com',
+      visitorConfig: { language: 'en', enabled: true },
+    });
+    prismaMock.visitorProfile.findUnique.mockResolvedValue(null);
+    prismaMock.visitorProfile.create.mockResolvedValue({ id: 'vp1' });
+
+    const payload = {
+      tenantId: 't1',
+      category: 'Technical Issue',
+      description: 'WiFi unstable in room 402',
+      email: 'alex@startup.io',
+      name: 'Alex Tan',
+      company: 'Tech Startup',
+    };
+
+    const res = await send(payload);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.userMessage).toContain('📝 [Inquiry / Issue Report to Company]');
+    expect(json.userMessage).toContain('• Category: Technical Issue');
+    expect(json.userMessage).toContain('• Company: Tech Startup');
+    expect(json.userMessage).toContain('• Name: Alex Tan');
+    expect(json.userMessage).toContain('• Description: WiFi unstable in room 402');
+    expect(json.botReply).toContain('Thank you Alex Tan! Your message and report regarding "Technical Issue" has been forwarded to our team.');
+  });
+
+  it('formats userMessage and botReply in Indonesian when language is id', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue({
+      id: 't1',
+      name: 'CEO SUITE Jakarta',
+      fallbackEmail: 'support@ceosuite.com',
+      visitorConfig: { language: 'id', enabled: true },
+    });
+    prismaMock.visitorProfile.findUnique.mockResolvedValue(null);
+    prismaMock.visitorProfile.create.mockResolvedValue({ id: 'vp1' });
+
+    const payload = {
+      tenantId: 't1',
+      category: 'Kendala Teknis',
+      description: 'AC meeting room mati',
+      email: 'budi@perusahaan.co.id',
+      name: 'Budi Santoso',
+      company: 'PT Maju Bersama',
+    };
+
+    const res = await send(payload);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.userMessage).toContain('📝 [Laporan Masalah ke Perusahaan]');
+    expect(json.userMessage).toContain('• Kategori: Kendala Teknis');
+    expect(json.userMessage).toContain('• Perusahaan: PT Maju Bersama');
+    expect(json.userMessage).toContain('• Nama: Budi Santoso');
+    expect(json.userMessage).toContain('• Deskripsi: AC meeting room mati');
+    expect(json.botReply).toContain('Terima kasih Budi Santoso! Pesan dan laporan Anda terkait "Kendala Teknis" telah kami teruskan ke tim perusahaan.');
+  });
+
   it('handles preflight OPTIONS request with CORS headers', async () => {
     const res = await OPTIONS();
     expect(res.status).toBe(204);

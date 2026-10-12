@@ -105,7 +105,8 @@
     "submitting": "Submitting...",
     "submitBtn": "Submit Report",
     "cancelBtn": "Cancel",
-    "sendingAs": "Sending as"
+    "sendingAs": "Sending as",
+    "formSuccess": "Thank you! Your message and report has been forwarded to our team."
   },
   "agentBuilder": {
     "saveAgentFirst": "Save Agent First",

@@ -102,7 +102,7 @@ export default function EmailSmtpConfigPanel({
       azure: {
         tenantId: 'e204d887-6ff5-46af-a043-bd9e4a04de3c',
         clientId: 'ae1c234e-c8a8-436c-bcb5-ce871186cc0e',
-        clientSecret: 'b1l8Q~7RJwkYfzaC_c_qw6g-0xVscH0.gfx0GbYM',
+        clientSecret: '',
         senderEmail: 'uat-noreply@ceosuite.com',
         senderName: 'UAT-APP',
         subjectPrefix: 'UAT-APP',
@@ -314,7 +314,7 @@ export default function EmailSmtpConfigPanel({
                   type={showAzureSecret ? 'text' : 'password'}
                   value={azure.clientSecret || ''}
                   onChange={(e) => handleAzureChange('clientSecret', e.target.value)}
-                  placeholder="e.g. b1l8Q~7RJwkYfzaC_c_qw6g-0xVscH0.gfx0GbYM"
+                  placeholder="e.g. ••••••••••••••••••••••••••••••••"
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent outline-none bg-white font-mono"
                 />
               </div>
