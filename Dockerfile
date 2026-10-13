@@ -19,6 +19,10 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# Rebuild the CS support flow from userjourney/knowledge base/KB - List of Centres.json so the image
+# always carries answers (address, hours, phone, email, map link, ...) that match the knowledge base.
+RUN node userjourney/build_cs_support.js
+
 # CRM_VERSION stamps the Flutter SDK archive built by `npm run build` (prebuild hook)
 ARG CRM_VERSION=""
 ENV CRM_VERSION=$CRM_VERSION
@@ -67,6 +71,12 @@ COPY --from=builder /app/prisma ./prisma
 # Flutter SDK archive + manifest served by /api/pub (built by scripts/build-sdk-package.js)
 COPY --from=builder /app/sdk-dist ./sdk-dist
 
+# Chatbot flow + knowledge base, loaded into the database at start by scripts/docker/sync-knowledge.js
+COPY --from=builder /app/userjourney/UserJourney-CS-Support.json ./userjourney/UserJourney-CS-Support.json
+COPY --from=builder ["/app/userjourney/knowledge base", "./userjourney/knowledge base"]
+COPY --from=builder /app/scripts/docker ./scripts/docker
+COPY --from=builder /app/scripts/lib ./scripts/lib
+
 # Change ownership to non-root user
 RUN chown -R nextjs:nodejs /app
 
@@ -74,5 +84,5 @@ USER nextjs
 
 EXPOSE 8201
 
-# Run prisma migration/sync before starting the server
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm run start"]
+# Run prisma migration/sync, load flow + knowledge base (never blocks startup), then start the server
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && { node scripts/docker/sync-knowledge.js || echo '[sync-knowledge] failed, continuing without knowledge sync'; } && npm run start"]

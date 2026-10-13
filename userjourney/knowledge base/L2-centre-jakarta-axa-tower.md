@@ -12,7 +12,6 @@ Controlled centre identity:
 - Centre: AXA Tower
 - Address: 45th Floor, AXA Tower Jl. Prof. Dr. Satrio Kav. 18 Kuningan City Jakarta 12940
 - Telepon: +62 (21) 3005 3500
-- WhatsApp: +62 8111 50 894
 - Email: sales@ceosuite.com
 - Latitude: -6.224568
 - Longitude: 106.828726

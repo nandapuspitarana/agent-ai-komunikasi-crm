@@ -6,14 +6,14 @@ CEO SUITE Lujiazui Finance Plaza is an active centre in Shanghai, China. Shangha
 **Deskripsi Lokasi:**
 Shanghai Lujiazui Finance Plaza
 Shanghai Pudong, China
-Lantai mewah dari CEO SUITE di Lantai 16 dilengkapi dengan balkon terbuka yang eksklusif. Terletak dalam area berkembang kelas dunia Lujiazui Free Trade Zone (TDZ) dan Shanghai Pilot Free-Trade Zone (PFTZ), gedung ini mencakup pusat perbelanjaan 11 lantai , kafe, restoran, pusat kebugaran dan banyak bank. Mudah dicapai dengan berjalan kaki dengan dilengkapi kemewahan hotel bintang 5 seperti Four Seasons, Shangri-La, Park Hyatt, Grand Hyatt, dan Ritz-Carlton. Sebuah taman terbuka dengan tempat duduk nyaman yang membuat tempat yang cocok untuk pertemuan yang santai, tempat untuk istirahat santai dan bahkan untuk acara publik.
+Lantai mewah dari CEO SUITE di Lantai 18 dilengkapi dengan balkon terbuka yang eksklusif. Terletak dalam area berkembang kelas dunia Lujiazui Free Trade Zone (TDZ) dan Shanghai Pilot Free-Trade Zone (PFTZ), gedung ini mencakup pusat perbelanjaan 11 lantai , kafe, restoran, pusat kebugaran dan banyak bank. Mudah dicapai dengan berjalan kaki dengan dilengkapi kemewahan hotel bintang 5 seperti Four Seasons, Shangri-La, Park Hyatt, Grand Hyatt, dan Ritz-Carlton. Sebuah taman terbuka dengan tempat duduk nyaman yang membuat tempat yang cocok untuk pertemuan yang santai, tempat untuk istirahat santai dan bahkan untuk acara publik.
 
 Controlled centre identity:
 - Country: China
 - City: Shanghai
 - Centre: Lujiazui Finance Plaza
 - Address: 18th Floor, 826 Century Avenue, Pudong, Shanghai 200120
-- Telepon: +86 (21) 2052 0666
+- Telepon: +86 (21) 5116 5116
 - Email: sales@cn.ceosuite.com
 - Latitude: 31.234564
 - Longitude: 121.507439

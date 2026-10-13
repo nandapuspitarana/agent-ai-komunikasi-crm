@@ -20,8 +20,8 @@ Controlled centre identity:
 - City: Hangzhou
 - Centre: Ping An Finance Center (Tower B)
 - Address: 7th-9th Floor, 159 Jiangjin Road, Shangcheng District, Hangzhou 310020
-- Telepon: +86 21 2052 0666
-- Email: sales@cn.ceosuite.com
+- Telepon: +86 (571) 5812 5868
+- Email: saleshz@cn.ceosuite.com
 - Latitude: 30.251208
 - Longitude: 120.211809
 

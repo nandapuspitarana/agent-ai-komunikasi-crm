@@ -10,3 +10,6 @@ yarn-debug.log*
 yarn-error.log*
 .vercel
 *.tsbuildinfo
+
+# Legacy per-centre copies, not registered anywhere (superseded by L2-centre-*.md and KB - List of Centres.json)
+userjourney/knowledge base/md_locations

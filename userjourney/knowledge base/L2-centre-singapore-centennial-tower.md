@@ -19,8 +19,7 @@ Controlled centre identity:
 - City: Singapore
 - Centre: Centennial Tower
 - Address: Controlled address not yet captured in this file.
-- Telepon: + 65 6829 7000
-- WhatsApp: +65 9182 9667
+- Telepon: +65 6829 7000
 - Email: sales@sg.ceosuite.com
 - Latitude: 1.293265
 - Longitude: 103.860142

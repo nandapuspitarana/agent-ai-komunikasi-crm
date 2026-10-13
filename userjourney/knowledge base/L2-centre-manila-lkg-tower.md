@@ -11,7 +11,7 @@ Controlled centre identity:
 - City: Manila
 - Centre: LKG Tower
 - Address: 37th Floor, 6801 Ayala Avenue, Makati City 1226
-- Telepon: +63 (2) 859 2888
+- Telepon: +63 2 8859 2888
 - Email: sales@ph.ceosuite.com
 - Latitude: 14.5595619
 - Longitude: 121.0180439

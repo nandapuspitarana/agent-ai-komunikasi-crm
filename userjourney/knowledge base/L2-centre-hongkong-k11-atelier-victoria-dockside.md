@@ -17,7 +17,6 @@ Controlled centre identity:
 - Centre: K11 Atelier Victoria Dockside
 - Address: Level 7, 18 Salisbury Road, Tsim Sha Tsui
 - Telepon: +852 3166 6166
-- WhatsApp: +852 6086 6673
 - Email: sales@hk.ceosuite.com
 - Latitude: 22.29492
 - Longitude: 114.17577

@@ -10,7 +10,7 @@ Kami menggunakan script Python khusus (`convert_xml_to_md.py`) yang diletakkan d
 3. Mengekstrak data spesifik untuk post_type `office`, meliputi:
    - Nama Lokasi
    - Deskripsi Singkat
-   - Alamat, Email, Telepon, WhatsApp
+   - Alamat, Email, Telepon
    - Daftar Fasilitas (Amenities)
    - Daftar Layanan & Harga
 4. Menyimpannya menjadi file `.md` yang bersih.

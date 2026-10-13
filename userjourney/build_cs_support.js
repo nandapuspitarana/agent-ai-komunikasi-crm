@@ -11,11 +11,8 @@ const centresMeta = {
   'Axiata Tower': {
     city: 'Kuala Lumpur',
     country: 'Malaysia',
-    address: '27th Floor, Jalan Stesen Sentral 5, KL Sentral, Kuala Lumpur 50470, Malaysia',
+    address: '27th Floor, 9 Jalan Stesen Sentral 5, KL Sentral, Kuala Lumpur 50470, Malaysia',
     phone: '+60 (3) 2776 6888',
-    whatsapp: '+60 12 360 8913',
-    transport: 'Direct internal link to KL Sentral Transit Hub (KLIA Express, LRT, MRT, KTM, Monorail).',
-    facilities: '24/7 Member Access, Front Desk Reception, Super-Fast Internet, Fresh Fruit Water & Micro-Roasted Coffee, Business-Class Printers, Meeting Rooms, Lounges.',
     url: 'https://www.ceosuite.com/locations/kuala-lumpur-axiata-tower/'
   },
   'Q Sentral': {
@@ -23,9 +20,6 @@ const centresMeta = {
     country: 'Malaysia',
     address: 'Level 35-02 (East Wing), 2A, Jalan Stesen Sentral 2, KL Sentral, Kuala Lumpur 50470, Malaysia',
     phone: '+60 (3) 2731 9388',
-    whatsapp: '+60 12 360 7089',
-    transport: 'Covered pedestrian link to KL Sentral Station and Muzium Negara MRT.',
-    facilities: '24/7 Member Access, Sky Lobby, Business Lounge, Meeting Facilities, High-Speed Wi-Fi, Mail Handling, Daily Cleaning.',
     url: 'https://www.ceosuite.com/locations/kuala-lumpur-q-sentral/'
   },
   'Manara Maxis 36': {
@@ -33,9 +27,6 @@ const centresMeta = {
     country: 'Malaysia',
     address: '36th Floor, Menara Maxis, Kuala Lumpur City Centre (KLCC), Kuala Lumpur 50088, Malaysia',
     phone: '+60 (3) 2615 0000',
-    whatsapp: '+60 12 360 6982',
-    transport: 'Adjacent to Petronas Twin Towers, Suria KLCC, and KLCC LRT Station.',
-    facilities: '24/7 Member Access, Panoramic City Views, Executive Boardrooms, Video Conferencing, High-Speed Fiber Internet, Front Desk Reception.',
     url: 'https://www.ceosuite.com/locations/kuala-lumpur-maxis-36th/'
   },
   'Manara Maxis 26': {
@@ -43,9 +34,6 @@ const centresMeta = {
     country: 'Malaysia',
     address: '26th Floor, Menara Maxis, Kuala Lumpur City Centre (KLCC), Kuala Lumpur 50088, Malaysia',
     phone: '+60 (3) 2615 2688',
-    whatsapp: '+60 12 360 6982',
-    transport: 'Direct connection to KLCC Suria shopping mall and KLCC LRT Station.',
-    facilities: '24/7 Member Access, Front Desk Reception, Modern Meeting Rooms, High-Speed Internet, Pantry & Refreshments, Daily Housekeeping.',
     url: 'https://www.ceosuite.com/locations/kuala-lumpur-maxis-26th/'
   },
   'Chinachem Tower': {
@@ -53,9 +41,6 @@ const centresMeta = {
     country: 'China',
     address: 'Levels 5-7, Chinachem Tower, 34-37 Connaught Road Central, Central, Hong Kong',
     phone: '+852 3166 6160',
-    whatsapp: '+852 6795 3268',
-    transport: 'Central MTR Station (Exit A/B) & Hong Kong Airport Express Station.',
-    facilities: '24/7 Member Access, High-Speed Wi-Fi, Receptionist Services, Meeting Rooms, Micro-Roasted Coffee, Mail Handling, Daily Cleaning.',
     url: 'https://www.ceosuite.com/locations/chinachem-tower/'
   },
   'K11 Atelier Victoria Dockside': {
@@ -63,9 +48,6 @@ const centresMeta = {
     country: 'China',
     address: 'Level 7, 18 Salisbury Road, Tsim Sha Tsui, Hong Kong',
     phone: '+852 3166 6166',
-    whatsapp: '+852 6086 6673',
-    transport: 'Tsim Sha Tsui MTR Station (Exit J) & East Tsim Sha Tsui Station.',
-    facilities: 'Harbour Views, 24/7 Member Access, Executive Boardrooms, High-Speed Wi-Fi, Front Desk Concierge, Business Lounge, Barista Refreshments.',
     url: 'https://www.ceosuite.com/locations/hongkong-k11-atelier/'
   },
   'Sunshine Financial Center': {
@@ -73,9 +55,6 @@ const centresMeta = {
     country: 'China',
     address: '31st Floor, No. 33 Jinghui Avenue, Chaoyang District, Beijing 100020, China',
     phone: '+86 (10) 8660 8888',
-    whatsapp: '',
-    transport: 'Guomao Subway Station (Line 1 & 10) in Beijing CBD core area.',
-    facilities: '24/7 Member Access, High-Speed Internet, Front Desk Secretarial Support, Conference Rooms, Ergonomic Furniture, Daily Housekeeping.',
     url: 'https://www.ceosuite.com/locations/sunshine-financial-center/'
   },
   'The Exchange Twin Towers': {
@@ -83,29 +62,20 @@ const centresMeta = {
     country: 'China',
     address: '10th Floor, B-12 Jianguomenwai Avenue, Chaoyang District, Beijing 100022, China',
     phone: '+86 (10) 5909 2988',
-    whatsapp: '',
-    transport: 'Yong\'anli Subway Station (Line 1), directly connected via underground concourse.',
-    facilities: '24/7 Member Access, Executive Boardrooms, Video Conferencing, High-Speed Wi-Fi, Front Desk Concierge, Mail & Parcel Handling.',
-    url: 'https://www.ceosuite.com/locations/beijing-the-exchange-twin-tower/'
+    url: 'https://www.ceosuite.com/locations/beijing-lg-twin-tower/'
   },
   'Lujiazui Finance Plaza': {
     city: 'Shanghai',
     country: 'China',
     address: '18th Floor, 826 Century Avenue, Pudong, Shanghai 200120, China',
     phone: '+86 (21) 5116 5116',
-    whatsapp: '',
-    transport: 'Century Avenue Metro Station (Lines 2, 4, 6, 9 quadruple interchange).',
-    facilities: '24/7 Member Access, Front Desk Reception, High-Speed Fiber Internet, Meeting Rooms, Business Lounge, Pantry Refreshments.',
-    url: 'https://www.ceosuite.com/locations/lujiazui-financial-plaza/'
+    url: 'https://www.ceosuite.com/locations/shanghai-lujiazui-financial-plaza/'
   },
   'Shanghai World Financial Center': {
     city: 'Shanghai',
     country: 'China',
     address: '28th Floor, 100 Century Avenue, Pudong, Shanghai 200120, China',
     phone: '+86 (21) 2052 0666',
-    whatsapp: '',
-    transport: 'Lujiazui Metro Station (Line 2 & Line 14) in the Lujiazui Financial Core.',
-    facilities: 'Landmark Skyscraper Location, 24/7 Member Access, Multilingual Reception, Executive Meeting Rooms, High-Speed Internet, Lounges.',
     url: 'https://www.ceosuite.com/locations/shanghai-world-financial-centre/'
   },
   'Hong Kong New World Tower (K11)': {
@@ -113,19 +83,13 @@ const centresMeta = {
     country: 'China',
     address: '47th Floor, 300 Huaihai Zhong Road, Puxi, Shanghai 200021, China',
     phone: '+86 (21) 5116 2888',
-    whatsapp: '',
-    transport: 'South Huangpi Road Metro Station (Line 1 & Line 14) in Puxi shopping & commercial district.',
-    facilities: '24/7 Member Access, Panoramic City Views, High-Speed Wi-Fi, Meeting Rooms, Business Concierge, Mail Handling.',
     url: 'https://www.ceosuite.com/locations/shanghai-puxi-hong-kong-new-world-tower/'
   },
   'Ping An Finance Center': {
     city: 'Hangzhou',
     country: 'China',
     address: '7th-9th Floor, Tower B, 159 Jiangjin Road, Shangcheng District, Hangzhou 310020, China',
-    phone: '+86 21 2052 0666',
-    whatsapp: '',
-    transport: 'Qianjiang Exchange Metro Station (Line 2 & Line 4) in Qianjiang New City CBD.',
-    facilities: '24/7 Member Access, High-Speed Internet, Multilingual Front Desk, Boardrooms, Fresh Coffee & Tea, Daily Cleaning.',
+    phone: '+86 (571) 5812 5868',
     url: 'https://www.ceosuite.com/locations/ping-an-finance-center/'
   },
   'Lkg Tower': {
@@ -133,9 +97,6 @@ const centresMeta = {
     country: 'Philippines',
     address: '37th Floor, 6801 Ayala Avenue, Makati City 1226, Philippines',
     phone: '+63 (2) 8859 2888',
-    whatsapp: '+63 93 9932 7673',
-    transport: 'Ayala Avenue, Makati Central Business District, near Ayala MRT Station.',
-    facilities: '24/7 Member Access, Business Lounge, High-Speed Fiber Internet, Meeting Rooms, Front Desk Secretarial Support, Mail Handling.',
     url: 'https://www.ceosuite.com/locations/office-space-for-rent-manila/'
   },
   'Sahid Sudirman Center': {
@@ -143,9 +104,6 @@ const centresMeta = {
     country: 'Indonesia',
     address: '56th Floor, Jl. Jend. Sudirman No. 86, Jakarta 10220, Indonesia',
     phone: '+62 (21) 8063 1888',
-    whatsapp: '+62 8111 50 836',
-    transport: 'Bendungan Hilir / Setiabudi Astra MRT Station, TransJakarta Busway Koridor 1.',
-    facilities: 'Jakarta\'s Tallest Office Tower, 24/7 Member Access, 360-Degree Panoramic Views, High-Speed Internet, Executive Boardrooms, Barista Coffee.',
     url: 'https://www.ceosuite.com/locations/jakarta-sahid-sudirman-centre/'
   },
   'Axa Tower': {
@@ -153,19 +111,13 @@ const centresMeta = {
     country: 'Indonesia',
     address: '45th Floor, Jl. Prof. Dr. Satrio Kav. 18, Kuningan City, Jakarta 12940, Indonesia',
     phone: '+62 (21) 3005 3500',
-    whatsapp: '+62 8111 50 894',
-    transport: 'Direct access to Kuningan City Mall, LRT Jabodebek Kuningan, TransJakarta Satrio.',
-    facilities: '24/7 Member Access, Modern Meeting Rooms, High-Speed Internet, Front Desk Concierge, Business Lounge, Mail & Package Handling.',
     url: 'https://www.ceosuite.com/locations/jakarta-axa/'
   },
   'Indonesia Stock Exchange Tower 2': {
     city: 'Jakarta',
     country: 'Indonesia',
-    address: '17th Floor, Tower 2, Jl. Jend. Sudirman Kav. 52-53, SCBD, Jakarta 12190, Indonesia',
+    address: '17th Floor, Jl. Jend. Sudirman Kav. 52-53, SCBD, Jakarta 12190, Indonesia',
     phone: '+62 (21) 515 7777',
-    whatsapp: '+62 8111 50 857',
-    transport: 'Istora Mandiri MRT Station, SCBD busway shuttle, direct Sudirman road access.',
-    facilities: 'Prestigious SCBD Financial Address, 24/7 Member Access, High-Speed Wi-Fi, Meeting Rooms, Multilingual Front Desk, Mail Handling.',
     url: 'https://www.ceosuite.com/locations/jakarta-stock-exchange/'
   },
   'One Pacific Place': {
@@ -173,9 +125,6 @@ const centresMeta = {
     country: 'Indonesia',
     address: '15th Floor, Jl. Jend. Sudirman Kav. 52-53, SCBD, Jakarta 12190, Indonesia',
     phone: '+62 (21) 2550 2550',
-    whatsapp: '+62 8111 50 849',
-    transport: 'Direct underground connection to Istora Mandiri MRT Station and Pacific Place Luxury Mall.',
-    facilities: 'Ultra-Premium SCBD Centre, 24/7 Member Access, Luxury Executive Boardrooms, High-Speed Fiber Internet, Barista Pantry, Concierge Support.',
     url: 'https://www.ceosuite.com/locations/jakarta-one-pacific-place/'
   },
   'Centennial Tower': {
@@ -183,9 +132,6 @@ const centresMeta = {
     country: 'Singapore',
     address: '21st Floor, 3 Temasek Avenue, Singapore 039190',
     phone: '+65 6829 7000',
-    whatsapp: '+65 9182 9667',
-    transport: 'Promenade MRT Station (Circle Line & Downtown Line Interchange), Suntec City link.',
-    facilities: '24/7 Member Access, Front Desk Reception, High-Speed Internet, Meeting Rooms, Business Lounge, Micro-Roasted Coffee, Mail Services.',
     url: 'https://www.ceosuite.com/locations/centennial-tower/'
   },
   'Kyobo Building': {
@@ -193,9 +139,6 @@ const centresMeta = {
     country: 'South Korea',
     address: '15th Floor, 1 Jongno, Jongno-gu, Seoul 03154, Korea',
     phone: '+82 (2) 2010 8888',
-    whatsapp: '+82 10 7445 8807',
-    transport: 'Direct underground walkway to Gwanghwamun Subway Station (Line 5), City Hall CBD.',
-    facilities: '24/7 Member Access, High-Speed Internet, Multilingual Front Desk, Boardrooms, Fresh Fruit Water & Coffee, Mail Handling.',
     url: 'https://www.ceosuite.com/locations/seoul-kyobo-building/'
   },
   'Parnas Tower': {
@@ -203,19 +146,13 @@ const centresMeta = {
     country: 'South Korea',
     address: '29th Floor, 521 Teheran-ro, Gangnam-gu, Seoul 06164, Korea',
     phone: '+82 (2) 2097 8288',
-    whatsapp: '+82 10 7445 8807',
-    transport: 'Direct connection to Samseong Subway Station (Line 2), COEX Convention & Mall, Grand InterContinental.',
-    facilities: 'Prime Gangnam Teheran-ro Landmark, 24/7 Member Access, High-Speed Internet, Executive Meeting Rooms, Business Lounge, Concierge Support.',
-    url: 'https://www.ceosuite.com/locations/seoul-gangnam-parnas-tower/'
+    url: 'https://www.ceosuite.com/location/south-korea-seoul/'
   },
   'Athenee Tower': {
     city: 'Bangkok',
     country: 'Thailand',
     address: '23rd Floor, 63 Wireless Road, Lumpini, Pathumwan, Bangkok 10330, Thailand',
     phone: '+66 (2) 126 8000',
-    whatsapp: '+66 83 067 8870',
-    transport: 'Ploenchit BTS Skytrain Station via covered skybridge, Wireless Road embassy district.',
-    facilities: '24/7 Member Access, Front Desk Reception, High-Speed Internet, Meeting Facilities, Business Lounge, Coffee & Refreshments, Daily Housekeeping.',
     url: 'https://www.ceosuite.com/locations/bangkok-athenee-tower/'
   },
   'Hanoi Lotte Center': {
@@ -223,22 +160,76 @@ const centresMeta = {
     country: 'Vietnam',
     address: '29th Floor, East Tower, 54 Lieu Giai Street, Ba Dinh District, Hanoi 100000, Vietnam',
     phone: '+84 (24) 3267 3999',
-    whatsapp: '+84 83 878 8999',
-    transport: 'Ba Dinh diplomatic corridor, near Kim Ma transit interchange and Daewoo Hotel.',
-    facilities: 'Landmark High-Rise, 24/7 Member Access, Panoramic City Views, High-Speed Internet, Meeting Rooms, Multilingual Secretarial Support.',
     url: 'https://www.ceosuite.com/locations/hanoi-lotte-center/'
   },
   'Vietcombank Tower': {
     city: 'Ho Chi Minh City',
     country: 'Vietnam',
-    address: 'Level 21, No. 5 Me Linh Square, Ben Nghe Ward, District 1, Ho Chi Minh City 70000, Vietnam',
+    address: 'Level 21, No. 5 Mê Linh Square, Sai Gon Ward, Ho Chi Minh City 70000, Vietnam',
     phone: '+84 (28) 3827 1988',
-    whatsapp: '+84 83 704 8668',
-    transport: 'Prime District 1 waterfront location on Me Linh Square, near Bach Dang pier.',
-    facilities: 'Grade A Waterfront Tower, 24/7 Member Access, Executive Boardrooms, High-Speed Wi-Fi, Reception Concierge, Mail & Parcel Handling.',
     url: 'https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/'
   }
 };
+
+// Operating hours come from the KB (single source of truth) so the bot never drifts from it.
+const kbCentres = JSON.parse(fs.readFileSync(path.join(__dirname, 'knowledge base', 'KB - List of Centres.json'), 'utf8'));
+const centreBrand = {
+  'Axiata Tower': 'QU7', 'Q Sentral': 'QSE', 'Manara Maxis 36': 'MMX', 'Manara Maxis 26': 'MKL',
+  'Chinachem Tower': 'WCC', 'K11 Atelier Victoria Dockside': 'KHK', 'Sunshine Financial Center': 'SUN',
+  'The Exchange Twin Towers': 'LGT', 'Lujiazui Finance Plaza': 'LJZ', 'Shanghai World Financial Center': 'SWF',
+  'Hong Kong New World Tower (K11)': 'HKN', 'Ping An Finance Center': 'PAN', 'Lkg Tower': 'LKG',
+  'Sahid Sudirman Center': 'SSC', 'Axa Tower': 'AXA', 'Indonesia Stock Exchange Tower 2': 'IDX',
+  'One Pacific Place': 'OPP', 'Centennial Tower': 'CTN', 'Kyobo Building': 'KYB', 'Parnas Tower': 'PNS',
+  'Athenee Tower': 'ATT', 'Hanoi Lotte Center': 'LCH', 'Vietcombank Tower': 'VCB'
+};
+function fmtTime(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+}
+// KB free text is rendered as HTML in the widget
+const escHtml = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// KB addresses sometimes contain markdown links: keep only the link text
+const stripMdLinks = t => String(t || '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').trim();
+// Truncated or empty map links in the KB are not shown (a broken link is worse than none)
+const usableUrl = u => /^https?:\/\//.test(u || '') && !/\.\.\.$/.test(u);
+for (const [name, meta] of Object.entries(centresMeta)) {
+  const kb = kbCentres.find(c => c.brand === centreBrand[name]);
+  if (!kb) throw new Error(`No KB entry for centre ${name}`);
+  const ci = kb.contact_information || {};
+  meta.hours = `${fmtTime(kb.operating_hours.opening_time)} – ${fmtTime(kb.operating_hours.closing_time)}`;
+  meta.address = stripMdLinks(ci.address);
+  meta.phone = ci.phone;
+  meta.fax = ci.fax || '';
+  meta.email = ci.email || '';
+  meta.url = ci.website;
+  meta.mapUrl = usableUrl(ci.location_url) ? ci.location_url : '';
+  meta.description = kb.description || '';
+  meta.amenities = kb.amenities || [];
+  meta.convenience = kb.convenience || [];
+  meta.brand = kb.brand;
+  meta.kbName = kb.centre_name;
+}
+// Cities grouped by hours, for the generic (no centre selected) answers
+const hoursByCity = new Map();
+for (const meta of Object.values(centresMeta)) {
+  if (!hoursByCity.has(meta.hours)) hoursByCity.set(meta.hours, new Set());
+  hoursByCity.get(meta.hours).add(meta.city);
+}
+const genericHours = [...hoursByCity.entries()].map(([h, cities]) => `${h} (${[...cities].join(', ')})`).join('; ');
+
+// Per-centre phone directory (phones come from centresMeta, which mirrors the KB) grouped by city
+const centresByCity = new Map();
+for (const [name, meta] of Object.entries(centresMeta)) {
+  if (!centresByCity.has(meta.city)) centresByCity.set(meta.city, []);
+  centresByCity.get(meta.city).push([name, meta]);
+}
+const NL = String.fromCharCode(10);
+const handoffHotlines = [...centresByCity.entries()].map(([city, list]) =>
+  city + NL + list.map(([n, m]) => `• ${n}: ${m.phone}`).join(NL)
+).join(NL);
+const contactDirectoryHtml = [...centresByCity.entries()].map(([city, list]) =>
+  `<b>${city}</b><br/>` + list.map(([n, m]) => `• ${n}: ${m.phone}`).join('<br/>')
+).join('<br/><br/>');
 
 // Filter out all sales form action intents (responseType === 'form')
 const filteredIntents = rawOriginal.data.intents.filter(it => it.responseType !== 'form');
@@ -265,8 +256,19 @@ filteredIntents.forEach(it => {
     else if (it.name.startsWith('DW Centre:')) productTitle = 'Dedicated Workstation';
 
     if (meta) {
-      const waDisplay = meta.whatsapp ? ` | <b>WhatsApp:</b> <a href='https://wa.me/${meta.whatsapp.replace(/[^0-9]/g, '')}'>${meta.whatsapp}</a>` : '';
-      it.response = `<div class='card'><div class='card-title'>${rawCentreName} (${meta.city}) - ${productTitle}</div><div class='small'><b>Address:</b> ${meta.address}<br/><b>Phone:</b> ${meta.phone}${waDisplay}<br/><b>Transport:</b> ${meta.transport}<br/><b>Facilities:</b> ${meta.facilities}<br/><br/>Explore space details: <a href='${meta.url}' target='_blank'>${meta.url}</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>`;
+      // Every field below comes from "KB - List of Centres.json" (see enrichment above)
+      const parts = [];
+      parts.push(`<b>Address:</b> ${escHtml(meta.address)}`);
+      if (meta.mapUrl) parts.push(`<b>Location Map:</b> <a href='${meta.mapUrl}' target='_blank'>${meta.mapUrl}</a>`);
+      parts.push(`<b>Phone:</b> ${escHtml(meta.phone)}`);
+      if (meta.fax) parts.push(`<b>Fax:</b> ${escHtml(meta.fax)}`);
+      if (meta.email) parts.push(`<b>Email:</b> <a href='mailto:${meta.email}'>${escHtml(meta.email)}</a>`);
+      parts.push(`<b>Operating Hours:</b> Monday - Friday, ${meta.hours}`);
+      if (meta.description) parts.push(`<b>About:</b> ${escHtml(meta.description).split(NL).filter(Boolean).join('<br/>')}`);
+      if (meta.convenience.length) parts.push(`<b>Convenience:</b><br/>${meta.convenience.map(c => '• ' + escHtml(c)).join('<br/>')}`);
+      if (meta.amenities.length) parts.push(`<b>Amenities:</b><br/>${meta.amenities.map(a => '• ' + escHtml(a)).join('<br/>')}`);
+      parts.push(`Explore space details: <a href='${meta.url}' target='_blank'>${meta.url}</a>`);
+      it.response = `<div class='card'><div class='card-title'>${rawCentreName} (${meta.city}) - ${productTitle}</div><div class='small'>${parts.join('<br/>')}</div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>`;
       it.options = `Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: ${rawCentreName}, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in ${meta.city}|City Directory: ${meta.city}, Start again|Start / Main Menu`;
     } else {
       it.options = `Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|CS: Contact Directory All Locations, Operating Hours & Access|Facilities: Building Access & Access Cards, Start again|Start / Main Menu`;
@@ -693,7 +695,7 @@ const csIntents = [
       "office hours"
     ],
     responseType: "options",
-    response: "<b>Access Hours & Building Security:</b><br/><br/>• <b>Reception Hours:</b> Front desk staff are on duty Monday to Friday, 8:30 AM – 6:00 PM.<br/>• <b>Member Access:</b> Private Office and Dedicated Desk members enjoy <b>24/7 secure card/key access</b>.<br/>• <b>Lost Card:</b> If you lose your access card, notify reception immediately for temporary access and card re-issuance.<br/>• <b>Visitors:</b> Guests must sign in at the front desk reception upon arrival.",
+    response: "<b>Access Hours & Building Security:</b><br/><br/>• <b>Reception Hours:</b> Front desk staff are on duty Monday to Friday. Hours depend on the centre: " + genericHours + ". Select your centre for its exact hours.<br/>• <b>Member Access:</b> Private Office and Dedicated Desk members enjoy <b>24/7 secure card/key access</b>.<br/>• <b>Lost Card:</b> If you lose your access card, notify reception immediately for temporary access and card re-issuance.<br/>• <b>Visitors:</b> Guests must sign in at the front desk reception upon arrival.",
     options: "Visitor & Guest Policy|Facilities: Visitor & Guest Policy, Mail & Courier Handling|Facilities: Mail & Courier Handling, Main Menu|Start / Main Menu",
     metadata: { category: "Facilities" }
   },
@@ -710,7 +712,7 @@ const csIntents = [
       "mail forwarding"
     ],
     responseType: "options",
-    response: "<b>Mail & Package Handling Service:</b><br/><br/>• Our reception team receives and logs all incoming mail, registered letters, and courier parcels.<br/>• Members receive prompt email or WhatsApp notifications upon delivery.<br/>• Mail forwarding and scanning services can be arranged upon request.<br/>• Mail pickup is available during staffed reception hours (Mon-Fri 8:30 AM – 6:00 PM).",
+    response: "<b>Mail & Package Handling Service:</b><br/><br/>• Our reception team receives and logs all incoming mail, registered letters, and courier parcels.<br/>• Members receive prompt email or WhatsApp notifications upon delivery.<br/>• Mail forwarding and scanning services can be arranged upon request.<br/>• Mail pickup is available during staffed reception hours (Mon-Fri; hours depend on the centre: " + genericHours + ").",
     options: "Building Access & Access Cards|Facilities: Building Access & Access Cards, Speak to CS Agent|CS: Speak to Human Agent / Live Support, Main Menu|Start / Main Menu",
     metadata: { category: "Facilities" }
   },
@@ -894,7 +896,7 @@ const csIntents = [
       "agent"
     ],
     responseType: "text",
-    response: "[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\nFor urgent support, you may also reach our hotlines directly:\n• Jakarta: +62 8111 508 481\n• Kuala Lumpur: +60 (3) 2615 0000\n• Singapore: +65 6829 7000\n• Hong Kong: +852 3166 6166\n• Beijing / Shanghai: +86 (21) 5116 5116\n• Seoul: +82 (2) 2010 8888\n• Bangkok: +66 (2) 126 8000\n• Manila: +63 (2) 8859 2888\n• Vietnam: +84 (24) 3267 3999",
+    response: "[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\nFor urgent support, you may also call the front desk of your centre directly:\n" + handoffHotlines,
     options: "",
     metadata: { handoff: true, category: "Support" }
   },
@@ -922,12 +924,11 @@ const csIntents = [
       "nomor telepon kantor",
       "daftar kontak ceo suite",
       "office phone numbers",
-      "whatsapp hotline",
       "contact front desk",
       "hubungi front desk"
     ],
     responseType: "options",
-    response: "<b>CEO SUITE Regional Contact Directory:</b><br/><br/>• <b>Indonesia (Jakarta):</b> +62 (21) 8063 1888 | WA: +62 8111 508 481<br/>• <b>Malaysia (KL):</b> +60 (3) 2615 0000 | WA: +60 12 360 6982<br/>• <b>Singapore:</b> +65 6829 7000 | WA: +65 9182 9667<br/>• <b>Hong Kong:</b> +852 3166 6166 | WA: +852 6086 6673<br/>• <b>China (Shanghai/Beijing/Hangzhou):</b> +86 (21) 5116 5116<br/>• <b>South Korea (Seoul):</b> +82 (2) 2010 8888 | WA: +82 10 7445 8807<br/>• <b>Thailand (Bangkok):</b> +66 (2) 126 8000 | WA: +66 83 067 8870<br/>• <b>Philippines (Manila):</b> +63 (2) 8859 2888 | WA: +63 93 9932 7673<br/>• <b>Vietnam (Hanoi/HCMC):</b> +84 (24) 3267 3999 | WA: +84 83 878 8999",
+    response: "<b>CEO SUITE Centre Contact Directory:</b><br/><br/>" + contactDirectoryHtml,
     options: "Speak to CS Agent|CS: Speak to Human Agent / Live Support, Our Centres & Locations|Locations: Select City, Main Menu|Start / Main Menu",
     metadata: { category: "Support" }
   },
@@ -1033,7 +1034,6 @@ const csIntents = [
 
 // --- CENTRE-SPECIFIC FRONT DESK CONTACT INTENTS ---
 const frontDeskIntents = Object.entries(centresMeta).map(([centreName, meta]) => {
-  const waDisplay = meta.whatsapp ? ` | <b>WhatsApp:</b> <a href='https://wa.me/${meta.whatsapp.replace(/[^0-9]/g, '')}'>${meta.whatsapp}</a>` : '';
 
   return {
     name: `Front Desk: ${centreName}`,
@@ -1047,7 +1047,7 @@ const frontDeskIntents = Object.entries(centresMeta).map(([centreName, meta]) =>
       `Resepsionis ${centreName}`
     ],
     responseType: "options",
-    response: `<div class='card'><div class='card-title'>Front Desk & Reception - ${centreName} (${meta.city})</div><div class='small'><b>Address:</b> ${meta.address}<br/><b>Phone:</b> ${meta.phone}${waDisplay}<br/><b>Reception Hours:</b> Monday - Friday, 8:30 AM – 6:00 PM<br/><b>Services:</b> Guest Registration, Access Cards, Meeting Room Support, Mail & Courier Handling, On-site IT Assistance.<br/><br/>Our on-duty front desk reception team at ${centreName} is ready to assist you.</div></div><div class='cta-note'>Need direct assistance from an on-duty receptionist or customer support agent? Choose an option below:</div>`,
+    response: `<div class='card'><div class='card-title'>Front Desk & Reception - ${centreName} (${meta.city})</div><div class='small'><b>Address:</b> ${meta.address}<br/><b>Phone:</b> ${meta.phone}${meta.email ? `<br/><b>Email:</b> ${meta.email}` : ''}${meta.mapUrl ? `<br/><b>Location Map:</b> <a href='${meta.mapUrl}' target='_blank'>${meta.mapUrl}</a>` : ''}<br/><b>Reception Hours:</b> Monday - Friday, ${meta.hours}<br/><b>Services:</b> Guest Registration, Access Cards, Meeting Room Support, Mail & Courier Handling, On-site IT Assistance.<br/><br/>Our on-duty front desk reception team at ${centreName} is ready to assist you.</div></div><div class='cta-note'>Need direct assistance from an on-duty receptionist or customer support agent? Choose an option below:</div>`,
     options: `Speak to Front Desk Agent|CS: Speak to Human Agent / Live Support, Operating Hours & Access|Facilities: Building Access & Access Cards, Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Other Centres in ${meta.city}|City Directory: ${meta.city}, Start again|Start / Main Menu`,
     metadata: {
       category: "Front Desk",
@@ -1121,6 +1121,66 @@ for (const intent of allIntents) {
   }
 }
 
+// 4. Free-text questions about one centre (address, map link, email, ...) land on that centre's card,
+//    which carries every KB field. Names: our short name, the KB name and the KB brand code.
+const centreQuestionTemplates = [
+  'address {n}', '{n} address', 'alamat {n}', 'alamat {n} dimana',
+  'location {n}', '{n} location', 'lokasi {n}', 'where is {n}', '{n} dimana',
+  'location link {n}', 'link lokasi {n}', 'link location {n}', 'map {n}', 'maps {n}', 'google maps {n}', 'peta {n}',
+  'email {n}', '{n} email', 'email address {n}', 'alamat email {n}',
+  'phone {n}', '{n} phone', 'telepon {n}', 'nomor telepon {n}', 'phone number {n}',
+  'fax {n}', '{n} fax',
+  'opening hours {n}', '{n} opening hours', 'operating hours {n}', 'jam buka {n}', 'jam tutup {n}', 'jam operasional {n}', 'jam buka dan tutup {n}',
+  'convenience {n}', '{n} convenience', 'transport {n}', 'transportasi {n}', 'akses transportasi {n}',
+  'amenities {n}', '{n} amenities', 'facilities {n}', 'fasilitas {n}',
+  'details {n}', 'detail {n}', 'info {n}', 'information {n}', 'about {n}', 'tentang {n}'
+];
+const kbNameCount = {};
+kbCentres.forEach(c => { kbNameCount[c.centre_name] = (kbNameCount[c.centre_name] || 0) + 1; });
+for (const intent of allIntents) {
+  const m = intent.name.match(/^PO Centre:\s*(.*)$/);
+  const meta = m && centresMeta[m[1].trim()];
+  if (!meta) continue;
+  const names = new Set([m[1].trim(), meta.brand]);
+  if (kbNameCount[meta.kbName] === 1) names.add(meta.kbName);
+  for (const n of names) {
+    for (const tpl of centreQuestionTemplates) addPhrase(intent, tpl.replace(/\{n\}/g, n));
+  }
+}
+
+// 5. City questions ("centre jakarta", "kantor di jakarta") land on that city's centre list,
+//    which is built from the KB so addresses and hours are always the KB's.
+for (const intent of allIntents) {
+  const m = intent.name.match(/^City Directory:\s*(.*)$/);
+  if (!m) continue;
+  const city = m[1].trim();
+  for (const tpl of ['centre {c}', 'center {c}', 'centres {c}', 'centers {c}', 'centre in {c}', 'center in {c}', 'centre di {c}', 'center di {c}',
+    'office {c}', 'office in {c}', 'offices in {c}', 'kantor {c}', 'kantor di {c}', 'kantor ceo suite {c}', 'ceo suite {c}', 'ceo suite di {c}',
+    'lokasi {c}', 'lokasi di {c}', 'cabang {c}', 'cabang di {c}', 'locations in {c}', 'location {c}', 'alamat {c}', 'alamat di {c}',
+    'address {c}', 'address in {c}', 'link lokasi {c}', 'location link {c}', 'email {c}', 'email centre {c}', 'email center {c}']) {
+    addPhrase(intent, tpl.replace(/\{c\}/g, city));
+  }
+  const inCity = Object.entries(centresMeta).filter(([, mt]) => mt.city === city);
+  if (inCity.length) {
+    intent.response = `Here are our ${inCity.length} prime Grade-A location${inCity.length > 1 ? 's' : ''} in ${city}. Please select a centre to view address, map link, email, convenience, amenities, and contact details:<br/><br/>` +
+      inCity.map(([n, mt]) => `<b>${n}</b><br/>${escHtml(mt.address)}<br/>Operating Hours: Monday - Friday, ${mt.hours}`).join('<br/><br/>');
+  }
+}
+
+// 6. Centre-less questions ("link lokasi", "email") -> ask which centre/city
+const selectCity = allIntents.find(i => i.name === 'Locations: Select City');
+for (const phrase of ['address', 'alamat', 'alamat centre', 'alamat kantor', 'email', 'email centre', 'email center', 'email kantor',
+  'location link', 'link lokasi', 'link location', 'google maps', 'maps', 'peta lokasi', 'phone number', 'nomor telepon']) {
+  const taken = allIntents.some(i => i !== selectCity && (i.trainingPhrases || []).some(p => p.toLowerCase().trim() === phrase));
+  if (!taken) addPhrase(selectCity, phrase);
+}
+
+// Generic hours questions (no centre named) -> access/hours answer, which lists hours per city
+const accessIntent = allIntents.find(i => i.name === 'Facilities: Building Access & Access Cards');
+for (const phrase of ['opening hours', 'closing hours', 'jam buka', 'jam tutup', 'jam buka dan tutup', 'jam operasional', 'jam kerja', 'jam buka kantor', 'jam tutup kantor']) {
+  addPhrase(accessIntent, phrase);
+}
+
 // 3. For all 23 PO Centre intents, ensure bare centre names are also recognized
 for (const intent of allIntents) {
   const m = intent.name.match(/^PO Centre:\s*(.*)$/);
@@ -1133,6 +1193,48 @@ for (const intent of allIntents) {
       addPhrase(intent, bareName.replace(/Center/g, 'Centre'));
     }
   }
+}
+
+// 7. De-duplicate training phrases so every phrase belongs to exactly one intent.
+//    The widget answers the first intent that matches, so duplicates only add noise (and the PO/MR/VO/DW
+//    copies of a name used to fight over it). Owner of a phrase: the intent named exactly like it, else the
+//    first intent that lists it.
+{
+  const norm = p => String(p).toLowerCase().trim();
+  // A centre name must open that centre's card, not the city list that merely mentions it.
+  const centrePhrases = new Set();
+  const cityNames = new Set();
+  for (const i of allIntents) {
+    if (/^PO Centre:/.test(i.name)) (i.trainingPhrases || []).forEach(p => centrePhrases.add(norm(p)));
+    const c = i.name.match(/^City Directory:\s*(.*)$/);
+    if (c) cityNames.add(norm(c[1]));
+  }
+  for (const i of allIntents) {
+    if (!/^City Directory:/.test(i.name)) continue;
+    i.trainingPhrases = (i.trainingPhrases || []).filter(p => !centrePhrases.has(norm(p)) || cityNames.has(norm(p)));
+  }
+
+  const byName = new Map(allIntents.map(i => [norm(i.name), i]));
+  const owner = new Map();
+  for (const i of allIntents) {
+    for (const p of i.trainingPhrases || []) {
+      const k = norm(p);
+      if (!owner.has(k)) owner.set(k, byName.get(k) || i);
+    }
+  }
+  let removed = 0;
+  for (const i of allIntents) {
+    const seen = new Set();
+    const before = (i.trainingPhrases || []).length;
+    i.trainingPhrases = (i.trainingPhrases || []).filter(p => {
+      const k = norm(p);
+      if (seen.has(k) || owner.get(k) !== i) return false;
+      seen.add(k);
+      return true;
+    });
+    removed += before - i.trainingPhrases.length;
+  }
+  console.log('Duplicate training phrases removed:', removed);
 }
 
 const newFlow = {

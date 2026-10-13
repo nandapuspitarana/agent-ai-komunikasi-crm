@@ -1,0 +1,817 @@
+[
+  {
+    "centre_name": "AXA Tower",
+    "brand": "AXA",
+    "amenities": [
+      "Kuningan City mega-development incorporating luxurious shopping brands, local and international restaurants",
+      "Exclusive Denpasar Residence & 2 blocks of contemporary-Balinese mixed design of residential apartments",
+      "Fitness Centre"
+    ],
+    "convenience": [
+      "5 minutes’ drive to the Sudirman Train Station",
+      "40 minutes’ drive to the Soekarno Hatta International Airport",
+      "Availability of the Transjakarta public transportation"
+    ],
+    "contact_information": {
+      "address": "45th Floor Jl.Prof.Dr.Satrio Kav 18, Kuningan Setiabudi Jakarta 12940 Indonesia",
+      "phone": "+62 21 3005 3500",
+      "fax": "+62 21 3005 3600",
+      "email": "sales@ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/jakarta-axa/",
+      "location_url": "https://www.google.com/maps?cid=606997664944143283"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Jakarta",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Mirna Pulungan",
+      "related_company": "CEO SUITE Jakarta",
+      "memo_channel": "AXA"
+    }
+  },
+  {
+    "centre_name": "Athenee Tower",
+    "brand": "ATT",
+    "amenities": [
+      "34 storeys",
+      "10 elevators",
+      "800 parking spaces",
+      "Ploenchit BTS Station",
+      "Plaza Athenee Hotel, a Luxury Collection Hotel",
+      "Athenee Residence, a luxury residential complex with 219 apartments, including 7 penthouses"
+    ],
+    "description": "Situated between Sukhumvit and Silom, this prominent tower provides premium office spaces and retail options. It offers convenient transportation links to the city's Skytrain, highway networks, and international airports, making it an ideal location for business.",
+    "contact_information": {
+      "address": "23rd Floor 63 Wireless Road, Lumpini, Pathumwan Bangkok 10330 Thailand",
+      "phone": "+66 2 126 8000",
+      "fax": "+66 2 126 8080",
+      "email": "sales@th.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/bangkok-athenee-tower/",
+      "location_url": "https://www.google.com/maps?cid=0x30e29ed700000001:0x64a02ad7aab52a16"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Bangkok",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Pim Kamonchanok",
+      "related_company": "CEO SUITE Bangkok",
+      "memo_channel": "ATT"
+    }
+  },
+  {
+    "centre_name": "Centennial Tower",
+    "brand": "CTN",
+    "amenities": [
+      "This luxurious business center is designed with feng-shui principles and boasts unobstructed waterfront views of Marina Bay and lush green skyline from its reception, lounge and boardroom."
+    ],
+    "convenience": [
+      "2 mins to Promenade MRT Station (Circle Line & Downtown Line)",
+      "14 passenger lifts and 2 carpark lifts",
+      "Access to cafes, restaurants, Suntec convention centre and retail shops",
+      "17 mins to Changi International Airport by car"
+    ],
+    "contact_information": {
+      "address": "21st Floor 3 Temasek Avenue Singapore 039190 Singapore",
+      "phone": "+65 6829 7000",
+      "fax": "+65 6829 7070",
+      "email": "sales@sg.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/centennial-tower/",
+      "location_url": "https://www.google.com/maps?cid=0x31da19153079d8ab:0xda2b79c97e717912"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Singapore",
+      "opening_time": "09:00",
+      "closing_time": "18:00"
+    },
+    "management": {
+      "centre_manager": "Shander Lim",
+      "related_company": "CEO SUITE Singapore",
+      "memo_channel": "CTN"
+    }
+  },
+  {
+    "centre_name": "Chinachem Tower",
+    "brand": "WCC",
+    "amenities": [
+      "Prime location in the heart of Central, Hong Kong",
+      "Newly refurbished 23-storey commercial building, strategically located at the junction of Connaught Road Central and Pottinger Street",
+      "Just a 3-minute walk from Central MTR Station",
+      "Excellent connectivity to major transport links, including the Airport Express at Hong Kong Station",
+      "Wide range of nearby amenities, including banks, restaurants, shopping outlets, serviced apartments, and hotels"
+    ],
+    "contact_information": {
+      "address": "Level 5 to Level 7 No 34-37 Connaught Rd Central, Central Hong Kong Hong Kong",
+      "phone": "+852 3166 6160",
+      "fax": "+852 3166 6266",
+      "email": "sales@hk.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/chinachem-tower/",
+      "location_url": "https://www.google.com/maps?cid=0x3404010eefb45cbb:0xd3a035046e271427"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Hong_Kong",
+      "opening_time": "09:00",
+      "closing_time": "18:00"
+    },
+    "management": {
+      "centre_manager": "Carman Chan",
+      "related_company": "Work Wise Hong Kong WCC",
+      "memo_channel": "WCC"
+    }
+  },
+  {
+    "centre_name": "Hong Kong New World Tower",
+    "brand": "HKN",
+    "description": "Operating from the 47th floor of this iconic 61-story landmark, the center provides sweeping views of the Huangpu River. Designed as a prominent hub where commerce meets culture, it features modern IT infrastructure and an elegant art deco style.",
+    "amenities": [
+      "61 storeys",
+      "14 elevators",
+      "350 parking spaces",
+      "Huangpi-Nan-Lu Station"
+    ],
+    "contact_information": {
+      "address": "47th floor 300 Huaihai Zhong Road, Puxi Shanghai 200021 China",
+      "phone": "+86 21 5116 2888",
+      "fax": "+86 21 5116 2882",
+      "email": "sales@cn.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/shanghai-puxi-hong-kong-new-world-tower/",
+      "location_url": "https://j.map.baidu.com/00/aRR"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Shanghai",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Lena Li",
+      "related_company": "CEO SUITE Shanghai HKN",
+      "memo_channel": "HKN"
+    }
+  },
+  {
+    "centre_name": "Indonesia Stock Exchange Tower 2",
+    "brand": "IDX",
+    "amenities": [
+      "Most iconic building in Indonesia – the Indonesia Stock Exchange Tower",
+      "International banks",
+      "Assortment of fusion and Asian restaurants",
+      "Medical facilities"
+    ],
+    "convenience": [
+      "Close distance to MRT station",
+      "30-minutes ride to the Soekarno International Airport",
+      "7 exit points linking major highways"
+    ],
+    "contact_information": {
+      "address": "17th Floor Jl. Jend. Sudirman Kav. 52-53 Jakarta 12190 Indonesia",
+      "phone": "+62 21 515 7777",
+      "fax": "+62 21 515 7799",
+      "email": "sales@ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/jakarta-stock-exchange/",
+      "location_url": "https://www.google.com/maps?cid=8800365899341255005"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Jakarta",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Camelia Pratiwi",
+      "related_company": "CEO SUITE Jakarta",
+      "memo_channel": "IDX"
+    }
+  },
+  {
+    "centre_name": "K11 ATELIER Victoria Dockside",
+    "brand": "KHK",
+    "amenities": [
+      "Prime Waterfront Location With Iconic Views of the Victoria Harbour, A Brand New Commercial and Retail Complex open in 2019 with the Newest 6 STAR Rosewood Hotel and K11 Musea Retail Arcade",
+      "Luxurious Lift Lobby, Office Clients can display Company signage at 7/F Lift Lobby",
+      "Business Lounge with Stunning Harbor View next to Reception with Professional Concierge Services to Create the best image for your company",
+      "Choice of different style private offices including Most functional office, Superb Garden and Sea View Team space and Manager Suite",
+      "Premium Coworking & Professional Meeting room Space with Personalised Support Services",
+      "Impressive Corporate Meeting Spaces with Victoria Harbour view"
+    ],
+    "contact_information": {
+      "address": "Level 7 18 Salisbury Road, Tsim Sha Tsui Hong Kong Hong Kong",
+      "phone": "+852 3166 6166",
+      "fax": "+852 3166 6266",
+      "email": "sales@hk.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/hongkong-k11-atelier/",
+      "location_url": "https://www.google.com/maps?cid=0x340401593248fd69:0xa83e7cb54de9b66"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Hong_Kong",
+      "opening_time": "09:00",
+      "closing_time": "18:00"
+    },
+    "management": {
+      "centre_manager": "Esther Yee",
+      "related_company": "CEO SUITE Hong Kong",
+      "memo_channel": "KHK"
+    }
+  },
+  {
+    "centre_name": "Kyobo Building",
+    "brand": "KYB",
+    "amenities": [
+      "Seoul's most iconic building",
+      "Safe and eco-friendly building",
+      "Korea's largest bookstore & resources",
+      "Top-class restaurant provide a VIP business space",
+      "On-manned security with direct access from lobby to the office floor",
+      "Close to landmark sightseeing of largest art & culture hall, palace, plaza and presidential house"
+    ],
+    "convenience": [
+      "Direct access to subway lines 1,2, and 5",
+      "49 km / 50 minutes drive to Incheon International Airport",
+      "Subway access via Line 5 to Gimpo & Incheon International Airports",
+      "10 minutes from Seoul Train Station"
+    ],
+    "contact_information": {
+      "address": "15th Floor, 1 Jongno, Jongno-gu Seoul 03154 South Korea",
+      "phone": "+82 2 2010 8888",
+      "fax": "+82 2 2010 8899",
+      "email": "sales@kr.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/seoul-kyobo-building/",
+      "location_url": "https://www.google.com/maps?cid=0x357ca2ec8f950e43:0x65a0419e54ab8a4f"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Seoul",
+      "opening_time": "09:00",
+      "closing_time": "18:00"
+    },
+    "management": {
+      "centre_manager": "Alice Lim",
+      "related_company": "CEO SUITE Seoul",
+      "memo_channel": "KYB"
+    }
+  },
+  {
+    "centre_name": "Lotte Center Hanoi",
+    "brand": "LCH",
+    "description": "Centrally located in Hanoi, this prominent skyscraper blends modern architecture with sustainable design, serving as a dynamic hub for both business and leisure.",
+    "convenience": [
+      "30 minutes from Noi Bai airport by car",
+      "5-10 minutes from Hoan Kiem district by car",
+      "Lotte Department Store",
+      "Five-star Lotte Hotel & Apartment Hanoi",
+      "Big MNEs and Embassies are within walking distance"
+    ],
+    "contact_information": {
+      "address": "29th Floor East Tower 54 Lieu Giai street, Giang Vo ward Hanoi 100000 Vietnam",
+      "phone": "+84 24 3267 3999",
+      "fax": "+84 24 3267 3799",
+      "email": "sales@vn.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/hanoi-lotte-center/",
+      "location_url": "https://www.google.com/maps?cid=0x3135abdee2edbf05:0xf79994ae815ad25a"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Ho_Chi_Minh",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Pham Thi Huyen Hau",
+      "related_company": "CEO SUITE Hanoi",
+      "memo_channel": "LCH"
+    }
+  },
+  {
+    "centre_name": "Twin Towers (East)",
+    "brand": "LGT",
+    "amenities": [
+      "International Grade A Office Facilities",
+      "Centrally located in the heart of the business district; premium location.",
+      "Unique Twin Tower designed by USA SOM.",
+      "Customized office solution as customer's need.",
+      "Multi-options of restaurant, bank, hotel, service apartment, shopping mall, consulate...in walking distance."
+    ],
+    "convenience": [
+      "Iconic landmark building.",
+      "Excellent accessibility ; directly connecting with subway.",
+      "Sophisticated contemporary and modern interior design & ambience.",
+      "Completely equipped with the latest IT & Telecommunications system.",
+      "Comfortable business lounges, conferences, boardrooms with great street view."
+    ],
+    "contact_information": {
+      "address": "10th Floor B 12 Jianguomenwai Avenue Beijing 100022 China",
+      "phone": "+86 10 5909 2988",
+      "fax": "+86 10 5909 2999",
+      "email": "salesbj@cn.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/beijing-lg-twin-tower/",
+      "location_url": "https://j.map.baidu.com/a6/aIq"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Shanghai",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Bella Ren",
+      "related_company": "CEO SUITE Beijing",
+      "memo_channel": "LGT"
+    }
+  },
+  {
+    "centre_name": "Shanghai Lujiazui Finance Plaza",
+    "brand": "LJZ",
+    "description": "Situated on Level 18 with an exclusive balcony, this facility is located in the Lujiazui Free Trade Zone. It offers convenient access to a shopping mall, dining, fitness centers, nearby 5-star luxury hotels, and an outdoor sunken garden suitable for meetings and events.",
+    "amenities": [
+      "20 storeys",
+      "12 elevators",
+      "1,500 parking spaces"
+    ],
+    "convenience": [
+      "Dongchang Road Station & Shangcheng Road Station",
+      "Excellent direct access to 2 subway stations and 6-line bus terminal",
+      "5-minute drive to Fuxing Road Tunnel and Renmin Road Tunnel"
+    ],
+    "contact_information": {
+      "address": "18th Floor 826 Century Avenue, Pudong Shanghai 200120 China",
+      "phone": "+86 21 5116 5116",
+      "fax": "+86 21 5116 7116",
+      "email": "sales@cn.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/shanghai-lujiazui-financial-plaza/",
+      "location_url": "https://j.map.baidu.com/c2/iR1"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Shanghai",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Sherry Chen",
+      "related_company": "CEO SUITE Shanghai LJZ",
+      "memo_channel": "LJZ"
+    }
+  },
+  {
+    "centre_name": "LKG Tower",
+    "brand": "LKG",
+    "amenities": [
+      "Located in the heart of Makati City's financial district on the 37th floor",
+      "Modern 39-story, 591-foot Grade A building design"
+    ],
+    "convenience": [
+      "Approximately 5 kilometers from Ninoy Aquino International Airport",
+      "Within walking distance to the Philippine Stock Exchange and other major landmarks",
+      "Accessible to various forms of public transportation",
+      "Short 5 to 10-minute walk to luxury accommodations including Manila Peninsula Hotel, Shangri-La Makati, and New World Hotel"
+    ],
+    "contact_information": {
+      "address": "37th Floor 6801 Ayala Avenue, Makati City Manila 1226 Philippines",
+      "phone": "+63 2 8859 2888",
+      "fax": "+63 2 8859 2882",
+      "email": "sales@ph.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/office-space-for-rent-manila/",
+      "location_url": "https://www.google.com/maps?cid=0x3397c90948a0cb81:0x3b8c85c66173544c"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Manila",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Patricia Cruz",
+      "related_company": "CEO SUITE Manila",
+      "memo_channel": "LKG"
+    }
+  },
+  {
+    "centre_name": "Menara Maxis",
+    "brand": "MKL",
+    "amenities": [
+      "Kuala Lumpur’s largest upmarket mall, KLCC",
+      "Malaysian Philharmonic Orchestra Hall",
+      "Petronas Science Centre",
+      "City’s largest Convention Centre"
+    ],
+    "convenience": [
+      "Next to world’s famous Petronas Twin Towers",
+      "Close to all major embassies",
+      "7-star luxurious hotels within walking distance",
+      "Direct walking access to subway station (KLCC station)",
+      "60.5 km / 53 minutes drive to Kuala Lumpur International Airport"
+    ],
+    "contact_information": {
+      "address": "Level 26 Kuala Lumpur City Centre Kuala Lumpur 50088 Malaysia",
+      "phone": "+60 3 2615 2688",
+      "fax": "+60 3 2615 2699",
+      "email": "sales@my.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/kuala-lumpur-maxis-26th/",
+      "location_url": "https://www.google.com/maps?cid=0x31cc37d12e3090ab:0x5e22d46c91163024"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Kuala_Lumpur",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Carrie Law",
+      "related_company": "CEO SUITE Kuala Lumpur",
+      "memo_channel": "MKL"
+    }
+  },
+  {
+    "centre_name": "Menara Maxis",
+    "brand": "MMX",
+    "amenities": [
+      "Kuala Lumpur’s largest upmarket mall, KLCC",
+      "Malaysian Philharmonic Orchestra Hall",
+      "Petronas Science Centre",
+      "City’s largest Convention Centre"
+    ],
+    "convenience": [
+      "Next to world’s famous Petronas Twin Towers",
+      "Close to all major embassies",
+      "7-star luxurious hotels within walking distance",
+      "Direct walking access to subway station (KLCC station)",
+      "60.5 km / 53 minutes drive to Kuala Lumpur International Airport"
+    ],
+    "contact_information": {
+      "address": "Level 36 Kuala Lumpur City Centre Kuala Lumpur 50088 Malaysia",
+      "phone": "+60 3 2615 0000",
+      "fax": "+60 3 2615 0088",
+      "email": "sales@my.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/kuala-lumpur-maxis-36th/",
+      "location_url": "https://www.google.com/maps?cid=0x31cc37d12e3090ab:0x5e22d46c91163024"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Kuala_Lumpur",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Carrie Law",
+      "related_company": "CEO SUITE Kuala Lumpur",
+      "memo_channel": "MMX"
+    }
+  },
+  {
+    "centre_name": "Nan Fung Tower",
+    "brand": "WNF",
+    "amenities": [
+      "Prime location in the heart of Central, Hong Kong",
+      "Newly refurbished 23-storey commercial building, strategically located at the junction of Connaught Road Central and Pottinger Street",
+      "Just a 3-minute walk from Central MTR Station",
+      "Excellent connectivity to major transport links, including the Airport Express at Hong Kong Station",
+      "Wide range of nearby amenities, including banks, restaurants, shopping outlets, serviced apartments, and hotels"
+    ],
+    "contact_information": {
+      "address": "Level 21 & 23, 88 Connaught Road Central, Sheung Wan Hong Kong Hong Kong",
+      "phone": "+852 3166 6166",
+      "fax": "+852 3166 6266",
+      "email": "sales@hk.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/nanfung-tower/",
+      "location_url": "https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Hong_Kong",
+      "opening_time": "09:00",
+      "closing_time": "18:00"
+    },
+    "management": {
+      "centre_manager": "",
+      "related_company": "Work Wise Hong Kong WNF",
+      "memo_channel": "WNF"
+    }
+  },
+  {
+    "centre_name": "One Pacific Place",
+    "brand": "OPP",
+    "amenities": [
+      "Luxurious 5-star Ritz Carlton Hotel",
+      "Upscale mega mall, the Pacific Place Mall featuring many first class international restaurants, and boutiques",
+      "Grand multi-function hall, elite spa"
+    ],
+    "convenience": [
+      "Close distance to MRT station",
+      "30-minutes ride to the Jakarta Soekarno International Airport",
+      "7 exit points linking major highways"
+    ],
+    "contact_information": {
+      "address": "15th Floor Jl. Jend. Sudirman Kav. [52-53 Jakarta](https://www.ceosuite.com/locations/jakarta-one-pacific-place/) 12190 Indonesia",
+      "phone": "+62 21 2550 2550",
+      "fax": "+62 21 2550 2555",
+      "email": "sales@ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/jakarta-one-pacific-place/",
+      "location_url": "https://www.google.com/maps?cid=808921101083265832"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Jakarta",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Shinta Permatasari",
+      "related_company": "CEO SUITE Jakarta",
+      "memo_channel": "OPP"
+    }
+  },
+  {
+    "centre_name": "Ping An Finance Center",
+    "brand": "PAN",
+    "description": "Located on the 7th to 9th floors of the iconic Ping An Finance Center, in the heart of Qianjiang New City CBD, CEO SUITE Hangzhou offers the latest in premium workspace solutions – including private office suites, coworking spaces, video conferencing rooms, meeting and conference facilities, phone booths, and networking lounges – all equipped with cutting-edge IT and telecommunications systems.\n\nSpanning an impressive 6,200 square meters across three interconnected floors with internal stairways, the space is designed to promote seamless collaboration and flexibility. It also features three fully equipped server room – built to support technology companies and clients with data-intensive operational requirements.\n\nThis newest location is directly connected to Yuefang Mall and is adjacent to major landmarks such as the Citizen Center, Hangzhou Grand Theatre, and the International Conference Center. Facing south, it offers a serene view of the rippling Qiantang River.\n\nThe workspace includes a wide range of thoughtfully designed shared amenities such as meeting rooms, relaxation lounges, quiet zones, tea rooms, printing areas, phone booths, and comfortable breakout spaces – all crafted to create a dynamic, inspiring environment that redefines the traditional office experience.\n\nCEO SUITE also provides meeting room rentals, virtual offices, and tailored serviced office solutions for businesses of all sizes.",
+    "amenities": [
+      "31 storeys (Tower B)",
+      "12 passenger lifts, 2 cargo lifts, and 2 parking elevators",
+      "1,500 parking bays",
+      "Direct access to cafés, restaurants, fitness centers, event spaces, and retail shops",
+      "30 minutes by car to West Lake (Xi Hu)",
+      "15 minutes by car to Hangzhou Railway Station",
+      "20 minutes by car to Hangzhou East Railway Station",
+      "30 minutes by car to Hangzhou Xiaoshan International Airport",
+      "5–10 minutes’ walk to Metro Line 4 (Jiangjin Road Station), and access to Lines 2 and 9 (Qianjiang Road Station)"
+    ],
+    "contact_information": {
+      "address": "7th - 9th Floor Tower B, 159, Jiangjin Road, Shangcheng District Hangzhou 310020 China",
+      "phone": "+86 (571) 5812 5868",
+      "fax": "+86 21 2052 0777",
+      "email": "saleshz@cn.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/ping-an-finance-center/",
+      "location_url": ""
+    },
+    "operating_hours": {
+      "timezone": "Asia/Shanghai",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "",
+      "related_company": "CEO SUITE Hangzhou",
+      "memo_channel": "PAN"
+    }
+  },
+  {
+    "centre_name": "Parnas Tower",
+    "brand": "PNS",
+    "amenities": [
+      "Landmark building in an upmarket location at COEX",
+      "Directly connected to Parnas InterContinental Hotel, and Korea’s most luxurious COEX mall, Parnas Malls and Hyundai Department Store - a comprehensive array of dining and shopping options for day and night",
+      "Iconic famous book store at Starfield mall"
+    ],
+    "convenience": [
+      "Direct underground subway connection via Line 2 & 9",
+      "1 minutes walk to City Airport",
+      "40 minutes via the Airport Railroad Express (AREX)"
+    ],
+    "contact_information": {
+      "address": "29th Floor, 521 Teheran-ro, Gangnam-gu Seoul 06164 South Korea",
+      "phone": "+82 2 2097 8288",
+      "fax": "+82 2 2097 8299",
+      "email": "sales@kr.ceosuite.com",
+      "website": "https://www.ceosuite.com/location/south-korea-seoul/",
+      "location_url": "https://www.google.com/maps?cid=0x357ca44017962321:0xabecd6f821919a2b"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Seoul",
+      "opening_time": "09:00",
+      "closing_time": "18:00"
+    },
+    "management": {
+      "centre_manager": "Erica Kim",
+      "related_company": "CEO SUITE Seoul",
+      "memo_channel": "PNS"
+    }
+  },
+  {
+    "centre_name": "Q Sentral",
+    "brand": "QSE",
+    "amenities": [
+      "Iconic landmark building with Multimedia Super Corridor (MSC) compliance",
+      "Considered a Green Building, Q Sentral was designed by the award-winning MRCB Group and became the World Gold Winner 2014 in the Sustainable Development category",
+      "“City-within-city” built around KL’s largest transportation hub with direct link to the KL International Airport",
+      "International dining outlets, banks and hotels",
+      "Sports and recreational facilities"
+    ],
+    "convenience": [
+      "KLIA express, LRT, KTM, Monorail and MRT",
+      "59 km / 50 minutes drive to Kuala Lumpur International Airport (KLIA)",
+      "28 minutes by KLIA express train direct to KL International Airport"
+    ],
+    "contact_information": {
+      "address": "Level 35-02 (East Wing) 2A, Jalan Stesen Sentral 2, KL Sentral [Kuala Lumpur](https://c-suite.ceosuite.com/web?#id=11&model=center.city) 50470 Malaysia",
+      "phone": "+60 3 2731 9388",
+      "fax": "+60 3 2731 9399",
+      "email": "sales@my.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/kuala-lumpur-q-sentral/",
+      "location_url": "https://www.google.com/maps?cid=0x31cc49c0de13995f:0xb49b4c3f4c5bb8d1"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Kuala_Lumpur",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Sy Chiann Pan",
+      "related_company": "CEO SUITE Kuala Lumpur",
+      "memo_channel": "QSE"
+    }
+  },
+  {
+    "centre_name": "Axiata Tower",
+    "brand": "QU7",
+    "amenities": [
+      "First private building in KL Sentral to be awarded Multimedia Super Corridor (MSC) status",
+      "Best corporate building award 2010 for office development category",
+      "International dining outlets, banks and hotels",
+      "Sports and recreational facilities"
+    ],
+    "convenience": [
+      "KLIA express, LRT, KTM, Monorail and MRT",
+      "59 km / 50 minutes drive to Kuala Lumpur International Airport (KLIA)",
+      "28 minutes by KLIA express train direct to KL International Airport"
+    ],
+    "contact_information": {
+      "address": "27th Floor 9 Jalan Stesen Sentral 5, KL Sentral Kuala Lumpur 50470 Malaysia",
+      "phone": "+60 3 2776 6888",
+      "fax": "+60 3 2776 6999",
+      "email": "sales@my.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/kuala-lumpur-axiata-tower/",
+      "location_url": "https://www.google.com/maps?cid=0x31cc49c05464fa55:0x30c8b9154443671"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Kuala_Lumpur",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Jessy Woo",
+      "related_company": "CEO SUITE Kuala Lumpur",
+      "memo_channel": "QU7"
+    }
+  },
+  {
+    "centre_name": "Singapore Land Tower",
+    "brand": "SLT",
+    "amenities": [
+      "One of the pioneer buildings in the heart of Singapore’s Central Business District, Raffles Place",
+      "Home to bluechip multinational companies",
+      "Penthouse lifestyle hub consisting of Empire (an upscale bar lounge), a steakhouse, Oyster Bar and a modern Japanese Restaurant"
+    ],
+    "convenience": [
+      "100 meters to Boat Quay",
+      "Busy entertainment district with bars, lounges & eateries",
+      "Home to all major banks and financial institutions",
+      "Adjacent to the Raffles Place MRT Station",
+      "17 km / 25 minutes drive to Changi International Airport"
+    ],
+    "contact_information": {
+      "address": "37th Floor 50 Raffles Place Singapore 048623 Singapore",
+      "phone": "+65 6829 7000",
+      "fax": "+65 6829 7070",
+      "email": "sales@sg.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/singapore-land-tower/",
+      "location_url": "https://goo.gl/maps/UFRLLBnA5vpRN6858"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Singapore",
+      "opening_time": "09:00",
+      "closing_time": "18:00"
+    },
+    "management": {
+      "centre_manager": "Christina Lim",
+      "related_company": "CEO SUITE Singapore",
+      "memo_channel": "SLT"
+    }
+  },
+  {
+    "centre_name": "Sahid Sudirman Center",
+    "brand": "SSC",
+    "amenities": [
+      "Tallest building in Jakarta at 258 meters",
+      "Stunningly elegant, clad in glass and aluminum curtain wall",
+      "Within the same complex and direct adjecent from basement level of 5 Stars Sahid Jaya Hotel and Sahid Sudirman Residence",
+      "A total of 1,300 car parking spaces on 6 levels above the lobby and 5 levels underground"
+    ],
+    "convenience": [
+      "Close distance to MRT station",
+      "Easy access to-and-from the Jakarta Soekarno International Airport."
+    ],
+    "contact_information": {
+      "address": "56th Floor Jl. Jenderal Sudirman No. 86 Jakarta 10220 Indonesia",
+      "phone": "+62 21 8063 1888",
+      "fax": "+62 21 8063 1999",
+      "email": "sales@ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/jakarta-sahid-sudirman-centre/",
+      "location_url": "https://www.google.com/maps?cid=10002666713572393788"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Jakarta",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Camelia Pratiwi",
+      "related_company": "CEO SUITE Jakarta",
+      "memo_channel": "SSC"
+    }
+  },
+  {
+    "centre_name": "Sunshine Financial Center",
+    "brand": "SUN",
+    "amenities": [
+      "International Grade A Office Facilities",
+      "Centrally located in the heart of the business district; premium location.",
+      "Unique Twin Tower designed by USA SOM",
+      "Customized office solution as customer's need",
+      "Multi-options of restaurant, bank, hotel, service apartment, shopping mall, consulate...in walking distance"
+    ],
+    "convenience": [
+      "Iconic landmark building",
+      "Excellent accessibility ; directly connecting with subway",
+      "Sophisticated contemporary and modern interior design & ambience",
+      "Completely equipped with the latest IT & Telecommunications system",
+      "Comfortable business lounges, conferences, boardrooms with great street view"
+    ],
+    "contact_information": {
+      "address": "31st Floor, No. 33 Jinghui Avenue, Chaoyang Beijing 100020 China",
+      "phone": "+86 10 8660 8888",
+      "fax": "+86 10 8660 8999",
+      "email": "salesbj@cn.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/sunshine-financial-center/",
+      "location_url": ""
+    },
+    "operating_hours": {
+      "timezone": "Asia/Shanghai",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Bella Ren",
+      "related_company": "CEO SUITE Beijing",
+      "memo_channel": "SUN"
+    }
+  },
+  {
+    "centre_name": "Shanghai World Financial Center",
+    "brand": "SWF",
+    "description": "With CEO SUITE's largest location on its 28th floor, this 101-storey business landmark was designed to be a city-within-a-city. The world's second largest hotel, the elegant Park Hyatt Shanghai, offers views of the sprawling skyline or the Huangpu River and is complimented by spectacular observation decks, a spa, media center, shopping malls and 70 storeys dedicated for serviced office space. Inside our office space, timeless feng shui elements are employed in order to optimize business success.",
+    "amenities": [
+      "101 storeys",
+      "31 elevators",
+      "1,100 parking spaces",
+      "3 observation decks",
+      "Lujiazui Station",
+      "38 mins to Shanghai Pudong International Airport"
+    ],
+    "contact_information": {
+      "address": "28th Floor 100 Century Avenue, Pudong New Area Shanghai 200120 China",
+      "phone": "+86 21 2052 0666",
+      "fax": "+86 21 2052 0777",
+      "email": "sales@cn.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/shanghai-world-financial-centre/",
+      "location_url": "https://j.map.baidu.com/e8/ILJJ"
+    },
+    "operating_hours": {
+      "timezone": "Asia/Shanghai",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Sherry Chen",
+      "related_company": "CEO SUITE Shanghai SWF",
+      "memo_channel": "SWF"
+    }
+  },
+  {
+    "centre_name": "Vietcombank Tower",
+    "brand": "VCB",
+    "amenities": [
+      "International Grade A Office Facilities",
+      "Centrally located in the heart of the business district; premium location.",
+      "Designed by Pelli Clarke Pelli Architects (USA)",
+      "Customized office solution as customer's need",
+      "Multi-options of restaurant, bank, hotel, service apartment, shopping mall, consulate...in walking distance"
+    ],
+    "convenience": [
+      "Iconic landmark building, 2nd tallest skyscraper in Ho Chi Minh City",
+      "Excellent accessibility ; 5 mins walk to future MRT line",
+      "Sophisticated contemporary and modern interior design & ambience",
+      "Completely equipped with the latest IT & Telecommunications system",
+      "Opulent business lounges, conferences, boardrooms with breathtaking viewing of Saigon River"
+    ],
+    "contact_information": {
+      "address": "Level 21 No. 5 Mê Linh Square, Sai Gon ward Ho Chi Minh City 70000 Vietnam",
+      "phone": "+84 28 3827 1988",
+      "fax": "+84 28 3827 1899",
+      "email": "sales@vn.ceosuite.com",
+      "website": "https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/",
+      "location_url": "https://www.google.com/maps?cid=0x31752fe6b9a273b3:0x713bb1cfecac7..."
+    },
+    "operating_hours": {
+      "timezone": "Asia/Ho_Chi_Minh",
+      "opening_time": "08:30",
+      "closing_time": "17:30"
+    },
+    "management": {
+      "centre_manager": "Hana Nguyen",
+      "related_company": "CEO SUITE Ho Chi Minh City",
+      "memo_channel": "VCB"
+    }
+  }
+]

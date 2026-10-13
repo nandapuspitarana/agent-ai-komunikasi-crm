@@ -12,7 +12,6 @@ Controlled centre identity:
 - Centre: Jakarta IDX
 - Address: Controlled address not yet captured in this file.
 - Telepon: +62 (21) 515 7777
-- WhatsApp: +62 8111 50 857
 - Email: sales@ceosuite.com
 - Latitude: -6.22402
 - Longitude: 106.80867

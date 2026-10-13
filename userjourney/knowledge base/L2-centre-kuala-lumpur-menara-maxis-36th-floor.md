@@ -14,7 +14,6 @@ Controlled centre identity:
 - Centre: Menara Maxis (36th Floor)
 - Address: 36th Floor, KLCC, Kuala Lumpur 50088
 - Telepon: +60 3 2615 0000
-- WhatsApp: +60 (12) 360 6982
 - Email: sales@my.ceosuite.com
 - Latitude: 3.15800
 - Longitude: 101.71306
