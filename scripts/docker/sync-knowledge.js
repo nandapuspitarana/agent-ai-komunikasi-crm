@@ -12,7 +12,9 @@
  *
  * Environment:
  *   KB_SYNC            "false" to skip everything (default: true)
- *   KB_TENANT_ID       tenant to load into. Default: the tenant that already owns the flow, else the only tenant.
+ *   KB_TENANT_ID       tenant id(s) to load into: "<id>", "<id>,<id>" or "all". Default: tenants that already own
+ *                      the flow, else the only tenant. With several tenants and no owner nothing is loaded
+ *                      (a warning lists them) - run with --list-tenants to see ids.
  *   KB_ALIGN_LANGUAGE  "false" to leave tenant.visitorConfig.language alone (default: true = when this flow is the
  *                      tenant's active flow, the tenant language follows the flow's language, so the report form,
  *                      handoff texts and bot replies are not a mix of English and Indonesian)
@@ -20,7 +22,8 @@
  *                      "force" - activate on every sync
  *                      "false" - never touch the tenant's active flow
  *
- * Flags: --dry-run  build the plan from the files and print it, without touching the database.
+ * Flags: --dry-run       build the plan from the files and print it, without touching the database.
+ *        --list-tenants  print tenants (id, language, active flow) and exit.
  */
 
 const fs = require('fs');
@@ -34,6 +37,7 @@ const KB_DIR = path.join(ROOT, 'userjourney', 'knowledge base');
 const BOT_NAME = 'Claire CEOSUITE';
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const LIST_TENANTS = process.argv.includes('--list-tenants');
 const log = (...a) => console.log('[sync-knowledge]', ...a);
 
 function buildPlan() {
@@ -95,19 +99,39 @@ function buildPlan() {
   };
 }
 
-async function resolveTenant(prisma, flowNames) {
-  const wanted = process.env.KB_TENANT_ID;
+// Returns the tenants to load into. Several tenants may exist (one per centre), so this never guesses:
+//   KB_TENANT_ID = "<id>[,<id>...]" | "all"  -> exactly those tenants
+//   unset                                    -> tenants that already own the flow, else the only tenant
+async function resolveTenants(prisma, flowNames) {
+  const wanted = (process.env.KB_TENANT_ID || '').trim();
+  if (wanted.toLowerCase() === 'all') return prisma.tenant.findMany({ orderBy: { createdAt: 'asc' } });
   if (wanted) {
-    const t = await prisma.tenant.findUnique({ where: { id: wanted } });
-    if (!t) throw new Error(`KB_TENANT_ID=${wanted} does not exist`);
-    return t;
+    const ids = wanted.split(',').map(x => x.trim()).filter(Boolean);
+    const found = await prisma.tenant.findMany({ where: { id: { in: ids } } });
+    const missing = ids.filter(id => !found.some(t => t.id === id));
+    if (missing.length) throw new Error(`KB_TENANT_ID refers to unknown tenant(s): ${missing.join(', ')}`);
+    return found;
   }
-  const owned = await prisma.flow.findFirst({ where: { name: { in: flowNames } }, include: { tenant: true } });
-  if (owned) return owned.tenant;
-  const tenants = await prisma.tenant.findMany({ take: 2 });
-  if (tenants.length === 1) return tenants[0];
-  if (tenants.length === 0) return null;
-  throw new Error('More than one tenant exists and none owns the flow yet - set KB_TENANT_ID');
+  const owners = await prisma.flow.findMany({ where: { name: { in: flowNames } }, include: { tenant: true } });
+  if (owners.length) {
+    const seen = new Map();
+    owners.forEach(f => seen.set(f.tenant.id, f.tenant));
+    return [...seen.values()];
+  }
+  const tenants = await prisma.tenant.findMany({ orderBy: { createdAt: 'asc' } });
+  if (tenants.length <= 1) return tenants;
+  log(`WARNING: ${tenants.length} tenants exist and none has this flow yet, so NOTHING was loaded.`);
+  log('         Set KB_TENANT_ID (comma separated ids, or "all") in .env and restart. Tenants:');
+  for (const t of tenants) log(`           ${t.id}  "${t.name}"  language=${(t.visitorConfig && t.visitorConfig.language) || 'unset'}`);
+  return [];
+}
+
+async function listTenants(prisma) {
+  const tenants = await prisma.tenant.findMany({ orderBy: { createdAt: 'asc' }, include: { activeFlow: true } });
+  for (const t of tenants) {
+    const lang = (t.visitorConfig && t.visitorConfig.language) || 'unset';
+    log(`${t.id}  "${t.name}"  language=${lang}  activeFlow=${t.activeFlow ? `"${t.activeFlow.name}"` : 'none'}`);
+  }
 }
 
 async function syncFlow(prisma, plan, tenant) {
@@ -299,15 +323,29 @@ async function main() {
   const { PrismaClient } = require('@prisma/client');
   const prisma = new PrismaClient();
   try {
-    const flowNames = [plan.flowJson.data.name, `${plan.flowJson.data.name} (Imported)`];
-    const tenant = await resolveTenant(prisma, flowNames);
-    if (!tenant) {
-      log('No tenant exists yet. Create the tenant/admin first, then restart the container to load the flow and knowledge base.');
+    if (LIST_TENANTS) {
+      await listTenants(prisma);
       return;
     }
-    log(`tenant: "${tenant.name}" (${tenant.id})`);
-    const flow = await syncFlow(prisma, plan, tenant);
-    await syncKnowledge(prisma, plan, tenant, await prisma.flow.findUnique({ where: { id: flow.id } }));
+    const flowNames = [plan.flowJson.data.name, `${plan.flowJson.data.name} (Imported)`];
+    const tenants = await resolveTenants(prisma, flowNames);
+    if (!tenants.length) {
+      log('No tenant to load into. Create the tenant/admin first, or set KB_TENANT_ID, then restart the container.');
+      return;
+    }
+    for (const tenant of tenants) {
+      try {
+        log(`tenant: "${tenant.name}" (${tenant.id})`);
+        const flow = await syncFlow(prisma, plan, tenant);
+        await syncKnowledge(prisma, plan, tenant, await prisma.flow.findUnique({ where: { id: flow.id } }));
+        const after = await prisma.tenant.findUnique({ where: { id: tenant.id }, include: { activeFlow: true } });
+        const lang = (after.visitorConfig && after.visitorConfig.language) || 'unset';
+        log(`  result: activeFlow="${after.activeFlow ? after.activeFlow.name : 'none'}" language=${lang}`);
+      } catch (err) {
+        console.error(`[sync-knowledge] tenant ${tenant.id} failed:`, err && err.message ? err.message : err);
+        process.exitCode = 1;
+      }
+    }
   } finally {
     await prisma.$disconnect();
   }

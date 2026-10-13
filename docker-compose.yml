@@ -24,7 +24,7 @@ services:
       # Flow + knowledge base baked into the image are loaded into the database on every start
       # (scripts/docker/sync-knowledge.js). Only changed content is rewritten.
       KB_SYNC: ${KB_SYNC:-true}                    # "false" to skip
-      KB_TENANT_ID: ${KB_TENANT_ID:-}              # optional; default = tenant that owns the flow / the only tenant
+      KB_TENANT_ID: ${KB_TENANT_ID:-}              # tenant id(s), comma separated, or "all". Required when several tenants exist
       KB_ACTIVATE_FLOW: ${KB_ACTIVATE_FLOW:-true}  # true = on first creation, force = every start, false = never
       KB_ALIGN_LANGUAGE: ${KB_ALIGN_LANGUAGE:-true}  # tenant language follows the active flow's language (en)
     restart: always
