@@ -50,6 +50,13 @@ const centresMeta = {
     phone: '+852 3166 6166',
     url: 'https://www.ceosuite.com/locations/hongkong-k11-atelier/'
   },
+  'Nan Fung Tower': {
+    city: 'Hong Kong',
+    country: 'China',
+    address: 'Level 21 & 23, 88 Connaught Road Central, Sheung Wan, Hong Kong',
+    phone: '+852 3166 6166',
+    url: 'https://www.ceosuite.com/locations/nanfung-tower/'
+  },
   'Sunshine Financial Center': {
     city: 'Beijing',
     country: 'China',
@@ -134,6 +141,13 @@ const centresMeta = {
     phone: '+65 6829 7000',
     url: 'https://www.ceosuite.com/locations/centennial-tower/'
   },
+  'Singapore Land Tower': {
+    city: 'Singapore',
+    country: 'Singapore',
+    address: '37th Floor, 50 Raffles Place, Singapore 048623',
+    phone: '+65 6829 7000',
+    url: 'https://www.ceosuite.com/locations/singapore-land-tower/'
+  },
   'Kyobo Building': {
     city: 'Seoul',
     country: 'South Korea',
@@ -175,11 +189,11 @@ const centresMeta = {
 const kbCentres = JSON.parse(fs.readFileSync(path.join(__dirname, 'knowledge base', 'KB - List of Centres.json'), 'utf8'));
 const centreBrand = {
   'Axiata Tower': 'QU7', 'Q Sentral': 'QSE', 'Manara Maxis 36': 'MMX', 'Manara Maxis 26': 'MKL',
-  'Chinachem Tower': 'WCC', 'K11 Atelier Victoria Dockside': 'KHK', 'Sunshine Financial Center': 'SUN',
+  'Chinachem Tower': 'WCC', 'K11 Atelier Victoria Dockside': 'KHK', 'Nan Fung Tower': 'WNF', 'Sunshine Financial Center': 'SUN',
   'The Exchange Twin Towers': 'LGT', 'Lujiazui Finance Plaza': 'LJZ', 'Shanghai World Financial Center': 'SWF',
   'Hong Kong New World Tower (K11)': 'HKN', 'Ping An Finance Center': 'PAN', 'Lkg Tower': 'LKG',
   'Sahid Sudirman Center': 'SSC', 'Axa Tower': 'AXA', 'Indonesia Stock Exchange Tower 2': 'IDX',
-  'One Pacific Place': 'OPP', 'Centennial Tower': 'CTN', 'Kyobo Building': 'KYB', 'Parnas Tower': 'PNS',
+  'One Pacific Place': 'OPP', 'Centennial Tower': 'CTN', 'Singapore Land Tower': 'SLT', 'Kyobo Building': 'KYB', 'Parnas Tower': 'PNS',
   'Athenee Tower': 'ATT', 'Hanoi Lotte Center': 'LCH', 'Vietcombank Tower': 'VCB'
 };
 function fmtTime(hhmm) {
@@ -233,6 +247,21 @@ const contactDirectoryHtml = [...centresByCity.entries()].map(([city, list]) =>
 
 // Filter out all sales form action intents (responseType === 'form')
 const filteredIntents = rawOriginal.data.intents.filter(it => it.responseType !== 'form');
+
+// Add PO, MR, VO, and DW intents for extra centres from KB not present in original rawOriginal
+const extraCentres = ['Nan Fung Tower', 'Singapore Land Tower'];
+for (const ec of extraCentres) {
+  for (const pfx of ['PO', 'MR', 'VO', 'DW']) {
+    filteredIntents.push({
+      name: `${pfx} Centre: ${ec}`,
+      trainingPhrases: [`${pfx} Centre: ${ec}`, `${ec} ${pfx}`],
+      responseType: 'options',
+      response: '',
+      options: '',
+      metadata: { centre: ec, product: pfx }
+    });
+  }
+}
 
 // Process existing intents to remove sales phrasing and inject rich CS support options
 filteredIntents.forEach(it => {
@@ -695,7 +724,7 @@ const csIntents = [
       "office hours"
     ],
     responseType: "options",
-    response: "<b>Access Hours & Building Security:</b><br/><br/>• <b>Reception Hours:</b> Front desk staff are on duty Monday to Friday. Hours depend on the centre: " + genericHours + ". Select your centre for its exact hours.<br/>• <b>Member Access:</b> Private Office and Dedicated Desk members enjoy <b>24/7 secure card/key access</b>.<br/>• <b>Lost Card:</b> If you lose your access card, notify reception immediately for temporary access and card re-issuance.<br/>• <b>Visitors:</b> Guests must sign in at the front desk reception upon arrival.",
+    response: "<b>Access Hours & Building Security:</b><br/><br/>• <b>Reception Hours:</b> Front desk staff are on duty Monday to Friday. Hours depend on the centre:<br/>&nbsp;&nbsp;– <b>8:30 AM – 5:30 PM:</b> Jakarta (Indonesia), Kuala Lumpur, Bangkok, Manila, Hanoi, Ho Chi Minh City, Beijing, Shanghai, Hangzhou<br/>&nbsp;&nbsp;– <b>9:00 AM – 6:00 PM:</b> Hong Kong, Singapore, Seoul<br/><i>(Select your centre below for exact reception hours and contacts)</i><br/>• <b>Member Access:</b> Private Office and Dedicated Desk members enjoy <b>24/7 secure card/key access</b>.<br/>• <b>Lost Card:</b> If you lose your access card, notify reception immediately for temporary access and card re-issuance.<br/>• <b>Visitors:</b> Guests must sign in at the front desk reception upon arrival.",
     options: "Visitor & Guest Policy|Facilities: Visitor & Guest Policy, Mail & Courier Handling|Facilities: Mail & Courier Handling, Main Menu|Start / Main Menu",
     metadata: { category: "Facilities" }
   },
@@ -712,7 +741,7 @@ const csIntents = [
       "mail forwarding"
     ],
     responseType: "options",
-    response: "<b>Mail & Package Handling Service:</b><br/><br/>• Our reception team receives and logs all incoming mail, registered letters, and courier parcels.<br/>• Members receive prompt email or WhatsApp notifications upon delivery.<br/>• Mail forwarding and scanning services can be arranged upon request.<br/>• Mail pickup is available during staffed reception hours (Mon-Fri; hours depend on the centre: " + genericHours + ").",
+    response: "<b>Mail & Package Handling Service:</b><br/><br/>• Our reception team receives and logs all incoming mail, registered letters, and courier parcels.<br/>• Members receive prompt email or WhatsApp notifications upon delivery.<br/>• Mail forwarding and scanning services can be arranged upon request.<br/>• Mail pickup is available during staffed reception hours (Monday - Friday; 8:30 AM – 5:30 PM for Jakarta, KL, Bangkok, Manila, Vietnam, China; 9:00 AM – 6:00 PM for Hong Kong, Singapore, Seoul).",
     options: "Building Access & Access Cards|Facilities: Building Access & Access Cards, Speak to CS Agent|CS: Speak to Human Agent / Live Support, Main Menu|Start / Main Menu",
     metadata: { category: "Facilities" }
   },
@@ -952,18 +981,18 @@ const csIntents = [
   },
   {
     name: "City Directory: Singapore",
-    trainingPhrases: ["singapore", "in singapore", "singapore office", "centennial tower", "other centres in singapore"],
+    trainingPhrases: ["singapore", "in singapore", "singapore office", "centennial tower", "singapore land tower", "other centres in singapore"],
     responseType: "options",
-    response: "Here is our flagship centre in Singapore. Select below for full details:",
-    options: "Centennial Tower|PO Centre: Centennial Tower, Other Cities|Locations: Select City",
+    response: "Here are our 2 prime Grade-A locations in Singapore. Please select a centre:",
+    options: "Centennial Tower|PO Centre: Centennial Tower, Singapore Land Tower|PO Centre: Singapore Land Tower, Other Cities|Locations: Select City",
     metadata: { city: "Singapore" }
   },
   {
     name: "City Directory: Hong Kong",
-    trainingPhrases: ["hong kong", "in hong kong", "centres in hong kong", "other centres in hong kong"],
+    trainingPhrases: ["hong kong", "in hong kong", "centres in hong kong", "chinachem tower", "k11 atelier", "nan fung tower", "other centres in hong kong"],
     responseType: "options",
-    response: "Here are our premium centres in Hong Kong. Please select a centre:",
-    options: "Chinachem Tower|PO Centre: Chinachem Tower, K11 Atelier Victoria Dockside|PO Centre: K11 Atelier Victoria Dockside, Other Cities|Locations: Select City",
+    response: "Here are our 3 premium centres in Hong Kong. Please select a centre:",
+    options: "Chinachem Tower|PO Centre: Chinachem Tower, K11 Atelier Victoria Dockside|PO Centre: K11 Atelier Victoria Dockside, Nan Fung Tower|PO Centre: Nan Fung Tower, Other Cities|Locations: Select City",
     metadata: { city: "Hong Kong" }
   },
   {

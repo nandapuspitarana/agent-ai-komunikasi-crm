@@ -54,7 +54,7 @@ describe('Docker knowledge sync (scripts/docker/sync-knowledge.js)', () => {
       encoding: 'utf8',
       env: { ...process.env, DATABASE_URL: '' },
     });
-    expect(out).toContain('220 intents');
+    expect(out).toContain('230 intents');
     expect(out).toContain('KB - List of Centres.json -> Directory - List of Centres');
     expect(out).toContain('skipped: KB - List of Centres.xlsx');
     expect(out).toContain('KB - Pricing Table.xlsx');

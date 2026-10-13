@@ -63,4 +63,48 @@ describe('visitor-config (ContactFormConfig)', () => {
     expect(configId.contactForm?.buttonLabel).toBe('Kirim Email ke Perusahaan');
     expect(configId.contactForm?.categories).toContain('Pertanyaan Umum');
   });
+
+  it('translates Indonesian defaults to English when tenant language is English', () => {
+    const configWithIdDefaults = {
+      language: 'en',
+      leadFormTitle: 'Boleh kami tahu sedikit tentang Anda?',
+      contactForm: {
+        formTitle: 'Hubungi Perusahaan / Laporan',
+        buttonLabel: 'Kirim Email ke Perusahaan',
+        categories: [
+          'Pertanyaan Umum',
+          'Layanan & Fasilitas',
+          'Kendala Teknis',
+          'Billing & Pembayaran',
+          'Kemitraan',
+          'Lainnya',
+        ],
+      },
+    };
+
+    const resolved = getVisitorConfig(configWithIdDefaults);
+    expect(resolved.leadFormTitle).toBe('May we know a little about you?');
+    expect(resolved.contactForm?.formTitle).toBe('Contact Company / Report Issue');
+    expect(resolved.contactForm?.buttonLabel).toBe('Send Email to Company');
+    expect(resolved.contactForm?.categories).toContain('General Inquiry');
+    expect(resolved.contactForm?.categories).not.toContain('Pertanyaan Umum');
+  });
+
+  it('preserves user custom titles and categories regardless of language setting', () => {
+    const custom = {
+      language: 'en',
+      leadFormTitle: 'Custom Questionnaire',
+      contactForm: {
+        formTitle: 'Custom Issue Reporter',
+        buttonLabel: 'Send Custom Alert',
+        categories: ['Custom Category 1', 'Custom Category 2'],
+      },
+    };
+
+    const resolved = getVisitorConfig(custom);
+    expect(resolved.leadFormTitle).toBe('Custom Questionnaire');
+    expect(resolved.contactForm?.formTitle).toBe('Custom Issue Reporter');
+    expect(resolved.contactForm?.buttonLabel).toBe('Send Custom Alert');
+    expect(resolved.contactForm?.categories).toEqual(['Custom Category 1', 'Custom Category 2']);
+  });
 });

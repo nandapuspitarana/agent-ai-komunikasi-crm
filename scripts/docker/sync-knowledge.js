@@ -136,7 +136,7 @@ async function listTenants(prisma) {
 
 async function syncFlow(prisma, plan, tenant) {
   const { name, description, config, metadata, intents } = plan.flowJson.data;
-  const flowNames = [name, `${name} (Imported)`];
+  const flowNames = [name, `${name} (Imported)`, BOT_NAME];
   const activate = (process.env.KB_ACTIVATE_FLOW || 'true').toLowerCase();
 
   let flow = await prisma.flow.findFirst({ where: { tenantId: tenant.id, name: { in: flowNames } } });
@@ -154,7 +154,7 @@ async function syncFlow(prisma, plan, tenant) {
   if (!flow || meta.sourceHash !== plan.flowHash) {
     flow = await prisma.$transaction(async tx => {
       const data = {
-        name,
+        name: flow ? flow.name : name,
         description: description || null,
         config: cfg,
         metadata: { ...(metadata || {}), ...meta, sourceHash: plan.flowHash },
@@ -206,9 +206,15 @@ async function syncFlow(prisma, plan, tenant) {
       const vc = fresh.visitorConfig && typeof fresh.visitorConfig === 'object' && !Array.isArray(fresh.visitorConfig)
         ? fresh.visitorConfig : {};
       if (String(vc.language || '').toLowerCase() !== flowLang) {
+        const isId = flowLang.startsWith('id');
+        const leadFormTitle = !vc.leadFormTitle ||
+          (!isId && vc.leadFormTitle === 'Boleh kami tahu sedikit tentang Anda?') ||
+          (isId && vc.leadFormTitle === 'May we know a little about you?')
+            ? (isId ? 'Boleh kami tahu sedikit tentang Anda?' : 'May we know a little about you?')
+            : vc.leadFormTitle;
         await prisma.tenant.update({
           where: { id: tenant.id },
-          data: { visitorConfig: { ...vc, language: flowLang } },
+          data: { visitorConfig: { ...vc, language: flowLang, leadFormTitle } },
         });
         log(`tenant language set to "${flowLang}" to match the flow (was "${vc.language || 'unset'}")`);
       }
@@ -226,8 +232,9 @@ async function syncKnowledge(prisma, plan, tenant, flow) {
   }
 
   const tables = await prisma.$queryRawUnsafe(`
-    SELECT to_regclass('public.crm_documents') AS docs, to_regclass('public.crm_document_chunks') AS chunks,
-           to_regclass('public.documents') AS legacy
+    SELECT to_regclass('public.crm_documents')::text AS docs,
+           to_regclass('public.crm_document_chunks')::text AS chunks,
+           to_regclass('public.documents')::text AS legacy
   `);
   if (!tables[0].docs || !tables[0].chunks || !tables[0].legacy) {
     log('WARNING: public.crm_documents / crm_document_chunks / documents not found in this database.');
@@ -327,7 +334,7 @@ async function main() {
       await listTenants(prisma);
       return;
     }
-    const flowNames = [plan.flowJson.data.name, `${plan.flowJson.data.name} (Imported)`];
+    const flowNames = [plan.flowJson.data.name, `${plan.flowJson.data.name} (Imported)`, BOT_NAME];
     const tenants = await resolveTenants(prisma, flowNames);
     if (!tenants.length) {
       log('No tenant to load into. Create the tenant/admin first, or set KB_TENANT_ID, then restart the container.');

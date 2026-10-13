@@ -38,7 +38,7 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
   it('TEST-CS-01 Flow metadata and intent counts are valid', () => {
     expect(flowData.type).toBe('agent_flow');
     expect(flowData.data.name).toBe('CEO SUITE Customer Service & Support Flow');
-    expect(intents.length).toBe(220);
+    expect(intents.length).toBe(230);
 
     // Verify all sales forms are removed
     const formIntents = intents.filter((i: any) => i.responseType === 'form');
@@ -178,7 +178,7 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
     }
   });
 
-  it('TEST-CS-06 All 23 centre cards display address, contact and hours', () => {
+  it('TEST-CS-06 All 25 centre cards display address, contact and hours', () => {
     const expectedCentres = [
       'Axiata Tower',
       'Q Sentral',
@@ -186,6 +186,7 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
       'Manara Maxis 26',
       'Chinachem Tower',
       'K11 Atelier Victoria Dockside',
+      'Nan Fung Tower',
       'Sunshine Financial Center',
       'The Exchange Twin Towers',
       'Lujiazui Finance Plaza',
@@ -198,6 +199,7 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
       'Indonesia Stock Exchange Tower 2',
       'One Pacific Place',
       'Centennial Tower',
+      'Singapore Land Tower',
       'Kyobo Building',
       'Parnas Tower',
       'Athenee Tower',
@@ -327,6 +329,7 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
       MKL: 'Manara Maxis 26',
       WCC: 'Chinachem Tower',
       KHK: 'K11 Atelier Victoria Dockside',
+      WNF: 'Nan Fung Tower',
       SUN: 'Sunshine Financial Center',
       LGT: 'The Exchange Twin Towers',
       LJZ: 'Lujiazui Finance Plaza',
@@ -339,6 +342,7 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
       IDX: 'Indonesia Stock Exchange Tower 2',
       OPP: 'One Pacific Place',
       CTN: 'Centennial Tower',
+      SLT: 'Singapore Land Tower',
       KYB: 'Kyobo Building',
       PNS: 'Parnas Tower',
       ATT: 'Athenee Tower',
@@ -346,8 +350,8 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
       VCB: 'Vietcombank Tower'
     };
 
-    // Present in the KB but not yet offered by the bot (no city menu entry / centre card).
-    const kbCentresNotInFlow = ['SLT', 'WNF'];
+    // All KB centres are now fully offered in the flow
+    const kbCentresNotInFlow: string[] = [];
 
     const to12h = (hhmm: string) => {
       const [h, m] = hhmm.split(':').map(Number);
@@ -415,9 +419,9 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
     const usable = (u: string) => /^https?:\/\//.test(u || '') && !/\.\.\.$/.test(u);
     const brandToCity: Record<string, string> = {
       QU7: 'Kuala Lumpur', QSE: 'Kuala Lumpur', MMX: 'Kuala Lumpur', MKL: 'Kuala Lumpur',
-      WCC: 'Hong Kong', KHK: 'Hong Kong', SUN: 'Beijing', LGT: 'Beijing',
+      WCC: 'Hong Kong', KHK: 'Hong Kong', WNF: 'Hong Kong', SUN: 'Beijing', LGT: 'Beijing',
       LJZ: 'Shanghai', SWF: 'Shanghai', HKN: 'Shanghai', PAN: 'Hangzhou', LKG: 'Manila',
-      SSC: 'Jakarta', AXA: 'Jakarta', IDX: 'Jakarta', OPP: 'Jakarta', CTN: 'Singapore',
+      SSC: 'Jakarta', AXA: 'Jakarta', IDX: 'Jakarta', OPP: 'Jakarta', CTN: 'Singapore', SLT: 'Singapore',
       KYB: 'Seoul', PNS: 'Seoul', ATT: 'Bangkok', LCH: 'Hanoi', VCB: 'Ho Chi Minh City'
     };
 

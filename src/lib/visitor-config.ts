@@ -200,15 +200,46 @@ export function getVisitorConfig(tenantVisitorConfig: any, preferredLang?: strin
   }
 
   const effectiveLang = (parsedConfig.language || preferredLang || 'en').toLowerCase();
-  const defaultContactForm = effectiveLang.startsWith('id')
+  const isId = effectiveLang.startsWith('id');
+  const defaultContactForm = isId
     ? DEFAULT_CONTACT_FORM_CONFIG_ID
     : DEFAULT_CONTACT_FORM_CONFIG_EN;
+
+  const rawLeadTitle = parsedConfig.leadFormTitle;
+  const leadFormTitle = !rawLeadTitle ||
+    (!isId && rawLeadTitle === 'Boleh kami tahu sedikit tentang Anda?') ||
+    (isId && rawLeadTitle === 'May we know a little about you?')
+      ? (isId ? 'Boleh kami tahu sedikit tentang Anda?' : 'May we know a little about you?')
+      : rawLeadTitle;
+
+  const rawFormTitle = parsedConfig.contactForm?.formTitle;
+  const resolvedFormTitle = !rawFormTitle ||
+    (!isId && rawFormTitle === 'Hubungi Perusahaan / Laporan') ||
+    (isId && rawFormTitle === 'Contact Company / Report Issue')
+      ? defaultContactForm.formTitle
+      : rawFormTitle;
+
+  const rawButtonLabel = parsedConfig.contactForm?.buttonLabel;
+  const resolvedButtonLabel = !rawButtonLabel ||
+    (!isId && rawButtonLabel === 'Kirim Email ke Perusahaan') ||
+    (isId && rawButtonLabel === 'Send Email to Company')
+      ? defaultContactForm.buttonLabel
+      : rawButtonLabel;
+
+  const rawCats = parsedConfig.contactForm?.categories;
+  const isDefaultIdCats = Array.isArray(rawCats) &&
+    JSON.stringify(rawCats) === JSON.stringify(DEFAULT_CONTACT_FORM_CONFIG_ID.categories);
+  const isDefaultEnCats = Array.isArray(rawCats) &&
+    JSON.stringify(rawCats) === JSON.stringify(DEFAULT_CONTACT_FORM_CONFIG_EN.categories);
+  const resolvedCats = !rawCats || rawCats.length === 0 || (!isId && isDefaultIdCats) || (isId && isDefaultEnCats)
+    ? defaultContactForm.categories
+    : rawCats;
 
   return {
     ...DEFAULT_VISITOR_CONFIG,
     ...parsedConfig,
-    language: parsedConfig.language || (effectiveLang.startsWith('id') ? 'id' : 'en'),
-    leadFormTitle: parsedConfig.leadFormTitle || (effectiveLang.startsWith('id') ? 'Boleh kami tahu sedikit tentang Anda?' : 'May we know a little about you?'),
+    language: parsedConfig.language || (isId ? 'id' : 'en'),
+    leadFormTitle,
     scoreWeights: {
       ...DEFAULT_VISITOR_CONFIG.scoreWeights,
       ...(parsedConfig.scoreWeights || {})
@@ -218,9 +249,9 @@ export function getVisitorConfig(tenantVisitorConfig: any, preferredLang?: strin
     contactForm: {
       ...defaultContactForm,
       ...(parsedConfig.contactForm || {}),
-      categories: parsedConfig.contactForm?.categories && parsedConfig.contactForm.categories.length > 0
-        ? parsedConfig.contactForm.categories
-        : defaultContactForm.categories,
+      formTitle: resolvedFormTitle,
+      buttonLabel: resolvedButtonLabel,
+      categories: resolvedCats,
     },
     emailConfig: {
       ...DEFAULT_EMAIL_CONFIG,

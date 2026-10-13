@@ -95,26 +95,43 @@ class ContactFunnelStrings {
     String? language,
   }) {
     final base = ContactFunnelStrings.fromLocale(language);
+    final isId = (language ?? '').toLowerCase().startsWith('id');
     final formTitle = contactFormConfig?['formTitle']?.toString();
     final buttonLabel = contactFormConfig?['buttonLabel']?.toString();
     final rawCats = contactFormConfig?['categories'];
     List<String>? parsedCats;
     if (rawCats is List && rawCats.isNotEmpty) {
-      parsedCats = rawCats.map((c) => c.toString()).toList();
+      final list = rawCats.map((c) => c.toString()).toList();
+      final isDefaultIdCats = list.isNotEmpty && list.first == 'Pertanyaan Umum';
+      final isDefaultEnCats = list.isNotEmpty && list.first == 'General Inquiry';
+      if ((!isId && isDefaultIdCats) || (isId && isDefaultEnCats)) {
+        parsedCats = null;
+      } else {
+        parsedCats = list;
+      }
     }
 
+    final resolvedTitle = (formTitle != null &&
+            formTitle.trim().isNotEmpty &&
+            formTitle != (!isId ? 'Hubungi Perusahaan / Laporan' : 'Contact Company / Report Issue'))
+        ? formTitle
+        : base.title;
+
+    final resolvedSubmit = (buttonLabel != null &&
+            buttonLabel.trim().isNotEmpty &&
+            buttonLabel != 'Send Email to Company' &&
+            buttonLabel != 'Kirim Email ke Perusahaan' &&
+            buttonLabel != (!isId ? 'Kirim Laporan' : 'Submit Report'))
+        ? buttonLabel
+        : base.submit;
+
     return ContactFunnelStrings(
-      title: (formTitle != null && formTitle.trim().isNotEmpty) ? formTitle : base.title,
+      title: resolvedTitle,
       categoryLabel: base.categoryLabel,
       descriptionLabel: base.descriptionLabel,
       descriptionPlaceholder: base.descriptionPlaceholder,
       cancel: base.cancel,
-      submit: (buttonLabel != null &&
-              buttonLabel.trim().isNotEmpty &&
-              buttonLabel != 'Send Email to Company' &&
-              buttonLabel != 'Kirim Email ke Perusahaan')
-          ? buttonLabel
-          : base.submit,
+      submit: resolvedSubmit,
       submitting: base.submitting,
       required: base.required,
       failedSubmit: base.failedSubmit,

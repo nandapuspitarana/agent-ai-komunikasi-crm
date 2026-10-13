@@ -504,7 +504,7 @@
           "jam tutup kantor"
         ],
         "responseType": "options",
-        "response": "<b>Access Hours & Building Security:</b><br/><br/>• <b>Reception Hours:</b> Front desk staff are on duty Monday to Friday. Hours depend on the centre: 8:30 AM – 5:30 PM (Kuala Lumpur, Beijing, Shanghai, Hangzhou, Manila, Jakarta, Bangkok, Hanoi, Ho Chi Minh City); 9:00 AM – 6:00 PM (Hong Kong, Singapore, Seoul). Select your centre for its exact hours.<br/>• <b>Member Access:</b> Private Office and Dedicated Desk members enjoy <b>24/7 secure card/key access</b>.<br/>• <b>Lost Card:</b> If you lose your access card, notify reception immediately for temporary access and card re-issuance.<br/>• <b>Visitors:</b> Guests must sign in at the front desk reception upon arrival.",
+        "response": "<b>Access Hours & Building Security:</b><br/><br/>• <b>Reception Hours:</b> Front desk staff are on duty Monday to Friday. Hours depend on the centre:<br/>&nbsp;&nbsp;– <b>8:30 AM – 5:30 PM:</b> Jakarta (Indonesia), Kuala Lumpur, Bangkok, Manila, Hanoi, Ho Chi Minh City, Beijing, Shanghai, Hangzhou<br/>&nbsp;&nbsp;– <b>9:00 AM – 6:00 PM:</b> Hong Kong, Singapore, Seoul<br/><i>(Select your centre below for exact reception hours and contacts)</i><br/>• <b>Member Access:</b> Private Office and Dedicated Desk members enjoy <b>24/7 secure card/key access</b>.<br/>• <b>Lost Card:</b> If you lose your access card, notify reception immediately for temporary access and card re-issuance.<br/>• <b>Visitors:</b> Guests must sign in at the front desk reception upon arrival.",
         "options": "Visitor & Guest Policy|Facilities: Visitor & Guest Policy, Mail & Courier Handling|Facilities: Mail & Courier Handling, Main Menu|Start / Main Menu",
         "metadata": {
           "category": "Facilities"
@@ -524,7 +524,7 @@
           "Facilities: Mail & Courier Handling"
         ],
         "responseType": "options",
-        "response": "<b>Mail & Package Handling Service:</b><br/><br/>• Our reception team receives and logs all incoming mail, registered letters, and courier parcels.<br/>• Members receive prompt email or WhatsApp notifications upon delivery.<br/>• Mail forwarding and scanning services can be arranged upon request.<br/>• Mail pickup is available during staffed reception hours (Mon-Fri; hours depend on the centre: 8:30 AM – 5:30 PM (Kuala Lumpur, Beijing, Shanghai, Hangzhou, Manila, Jakarta, Bangkok, Hanoi, Ho Chi Minh City); 9:00 AM – 6:00 PM (Hong Kong, Singapore, Seoul)).",
+        "response": "<b>Mail & Package Handling Service:</b><br/><br/>• Our reception team receives and logs all incoming mail, registered letters, and courier parcels.<br/>• Members receive prompt email or WhatsApp notifications upon delivery.<br/>• Mail forwarding and scanning services can be arranged upon request.<br/>• Mail pickup is available during staffed reception hours (Monday - Friday; 8:30 AM – 5:30 PM for Jakarta, KL, Bangkok, Manila, Vietnam, China; 9:00 AM – 6:00 PM for Hong Kong, Singapore, Seoul).",
         "options": "Building Access & Access Cards|Facilities: Building Access & Access Cards, Speak to CS Agent|CS: Speak to Human Agent / Live Support, Main Menu|Start / Main Menu",
         "metadata": {
           "category": "Facilities"
@@ -736,7 +736,7 @@
           "Speak to Front Desk Agent"
         ],
         "responseType": "text",
-        "response": "[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\nFor urgent support, you may also call the front desk of your centre directly:\nKuala Lumpur\n• Axiata Tower: +60 3 2776 6888\n• Q Sentral: +60 3 2731 9388\n• Manara Maxis 36: +60 3 2615 0000\n• Manara Maxis 26: +60 3 2615 2688\nHong Kong\n• Chinachem Tower: +852 3166 6160\n• K11 Atelier Victoria Dockside: +852 3166 6166\nBeijing\n• Sunshine Financial Center: +86 10 8660 8888\n• The Exchange Twin Towers: +86 10 5909 2988\nShanghai\n• Lujiazui Finance Plaza: +86 21 5116 5116\n• Shanghai World Financial Center: +86 21 2052 0666\n• Hong Kong New World Tower (K11): +86 21 5116 2888\nHangzhou\n• Ping An Finance Center: +86 (571) 5812 5868\nManila\n• Lkg Tower: +63 2 8859 2888\nJakarta\n• Sahid Sudirman Center: +62 21 8063 1888\n• Axa Tower: +62 21 3005 3500\n• Indonesia Stock Exchange Tower 2: +62 21 515 7777\n• One Pacific Place: +62 21 2550 2550\nSingapore\n• Centennial Tower: +65 6829 7000\nSeoul\n• Kyobo Building: +82 2 2010 8888\n• Parnas Tower: +82 2 2097 8288\nBangkok\n• Athenee Tower: +66 2 126 8000\nHanoi\n• Hanoi Lotte Center: +84 24 3267 3999\nHo Chi Minh City\n• Vietcombank Tower: +84 28 3827 1988",
+        "response": "[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\nFor urgent support, you may also call the front desk of your centre directly:\nKuala Lumpur\n• Axiata Tower: +60 3 2776 6888\n• Q Sentral: +60 3 2731 9388\n• Manara Maxis 36: +60 3 2615 0000\n• Manara Maxis 26: +60 3 2615 2688\nHong Kong\n• Chinachem Tower: +852 3166 6160\n• K11 Atelier Victoria Dockside: +852 3166 6166\n• Nan Fung Tower: +852 3166 6166\nBeijing\n• Sunshine Financial Center: +86 10 8660 8888\n• The Exchange Twin Towers: +86 10 5909 2988\nShanghai\n• Lujiazui Finance Plaza: +86 21 5116 5116\n• Shanghai World Financial Center: +86 21 2052 0666\n• Hong Kong New World Tower (K11): +86 21 5116 2888\nHangzhou\n• Ping An Finance Center: +86 (571) 5812 5868\nManila\n• Lkg Tower: +63 2 8859 2888\nJakarta\n• Sahid Sudirman Center: +62 21 8063 1888\n• Axa Tower: +62 21 3005 3500\n• Indonesia Stock Exchange Tower 2: +62 21 515 7777\n• One Pacific Place: +62 21 2550 2550\nSingapore\n• Centennial Tower: +65 6829 7000\n• Singapore Land Tower: +65 6829 7000\nSeoul\n• Kyobo Building: +82 2 2010 8888\n• Parnas Tower: +82 2 2097 8288\nBangkok\n• Athenee Tower: +66 2 126 8000\nHanoi\n• Hanoi Lotte Center: +84 24 3267 3999\nHo Chi Minh City\n• Vietcombank Tower: +84 28 3827 1988",
         "options": "",
         "metadata": {
           "handoff": true,
@@ -776,7 +776,7 @@
           "CS: Contact Directory All Locations"
         ],
         "responseType": "options",
-        "response": "<b>CEO SUITE Centre Contact Directory:</b><br/><br/><b>Kuala Lumpur</b><br/>• Axiata Tower: +60 3 2776 6888<br/>• Q Sentral: +60 3 2731 9388<br/>• Manara Maxis 36: +60 3 2615 0000<br/>• Manara Maxis 26: +60 3 2615 2688<br/><br/><b>Hong Kong</b><br/>• Chinachem Tower: +852 3166 6160<br/>• K11 Atelier Victoria Dockside: +852 3166 6166<br/><br/><b>Beijing</b><br/>• Sunshine Financial Center: +86 10 8660 8888<br/>• The Exchange Twin Towers: +86 10 5909 2988<br/><br/><b>Shanghai</b><br/>• Lujiazui Finance Plaza: +86 21 5116 5116<br/>• Shanghai World Financial Center: +86 21 2052 0666<br/>• Hong Kong New World Tower (K11): +86 21 5116 2888<br/><br/><b>Hangzhou</b><br/>• Ping An Finance Center: +86 (571) 5812 5868<br/><br/><b>Manila</b><br/>• Lkg Tower: +63 2 8859 2888<br/><br/><b>Jakarta</b><br/>• Sahid Sudirman Center: +62 21 8063 1888<br/>• Axa Tower: +62 21 3005 3500<br/>• Indonesia Stock Exchange Tower 2: +62 21 515 7777<br/>• One Pacific Place: +62 21 2550 2550<br/><br/><b>Singapore</b><br/>• Centennial Tower: +65 6829 7000<br/><br/><b>Seoul</b><br/>• Kyobo Building: +82 2 2010 8888<br/>• Parnas Tower: +82 2 2097 8288<br/><br/><b>Bangkok</b><br/>• Athenee Tower: +66 2 126 8000<br/><br/><b>Hanoi</b><br/>• Hanoi Lotte Center: +84 24 3267 3999<br/><br/><b>Ho Chi Minh City</b><br/>• Vietcombank Tower: +84 28 3827 1988",
+        "response": "<b>CEO SUITE Centre Contact Directory:</b><br/><br/><b>Kuala Lumpur</b><br/>• Axiata Tower: +60 3 2776 6888<br/>• Q Sentral: +60 3 2731 9388<br/>• Manara Maxis 36: +60 3 2615 0000<br/>• Manara Maxis 26: +60 3 2615 2688<br/><br/><b>Hong Kong</b><br/>• Chinachem Tower: +852 3166 6160<br/>• K11 Atelier Victoria Dockside: +852 3166 6166<br/>• Nan Fung Tower: +852 3166 6166<br/><br/><b>Beijing</b><br/>• Sunshine Financial Center: +86 10 8660 8888<br/>• The Exchange Twin Towers: +86 10 5909 2988<br/><br/><b>Shanghai</b><br/>• Lujiazui Finance Plaza: +86 21 5116 5116<br/>• Shanghai World Financial Center: +86 21 2052 0666<br/>• Hong Kong New World Tower (K11): +86 21 5116 2888<br/><br/><b>Hangzhou</b><br/>• Ping An Finance Center: +86 (571) 5812 5868<br/><br/><b>Manila</b><br/>• Lkg Tower: +63 2 8859 2888<br/><br/><b>Jakarta</b><br/>• Sahid Sudirman Center: +62 21 8063 1888<br/>• Axa Tower: +62 21 3005 3500<br/>• Indonesia Stock Exchange Tower 2: +62 21 515 7777<br/>• One Pacific Place: +62 21 2550 2550<br/><br/><b>Singapore</b><br/>• Centennial Tower: +65 6829 7000<br/>• Singapore Land Tower: +65 6829 7000<br/><br/><b>Seoul</b><br/>• Kyobo Building: +82 2 2010 8888<br/>• Parnas Tower: +82 2 2097 8288<br/><br/><b>Bangkok</b><br/>• Athenee Tower: +66 2 126 8000<br/><br/><b>Hanoi</b><br/>• Hanoi Lotte Center: +84 24 3267 3999<br/><br/><b>Ho Chi Minh City</b><br/>• Vietcombank Tower: +84 28 3827 1988",
         "options": "Speak to CS Agent|CS: Speak to Human Agent / Live Support, Our Centres & Locations|Locations: Select City, Main Menu|Start / Main Menu",
         "metadata": {
           "category": "Support"
@@ -922,8 +922,8 @@
           "email center Singapore"
         ],
         "responseType": "options",
-        "response": "Here are our 1 prime Grade-A location in Singapore. Please select a centre to view address, map link, email, convenience, amenities, and contact details:<br/><br/><b>Centennial Tower</b><br/>21st Floor 3 Temasek Avenue Singapore 039190 Singapore<br/>Operating Hours: Monday - Friday, 9:00 AM – 6:00 PM",
-        "options": "Centennial Tower|PO Centre: Centennial Tower, Other Cities|Locations: Select City",
+        "response": "Here are our 2 prime Grade-A locations in Singapore. Please select a centre to view address, map link, email, convenience, amenities, and contact details:<br/><br/><b>Centennial Tower</b><br/>21st Floor 3 Temasek Avenue Singapore 039190 Singapore<br/>Operating Hours: Monday - Friday, 9:00 AM – 6:00 PM<br/><br/><b>Singapore Land Tower</b><br/>37th Floor 50 Raffles Place Singapore 048623 Singapore<br/>Operating Hours: Monday - Friday, 9:00 AM – 6:00 PM",
+        "options": "Centennial Tower|PO Centre: Centennial Tower, Singapore Land Tower|PO Centre: Singapore Land Tower, Other Cities|Locations: Select City",
         "metadata": {
           "city": "Singapore"
         }
@@ -934,6 +934,7 @@
           "hong kong",
           "in hong kong",
           "centres in hong kong",
+          "k11 atelier",
           "other centres in hong kong",
           "City Directory: Hong Kong",
           "Other Centers in Hong Kong",
@@ -970,8 +971,8 @@
           "email center Hong Kong"
         ],
         "responseType": "options",
-        "response": "Here are our 2 prime Grade-A locations in Hong Kong. Please select a centre to view address, map link, email, convenience, amenities, and contact details:<br/><br/><b>Chinachem Tower</b><br/>Level 5 to Level 7 No 34-37 Connaught Rd Central, Central Hong Kong Hong Kong<br/>Operating Hours: Monday - Friday, 9:00 AM – 6:00 PM<br/><br/><b>K11 Atelier Victoria Dockside</b><br/>Level 7 18 Salisbury Road, Tsim Sha Tsui Hong Kong Hong Kong<br/>Operating Hours: Monday - Friday, 9:00 AM – 6:00 PM",
-        "options": "Chinachem Tower|PO Centre: Chinachem Tower, K11 Atelier Victoria Dockside|PO Centre: K11 Atelier Victoria Dockside, Other Cities|Locations: Select City",
+        "response": "Here are our 3 prime Grade-A locations in Hong Kong. Please select a centre to view address, map link, email, convenience, amenities, and contact details:<br/><br/><b>Chinachem Tower</b><br/>Level 5 to Level 7 No 34-37 Connaught Rd Central, Central Hong Kong Hong Kong<br/>Operating Hours: Monday - Friday, 9:00 AM – 6:00 PM<br/><br/><b>K11 Atelier Victoria Dockside</b><br/>Level 7 18 Salisbury Road, Tsim Sha Tsui Hong Kong Hong Kong<br/>Operating Hours: Monday - Friday, 9:00 AM – 6:00 PM<br/><br/><b>Nan Fung Tower</b><br/>Level 21 &amp; 23, 88 Connaught Road Central, Sheung Wan Hong Kong Hong Kong<br/>Operating Hours: Monday - Friday, 9:00 AM – 6:00 PM",
+        "options": "Chinachem Tower|PO Centre: Chinachem Tower, K11 Atelier Victoria Dockside|PO Centre: K11 Atelier Victoria Dockside, Nan Fung Tower|PO Centre: Nan Fung Tower, Other Cities|Locations: Select City",
         "metadata": {
           "city": "Hong Kong"
         }
@@ -1480,6 +1481,26 @@
         }
       },
       {
+        "name": "Front Desk: Nan Fung Tower",
+        "trainingPhrases": [
+          "Front Desk: Nan Fung Tower",
+          "Contact Front Desk: Nan Fung Tower",
+          "Front desk Nan Fung Tower",
+          "Contact front desk Nan Fung Tower",
+          "Hubungi front desk Nan Fung Tower",
+          "Kontak front desk Nan Fung Tower",
+          "Resepsionis Nan Fung Tower"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Front Desk & Reception - Nan Fung Tower (Hong Kong)</div><div class='small'><b>Address:</b> Level 21 & 23, 88 Connaught Road Central, Sheung Wan Hong Kong Hong Kong<br/><b>Phone:</b> +852 3166 6166<br/><b>Email:</b> sales@hk.ceosuite.com<br/><b>Location Map:</b> <a href='https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9' target='_blank'>https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9</a><br/><b>Reception Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Services:</b> Guest Registration, Access Cards, Meeting Room Support, Mail & Courier Handling, On-site IT Assistance.<br/><br/>Our on-duty front desk reception team at Nan Fung Tower is ready to assist you.</div></div><div class='cta-note'>Need direct assistance from an on-duty receptionist or customer support agent? Choose an option below:</div>",
+        "options": "Speak to Front Desk Agent|CS: Speak to Human Agent / Live Support, Operating Hours & Access|Facilities: Building Access & Access Cards, Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Other Centres in Hong Kong|City Directory: Hong Kong, Start again|Start / Main Menu",
+        "metadata": {
+          "category": "Front Desk",
+          "centre": "Nan Fung Tower",
+          "city": "Hong Kong"
+        }
+      },
+      {
         "name": "Front Desk: Sunshine Financial Center",
         "trainingPhrases": [
           "Front Desk: Sunshine Financial Center",
@@ -1720,6 +1741,26 @@
         "metadata": {
           "category": "Front Desk",
           "centre": "Centennial Tower",
+          "city": "Singapore"
+        }
+      },
+      {
+        "name": "Front Desk: Singapore Land Tower",
+        "trainingPhrases": [
+          "Front Desk: Singapore Land Tower",
+          "Contact Front Desk: Singapore Land Tower",
+          "Front desk Singapore Land Tower",
+          "Contact front desk Singapore Land Tower",
+          "Hubungi front desk Singapore Land Tower",
+          "Kontak front desk Singapore Land Tower",
+          "Resepsionis Singapore Land Tower"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Front Desk & Reception - Singapore Land Tower (Singapore)</div><div class='small'><b>Address:</b> 37th Floor 50 Raffles Place Singapore 048623 Singapore<br/><b>Phone:</b> +65 6829 7000<br/><b>Email:</b> sales@sg.ceosuite.com<br/><b>Location Map:</b> <a href='https://goo.gl/maps/UFRLLBnA5vpRN6858' target='_blank'>https://goo.gl/maps/UFRLLBnA5vpRN6858</a><br/><b>Reception Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Services:</b> Guest Registration, Access Cards, Meeting Room Support, Mail & Courier Handling, On-site IT Assistance.<br/><br/>Our on-duty front desk reception team at Singapore Land Tower is ready to assist you.</div></div><div class='cta-note'>Need direct assistance from an on-duty receptionist or customer support agent? Choose an option below:</div>",
+        "options": "Speak to Front Desk Agent|CS: Speak to Human Agent / Live Support, Operating Hours & Access|Facilities: Building Access & Access Cards, Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Other Centres in Singapore|City Directory: Singapore, Start again|Start / Main Menu",
+        "metadata": {
+          "category": "Front Desk",
+          "centre": "Singapore Land Tower",
           "city": "Singapore"
         }
       },
@@ -6226,6 +6267,318 @@
         "response": "<div class='card'><div class='card-title'>Vietcombank Tower (Ho Chi Minh City) - Dedicated Workstation</div><div class='small'><b>Address:</b> Level 21 No. 5 Mê Linh Square, Sai Gon ward Ho Chi Minh City 70000 Vietnam<br/><b>Phone:</b> +84 28 3827 1988<br/><b>Fax:</b> +84 28 3827 1899<br/><b>Email:</b> <a href='mailto:sales@vn.ceosuite.com'>sales@vn.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 8:30 AM – 5:30 PM<br/><b>Convenience:</b><br/>• Iconic landmark building, 2nd tallest skyscraper in Ho Chi Minh City<br/>• Excellent accessibility ; 5 mins walk to future MRT line<br/>• Sophisticated contemporary and modern interior design &amp; ambience<br/>• Completely equipped with the latest IT &amp; Telecommunications system<br/>• Opulent business lounges, conferences, boardrooms with breathtaking viewing of Saigon River<br/><b>Amenities:</b><br/>• International Grade A Office Facilities<br/>• Centrally located in the heart of the business district; premium location.<br/>• Designed by Pelli Clarke Pelli Architects (USA)<br/>• Customized office solution as customer's need<br/>• Multi-options of restaurant, bank, hotel, service apartment, shopping mall, consulate...in walking distance<br/>Explore space details: <a href='https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/' target='_blank'>https://www.ceosuite.com/locations/ho-chi-minh-vietcombank-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
         "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Vietcombank Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Ho Chi Minh City|City Directory: Ho Chi Minh City, Start again|Start / Main Menu",
         "metadata": {}
+      },
+      {
+        "name": "PO Centre: Nan Fung Tower",
+        "trainingPhrases": [
+          "PO Centre: Nan Fung Tower",
+          "Nan Fung Tower PO",
+          "Nan Fung Tower",
+          "PO Center: Nan Fung Tower",
+          "address Nan Fung Tower",
+          "Nan Fung Tower address",
+          "alamat Nan Fung Tower",
+          "alamat Nan Fung Tower dimana",
+          "location Nan Fung Tower",
+          "Nan Fung Tower location",
+          "lokasi Nan Fung Tower",
+          "where is Nan Fung Tower",
+          "Nan Fung Tower dimana",
+          "location link Nan Fung Tower",
+          "link lokasi Nan Fung Tower",
+          "link location Nan Fung Tower",
+          "map Nan Fung Tower",
+          "maps Nan Fung Tower",
+          "google maps Nan Fung Tower",
+          "peta Nan Fung Tower",
+          "email Nan Fung Tower",
+          "Nan Fung Tower email",
+          "email address Nan Fung Tower",
+          "alamat email Nan Fung Tower",
+          "phone Nan Fung Tower",
+          "Nan Fung Tower phone",
+          "telepon Nan Fung Tower",
+          "nomor telepon Nan Fung Tower",
+          "phone number Nan Fung Tower",
+          "fax Nan Fung Tower",
+          "Nan Fung Tower fax",
+          "opening hours Nan Fung Tower",
+          "Nan Fung Tower opening hours",
+          "operating hours Nan Fung Tower",
+          "jam buka Nan Fung Tower",
+          "jam tutup Nan Fung Tower",
+          "jam operasional Nan Fung Tower",
+          "jam buka dan tutup Nan Fung Tower",
+          "convenience Nan Fung Tower",
+          "Nan Fung Tower convenience",
+          "transport Nan Fung Tower",
+          "transportasi Nan Fung Tower",
+          "akses transportasi Nan Fung Tower",
+          "amenities Nan Fung Tower",
+          "Nan Fung Tower amenities",
+          "facilities Nan Fung Tower",
+          "fasilitas Nan Fung Tower",
+          "details Nan Fung Tower",
+          "detail Nan Fung Tower",
+          "info Nan Fung Tower",
+          "information Nan Fung Tower",
+          "about Nan Fung Tower",
+          "tentang Nan Fung Tower",
+          "address WNF",
+          "WNF address",
+          "alamat WNF",
+          "alamat WNF dimana",
+          "location WNF",
+          "WNF location",
+          "lokasi WNF",
+          "where is WNF",
+          "WNF dimana",
+          "location link WNF",
+          "link lokasi WNF",
+          "link location WNF",
+          "map WNF",
+          "maps WNF",
+          "google maps WNF",
+          "peta WNF",
+          "email WNF",
+          "WNF email",
+          "email address WNF",
+          "alamat email WNF",
+          "phone WNF",
+          "WNF phone",
+          "telepon WNF",
+          "nomor telepon WNF",
+          "phone number WNF",
+          "fax WNF",
+          "WNF fax",
+          "opening hours WNF",
+          "WNF opening hours",
+          "operating hours WNF",
+          "jam buka WNF",
+          "jam tutup WNF",
+          "jam operasional WNF",
+          "jam buka dan tutup WNF",
+          "convenience WNF",
+          "WNF convenience",
+          "transport WNF",
+          "transportasi WNF",
+          "akses transportasi WNF",
+          "amenities WNF",
+          "WNF amenities",
+          "facilities WNF",
+          "fasilitas WNF",
+          "details WNF",
+          "detail WNF",
+          "info WNF",
+          "information WNF",
+          "about WNF",
+          "tentang WNF"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Nan Fung Tower (Hong Kong) - Private & Serviced Office</div><div class='small'><b>Address:</b> Level 21 &amp; 23, 88 Connaught Road Central, Sheung Wan Hong Kong Hong Kong<br/><b>Location Map:</b> <a href='https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9' target='_blank'>https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9</a><br/><b>Phone:</b> +852 3166 6166<br/><b>Fax:</b> +852 3166 6266<br/><b>Email:</b> <a href='mailto:sales@hk.ceosuite.com'>sales@hk.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Amenities:</b><br/>• Prime location in the heart of Central, Hong Kong<br/>• Newly refurbished 23-storey commercial building, strategically located at the junction of Connaught Road Central and Pottinger Street<br/>• Just a 3-minute walk from Central MTR Station<br/>• Excellent connectivity to major transport links, including the Airport Express at Hong Kong Station<br/>• Wide range of nearby amenities, including banks, restaurants, shopping outlets, serviced apartments, and hotels<br/>Explore space details: <a href='https://www.ceosuite.com/locations/nanfung-tower/' target='_blank'>https://www.ceosuite.com/locations/nanfung-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
+        "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Nan Fung Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Hong Kong|City Directory: Hong Kong, Start again|Start / Main Menu",
+        "metadata": {
+          "centre": "Nan Fung Tower",
+          "product": "PO"
+        }
+      },
+      {
+        "name": "MR Centre: Nan Fung Tower",
+        "trainingPhrases": [
+          "MR Centre: Nan Fung Tower",
+          "Nan Fung Tower MR"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Nan Fung Tower (Hong Kong) - Meeting Room</div><div class='small'><b>Address:</b> Level 21 &amp; 23, 88 Connaught Road Central, Sheung Wan Hong Kong Hong Kong<br/><b>Location Map:</b> <a href='https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9' target='_blank'>https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9</a><br/><b>Phone:</b> +852 3166 6166<br/><b>Fax:</b> +852 3166 6266<br/><b>Email:</b> <a href='mailto:sales@hk.ceosuite.com'>sales@hk.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Amenities:</b><br/>• Prime location in the heart of Central, Hong Kong<br/>• Newly refurbished 23-storey commercial building, strategically located at the junction of Connaught Road Central and Pottinger Street<br/>• Just a 3-minute walk from Central MTR Station<br/>• Excellent connectivity to major transport links, including the Airport Express at Hong Kong Station<br/>• Wide range of nearby amenities, including banks, restaurants, shopping outlets, serviced apartments, and hotels<br/>Explore space details: <a href='https://www.ceosuite.com/locations/nanfung-tower/' target='_blank'>https://www.ceosuite.com/locations/nanfung-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
+        "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Nan Fung Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Hong Kong|City Directory: Hong Kong, Start again|Start / Main Menu",
+        "metadata": {
+          "centre": "Nan Fung Tower",
+          "product": "MR"
+        }
+      },
+      {
+        "name": "VO Centre: Nan Fung Tower",
+        "trainingPhrases": [
+          "VO Centre: Nan Fung Tower",
+          "Nan Fung Tower VO"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Nan Fung Tower (Hong Kong) - Virtual Office</div><div class='small'><b>Address:</b> Level 21 &amp; 23, 88 Connaught Road Central, Sheung Wan Hong Kong Hong Kong<br/><b>Location Map:</b> <a href='https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9' target='_blank'>https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9</a><br/><b>Phone:</b> +852 3166 6166<br/><b>Fax:</b> +852 3166 6266<br/><b>Email:</b> <a href='mailto:sales@hk.ceosuite.com'>sales@hk.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Amenities:</b><br/>• Prime location in the heart of Central, Hong Kong<br/>• Newly refurbished 23-storey commercial building, strategically located at the junction of Connaught Road Central and Pottinger Street<br/>• Just a 3-minute walk from Central MTR Station<br/>• Excellent connectivity to major transport links, including the Airport Express at Hong Kong Station<br/>• Wide range of nearby amenities, including banks, restaurants, shopping outlets, serviced apartments, and hotels<br/>Explore space details: <a href='https://www.ceosuite.com/locations/nanfung-tower/' target='_blank'>https://www.ceosuite.com/locations/nanfung-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
+        "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Nan Fung Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Hong Kong|City Directory: Hong Kong, Start again|Start / Main Menu",
+        "metadata": {
+          "centre": "Nan Fung Tower",
+          "product": "VO"
+        }
+      },
+      {
+        "name": "DW Centre: Nan Fung Tower",
+        "trainingPhrases": [
+          "DW Centre: Nan Fung Tower",
+          "Nan Fung Tower DW"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Nan Fung Tower (Hong Kong) - Dedicated Workstation</div><div class='small'><b>Address:</b> Level 21 &amp; 23, 88 Connaught Road Central, Sheung Wan Hong Kong Hong Kong<br/><b>Location Map:</b> <a href='https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9' target='_blank'>https://maps.app.goo.gl/fPlNbVSxtqaA58y2d9</a><br/><b>Phone:</b> +852 3166 6166<br/><b>Fax:</b> +852 3166 6266<br/><b>Email:</b> <a href='mailto:sales@hk.ceosuite.com'>sales@hk.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Amenities:</b><br/>• Prime location in the heart of Central, Hong Kong<br/>• Newly refurbished 23-storey commercial building, strategically located at the junction of Connaught Road Central and Pottinger Street<br/>• Just a 3-minute walk from Central MTR Station<br/>• Excellent connectivity to major transport links, including the Airport Express at Hong Kong Station<br/>• Wide range of nearby amenities, including banks, restaurants, shopping outlets, serviced apartments, and hotels<br/>Explore space details: <a href='https://www.ceosuite.com/locations/nanfung-tower/' target='_blank'>https://www.ceosuite.com/locations/nanfung-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
+        "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Nan Fung Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Hong Kong|City Directory: Hong Kong, Start again|Start / Main Menu",
+        "metadata": {
+          "centre": "Nan Fung Tower",
+          "product": "DW"
+        }
+      },
+      {
+        "name": "PO Centre: Singapore Land Tower",
+        "trainingPhrases": [
+          "PO Centre: Singapore Land Tower",
+          "Singapore Land Tower PO",
+          "Singapore Land Tower",
+          "PO Center: Singapore Land Tower",
+          "address Singapore Land Tower",
+          "Singapore Land Tower address",
+          "alamat Singapore Land Tower",
+          "alamat Singapore Land Tower dimana",
+          "location Singapore Land Tower",
+          "Singapore Land Tower location",
+          "lokasi Singapore Land Tower",
+          "where is Singapore Land Tower",
+          "Singapore Land Tower dimana",
+          "location link Singapore Land Tower",
+          "link lokasi Singapore Land Tower",
+          "link location Singapore Land Tower",
+          "map Singapore Land Tower",
+          "maps Singapore Land Tower",
+          "google maps Singapore Land Tower",
+          "peta Singapore Land Tower",
+          "email Singapore Land Tower",
+          "Singapore Land Tower email",
+          "email address Singapore Land Tower",
+          "alamat email Singapore Land Tower",
+          "phone Singapore Land Tower",
+          "Singapore Land Tower phone",
+          "telepon Singapore Land Tower",
+          "nomor telepon Singapore Land Tower",
+          "phone number Singapore Land Tower",
+          "fax Singapore Land Tower",
+          "Singapore Land Tower fax",
+          "opening hours Singapore Land Tower",
+          "Singapore Land Tower opening hours",
+          "operating hours Singapore Land Tower",
+          "jam buka Singapore Land Tower",
+          "jam tutup Singapore Land Tower",
+          "jam operasional Singapore Land Tower",
+          "jam buka dan tutup Singapore Land Tower",
+          "convenience Singapore Land Tower",
+          "Singapore Land Tower convenience",
+          "transport Singapore Land Tower",
+          "transportasi Singapore Land Tower",
+          "akses transportasi Singapore Land Tower",
+          "amenities Singapore Land Tower",
+          "Singapore Land Tower amenities",
+          "facilities Singapore Land Tower",
+          "fasilitas Singapore Land Tower",
+          "details Singapore Land Tower",
+          "detail Singapore Land Tower",
+          "info Singapore Land Tower",
+          "information Singapore Land Tower",
+          "about Singapore Land Tower",
+          "tentang Singapore Land Tower",
+          "address SLT",
+          "SLT address",
+          "alamat SLT",
+          "alamat SLT dimana",
+          "location SLT",
+          "SLT location",
+          "lokasi SLT",
+          "where is SLT",
+          "SLT dimana",
+          "location link SLT",
+          "link lokasi SLT",
+          "link location SLT",
+          "map SLT",
+          "maps SLT",
+          "google maps SLT",
+          "peta SLT",
+          "email SLT",
+          "SLT email",
+          "email address SLT",
+          "alamat email SLT",
+          "phone SLT",
+          "SLT phone",
+          "telepon SLT",
+          "nomor telepon SLT",
+          "phone number SLT",
+          "fax SLT",
+          "SLT fax",
+          "opening hours SLT",
+          "SLT opening hours",
+          "operating hours SLT",
+          "jam buka SLT",
+          "jam tutup SLT",
+          "jam operasional SLT",
+          "jam buka dan tutup SLT",
+          "convenience SLT",
+          "SLT convenience",
+          "transport SLT",
+          "transportasi SLT",
+          "akses transportasi SLT",
+          "amenities SLT",
+          "SLT amenities",
+          "facilities SLT",
+          "fasilitas SLT",
+          "details SLT",
+          "detail SLT",
+          "info SLT",
+          "information SLT",
+          "about SLT",
+          "tentang SLT"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Singapore Land Tower (Singapore) - Private & Serviced Office</div><div class='small'><b>Address:</b> 37th Floor 50 Raffles Place Singapore 048623 Singapore<br/><b>Location Map:</b> <a href='https://goo.gl/maps/UFRLLBnA5vpRN6858' target='_blank'>https://goo.gl/maps/UFRLLBnA5vpRN6858</a><br/><b>Phone:</b> +65 6829 7000<br/><b>Fax:</b> +65 6829 7070<br/><b>Email:</b> <a href='mailto:sales@sg.ceosuite.com'>sales@sg.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Convenience:</b><br/>• 100 meters to Boat Quay<br/>• Busy entertainment district with bars, lounges &amp; eateries<br/>• Home to all major banks and financial institutions<br/>• Adjacent to the Raffles Place MRT Station<br/>• 17 km / 25 minutes drive to Changi International Airport<br/><b>Amenities:</b><br/>• One of the pioneer buildings in the heart of Singapore’s Central Business District, Raffles Place<br/>• Home to bluechip multinational companies<br/>• Penthouse lifestyle hub consisting of Empire (an upscale bar lounge), a steakhouse, Oyster Bar and a modern Japanese Restaurant<br/>Explore space details: <a href='https://www.ceosuite.com/locations/singapore-land-tower/' target='_blank'>https://www.ceosuite.com/locations/singapore-land-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
+        "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Singapore Land Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Singapore|City Directory: Singapore, Start again|Start / Main Menu",
+        "metadata": {
+          "centre": "Singapore Land Tower",
+          "product": "PO"
+        }
+      },
+      {
+        "name": "MR Centre: Singapore Land Tower",
+        "trainingPhrases": [
+          "MR Centre: Singapore Land Tower",
+          "Singapore Land Tower MR"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Singapore Land Tower (Singapore) - Meeting Room</div><div class='small'><b>Address:</b> 37th Floor 50 Raffles Place Singapore 048623 Singapore<br/><b>Location Map:</b> <a href='https://goo.gl/maps/UFRLLBnA5vpRN6858' target='_blank'>https://goo.gl/maps/UFRLLBnA5vpRN6858</a><br/><b>Phone:</b> +65 6829 7000<br/><b>Fax:</b> +65 6829 7070<br/><b>Email:</b> <a href='mailto:sales@sg.ceosuite.com'>sales@sg.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Convenience:</b><br/>• 100 meters to Boat Quay<br/>• Busy entertainment district with bars, lounges &amp; eateries<br/>• Home to all major banks and financial institutions<br/>• Adjacent to the Raffles Place MRT Station<br/>• 17 km / 25 minutes drive to Changi International Airport<br/><b>Amenities:</b><br/>• One of the pioneer buildings in the heart of Singapore’s Central Business District, Raffles Place<br/>• Home to bluechip multinational companies<br/>• Penthouse lifestyle hub consisting of Empire (an upscale bar lounge), a steakhouse, Oyster Bar and a modern Japanese Restaurant<br/>Explore space details: <a href='https://www.ceosuite.com/locations/singapore-land-tower/' target='_blank'>https://www.ceosuite.com/locations/singapore-land-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
+        "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Singapore Land Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Singapore|City Directory: Singapore, Start again|Start / Main Menu",
+        "metadata": {
+          "centre": "Singapore Land Tower",
+          "product": "MR"
+        }
+      },
+      {
+        "name": "VO Centre: Singapore Land Tower",
+        "trainingPhrases": [
+          "VO Centre: Singapore Land Tower",
+          "Singapore Land Tower VO"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Singapore Land Tower (Singapore) - Virtual Office</div><div class='small'><b>Address:</b> 37th Floor 50 Raffles Place Singapore 048623 Singapore<br/><b>Location Map:</b> <a href='https://goo.gl/maps/UFRLLBnA5vpRN6858' target='_blank'>https://goo.gl/maps/UFRLLBnA5vpRN6858</a><br/><b>Phone:</b> +65 6829 7000<br/><b>Fax:</b> +65 6829 7070<br/><b>Email:</b> <a href='mailto:sales@sg.ceosuite.com'>sales@sg.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Convenience:</b><br/>• 100 meters to Boat Quay<br/>• Busy entertainment district with bars, lounges &amp; eateries<br/>• Home to all major banks and financial institutions<br/>• Adjacent to the Raffles Place MRT Station<br/>• 17 km / 25 minutes drive to Changi International Airport<br/><b>Amenities:</b><br/>• One of the pioneer buildings in the heart of Singapore’s Central Business District, Raffles Place<br/>• Home to bluechip multinational companies<br/>• Penthouse lifestyle hub consisting of Empire (an upscale bar lounge), a steakhouse, Oyster Bar and a modern Japanese Restaurant<br/>Explore space details: <a href='https://www.ceosuite.com/locations/singapore-land-tower/' target='_blank'>https://www.ceosuite.com/locations/singapore-land-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
+        "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Singapore Land Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Singapore|City Directory: Singapore, Start again|Start / Main Menu",
+        "metadata": {
+          "centre": "Singapore Land Tower",
+          "product": "VO"
+        }
+      },
+      {
+        "name": "DW Centre: Singapore Land Tower",
+        "trainingPhrases": [
+          "DW Centre: Singapore Land Tower",
+          "Singapore Land Tower DW"
+        ],
+        "responseType": "options",
+        "response": "<div class='card'><div class='card-title'>Singapore Land Tower (Singapore) - Dedicated Workstation</div><div class='small'><b>Address:</b> 37th Floor 50 Raffles Place Singapore 048623 Singapore<br/><b>Location Map:</b> <a href='https://goo.gl/maps/UFRLLBnA5vpRN6858' target='_blank'>https://goo.gl/maps/UFRLLBnA5vpRN6858</a><br/><b>Phone:</b> +65 6829 7000<br/><b>Fax:</b> +65 6829 7070<br/><b>Email:</b> <a href='mailto:sales@sg.ceosuite.com'>sales@sg.ceosuite.com</a><br/><b>Operating Hours:</b> Monday - Friday, 9:00 AM – 6:00 PM<br/><b>Convenience:</b><br/>• 100 meters to Boat Quay<br/>• Busy entertainment district with bars, lounges &amp; eateries<br/>• Home to all major banks and financial institutions<br/>• Adjacent to the Raffles Place MRT Station<br/>• 17 km / 25 minutes drive to Changi International Airport<br/><b>Amenities:</b><br/>• One of the pioneer buildings in the heart of Singapore’s Central Business District, Raffles Place<br/>• Home to bluechip multinational companies<br/>• Penthouse lifestyle hub consisting of Empire (an upscale bar lounge), a steakhouse, Oyster Bar and a modern Japanese Restaurant<br/>Explore space details: <a href='https://www.ceosuite.com/locations/singapore-land-tower/' target='_blank'>https://www.ceosuite.com/locations/singapore-land-tower/</a></div></div><div class='cta-note'>Have a question about this location? Select an option below or type your inquiry anytime.</div>",
+        "options": "Centre Facilities & Amenities|CS: Facilities & Amenities Menu, Contact Front Desk|Front Desk: Singapore Land Tower, Operating Hours & Access|Facilities: Building Access & Access Cards, Other Centres in Singapore|City Directory: Singapore, Start again|Start / Main Menu",
+        "metadata": {
+          "centre": "Singapore Land Tower",
+          "product": "DW"
+        }
       }
     ]
   }
