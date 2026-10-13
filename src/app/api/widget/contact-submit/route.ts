@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
         name: true,
         fallbackEmail: true,
         visitorConfig: true,
+        // Same fallback chain as /api/widget/init and /api/widget/message
+        activeFlow: { select: { config: true } },
       },
     });
 
@@ -85,9 +87,12 @@ export async function POST(req: NextRequest) {
     const actualSessionId = currentSession.id;
     const finalContactId = currentSession.contactId;
 
-    // Resolve language setting: priority = body.language > tenant.visitorConfig.language > 'en'
+    // Resolve language: tenant.visitorConfig.language > active flow language > body.language > 'en'.
+    // The server-side setting wins so that a stale client (cached init config) cannot flip the
+    // language of what is stored in the chat; this matches /api/widget/init and /api/widget/message.
     const tenantVConfig = (tenant.visitorConfig || {}) as any;
-    const requestedLang = String(language || tenantVConfig?.language || '').trim().toLowerCase();
+    const flowLanguage = ((tenant as any).activeFlow?.config as any)?.language;
+    const requestedLang = String(tenantVConfig?.language || flowLanguage || language || '').trim().toLowerCase();
     const isId = requestedLang.startsWith('id');
     const effectiveLang = isId ? 'id' : 'en';
     const visitorConfig = getVisitorConfig(tenant.visitorConfig, effectiveLang);

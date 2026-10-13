@@ -210,6 +210,56 @@ describe('POST /api/widget/contact-submit', () => {
     expect(json.botReply).toContain('Terima kasih Budi Santoso! Pesan dan laporan Anda terkait "Kendala Teknis" telah kami teruskan ke tim perusahaan.');
   });
 
+  describe('language resolution: tenant setting > active flow > request > English', () => {
+    const basePayload = {
+      tenantId: 't1',
+      category: 'Technical Issue',
+      description: 'WiFi unstable in room 402',
+      name: 'Alex Tan',
+    };
+
+    const tenantWith = (visitorConfig: any, flowLanguage?: string) => ({
+      id: 't1',
+      name: 'CEO SUITE',
+      fallbackEmail: 'support@ceosuite.com',
+      visitorConfig,
+      activeFlow: flowLanguage ? { config: { language: flowLanguage } } : null,
+    });
+
+    beforeEach(() => {
+      prismaMock.visitorProfile.findUnique.mockResolvedValue(null);
+      prismaMock.visitorProfile.create.mockResolvedValue({ id: 'vp1' });
+    });
+
+    it('uses the English flow language even when a stale client sends language "id"', async () => {
+      prismaMock.tenant.findUnique.mockResolvedValue(tenantWith({}, 'en'));
+      const json = await (await send({ ...basePayload, language: 'id' })).json();
+      expect(json.userMessage).toContain('📝 [Inquiry / Issue Report to Company]');
+      expect(json.userMessage).not.toContain('Laporan Masalah');
+      expect(json.botReply).toContain('Thank you Alex Tan!');
+    });
+
+    it('lets the tenant setting override the flow language', async () => {
+      prismaMock.tenant.findUnique.mockResolvedValue(tenantWith({ language: 'id' }, 'en'));
+      const json = await (await send(basePayload)).json();
+      expect(json.userMessage).toContain('📝 [Laporan Masalah ke Perusahaan]');
+    });
+
+    it('follows an Indonesian flow when the tenant has no language set', async () => {
+      prismaMock.tenant.findUnique.mockResolvedValue(tenantWith({}, 'id'));
+      const json = await (await send(basePayload)).json();
+      expect(json.userMessage).toContain('📝 [Laporan Masalah ke Perusahaan]');
+    });
+
+    it('falls back to the request language, then English, when neither tenant nor flow set one', async () => {
+      prismaMock.tenant.findUnique.mockResolvedValue(tenantWith({}));
+      const fromRequest = await (await send({ ...basePayload, language: 'id' })).json();
+      expect(fromRequest.userMessage).toContain('📝 [Laporan Masalah ke Perusahaan]');
+      const fallback = await (await send(basePayload)).json();
+      expect(fallback.userMessage).toContain('📝 [Inquiry / Issue Report to Company]');
+    });
+  });
+
   it('handles preflight OPTIONS request with CORS headers', async () => {
     const res = await OPTIONS();
     expect(res.status).toBe(204);

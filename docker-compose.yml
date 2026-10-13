@@ -26,5 +26,6 @@ services:
       KB_SYNC: ${KB_SYNC:-true}                    # "false" to skip
       KB_TENANT_ID: ${KB_TENANT_ID:-}              # optional; default = tenant that owns the flow / the only tenant
       KB_ACTIVATE_FLOW: ${KB_ACTIVATE_FLOW:-true}  # true = on first creation, force = every start, false = never
+      KB_ALIGN_LANGUAGE: ${KB_ALIGN_LANGUAGE:-true}  # tenant language follows the active flow's language (en)
     restart: always
     command: ["sh", "-c", "npx prisma db push --accept-data-loss && { node scripts/docker/sync-knowledge.js || echo '[sync-knowledge] failed, continuing without knowledge sync'; } && npm run start"]

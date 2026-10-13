@@ -13,6 +13,9 @@
  * Environment:
  *   KB_SYNC            "false" to skip everything (default: true)
  *   KB_TENANT_ID       tenant to load into. Default: the tenant that already owns the flow, else the only tenant.
+ *   KB_ALIGN_LANGUAGE  "false" to leave tenant.visitorConfig.language alone (default: true = when this flow is the
+ *                      tenant's active flow, the tenant language follows the flow's language, so the report form,
+ *                      handoff texts and bot replies are not a mix of English and Indonesian)
  *   KB_ACTIVATE_FLOW   "true"  - activate the flow when it is created (default)
  *                      "force" - activate on every sync
  *                      "false" - never touch the tenant's active flow
@@ -169,6 +172,23 @@ async function syncFlow(prisma, plan, tenant) {
   } else if (!tenant.activeFlowId && activate !== 'false') {
     await prisma.tenant.update({ where: { id: tenant.id }, data: { activeFlowId: flow.id, aiEnabled: true } });
     log(`tenant "${tenant.name}" had no active flow; set it to this flow`);
+  }
+
+  // Keep the tenant language in step with the flow it uses.
+  if ((process.env.KB_ALIGN_LANGUAGE || 'true').toLowerCase() !== 'false') {
+    const fresh = await prisma.tenant.findUnique({ where: { id: tenant.id } });
+    if (fresh && fresh.activeFlowId === flow.id) {
+      const flowLang = String(cfg.language || 'en').toLowerCase().startsWith('id') ? 'id' : 'en';
+      const vc = fresh.visitorConfig && typeof fresh.visitorConfig === 'object' && !Array.isArray(fresh.visitorConfig)
+        ? fresh.visitorConfig : {};
+      if (String(vc.language || '').toLowerCase() !== flowLang) {
+        await prisma.tenant.update({
+          where: { id: tenant.id },
+          data: { visitorConfig: { ...vc, language: flowLang } },
+        });
+        log(`tenant language set to "${flowLang}" to match the flow (was "${vc.language || 'unset'}")`);
+      }
+    }
   }
   return flow;
 }
