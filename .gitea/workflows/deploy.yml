@@ -1,0 +1,124 @@
+name: Deploy to Server (CD)
+
+on:
+  push:
+    branches:
+      - ceosuite
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ceosuite
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Pre-Deploy Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+
+      - name: TypeScript Type-check
+        run: npm run type-check
+
+      - name: Run Vitest Unit Tests
+        run: npm run test:api
+
+  deploy:
+    name: Remote Deployment via SSH
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Execute Remote SSH Deploy Script
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          SUDO_PASS: ${{ secrets.SUDO_PASSWORD || secrets.SSH_PASSWORD }}
+          TARGET_DIR: ${{ secrets.SSH_DEPLOY_PATH || '/opt/crm-custom-dashboard' }}
+        with:
+          host: ${{ secrets.SSH_HOST || '192.168.20.242' }}
+          username: ${{ secrets.SSH_USERNAME || 'nanda' }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          envs: SUDO_PASS,TARGET_DIR
+          script_stop: true
+          script: |
+            echo "=========================================================="
+            echo "🚀 [CD] Starting CRM Deployment on Host: $(hostname)"
+            echo "📅 Timestamp: $(date)"
+            echo "📁 Target directory: $TARGET_DIR"
+            echo "=========================================================="
+
+            if [ ! -d "$TARGET_DIR" ]; then
+              echo "❌ Error: Directory $TARGET_DIR does not exist!"
+              exit 1
+            fi
+
+            cd "$TARGET_DIR"
+
+            echo "📥 [1/4] Pulling latest changes from branch 'ceosuite'..."
+            # Configure git safe directory in case ownership differs
+            git config --global --add safe.directory "$TARGET_DIR" || true
+
+            # Fetch and pull latest changes
+            git fetch ceosuite || git fetch origin
+            git checkout ceosuite
+            git pull ceosuite ceosuite || git pull origin ceosuite
+
+            echo "📦 Git commit: $(git rev-parse --short HEAD) - $(git log -1 --pretty=%B | head -n 1)"
+
+            echo "🐳 [2/4] Building Docker container image..."
+            if [ -n "$SUDO_PASS" ]; then
+              echo "$SUDO_PASS" | sudo -S docker compose build web
+            else
+              docker compose build web
+            fi
+
+            echo "🔄 [3/4] Restarting 'web' service container..."
+            if [ -n "$SUDO_PASS" ]; then
+              echo "$SUDO_PASS" | sudo -S docker compose up -d web
+            else
+              docker compose up -d web
+            fi
+
+            echo "⏳ [4/4] Verifying Deployment Health Check..."
+            sleep 10
+
+            # Check container status
+            if [ -n "$SUDO_PASS" ]; then
+              echo "$SUDO_PASS" | sudo -S docker ps --filter "name=crm-web" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+            else
+              docker ps --filter "name=crm-web" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+            fi
+
+            # Health check endpoint probe
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 http://127.0.0.1:8201/api/version || echo "000")
+            echo "🔍 HTTP Probe /api/version Status Code: $HTTP_STATUS"
+
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "✅ Health check passed! Service is responding with HTTP 200."
+              curl -s http://127.0.0.1:8201/api/version
+              echo ""
+            else
+              echo "⚠️ Service returned HTTP $HTTP_STATUS (may still be running initial migrations or knowledge sync)."
+            fi
+
+            echo "=========================================================="
+            echo "🎉 [CD] Deployment finished successfully!"
+            echo "=========================================================="

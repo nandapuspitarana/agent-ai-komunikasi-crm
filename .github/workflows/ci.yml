@@ -1,6 +1,6 @@
 name: CI
 
-# Works on GitHub Actions and Gitea Actions (both read .github/workflows).
+# Works on GitHub Actions and Gitea Actions (both read .github/workflows or .gitea/workflows).
 on:
   push:
     branches: ['**']
@@ -12,13 +12,15 @@ concurrency:
 
 jobs:
   api:
-    name: API - type-check & unit tests
+    name: CRM Web - Type-check, Tests & Build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
@@ -38,6 +40,14 @@ jobs:
 
       - name: Unit tests (vitest)
         run: npm run test:api
+
+      - name: Build Next.js & SDK Package
+        run: npm run build
+        env:
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: 1
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          CRM_VERSION: ${{ github.sha }}
 
   sdk:
     name: Flutter SDK - analyze & tests
