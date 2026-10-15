@@ -4,6 +4,7 @@
   "main": "tailwind.config.js",
   "scripts": {
     "dev": "next dev -p 8201",
+    "bump:sdk": "node scripts/bump-sdk-version.js",
     "build:sdk": "node scripts/build-sdk-package.js",
     "prebuild": "npm run build:sdk",
     "build": "next build",
