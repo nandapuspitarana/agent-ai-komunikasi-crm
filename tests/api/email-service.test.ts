@@ -149,4 +149,54 @@ describe('email-service and EmailConfig', () => {
     expect(result?.success).toBe(true);
     expect(result?.provider).toBe('none');
   });
+
+  it('dispatches inquiry notification to emailCenter when provided even if tenant has no fallbackEmail', async () => {
+    const result = await sendInquiryNotificationToTenant(
+      {
+        id: 't-centennial',
+        name: 'Centennial Tower Singapore',
+        fallbackEmail: null,
+        visitorConfig: {
+          language: 'en',
+          emailConfig: { provider: 'none' },
+        },
+      },
+      {
+        category: 'General Inquiry',
+        description: 'Meeting room inquiry for next Monday',
+        name: 'Tan Ah Kow',
+        email: 'tan@sg.org',
+        emailCenter: 'sales@sg.ceosuite.com',
+      }
+    );
+
+    expect(result).not.toBeNull();
+    expect(result?.success).toBe(true);
+    expect(result?.provider).toBe('none');
+  });
+
+  it('prioritizes emailCenter parameter over tenant fallbackEmail when both exist', async () => {
+    const result = await sendInquiryNotificationToTenant(
+      {
+        id: 't-centennial',
+        name: 'Centennial Tower',
+        fallbackEmail: 'fallback-default@ceosuite.com',
+        visitorConfig: {
+          language: 'en',
+          emailConfig: { provider: 'none' },
+        },
+      },
+      {
+        category: 'Services & Facilities',
+        description: 'Need assistance with access card',
+        name: 'Jane Doe',
+        email: 'jane@initech.com',
+      },
+      'sales@sg.ceosuite.com'
+    );
+
+    expect(result).not.toBeNull();
+    expect(result?.success).toBe(true);
+    expect(result?.provider).toBe('none');
+  });
 });

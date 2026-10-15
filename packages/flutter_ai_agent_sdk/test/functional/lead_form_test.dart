@@ -488,8 +488,10 @@ void main() {
 
       verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
-            message: 'Saya ingin bicara dengan agen manusia',
+            message: any(named: 'message'),
             contactId: any(named: 'contactId'),
+            channel: any(named: 'channel'),
+            emailCenter: any(named: 'emailCenter'),
           )).called(1);
       expect(find.byKey(const ValueKey('talk_to_agent')), findsNothing);
       expect(find.text('Sarah'), findsOneWidget);

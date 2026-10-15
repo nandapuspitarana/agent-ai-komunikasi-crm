@@ -84,18 +84,15 @@ void main() {
           throw http.ClientException('Connection reset by peer');
         }
         return http.Response(
-          jsonEncode({'reply': 'Success on retry!'}),
+          jsonEncode({'config': {'welcomeMessage': 'Success on retry!'}}),
           200,
         );
       });
 
-      final reply = await apiClient.sendMessage(
-        sessionId: 'session_retry',
-        message: 'Hello',
-      );
+      final data = await apiClient.initWidget();
 
       expect(callCount, equals(2));
-      expect(reply.text, equals('Success on retry!'));
+      expect(data['config']?['welcomeMessage'], equals('Success on retry!'));
     });
 
     test('TEST-AI-U09: Should throw AiAgentApiException on HTTP 500 error', () async {

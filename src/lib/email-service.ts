@@ -241,18 +241,22 @@ export interface InquiryData {
   email?: string | null;
   company?: string | null;
   sessionId?: string | null;
+  emailCenter?: string | null;
 }
 
 /**
- * Dispatches a formatted notification email to the tenant's fallback email
+ * Dispatches a formatted notification email to the workspace center email (if provided)
+ * or to the tenant's fallback email.
  */
 export async function sendInquiryNotificationToTenant(
   tenant: { id: string; name?: string; fallbackEmail?: string | null; visitorConfig?: any },
-  inquiry: InquiryData
+  inquiry: InquiryData,
+  emailCenter?: string | null
 ): Promise<SendEmailResult | null> {
-  const targetEmail = tenant.fallbackEmail?.trim();
+  const centerRecipient = (emailCenter || inquiry.emailCenter || '').trim();
+  const targetEmail = centerRecipient || tenant.fallbackEmail?.trim();
   if (!targetEmail) {
-    console.log(`[EmailService] Tenant ${tenant.id} belum mengatur fallbackEmail. Notifikasi email dilewati.`);
+    console.log(`[EmailService] Tenant ${tenant.id} belum mengatur fallbackEmail dan tidak ada emailCenter. Notifikasi email dilewati.`);
     return null;
   }
 
@@ -274,6 +278,7 @@ export async function sendInquiryNotificationToTenant(
   const intro = isId
     ? 'Pengunjung aplikasi telah mengirimkan formulir laporan kendala saat bantuan live agen sedang dialihkan:'
     : 'An application visitor has submitted an issue or inquiry report while live agent assistance is routed:';
+  const centerLabel = isId ? 'Email Business Centre:' : 'Workspace / Centre Email:';
   const categoryLabel = isId ? 'Kategori Masalah:' : 'Issue Category:';
   const nameLabel = isId ? 'Nama Pengunjung:' : 'Visitor Name:';
   const companyLabel = isId ? 'Perusahaan:' : 'Company:';
@@ -305,6 +310,15 @@ export async function sendInquiryNotificationToTenant(
             <td style="padding: 10px 0; font-weight: bold; width: 140px; color: #64748b;">${categoryLabel}</td>
             <td style="padding: 10px 0; font-weight: bold; color: #801517;"><span style="background-color: #fef2f2; color: #991b1b; padding: 4px 8px; border-radius: 4px;">${inquiry.category}</span></td>
           </tr>
+          ${
+            centerRecipient
+              ? `
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; font-weight: bold; color: #64748b;">${centerLabel}</td>
+            <td style="padding: 10px 0; color: #0f172a;"><a href="mailto:${centerRecipient}" style="color: #2563eb; text-decoration: none;">${centerRecipient}</a></td>
+          </tr>`
+              : ''
+          }
           ${
             inquiry.name
               ? `
@@ -357,6 +371,7 @@ export async function sendInquiryNotificationToTenant(
       `${greeting.replace(/<[^>]*>/g, '')}\n` +
       `${intro}\n\n` +
       `${categoryLabel} ${inquiry.category}\n` +
+      (centerRecipient ? `${centerLabel} ${centerRecipient}\n` : '') +
       (inquiry.name ? `${nameLabel} ${inquiry.name}\n` : '') +
       (inquiry.company ? `${companyLabel} ${inquiry.company}\n` : '') +
       (inquiry.email ? `${emailLabel} ${inquiry.email}\n` : '') +
@@ -367,6 +382,7 @@ export async function sendInquiryNotificationToTenant(
       `${greeting.replace(/<[^>]*>/g, '')}\n` +
       `${intro}\n\n` +
       `${categoryLabel} ${inquiry.category}\n` +
+      (centerRecipient ? `${centerLabel} ${centerRecipient}\n` : '') +
       (inquiry.name ? `${nameLabel} ${inquiry.name}\n` : '') +
       (inquiry.company ? `${companyLabel} ${inquiry.company}\n` : '') +
       (inquiry.email ? `${emailLabel} ${inquiry.email}\n` : '') +

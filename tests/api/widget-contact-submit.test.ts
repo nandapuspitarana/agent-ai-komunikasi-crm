@@ -260,6 +260,72 @@ describe('POST /api/widget/contact-submit', () => {
     });
   });
 
+  it('accepts email_center parameter (e.g. sales@sg.ceosuite.com for Centennial Tower) and saves it in metadata and summary', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue({
+      id: 't-centennial',
+      name: 'CEO SUITE Centennial Tower',
+      fallbackEmail: 'default-fallback@ceosuite.com',
+      visitorConfig: { language: 'en', enabled: true },
+    });
+    prismaMock.visitorProfile.findUnique.mockResolvedValue(null);
+    prismaMock.visitorProfile.create.mockResolvedValue({ id: 'vp-ct' });
+
+    const payload = {
+      tenantId: 't-centennial',
+      category: 'General Inquiry',
+      description: 'Inquiry regarding serviced office rental',
+      name: 'Michael Lee',
+      email: 'michael@company.sg',
+      company: 'SG Tech Ltd',
+      email_center: 'sales@sg.ceosuite.com',
+    };
+
+    const res = await send(payload);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.summary.email_center).toBe('sales@sg.ceosuite.com');
+
+    expect(prismaMock.visitorProfile.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          metadata: expect.objectContaining({
+            emailCenter: 'sales@sg.ceosuite.com',
+            lastInquiryEmailCenter: 'sales@sg.ceosuite.com',
+          }),
+        }),
+      })
+    );
+  });
+
+  it('accepts centre_email alias and records it in visitor metadata', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue({
+      id: 't-centennial',
+      name: 'CEO SUITE Centennial Tower',
+      fallbackEmail: null,
+      visitorConfig: { language: 'en', enabled: true },
+    });
+    prismaMock.visitorProfile.findUnique.mockResolvedValue(null);
+    prismaMock.visitorProfile.create.mockResolvedValue({ id: 'vp-ct-2' });
+
+    const payload = {
+      tenantId: 't-centennial',
+      category: 'Technical Issue',
+      description: 'WiFi issue in Centennial suite 2101',
+      name: 'Sarah Connor',
+      email: 'sarah@skynet.com',
+      centre_email: 'sales@sg.ceosuite.com',
+    };
+
+    const res = await send(payload);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.summary.email_center).toBe('sales@sg.ceosuite.com');
+  });
+
   it('handles preflight OPTIONS request with CORS headers', async () => {
     const res = await OPTIONS();
     expect(res.status).toBe(204);

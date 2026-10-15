@@ -54,6 +54,7 @@ export function ChatWindow({
       email: propUserEmail || params.get('email') || params.get('userEmail') || cfg.email || cfg.userEmail || '',
       name: propUserName || params.get('userName') || params.get('name') || cfg.name || cfg.userName || '',
       company: propUserCompany || params.get('company') || params.get('companyName') || cfg.company || cfg.companyName || '',
+      emailCenter: params.get('email_center') || params.get('emailCenter') || params.get('centre_email') || cfg.email_center || cfg.emailCenter || cfg.centre_email || '',
     };
   };
 
@@ -260,6 +261,7 @@ export function ChatWindow({
           message: messageText,
           contactId: localSessionId.current,
           channel: 'widget',
+          email_center: userProfile.emailCenter || undefined,
         }),
       });
 
@@ -300,11 +302,12 @@ export function ChatWindow({
   const handleRequestHumanAgent = () => {
     if (sessionStatus !== 'bot') return;
     if (widgetConfig.humanHandoffEnabled === false) {
-      if (widgetConfig.contactForm?.enabled === false && widgetConfig.fallbackEmail) {
-        window.location.href = `mailto:${widgetConfig.fallbackEmail}`;
+      const targetEmail = userProfile.emailCenter || widgetConfig.fallbackEmail;
+      if (widgetConfig.contactForm?.enabled === false && targetEmail) {
+        window.location.href = `mailto:${targetEmail}`;
         return;
       }
-      if (widgetConfig.fallbackEmail || widgetConfig.contactForm) {
+      if (targetEmail || widgetConfig.contactForm) {
         setShowContactForm(true);
         return;
       }
@@ -330,6 +333,7 @@ export function ChatWindow({
           name: userProfile.name,
           company: userProfile.company,
           language: widgetConfig.language,
+          email_center: userProfile.emailCenter || undefined,
         }),
       });
 

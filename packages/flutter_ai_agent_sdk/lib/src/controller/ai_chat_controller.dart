@@ -53,12 +53,14 @@ class AiChatController extends ChangeNotifier {
     this.contactId,
     String? initialSessionId,
     List<ChatMessage>? initialMessages,
+    String? emailCenter,
   })  : apiClient = apiClient ?? AiAgentApiClient(config: config),
         rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
         _sessionId = initialSessionId ?? _newSessionId(),
         _messages = initialMessages != null ? List.from(initialMessages) : [],
         _humanHandoffEnabled = config.humanHandoffEnabled ?? true,
         _fallbackEmail = config.fallbackEmail,
+        _emailCenter = emailCenter,
         _isInitialized = initialMessages != null && initialMessages.isNotEmpty;
 
   static int _sessionSeq = 0;
@@ -132,6 +134,15 @@ class AiChatController extends ChangeNotifier {
   String? get cardBannerTitle => _cardBannerTitle ?? config.cardBannerTitle;
   String? get tenantLanguage => _tenantLanguage;
   Map<String, dynamic>? get contactFormConfig => _contactFormConfig;
+
+  String? _emailCenter;
+  String? get emailCenter => _emailCenter;
+  set emailCenter(String? value) {
+    if (_emailCenter != value) {
+      _emailCenter = value;
+      notifyListeners();
+    }
+  }
 
   /// Dynamic responder name:
   /// - When in handoff mode: returns the human agent's name (or 'Live Support' fallback).
@@ -388,11 +399,18 @@ class AiChatController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final botReply = await apiClient.sendMessage(
-        sessionId: _sessionId,
-        message: trimmed,
-        contactId: contactId,
-      );
+      final botReply = (_emailCenter != null && _emailCenter!.isNotEmpty)
+          ? await apiClient.sendMessage(
+              sessionId: _sessionId,
+              message: trimmed,
+              contactId: contactId,
+              emailCenter: _emailCenter,
+            )
+          : await apiClient.sendMessage(
+              sessionId: _sessionId,
+              message: trimmed,
+              contactId: contactId,
+            );
 
       // Update user message status to sent
       final userIdx = _messages.indexWhere((m) => m.id == userMsgId);
@@ -525,6 +543,7 @@ class AiChatController extends ChangeNotifier {
     String? email,
     String? name,
     String? company,
+    String? emailCenter,
   }) async {
     final trimmedCategory = category.trim();
     final trimmedDesc = description.trim();
@@ -565,17 +584,31 @@ class AiChatController extends ChangeNotifier {
     _messages.add(userMsg);
     notifyListeners();
 
+    final resolvedEmailCenter = emailCenter ?? _emailCenter;
+
     try {
-      final res = await apiClient.submitContactForm(
-        category: trimmedCategory,
-        description: trimmedDesc,
-        sessionId: _serverSessionId ?? (_sessionId.startsWith('session_') ? null : _sessionId),
-        contactId: contactId,
-        email: email,
-        name: name,
-        company: company,
-        language: _tenantLanguage,
-      );
+      final res = (resolvedEmailCenter != null && resolvedEmailCenter.isNotEmpty)
+          ? await apiClient.submitContactForm(
+              category: trimmedCategory,
+              description: trimmedDesc,
+              sessionId: _serverSessionId ?? (_sessionId.startsWith('session_') ? null : _sessionId),
+              contactId: contactId,
+              email: email,
+              name: name,
+              company: company,
+              language: _tenantLanguage,
+              emailCenter: resolvedEmailCenter,
+            )
+          : await apiClient.submitContactForm(
+              category: trimmedCategory,
+              description: trimmedDesc,
+              sessionId: _serverSessionId ?? (_sessionId.startsWith('session_') ? null : _sessionId),
+              contactId: contactId,
+              email: email,
+              name: name,
+              company: company,
+              language: _tenantLanguage,
+            );
 
       final serverUserMsg = res['userMessage']?.toString();
       final finalUserText = (serverUserMsg != null && serverUserMsg.isNotEmpty)

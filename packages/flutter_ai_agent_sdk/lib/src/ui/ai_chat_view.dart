@@ -80,6 +80,10 @@ class AiChatView extends StatefulWidget {
   /// to [controller.submitContactForm].
   final Future<bool> Function(String category, String description)? onContactFormSubmit;
 
+  /// Optional workspace or center email (e.g. sales@sg.ceosuite.com for Centennial Tower).
+  /// Takes priority over the tenant's default fallbackEmail for inquiry routing and mailto links.
+  final String? emailCenter;
+
   const AiChatView({
     super.key,
     required this.controller,
@@ -108,6 +112,7 @@ class AiChatView extends StatefulWidget {
     this.enableContactFunnel = true,
     this.contactFunnelStrings = const ContactFunnelStrings(),
     this.onContactFormSubmit,
+    this.emailCenter,
   });
 
   @override
@@ -121,6 +126,9 @@ class _AiChatViewState extends State<AiChatView> {
   @override
   void initState() {
     super.initState();
+    if (widget.emailCenter != null && widget.emailCenter!.isNotEmpty) {
+      widget.controller.emailCenter = widget.emailCenter;
+    }
     widget.controller.addListener(_onControllerUpdate);
     // Idempotent: fetches config on first open, refreshes a restored session's
     // greeting, retries after an offline fallback, and is a no-op otherwise.
@@ -130,6 +138,9 @@ class _AiChatViewState extends State<AiChatView> {
   @override
   void didUpdateWidget(AiChatView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.emailCenter != oldWidget.emailCenter && widget.emailCenter != null) {
+      widget.controller.emailCenter = widget.emailCenter;
+    }
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_onControllerUpdate);
       widget.controller.addListener(_onControllerUpdate);
@@ -371,7 +382,7 @@ class _AiChatViewState extends State<AiChatView> {
                       : () async {
                           if (!controller.humanHandoffEnabled) {
                             if (widget.onEmailRedirect != null) {
-                              final targetEmail =
+                              final targetEmail = widget.emailCenter ??
                                   widget.talkToAgentEmail ?? controller.fallbackEmail;
                               if (targetEmail != null && targetEmail.isNotEmpty) {
                                 widget.onEmailRedirect!(targetEmail);
@@ -384,7 +395,7 @@ class _AiChatViewState extends State<AiChatView> {
                               return;
                             }
 
-                            final targetEmail =
+                            final targetEmail = widget.emailCenter ??
                                 widget.talkToAgentEmail ?? controller.fallbackEmail;
                             if (targetEmail != null && targetEmail.isNotEmpty) {
                               final mailtoUri =
@@ -608,7 +619,7 @@ class _AiChatViewState extends State<AiChatView> {
       if (widget.talkToAgentEmailLabel != null) {
         return widget.talkToAgentEmailLabel!;
       }
-      final email = widget.talkToAgentEmail ?? controller.fallbackEmail;
+      final email = widget.emailCenter ?? widget.talkToAgentEmail ?? controller.fallbackEmail;
       if (email != null && email.isNotEmpty) {
         return isId ? 'Hubungi via Email ($email)' : 'Contact via Email ($email)';
       }
@@ -637,6 +648,7 @@ class _AiChatViewState extends State<AiChatView> {
           email: widget.userEmail ?? widget.talkToAgentEmail ?? widget.controller.fallbackEmail,
           name: widget.userName,
           company: widget.userCompany,
+          emailCenter: widget.emailCenter,
         );
       },
     );

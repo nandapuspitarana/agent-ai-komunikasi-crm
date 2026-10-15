@@ -66,6 +66,7 @@ void main() {
 
       final inputFinder = find.byType(TextField);
       await tester.enterText(inputFinder, 'Berapa harga ruang meeting?');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.send_rounded));
       await tester.pumpAndSettle();
 
@@ -130,6 +131,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextField), 'Mau bicara dengan agen manusia');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.send_rounded));
       await tester.pumpAndSettle();
 
@@ -195,6 +197,7 @@ void main() {
 
       // Send message that triggers agent reply
       await tester.enterText(find.byType(TextField), 'Bisa bicara dengan orang?');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.send_rounded));
       await tester.pumpAndSettle();
 

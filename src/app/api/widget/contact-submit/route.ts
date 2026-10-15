@@ -35,6 +35,10 @@ export async function POST(req: NextRequest) {
       language,
     } = body;
 
+    const rawEmailCenter =
+      body.email_center ?? body.emailCenter ?? body.centre_email ?? body.centreEmail;
+    const emailCenter = typeof rawEmailCenter === 'string' ? rawEmailCenter.trim() : '';
+
     if (!tenantId || !category || !description) {
       return corsResponse(
         { error: 'Missing required fields: tenantId, category, and description are required.' },
@@ -167,6 +171,7 @@ export async function POST(req: NextRequest) {
       const updatedMeta = {
         ...existingMeta,
         ...(company && { company }),
+        ...(emailCenter && { emailCenter, lastInquiryEmailCenter: emailCenter }),
         lastInquiryCategory: category,
         lastInquiryDescription: description,
         lastInquirySubmittedAt: new Date().toISOString(),
@@ -213,17 +218,25 @@ export async function POST(req: NextRequest) {
       console.error('[Contact Submit API] Error updating visitor profile:', vErr);
     }
 
-    // 6. Notify Company via fallbackEmail (using configured Email Service: Azure, Gmail, or Custom SMTP)
-    if (tenant.fallbackEmail) {
-      console.log(`[Contact Submit API] Dispatching notification to tenant email: ${tenant.fallbackEmail}`);
-      sendInquiryNotificationToTenant(tenant, {
-        category,
-        description,
-        email,
-        name,
-        company,
-        sessionId: actualSessionId,
-      }).catch((emailErr) => {
+    // 6. Notify Company via emailCenter (workspace center email) or fallbackEmail (using configured Email Service: Azure, Gmail, or Custom SMTP)
+    const targetNotificationEmail = emailCenter || tenant.fallbackEmail?.trim();
+    if (targetNotificationEmail) {
+      console.log(
+        `[Contact Submit API] Dispatching notification to: ${emailCenter ? `workspace center email (${emailCenter})` : `tenant fallback email (${tenant.fallbackEmail})`}`
+      );
+      sendInquiryNotificationToTenant(
+        tenant,
+        {
+          category,
+          description,
+          email,
+          name,
+          company,
+          sessionId: actualSessionId,
+          emailCenter: emailCenter || undefined,
+        },
+        emailCenter || undefined
+      ).catch((emailErr) => {
         console.error('[Contact Submit API] Error dispatching email notification:', emailErr);
       });
     }
@@ -240,6 +253,7 @@ export async function POST(req: NextRequest) {
         email,
         name,
         company,
+        email_center: emailCenter || null,
       },
     });
   } catch (error) {

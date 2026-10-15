@@ -142,6 +142,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { sessionId, tenantId, message, contactId, channel = 'widget' } = body;
+    const rawEmailCenter =
+      body.email_center ?? body.emailCenter ?? body.centre_email ?? body.centreEmail;
+    const emailCenter = typeof rawEmailCenter === 'string' ? rawEmailCenter.trim() : '';
 
     if (!tenantId || !message) {
       return corsResponse(
@@ -359,11 +362,11 @@ export async function POST(req: NextRequest) {
         const isHandoffEnabled = tenant.humanHandoffEnabled ?? true;
 
         if (!isHandoffEnabled) {
-          const fallbackEmail = tenant.fallbackEmail;
-          const noAgentMsg = fallbackEmail
+          const effectiveEmail = emailCenter || tenant.fallbackEmail;
+          const noAgentMsg = effectiveEmail
             ? (isEn
-                ? `For further assistance, our team would be pleased to assist you directly via email at ${fallbackEmail}.`
-                : `Untuk bantuan lebih lanjut, tim kami siap membantu Anda secara langsung melalui email di ${fallbackEmail}.`)
+                ? `For further assistance, our team would be pleased to assist you directly via email at ${effectiveEmail}.`
+                : `Untuk bantuan lebih lanjut, tim kami siap membantu Anda secara langsung melalui email di ${effectiveEmail}.`)
             : (isEn
                 ? 'For further assistance, our team would be pleased to assist you directly via email. Please leave a message with your contact details.'
                 : 'Untuk bantuan lebih lanjut, tim kami siap membantu Anda secara langsung via email. Silakan tinggalkan pesan beserta kontak Anda.');
@@ -382,7 +385,8 @@ export async function POST(req: NextRequest) {
             reply: noAgentMsg,
             handoffOccurred: false,
             humanHandoffEnabled: false,
-            fallbackEmail: fallbackEmail || null,
+            fallbackEmail: effectiveEmail || null,
+            emailCenter: emailCenter || null,
           });
         }
 
@@ -427,13 +431,14 @@ export async function POST(req: NextRequest) {
     finalCustomInstructions += `\n\n[IMPORTANT UI FORMATTING RULE]\nIf you read options or locations from your knowledge base that contain a pipe character (e.g. 'Bangkok|Bangkok Private Office'), DO NOT output the pipe or the value after it. ONLY output the friendly label before the pipe (e.g. 'Bangkok'). Never output 'Label|Value' in your response.`;
 
     // Build full prompt with context (We only need the system prompt, AI proxy handles history natively)
+    const effectiveEmailForPrompt = emailCenter || tenant.fallbackEmail;
     const systemPrompt = buildSystemPrompt({
       tenantName: tenant.name,
       botName: effectiveFlow?.name || 'Claire',
       customInstructions: finalCustomInstructions.trim() || undefined,
       handoffAgentName: tenant.handoffAgent?.name,
       humanHandoffEnabled: tenant.humanHandoffEnabled ?? true,
-      fallbackEmail: tenant.fallbackEmail || undefined,
+      fallbackEmail: effectiveEmailForPrompt || undefined,
       language: flowConfig.language,
       speakingStyle: flowConfig.speakingStyle,
       businessNeeds: flowConfig.businessNeeds,

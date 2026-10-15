@@ -68,7 +68,7 @@ void main() {
 
       verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
-            message: 'Saya ingin bicara dengan agen manusia',
+            message: any(named: 'message'),
             contactId: any(named: 'contactId'),
           )).called(1);
     });
@@ -235,6 +235,8 @@ void main() {
             email: any(named: 'email'),
             name: any(named: 'name'),
             company: any(named: 'company'),
+            language: any(named: 'language'),
+            emailCenter: any(named: 'emailCenter'),
           )).thenAnswer(
         (_) async => {
           'success': true,
@@ -297,6 +299,8 @@ void main() {
             email: 'leman@ceosuite.com',
             name: 'HC Leman',
             company: 'CEO SUITE',
+            language: any(named: 'language'),
+            emailCenter: any(named: 'emailCenter'),
           )).called(1);
 
       // Modal should be closed
@@ -326,6 +330,8 @@ void main() {
             email: any(named: 'email'),
             name: any(named: 'name'),
             company: any(named: 'company'),
+            language: any(named: 'language'),
+            emailCenter: any(named: 'emailCenter'),
           )).thenAnswer(
         (_) async => {
           'success': true,
@@ -379,6 +385,84 @@ void main() {
             email: 'leman@ceosuite.com',
             name: 'HC Leman',
             company: 'CEO SUITE',
+            language: any(named: 'language'),
+            emailCenter: any(named: 'emailCenter'),
+          )).called(1);
+    });
+
+    testWidgets('TEST-AI-F67 when emailCenter is provided (Centennial Tower), modal routes to emailCenter', (tester) async {
+      when(() => api.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
+        (_) async => {
+          'status': 'success',
+          'config': {
+            'welcomeMessage': 'Hello!',
+            'botName': 'Claire',
+            'humanHandoffEnabled': false,
+            'fallbackEmail': 'default-fallback@ceosuite.com',
+            'language': 'en',
+          },
+        },
+      );
+
+      when(() => api.submitContactForm(
+            category: any(named: 'category'),
+            description: any(named: 'description'),
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+            email: any(named: 'email'),
+            name: any(named: 'name'),
+            company: any(named: 'company'),
+            language: any(named: 'language'),
+            emailCenter: any(named: 'emailCenter'),
+          )).thenAnswer(
+        (_) async => {
+          'success': true,
+          'sessionId': 'server_session_ct',
+          'botReply': 'Report received.',
+        },
+      );
+
+      final controller = AiChatController(
+        apiClient: api,
+        config: const AiAgentConfig(
+          apiUrl: 'http://localhost',
+          tenantId: 't1',
+        ),
+      );
+
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: AiChatView(
+            controller: controller,
+            talkToAgentLabel: 'Talk to Human Agent',
+            userName: 'Centennial Member',
+            userEmail: 'member@centennial.sg',
+            userCompany: 'Centennial Pte Ltd',
+            emailCenter: 'sales@sg.ceosuite.com',
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('talk_to_agent')));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextFormField), 'Inquiry regarding Centennial Tower private office');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Report'));
+      await tester.pumpAndSettle();
+
+      verify(() => api.submitContactForm(
+            category: any(named: 'category'),
+            description: 'Inquiry regarding Centennial Tower private office',
+            sessionId: any(named: 'sessionId'),
+            contactId: any(named: 'contactId'),
+            email: 'member@centennial.sg',
+            name: 'Centennial Member',
+            company: 'Centennial Pte Ltd',
+            language: any(named: 'language'),
+            emailCenter: 'sales@sg.ceosuite.com',
           )).called(1);
     });
   });

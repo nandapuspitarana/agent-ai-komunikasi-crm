@@ -108,6 +108,7 @@ class AiAgentApiClient {
     required String message,
     String? contactId,
     String channel = 'mobile_app',
+    String? emailCenter,
   }) async {
     final sanitizedMessage = ContentSanitizer.sanitize(message);
     if (sanitizedMessage.isEmpty) {
@@ -121,6 +122,8 @@ class AiAgentApiClient {
       'message': sanitizedMessage,
       if (contactId != null) 'contactId': contactId,
       'channel': channel,
+      if (emailCenter != null && emailCenter.trim().isNotEmpty)
+        'email_center': emailCenter.trim(),
     };
 
     // Not retried: a second POST could deliver the user message and generate AI replies twice.
@@ -214,6 +217,7 @@ class AiAgentApiClient {
     String? name,
     String? company,
     String? language,
+    String? emailCenter,
   }) async {
     final uri = Uri.parse('${config.sanitizedApiUrl}/api/widget/contact-submit');
     final payload = {
@@ -226,6 +230,8 @@ class AiAgentApiClient {
       if (name != null && name.isNotEmpty) 'name': name,
       if (company != null && company.isNotEmpty) 'company': company,
       if (language != null && language.isNotEmpty) 'language': language,
+      if (emailCenter != null && emailCenter.trim().isNotEmpty)
+        'email_center': emailCenter.trim(),
     };
 
     final http.Response res;
