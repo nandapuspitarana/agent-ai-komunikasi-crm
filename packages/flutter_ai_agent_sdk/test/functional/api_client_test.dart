@@ -72,6 +72,37 @@ void main() {
       expect(reply.isHandoff, isFalse);
     });
 
+    test('TEST-AI-U07b: sendMessage should include email_center and centre in payload', () async {
+      Map<String, dynamic>? capturedPayload;
+      when(() => mockClient.post(
+            any(),
+            headers: any(named: 'headers'),
+            body: any(named: 'body'),
+          )).thenAnswer((invocation) async {
+        final bodyStr = invocation.namedArguments[#body] as String;
+        capturedPayload = jsonDecode(bodyStr) as Map<String, dynamic>;
+        return http.Response(
+          jsonEncode({
+            'reply': 'Sahid Sudirman Center hotline: +62 21 8063 1888',
+            'status': 'queue',
+            'handoffOccurred': true,
+          }),
+          200,
+        );
+      });
+
+      final reply = await apiClient.sendMessage(
+        sessionId: 'session_abc',
+        message: 'speak to human',
+        emailCenter: 'sales@ceosuite.com',
+        centreName: 'Sahid Sudirman Center',
+      );
+
+      expect(capturedPayload?['email_center'], equals('sales@ceosuite.com'));
+      expect(capturedPayload?['centre'], equals('Sahid Sudirman Center'));
+      expect(reply.text, contains('Sahid Sudirman Center'));
+    });
+
     test('TEST-AI-U08: Should retry once on network connection error and succeed', () async {
       int callCount = 0;
       when(() => mockClient.post(

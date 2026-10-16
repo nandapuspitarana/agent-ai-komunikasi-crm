@@ -109,6 +109,7 @@ class AiAgentApiClient {
     String? contactId,
     String channel = 'mobile_app',
     String? emailCenter,
+    String? centreName,
   }) async {
     final sanitizedMessage = ContentSanitizer.sanitize(message);
     if (sanitizedMessage.isEmpty) {
@@ -124,6 +125,8 @@ class AiAgentApiClient {
       'channel': channel,
       if (emailCenter != null && emailCenter.trim().isNotEmpty)
         'email_center': emailCenter.trim(),
+      if (centreName != null && centreName.trim().isNotEmpty)
+        'centre': centreName.trim(),
     };
 
     // Not retried: a second POST could deliver the user message and generate AI replies twice.

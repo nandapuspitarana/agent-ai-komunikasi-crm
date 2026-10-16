@@ -11,6 +11,13 @@ import { getVisitorConfig } from '@/lib/visitor-config';
 import { parseOptions, toLegacyHtml } from '@/lib/quick-replies';
 import { extractVisitorData } from '@/lib/visitor-extractor';
 import { updateVisitorFromExtraction, upsertVisitorProfile, updateVisitorClassification, shouldTriggerLeadForm } from '@/lib/visitor-service';
+import {
+  findCentre,
+  findCentresByEmail,
+  detectCentreInText,
+  detectCityInText,
+  resolveDynamicHandoff,
+} from '@/lib/centres-directory';
 
 import { prisma } from '@/lib/prisma';
 
@@ -146,6 +153,13 @@ export async function POST(req: NextRequest) {
       body.email_center ?? body.emailCenter ?? body.centre_email ?? body.centreEmail;
     const emailCenter = typeof rawEmailCenter === 'string' ? rawEmailCenter.trim() : '';
 
+    const rawCentre =
+      body.centre ?? body.centre_name ?? body.centreName ?? body.center ?? body.centerName;
+    const requestCentre = typeof rawCentre === 'string' ? rawCentre.trim() : '';
+
+    const rawCity = body.city ?? body.userCity ?? body.cityName;
+    const requestCity = typeof rawCity === 'string' ? rawCity.trim() : '';
+
     if (!tenantId || !message) {
       return corsResponse(
         { error: 'Missing required fields: tenantId, message' },
@@ -260,12 +274,102 @@ export async function POST(req: NextRequest) {
     });
 
     // Ensure VisitorProfile exists (useful for internal testing /widget-ui where init doesn't run)
-    if (visitorConfig.enabled && resolvedContactId) {
-      await upsertVisitorProfile(tenantId, resolvedContactId, {
-        referrerUrl: 'Chat Init',
-        pageUrl: 'Widget UI Preview'
-      }).catch(err => console.error('[Visitor Tracking] Upsert error:', err));
+    let existingVisitor: any = null;
+    if (resolvedContactId && typeof prisma.visitorProfile?.findUnique === 'function') {
+      try {
+        existingVisitor = await prisma.visitorProfile.findUnique({
+          where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
+        });
+      } catch (err) {
+        console.error('[Visitor Tracking] Error fetching existing visitor profile:', err);
+      }
     }
+
+    if (visitorConfig.enabled && resolvedContactId) {
+      if (!existingVisitor) {
+        existingVisitor = await upsertVisitorProfile(tenantId, resolvedContactId, {
+          referrerUrl: 'Chat Init',
+          pageUrl: 'Widget UI Preview'
+        }).catch(err => {
+          console.error('[Visitor Tracking] Upsert error:', err);
+          return null;
+        });
+      }
+    }
+
+    // Resolve centre from payload, emailCenter, or message text
+    let detectedCentre = findCentre(requestCentre);
+    if (!detectedCentre && emailCenter) {
+      const emailMatches = findCentresByEmail(emailCenter);
+      if (emailMatches.length === 1) {
+        detectedCentre = emailMatches[0];
+      }
+    }
+    if (!detectedCentre) {
+      detectedCentre = detectCentreInText(message);
+    }
+
+    let detectedCity = requestCity || detectCityInText(message);
+    if (!detectedCity && detectedCentre) {
+      detectedCity = detectedCentre.city;
+    } else if (!detectedCity && emailCenter) {
+      const emailMatches = findCentresByEmail(emailCenter);
+      if (emailMatches.length > 0) {
+        detectedCity = emailMatches[0].city;
+      }
+    }
+
+    // Memorize detected centre / city into VisitorProfile.metadata and VisitorProfile.city
+    if (resolvedContactId && (detectedCentre || detectedCity || emailCenter)) {
+      try {
+        const rawMeta = existingVisitor?.metadata;
+        const currentMeta: Record<string, any> =
+          rawMeta && typeof rawMeta === 'object' && !Array.isArray(rawMeta)
+            ? { ...rawMeta }
+            : {};
+
+        const updatedMeta: Record<string, any> = { ...currentMeta };
+        if (detectedCentre) {
+          updatedMeta.centre = detectedCentre.name;
+          updatedMeta.centreBrand = detectedCentre.brand;
+          updatedMeta.centreCity = detectedCentre.city;
+          updatedMeta.centrePhone = detectedCentre.phone;
+          updatedMeta.centreEmail = detectedCentre.email;
+          updatedMeta.centreAddress = detectedCentre.address;
+          updatedMeta.centreHours = detectedCentre.hours;
+        }
+        if (detectedCity) {
+          updatedMeta.city = detectedCity;
+        }
+        if (emailCenter) {
+          updatedMeta.emailCenter = emailCenter;
+        }
+
+        const visitorUpdateData: any = { metadata: updatedMeta };
+        if (detectedCity && !existingVisitor?.city) {
+          visitorUpdateData.city = detectedCity;
+        }
+
+        prisma.visitorProfile.update({
+          where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
+          data: visitorUpdateData,
+        }).catch(() => {});
+      } catch (memErr) {
+        console.error('[Visitor Tracking] Error memorizing centre profile:', memErr);
+      }
+    }
+
+    const rawVisitorMeta = existingVisitor?.metadata;
+    const visitorMeta: Record<string, any> =
+      rawVisitorMeta && typeof rawVisitorMeta === 'object' && !Array.isArray(rawVisitorMeta)
+        ? (rawVisitorMeta as Record<string, any>)
+        : {};
+
+    const effectiveCentre = detectedCentre?.name || requestCentre || visitorMeta.centre || visitorMeta.centreName;
+    const effectiveCity = detectedCity || requestCity || existingVisitor?.city || visitorMeta.city;
+    const visitorName = (body.name as string | undefined) || existingVisitor?.name || null;
+    const visitorEmail = (body.email as string | undefined) || existingVisitor?.email || null;
+    const visitorCompany = (body.company as string | undefined) || visitorMeta?.company || null;
 
     // Phase 3: Layer 2 - NLP Extraction (Fire and forget, wrap in try/catch to be non-blocking)
     if (visitorConfig.enabled && visitorConfig.layer2_nlp && resolvedContactId) {
@@ -422,6 +526,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (qnaMatch?.metadata?.centre && resolvedContactId) {
+      const intentCentre = findCentre(qnaMatch.metadata.centre as string);
+      if (intentCentre) {
+        prisma.visitorProfile.update({
+          where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
+          data: {
+            metadata: {
+              ...visitorMeta,
+              centre: intentCentre.name,
+              centreBrand: intentCentre.brand,
+              city: intentCentre.city,
+              centrePhone: intentCentre.phone,
+              centreEmail: intentCentre.email,
+              centreAddress: intentCentre.address,
+              centreHours: intentCentre.hours,
+            },
+            city: intentCentre.city,
+          },
+        }).catch(() => {});
+      }
+    }
+
     let finalCustomInstructions = tenant.aiSystemPrompt || '';
     if (flowSystemPrompt) {
       finalCustomInstructions += `\n\n[Specific Agent Instructions]\n${flowSystemPrompt}`;
@@ -429,6 +555,30 @@ export async function POST(req: NextRequest) {
 
     // Tell the LLM how to parse the UI pipe syntax if it reads it from RAG documents
     finalCustomInstructions += `\n\n[IMPORTANT UI FORMATTING RULE]\nIf you read options or locations from your knowledge base that contain a pipe character (e.g. 'Bangkok|Bangkok Private Office'), DO NOT output the pipe or the value after it. ONLY output the friendly label before the pipe (e.g. 'Bangkok'). Never output 'Label|Value' in your response.`;
+
+    // Inject User Profile & Memorized Centre Context so the AI Agent Proxy can answer dynamically
+    const resolvedCentreInfo = findCentre(effectiveCentre);
+    if (effectiveCentre || effectiveCity || visitorName || visitorCompany) {
+      finalCustomInstructions += `\n\n[USER PROFILE & MEMORIZED CENTRE CONTEXT]\n` +
+        (visitorName ? `• Visitor Name: ${visitorName}\n` : '') +
+        (visitorCompany ? `• Company: ${visitorCompany}\n` : '') +
+        (visitorEmail ? `• Email: ${visitorEmail}\n` : '') +
+        (effectiveCity ? `• City / Location: ${effectiveCity}\n` : '') +
+        (effectiveCentre ? `• Workspace Centre: ${effectiveCentre}\n` : '');
+
+      if (resolvedCentreInfo) {
+        finalCustomInstructions +=
+          `• Centre Front Desk Phone: ${resolvedCentreInfo.phone}\n` +
+          `• Centre Email: ${resolvedCentreInfo.email}\n` +
+          `• Centre Operating Hours: ${resolvedCentreInfo.hours}\n` +
+          `• Centre Address: ${resolvedCentreInfo.address}\n`;
+      }
+      finalCustomInstructions += `\nGUIDANCE FOR AI CONVERSATION:\n` +
+        `- When answering, personalize your responses to their workspace centre (${effectiveCentre || effectiveCity || 'their centre'}) whenever relevant.\n` +
+        `- If the user inquires about centre facilities, operating hours, reception, or urgent assistance, reference their specific centre details above.\n` +
+        `- Address the user respectfully by name if known.\n` +
+        `- Maintain a warm, highly professional, executive concierge demeanor.`;
+    }
 
     // Build full prompt with context (We only need the system prompt, AI proxy handles history natively)
     const effectiveEmailForPrompt = emailCenter || tenant.fallbackEmail;
@@ -470,23 +620,43 @@ export async function POST(req: NextRequest) {
       let bypassLLM = false;
 
       if (qnaMatch) {
-        const isRichOrHandoff =
-          ['form', 'options', 'card', 'handoff'].includes(qnaMatch.responseType) ||
-          qnaMatch.response.includes('[HANDOFF_REQUESTED]');
-        if (isRichOrHandoff) {
-          // Bypass LLM for rich UI responses and direct handoff messages to preserve formatting and hotlines
+        const userMsgLower = message.toLowerCase().trim();
+        const lowerIntentName = (qnaMatch.name || '').toLowerCase().trim();
+
+        // Check if this is an explicit menu button click or fixed form/card UI
+        const isMenuClick =
+          userMsgLower === lowerIntentName ||
+          userMsgLower.startsWith('cs:') ||
+          userMsgLower.startsWith('faq:') ||
+          userMsgLower.startsWith('po centre:') ||
+          userMsgLower.startsWith('po city:') ||
+          userMsgLower.startsWith('city directory:') ||
+          userMsgLower.startsWith('direct:') ||
+          userMsgLower.startsWith('front desk:') ||
+          ['form', 'card'].includes(qnaMatch.responseType);
+
+        if (isMenuClick) {
+          // Bypass LLM for instant button navigation and structured forms/cards
           bypassLLM = true;
           aiReplyRaw = qnaMatch.response;
           if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
             aiReplyRaw += ' [HANDOFF_REQUESTED]';
           }
         } else {
-          // For simple text, let LLM rewrite it conversationally
+          // The user typed a free-form message! Let the AI Agent Proxy generate a dynamic, conversational response
           let referenceResponse = qnaMatch.response;
           if (qnaMatch.responseType === 'handoff' && !referenceResponse.includes('[HANDOFF_REQUESTED]')) {
             referenceResponse += ' [HANDOFF_REQUESTED]';
           }
-          dynamicSystemPrompt += `\n\n[USER INTENT MATCHED]\nThe user's request matches the intent '${qnaMatch.name}'. Use the following pre-defined response as the core factual reference for your answer: "${referenceResponse}". Rewrite it to be conversational, natural, and directly address the user's message while maintaining the exact same facts, prices, and questions.`;
+
+          dynamicSystemPrompt += `\n\n[USER INTENT MATCHED: ${qnaMatch.name}]\n` +
+            `The user's query matched intent '${qnaMatch.name}'.\n` +
+            `Core factual reference:\n"${referenceResponse}"\n\n` +
+            `INSTRUCTION:\n` +
+            `- Provide a dynamic, friendly, natural, and helpful answer that directly addresses the user's specific query.\n` +
+            `- Use the core factual reference above as the truth.\n` +
+            `- If this is a customer service handoff or issue report, acknowledge their specific problem with empathy, confirm that our CS team is stepping in, offer their centre front desk hotline (${resolvedCentreInfo?.phone || 'reception'}) for urgent on-site support, and append [HANDOFF_REQUESTED] at the end.\n` +
+            `- Keep the tone executive, warm, and professional.`;
         }
       }
 
@@ -503,7 +673,8 @@ export async function POST(req: NextRequest) {
             take: 10,
           });
 
-          conversationHistory = previousDbMessages
+          conversationHistory = (previousDbMessages || [])
+            .slice()
             .reverse()
             .map((m) => {
               const cleanContent = m.content
@@ -540,10 +711,27 @@ export async function POST(req: NextRequest) {
             history: conversationHistory,
           });
 
-          aiReplyRaw = aiResponse.reply || flowConfig?.defaultResponse || defaultUnavailableMsg;
+          if (aiResponse.reply && aiResponse.intent !== 'offline_fallback') {
+            aiReplyRaw = aiResponse.reply;
+          } else if (qnaMatch) {
+            // Graceful fallback to matched intent response if proxy is offline
+            aiReplyRaw = qnaMatch.response;
+            if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
+              aiReplyRaw += ' [HANDOFF_REQUESTED]';
+            }
+          } else {
+            aiReplyRaw = flowConfig?.defaultResponse || defaultUnavailableMsg;
+          }
         } catch (aiError) {
           console.error('[Widget Message] AI Engine error:', aiError);
-          aiReplyRaw = flowConfig?.defaultResponse || defaultFailureMsg;
+          if (qnaMatch) {
+            aiReplyRaw = qnaMatch.response;
+            if (qnaMatch.responseType === 'handoff' && !aiReplyRaw.includes('[HANDOFF_REQUESTED]')) {
+              aiReplyRaw += ' [HANDOFF_REQUESTED]';
+            }
+          } else {
+            aiReplyRaw = flowConfig?.defaultResponse || defaultFailureMsg;
+          }
         }
       }
 
@@ -559,6 +747,26 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Resolve dynamic personalized handoff if handoff is requested or intent is human agent support
+    let dynamicOptionsOverride: string | null = null;
+    if (aiReplyRaw.includes('[HANDOFF_REQUESTED]') || qnaMatch?.name === 'CS: Speak to Human Agent / Live Support') {
+      const dynamicResult = resolveDynamicHandoff({
+        baseResponse: aiReplyRaw,
+        centre: effectiveCentre,
+        city: effectiveCity,
+        emailCenter,
+        isEn,
+        baseOptions: qnaMatch?.options || '',
+      });
+
+      if (dynamicResult.dynamicallyResolved) {
+        aiReplyRaw = dynamicResult.reply;
+        if (dynamicResult.options) {
+          dynamicOptionsOverride = dynamicResult.options;
+        }
+      }
+    }
+
     // Step 4: Parse AI response for handoff flag, classification, and data extraction
     const { cleanReply: parsedExtraction, extractedData } = parseDataExtractionTag(aiReplyRaw);
     const { cleanReply: parsedClassification, classification } = parseClassificationTag(parsedExtraction);
@@ -568,7 +776,8 @@ export async function POST(req: NextRequest) {
     // button shows Label but sends Value back as the user's message).
     //  - web widget (channel 'widget') renders HTML, so buttons are appended to the reply as before
     //  - every other channel (e.g. mobile_app) gets clean text plus a structured `options` array
-    const quickOptions = qnaMatch?.options ? parseOptions(qnaMatch.options) : [];
+    const rawOptionsString = dynamicOptionsOverride ?? qnaMatch?.options ?? '';
+    const quickOptions = rawOptionsString ? parseOptions(rawOptionsString) : [];
     const useLegacyHtml = channel === 'widget';
     let cleanReply = useLegacyHtml && quickOptions.length > 0
       ? textReply + toLegacyHtml(quickOptions)

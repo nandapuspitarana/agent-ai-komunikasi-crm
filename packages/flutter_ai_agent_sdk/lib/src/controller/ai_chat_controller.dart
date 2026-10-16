@@ -54,6 +54,7 @@ class AiChatController extends ChangeNotifier {
     String? initialSessionId,
     List<ChatMessage>? initialMessages,
     String? emailCenter,
+    String? centreName,
   })  : apiClient = apiClient ?? AiAgentApiClient(config: config),
         rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
         _sessionId = initialSessionId ?? _newSessionId(),
@@ -61,6 +62,7 @@ class AiChatController extends ChangeNotifier {
         _humanHandoffEnabled = config.humanHandoffEnabled ?? true,
         _fallbackEmail = config.fallbackEmail,
         _emailCenter = emailCenter,
+        _centreName = centreName,
         _isInitialized = initialMessages != null && initialMessages.isNotEmpty;
 
   static int _sessionSeq = 0;
@@ -140,6 +142,15 @@ class AiChatController extends ChangeNotifier {
   set emailCenter(String? value) {
     if (_emailCenter != value) {
       _emailCenter = value;
+      notifyListeners();
+    }
+  }
+
+  String? _centreName;
+  String? get centreName => _centreName;
+  set centreName(String? value) {
+    if (_centreName != value) {
+      _centreName = value;
       notifyListeners();
     }
   }
@@ -399,18 +410,13 @@ class AiChatController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final botReply = (_emailCenter != null && _emailCenter!.isNotEmpty)
-          ? await apiClient.sendMessage(
-              sessionId: _sessionId,
-              message: trimmed,
-              contactId: contactId,
-              emailCenter: _emailCenter,
-            )
-          : await apiClient.sendMessage(
-              sessionId: _sessionId,
-              message: trimmed,
-              contactId: contactId,
-            );
+      final botReply = await apiClient.sendMessage(
+        sessionId: _sessionId,
+        message: trimmed,
+        contactId: contactId,
+        emailCenter: _emailCenter,
+        centreName: _centreName,
+      );
 
       // Update user message status to sent
       final userIdx = _messages.indexWhere((m) => m.id == userMsgId);
