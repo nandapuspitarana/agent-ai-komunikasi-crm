@@ -84,6 +84,18 @@ class AiChatView extends StatefulWidget {
   /// Takes priority over the tenant's default fallbackEmail for inquiry routing and mailto links.
   final String? emailCenter;
 
+  /// Optional specific centre name (e.g. Centennial Tower).
+  final String? centreName;
+
+  /// Optional city name (e.g. Singapore).
+  final String? city;
+
+  /// Optional workspace / company client name.
+  final String? workspaceName;
+
+  /// Optional user phone number.
+  final String? userPhone;
+
   const AiChatView({
     super.key,
     required this.controller,
@@ -108,11 +120,15 @@ class AiChatView extends StatefulWidget {
     this.handoffBannerMessage,
     this.userName,
     this.userEmail,
+    this.userPhone,
     this.userCompany,
+    this.workspaceName,
     this.enableContactFunnel = true,
     this.contactFunnelStrings = const ContactFunnelStrings(),
     this.onContactFormSubmit,
     this.emailCenter,
+    this.centreName,
+    this.city,
   });
 
   @override
@@ -123,12 +139,37 @@ class _AiChatViewState extends State<AiChatView> {
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  @override
-  void initState() {
-    super.initState();
+  void _syncProfileToController() {
     if (widget.emailCenter != null && widget.emailCenter!.isNotEmpty) {
       widget.controller.emailCenter = widget.emailCenter;
     }
+    if (widget.centreName != null && widget.centreName!.isNotEmpty) {
+      widget.controller.centreName = widget.centreName;
+    }
+    if (widget.city != null && widget.city!.isNotEmpty) {
+      widget.controller.city = widget.city;
+    }
+    if (widget.workspaceName != null && widget.workspaceName!.isNotEmpty) {
+      widget.controller.workspaceName = widget.workspaceName;
+    }
+    if (widget.userName != null && widget.userName!.isNotEmpty) {
+      widget.controller.userName = widget.userName;
+    }
+    if (widget.userEmail != null && widget.userEmail!.isNotEmpty) {
+      widget.controller.userEmail = widget.userEmail;
+    }
+    if (widget.userPhone != null && widget.userPhone!.isNotEmpty) {
+      widget.controller.userPhone = widget.userPhone;
+    }
+    if (widget.userCompany != null && widget.userCompany!.isNotEmpty) {
+      widget.controller.userCompany = widget.userCompany;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _syncProfileToController();
     widget.controller.addListener(_onControllerUpdate);
     // Idempotent: fetches config on first open, refreshes a restored session's
     // greeting, retries after an offline fallback, and is a no-op otherwise.
@@ -138,9 +179,7 @@ class _AiChatViewState extends State<AiChatView> {
   @override
   void didUpdateWidget(AiChatView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.emailCenter != oldWidget.emailCenter && widget.emailCenter != null) {
-      widget.controller.emailCenter = widget.emailCenter;
-    }
+    _syncProfileToController();
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_onControllerUpdate);
       widget.controller.addListener(_onControllerUpdate);

@@ -1,5 +1,5 @@
 # Stage 1: Build dependency cache & compile
-FROM node:20-slim AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
@@ -10,8 +10,15 @@ RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
 COPY prisma ./prisma
 
-# Install all dependencies (including devDependencies)
-RUN npm ci
+# Configure npm network resilience against transient connection drops & ECONNRESET
+ENV npm_config_fetch_retries=5 \
+    npm_config_fetch_retry_mintimeout=20000 \
+    npm_config_fetch_retry_maxtimeout=120000 \
+    npm_config_fetch_timeout=300000 \
+    npm_config_maxsockets=5
+
+# Install all dependencies (including devDependencies) with cache mount
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 # Copy application source code
 COPY . .
@@ -35,13 +42,14 @@ ENV APP_BUILT_AT=$APP_BUILT_AT
 
 # Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm run build
 
 # Remove development dependencies to keep image size small
 RUN npm prune --production
 
 # Stage 2: Production runner
-FROM node:20-slim AS runner
+FROM node:22-slim AS runner
 
 WORKDIR /app
 

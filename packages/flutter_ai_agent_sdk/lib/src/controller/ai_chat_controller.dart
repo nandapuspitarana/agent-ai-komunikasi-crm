@@ -55,6 +55,13 @@ class AiChatController extends ChangeNotifier {
     List<ChatMessage>? initialMessages,
     String? emailCenter,
     String? centreName,
+    String? city,
+    String? userName,
+    String? userEmail,
+    String? userPhone,
+    String? userCompany,
+    String? workspaceName,
+    Map<String, dynamic>? customMetadata,
   })  : apiClient = apiClient ?? AiAgentApiClient(config: config),
         rateLimiter = RateLimiter(interval: config.floodThrottleInterval),
         _sessionId = initialSessionId ?? _newSessionId(),
@@ -63,6 +70,13 @@ class AiChatController extends ChangeNotifier {
         _fallbackEmail = config.fallbackEmail,
         _emailCenter = emailCenter,
         _centreName = centreName,
+        _city = city,
+        _userName = userName,
+        _userEmail = userEmail,
+        _userPhone = userPhone,
+        _userCompany = userCompany,
+        _workspaceName = workspaceName,
+        _customMetadata = customMetadata,
         _isInitialized = initialMessages != null && initialMessages.isNotEmpty;
 
   static int _sessionSeq = 0;
@@ -153,6 +167,67 @@ class AiChatController extends ChangeNotifier {
       _centreName = value;
       notifyListeners();
     }
+  }
+
+  String? _city;
+  String? get city => _city;
+  set city(String? value) {
+    if (_city != value) {
+      _city = value;
+      notifyListeners();
+    }
+  }
+
+  String? _userName;
+  String? get userName => _userName;
+  set userName(String? value) {
+    if (_userName != value) {
+      _userName = value;
+      notifyListeners();
+    }
+  }
+
+  String? _userEmail;
+  String? get userEmail => _userEmail;
+  set userEmail(String? value) {
+    if (_userEmail != value) {
+      _userEmail = value;
+      notifyListeners();
+    }
+  }
+
+  String? _userPhone;
+  String? get userPhone => _userPhone;
+  set userPhone(String? value) {
+    if (_userPhone != value) {
+      _userPhone = value;
+      notifyListeners();
+    }
+  }
+
+  String? _userCompany;
+  String? get userCompany => _userCompany;
+  set userCompany(String? value) {
+    if (_userCompany != value) {
+      _userCompany = value;
+      notifyListeners();
+    }
+  }
+
+  String? _workspaceName;
+  String? get workspaceName => _workspaceName;
+  set workspaceName(String? value) {
+    if (_workspaceName != value) {
+      _workspaceName = value;
+      notifyListeners();
+    }
+  }
+
+  Map<String, dynamic>? _customMetadata;
+  Map<String, dynamic>? get customMetadata => _customMetadata;
+  set customMetadata(Map<String, dynamic>? value) {
+    _customMetadata = value;
+    notifyListeners();
   }
 
   /// Dynamic responder name:
@@ -416,6 +491,13 @@ class AiChatController extends ChangeNotifier {
         contactId: contactId,
         emailCenter: _emailCenter,
         centreName: _centreName,
+        city: _city,
+        userName: _userName,
+        userEmail: _userEmail,
+        userPhone: _userPhone,
+        userCompany: _userCompany,
+        workspaceName: _workspaceName,
+        metadata: _customMetadata,
       );
 
       // Update user message status to sent

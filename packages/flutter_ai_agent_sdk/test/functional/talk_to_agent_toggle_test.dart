@@ -431,6 +431,7 @@ void main() {
       );
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(splashFactory: NoSplash.splashFactory),
         home: Scaffold(
           body: AiChatView(
             controller: controller,

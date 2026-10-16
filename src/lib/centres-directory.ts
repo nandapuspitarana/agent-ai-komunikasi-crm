@@ -527,27 +527,38 @@ export function detectCityInText(text?: string | null): string | undefined {
 export function formatSingleCentreHandoff(
   centre: CentreInfo,
   isEn: boolean = true,
-  customIntro?: string
+  customIntro?: string,
+  humanHandoffEnabled: boolean = true
 ): { message: string; options: string } {
   const hotlineBlock = isEn
-    ? `For urgent support, you may also call the front desk of your centre directly:\n• <b>${centre.name} (${centre.city})</b>: ${centre.phone}\nReception Hours: Monday - Friday, ${centre.hours}\nEmail: ${centre.email}\nAddress: ${centre.address}`
-    : `Untuk bantuan mendesak, Anda dapat langsung menghubungi front desk centre Anda:\n• <b>${centre.name} (${centre.city})</b>: ${centre.phone}\nJam Operasional: Senin - Jumat, ${centre.hours}\nEmail: ${centre.email}\nAlamat: ${centre.address}`;
+    ? `For direct support, you may contact the front desk of your centre directly:\n• <b>${centre.name} (${centre.city})</b>: ${centre.phone}\nReception Hours: Monday - Friday, ${centre.hours}\nEmail: ${centre.email}\nAddress: ${centre.address}`
+    : `Untuk bantuan langsung, Anda dapat menghubungi front desk centre Anda:\n• <b>${centre.name} (${centre.city})</b>: ${centre.phone}\nJam Operasional: Senin - Jumat, ${centre.hours}\nEmail: ${centre.email}\nAlamat: ${centre.address}`;
 
   const cleanedIntro = (customIntro || '')
     .replace(/\[HANDOFF_REQUESTED\]/g, '')
-    .replace(/For urgent support, you may also call the front desk[\s\S]*$/i, '')
-    .replace(/Untuk bantuan mendesak, Anda dapat langsung menghubungi front desk[\s\S]*$/i, '')
+    .replace(/For (urgent|direct) support, you may (also call|contact) the front desk[\s\S]*$/i, '')
+    .replace(/Untuk bantuan (mendesak|langsung), Anda dapat langsung menghubungi front desk[\s\S]*$/i, '')
     .replace(/Our Customer Service team has been notified[\s\S]*?join this chat shortly\./i, '')
     .replace(/Tim Layanan Pelanggan kami telah diberi tahu[\s\S]*?ruang obrolan ini\./i, '')
     .trim();
 
   let intro: string;
-  if (cleanedIntro.length > 0) {
-    intro = `[HANDOFF_REQUESTED]\n\n${cleanedIntro}\n\n${hotlineBlock}`;
+  if (!humanHandoffEnabled) {
+    if (cleanedIntro.length > 0) {
+      intro = `${cleanedIntro}\n\n${hotlineBlock}`;
+    } else {
+      intro = isEn
+        ? `Our Customer Service and Front Desk team at <b>${centre.name} (${centre.city})</b> is pleased to assist you directly:\n\n${hotlineBlock}`
+        : `Tim Layanan Pelanggan dan Front Desk kami di <b>${centre.name} (${centre.city})</b> siap membantu Anda secara langsung:\n\n${hotlineBlock}`;
+    }
   } else {
-    intro = isEn
-      ? `[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\n${hotlineBlock}`
-      : `[HANDOFF_REQUESTED]\n\nTim Layanan Pelanggan kami telah diberi tahu dan sedang bersiap untuk membantu Anda secara langsung. Tim kami akan segera bergabung ke ruang obrolan ini.\n\n${hotlineBlock}`;
+    if (cleanedIntro.length > 0) {
+      intro = `[HANDOFF_REQUESTED]\n\n${cleanedIntro}\n\n${hotlineBlock}`;
+    } else {
+      intro = isEn
+        ? `[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\n${hotlineBlock}`
+        : `[HANDOFF_REQUESTED]\n\nTim Layanan Pelanggan kami telah diberi tahu dan sedang bersiap untuk membantu Anda secara langsung. Tim kami akan segera bergabung ke ruang obrolan ini.\n\n${hotlineBlock}`;
+    }
   }
 
   const options = `Contact Front Desk|Front Desk: ${centre.name}, Facilities & Amenities|CS: Facilities & Amenities Menu, Other Centres in ${centre.city}|City Directory: ${centre.city}, Main Menu|Start / Main Menu`;
@@ -563,30 +574,41 @@ export function formatCityCentresHandoff(
   city: string,
   centres: CentreInfo[],
   isEn: boolean = true,
-  customIntro?: string
+  customIntro?: string,
+  humanHandoffEnabled: boolean = true
 ): { message: string; options: string } {
   const hotlines = centres.map((c) => `• ${c.name}: ${c.phone}`).join('\n');
   const primaryHours = centres[0]?.hours || '8:30 AM – 5:30 PM';
 
   const hotlineBlock = isEn
-    ? `For urgent support, you may call the front desk of our ${city} centres directly:\n${hotlines}\n\nReception Hours: Monday - Friday, ${primaryHours}`
-    : `Untuk bantuan mendesak, Anda dapat langsung menghubungi front desk centre kami di ${city}:\n${hotlines}\n\nJam Operasional: Senin - Jumat, ${primaryHours}`;
+    ? `For direct support, you may contact the front desk of our ${city} centres directly:\n${hotlines}\n\nReception Hours: Monday - Friday, ${primaryHours}`
+    : `Untuk bantuan langsung, Anda dapat menghubungi front desk centre kami di ${city}:\n${hotlines}\n\nJam Operasional: Senin - Jumat, ${primaryHours}`;
 
   const cleanedIntro = (customIntro || '')
     .replace(/\[HANDOFF_REQUESTED\]/g, '')
-    .replace(/For urgent support, you may call the front desk[\s\S]*$/i, '')
-    .replace(/Untuk bantuan mendesak, Anda dapat langsung menghubungi front desk[\s\S]*$/i, '')
+    .replace(/For (urgent|direct) support, you may (also call|contact) the front desk[\s\S]*$/i, '')
+    .replace(/Untuk bantuan (mendesak|langsung), Anda dapat langsung menghubungi front desk[\s\S]*$/i, '')
     .replace(/Our Customer Service team has been notified[\s\S]*?join this chat shortly\./i, '')
     .replace(/Tim Layanan Pelanggan kami telah diberi tahu[\s\S]*?ruang obrolan ini\./i, '')
     .trim();
 
   let intro: string;
-  if (cleanedIntro.length > 0) {
-    intro = `[HANDOFF_REQUESTED]\n\n${cleanedIntro}\n\n${hotlineBlock}`;
+  if (!humanHandoffEnabled) {
+    if (cleanedIntro.length > 0) {
+      intro = `${cleanedIntro}\n\n${hotlineBlock}`;
+    } else {
+      intro = isEn
+        ? `Our front desk and customer service team in <b>${city}</b> is pleased to assist you directly:\n\n${hotlineBlock}`
+        : `Tim front desk dan layanan pelanggan kami di <b>${city}</b> siap membantu Anda secara langsung:\n\n${hotlineBlock}`;
+    }
   } else {
-    intro = isEn
-      ? `[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\n${hotlineBlock}`
-      : `[HANDOFF_REQUESTED]\n\nTim Layanan Pelanggan kami telah diberi tahu dan sedang bersiap untuk membantu Anda secara langsung. Tim kami akan segera bergabung ke ruang obrolan ini.\n\n${hotlineBlock}`;
+    if (cleanedIntro.length > 0) {
+      intro = `[HANDOFF_REQUESTED]\n\n${cleanedIntro}\n\n${hotlineBlock}`;
+    } else {
+      intro = isEn
+        ? `[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\n${hotlineBlock}`
+        : `[HANDOFF_REQUESTED]\n\nTim Layanan Pelanggan kami telah diberi tahu dan sedang bersiap untuk membantu Anda secara langsung. Tim kami akan segera bergabung ke ruang obrolan ini.\n\n${hotlineBlock}`;
+    }
   }
 
   const centreOptions = centres.map((c) => `${c.name}|Front Desk: ${c.name}`).join(', ');
@@ -598,10 +620,17 @@ export function formatCityCentresHandoff(
 /**
  * Formats a clean default handoff with quick navigation options when no centre is known.
  */
-export function formatDefaultHandoff(isEn: boolean = true): { message: string; options: string } {
-  const intro = isEn
-    ? `[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\nFor urgent support, please select your city or centre below to connect with your local front desk directly:`
-    : `[HANDOFF_REQUESTED]\n\nTim Layanan Pelanggan kami telah diberi tahu dan sedang bersiap untuk membantu Anda secara langsung. Tim kami akan segera bergabung ke ruang obrolan ini.\n\nUntuk bantuan mendesak, silakan pilih kota atau centre Anda di bawah ini untuk menghubungi front desk setempat:`;
+export function formatDefaultHandoff(isEn: boolean = true, humanHandoffEnabled: boolean = true): { message: string; options: string } {
+  let intro: string;
+  if (!humanHandoffEnabled) {
+    intro = isEn
+      ? `Our Customer Service and Front Desk team would be pleased to assist you directly.\n\nPlease select your city or centre below to connect with your local front desk directly:`
+      : `Tim Layanan Pelanggan dan Front Desk kami siap membantu Anda secara langsung.\n\nSilakan pilih kota atau centre Anda di bawah ini untuk menghubungi front desk setempat:`;
+  } else {
+    intro = isEn
+      ? `[HANDOFF_REQUESTED]\n\nOur Customer Service team has been notified and is stepping in to assist you directly. A team member will join this chat shortly.\n\nFor urgent support, please select your city or centre below to connect with your local front desk directly:`
+      : `[HANDOFF_REQUESTED]\n\nTim Layanan Pelanggan kami telah diberi tahu dan sedang bersiap untuk membantu Anda secara langsung. Tim kami akan segera bergabung ke ruang obrolan ini.\n\nUntuk bantuan mendesak, silakan pilih kota atau centre Anda di bawah ini untuk menghubungi front desk setempat:`;
+  }
 
   const options = `Jakarta|City Directory: Jakarta, Kuala Lumpur|City Directory: Kuala Lumpur, Singapore|City Directory: Singapore, Hong Kong|City Directory: Hong Kong, Shanghai|City Directory: Shanghai, Beijing|City Directory: Beijing, All Centres Directory|CS: Contact Directory All Locations, Main Menu|Start / Main Menu`;
 
@@ -615,6 +644,7 @@ export interface ResolveHandoffParams {
   emailCenter?: string | null;
   isEn?: boolean;
   baseOptions?: string;
+  humanHandoffEnabled?: boolean;
 }
 
 export interface ResolvedHandoffResult {
@@ -631,7 +661,15 @@ export interface ResolvedHandoffResult {
  * any conversational AI reasoning.
  */
 export function resolveDynamicHandoff(params: ResolveHandoffParams): ResolvedHandoffResult {
-  const { baseResponse, centre, city, emailCenter, isEn = true, baseOptions = '' } = params;
+  const {
+    baseResponse,
+    centre,
+    city,
+    emailCenter,
+    isEn = true,
+    baseOptions = '',
+    humanHandoffEnabled = true,
+  } = params;
 
   // Check if baseResponse contains a custom conversational response (e.g. from AI proxy)
   // vs the generic legacy 24-centre list or default canned template
@@ -658,7 +696,7 @@ export function resolveDynamicHandoff(params: ResolveHandoffParams): ResolvedHan
   }
 
   if (targetCentre) {
-    const formatted = formatSingleCentreHandoff(targetCentre, isEn, customIntro);
+    const formatted = formatSingleCentreHandoff(targetCentre, isEn, customIntro, humanHandoffEnabled);
     return {
       reply: formatted.message,
       options: formatted.options,
@@ -680,7 +718,7 @@ export function resolveDynamicHandoff(params: ResolveHandoffParams): ResolvedHan
   if (targetCity) {
     const cityCentres = findCentresByCity(targetCity);
     if (cityCentres.length > 0) {
-      const formatted = formatCityCentresHandoff(targetCity, cityCentres, isEn, customIntro);
+      const formatted = formatCityCentresHandoff(targetCity, cityCentres, isEn, customIntro, humanHandoffEnabled);
       return {
         reply: formatted.message,
         options: formatted.options,
@@ -693,7 +731,7 @@ export function resolveDynamicHandoff(params: ResolveHandoffParams): ResolvedHan
   // 3. Priority 3: Fallback when profile has no centre/city
   // If baseResponse contains the legacy multi-country list, replace with clean default options
   if (baseResponse.includes('For urgent support, you may also call the front desk of your centre directly:')) {
-    const formatted = formatDefaultHandoff(isEn);
+    const formatted = formatDefaultHandoff(isEn, humanHandoffEnabled);
     return {
       reply: formatted.message,
       options: formatted.options,

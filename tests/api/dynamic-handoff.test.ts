@@ -312,4 +312,119 @@ describe('POST /api/widget/message — Dynamic Handoff & Memorization Integratio
     expect(res.reply).toContain('+60 3 2776 6888');
     expect(res.reply).toContain('27th Floor 9 Jalan Stesen Sentral 5');
   });
+
+  it('TEST-DH-14 Step 2 keyword handoff ("want to talk human agent") when humanHandoffEnabled is false routes to Centennial Tower Singapore, not fallbackEmail', async () => {
+    (prismaMock.tenant.findUnique as any).mockResolvedValueOnce({
+      id: TENANT_ID,
+      name: 'CEO SUITE',
+      aiEnabled: true,
+      humanHandoffEnabled: false, // human handoff disabled!
+      fallbackEmail: 'nanda@ceosuite.com',
+      visitorConfig: { enabled: true, language: 'en' },
+      activeFlow: null,
+      flows: [],
+    });
+
+    const res = await postMessage({
+      message: 'want to talk human agent',
+      contactId: 'user-singapore-ct',
+      centre: 'Centennial Tower',
+      city: 'Singapore',
+      name: 'Nanda',
+      company: 'CEO SUITE',
+      workspace: 'Centennial Tower',
+      channel: 'mobile_app',
+    });
+
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.status).toBe('bot');
+    expect(json.humanHandoffEnabled).toBe(false);
+    expect(json.handoffOccurred).toBe(false);
+
+    // CRITICAL: Must be routed to Centennial Tower Singapore, NOT generic fallback email nanda@ceosuite.com!
+    expect(json.reply).toContain('Centennial Tower (Singapore)');
+    expect(json.reply).toContain('+65 6829 7000');
+    expect(json.reply).toContain('sales@sg.ceosuite.com');
+    expect(json.reply).toContain('3 Temasek Avenue');
+    expect(json.reply).not.toContain('nanda@ceosuite.com');
+    expect(json.emailCenter).toBe('sales@sg.ceosuite.com');
+    expect(json.options).toBeDefined();
+    expect(json.options.some((o: any) => o.label === 'Contact Front Desk')).toBe(true);
+  });
+
+  it('TEST-DH-15 Step 2 keyword handoff ("want to talk human agent") when humanHandoffEnabled is true queues and attaches Centennial Tower hotline', async () => {
+    (prismaMock.tenant.findUnique as any).mockResolvedValueOnce({
+      id: TENANT_ID,
+      name: 'CEO SUITE',
+      aiEnabled: true,
+      humanHandoffEnabled: true,
+      handoffAgent: { name: 'Sarah' },
+      visitorConfig: { enabled: true, language: 'en' },
+      activeFlow: null,
+      flows: [],
+    });
+
+    const res = await postMessage({
+      message: 'I want to talk human agent',
+      contactId: 'user-singapore-live',
+      centre: 'Centennial Tower',
+      city: 'Singapore',
+      name: 'Nanda',
+      company: 'CEO SUITE',
+      channel: 'mobile_app',
+    });
+
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.status).toBe('queue');
+    expect(json.handoffOccurred).toBe(true);
+    expect(json.reply).toContain('Centennial Tower (Singapore)');
+    expect(json.reply).toContain('+65 6829 7000');
+    expect(json.emailCenter).toBe('sales@sg.ceosuite.com');
+  });
+
+  it('TEST-DH-16 Mobile data embedding: name, company, workspace, centre upserts VisitorProfile', async () => {
+    (prismaMock.tenant.findUnique as any).mockResolvedValueOnce({
+      id: TENANT_ID,
+      name: 'CEO SUITE',
+      aiEnabled: true,
+      humanHandoffEnabled: false,
+      fallbackEmail: 'nanda@ceosuite.com',
+      visitorConfig: { enabled: true, language: 'en' },
+      activeFlow: null,
+      flows: [],
+    });
+
+    const res = await postMessage({
+      message: 'What are the reception hours?',
+      contactId: 'client-nanda-sg',
+      name: 'Nanda',
+      email: 'nanda@ceosuite.com',
+      company: 'CEO SUITE Pte Ltd',
+      workspace: 'Centennial Tower',
+      centre: 'Centennial Tower',
+      city: 'Singapore',
+      channel: 'mobile_app',
+    });
+
+    expect(res.status).toBe(200);
+    // Verifies prisma.visitorProfile.update was called with the embedded profile data
+    expect(prismaMock.visitorProfile.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          name: 'Nanda',
+          email: 'nanda@ceosuite.com',
+          city: 'Singapore',
+          metadata: expect.objectContaining({
+            centre: 'Centennial Tower',
+            company: 'CEO SUITE Pte Ltd',
+            workspace: 'Centennial Tower',
+            centrePhone: '+65 6829 7000',
+            centreEmail: 'sales@sg.ceosuite.com',
+          }),
+        }),
+      })
+    );
+  });
 });

@@ -110,6 +110,13 @@ class AiAgentApiClient {
     String channel = 'mobile_app',
     String? emailCenter,
     String? centreName,
+    String? city,
+    String? userName,
+    String? userEmail,
+    String? userPhone,
+    String? userCompany,
+    String? workspaceName,
+    Map<String, dynamic>? metadata,
   }) async {
     final sanitizedMessage = ContentSanitizer.sanitize(message);
     if (sanitizedMessage.isEmpty) {
@@ -127,6 +134,13 @@ class AiAgentApiClient {
         'email_center': emailCenter.trim(),
       if (centreName != null && centreName.trim().isNotEmpty)
         'centre': centreName.trim(),
+      if (city != null && city.trim().isNotEmpty) 'city': city.trim(),
+      if (userName != null && userName.trim().isNotEmpty) 'name': userName.trim(),
+      if (userEmail != null && userEmail.trim().isNotEmpty) 'email': userEmail.trim(),
+      if (userPhone != null && userPhone.trim().isNotEmpty) 'phone': userPhone.trim(),
+      if (userCompany != null && userCompany.trim().isNotEmpty) 'company': userCompany.trim(),
+      if (workspaceName != null && workspaceName.trim().isNotEmpty) 'workspace': workspaceName.trim(),
+      if (metadata != null && metadata.isNotEmpty) 'metadata': metadata,
     };
 
     // Not retried: a second POST could deliver the user message and generate AI replies twice.

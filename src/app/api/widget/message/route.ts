@@ -160,6 +160,15 @@ export async function POST(req: NextRequest) {
     const rawCity = body.city ?? body.userCity ?? body.cityName;
     const requestCity = typeof rawCity === 'string' ? rawCity.trim() : '';
 
+    const rawWorkspace =
+      body.workspace ?? body.workspaceName ?? body.workspace_name ?? body.venue;
+    const requestWorkspace = typeof rawWorkspace === 'string' ? rawWorkspace.trim() : '';
+
+    const visitorName = typeof body.name === 'string' && body.name.trim() ? body.name.trim() : null;
+    const visitorEmail = typeof body.email === 'string' && body.email.trim() ? body.email.trim() : null;
+    const visitorPhone = typeof body.phone === 'string' && body.phone.trim() ? body.phone.trim() : null;
+    const visitorCompany = typeof body.company === 'string' && body.company.trim() ? body.company.trim() : null;
+
     if (!tenantId || !message) {
       return corsResponse(
         { error: 'Missing required fields: tenantId, message' },
@@ -297,8 +306,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Resolve centre from payload, emailCenter, or message text
+    // Resolve centre from payload, requestWorkspace, emailCenter, or message text
     let detectedCentre = findCentre(requestCentre);
+    if (!detectedCentre && requestWorkspace) {
+      detectedCentre = findCentre(requestWorkspace);
+    }
     if (!detectedCentre && emailCenter) {
       const emailMatches = findCentresByEmail(emailCenter);
       if (emailMatches.length === 1) {
@@ -319,8 +331,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Memorize detected centre / city into VisitorProfile.metadata and VisitorProfile.city
-    if (resolvedContactId && (detectedCentre || detectedCity || emailCenter)) {
+    // Memorize detected centre / city / user profile into VisitorProfile
+    if (resolvedContactId) {
       try {
         const rawMeta = existingVisitor?.metadata;
         const currentMeta: Record<string, any> =
@@ -344,16 +356,49 @@ export async function POST(req: NextRequest) {
         if (emailCenter) {
           updatedMeta.emailCenter = emailCenter;
         }
+        if (visitorCompany) {
+          updatedMeta.company = visitorCompany;
+        }
+        if (requestWorkspace) {
+          updatedMeta.workspace = requestWorkspace;
+        }
 
         const visitorUpdateData: any = { metadata: updatedMeta };
         if (detectedCity && !existingVisitor?.city) {
           visitorUpdateData.city = detectedCity;
         }
+        if (visitorName && !existingVisitor?.name) {
+          visitorUpdateData.name = visitorName;
+        }
+        if (visitorEmail && !existingVisitor?.email) {
+          visitorUpdateData.email = visitorEmail;
+        }
+        if (visitorPhone && !existingVisitor?.phone) {
+          visitorUpdateData.phone = visitorPhone;
+        }
 
-        prisma.visitorProfile.update({
-          where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
-          data: visitorUpdateData,
-        }).catch(() => {});
+        if (existingVisitor) {
+          prisma.visitorProfile.update({
+            where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
+            data: visitorUpdateData,
+          }).catch(() => {});
+        } else if (visitorConfig.enabled) {
+          existingVisitor = await prisma.visitorProfile.create({
+            data: {
+              tenantId,
+              contactId: resolvedContactId,
+              name: visitorName,
+              email: visitorEmail,
+              phone: visitorPhone,
+              city: detectedCity,
+              metadata: updatedMeta,
+              sessions: 1,
+              messageCount: 1,
+              leadScore: 20,
+              leadClassification: 'prospect',
+            },
+          }).catch(() => null);
+        }
       } catch (memErr) {
         console.error('[Visitor Tracking] Error memorizing centre profile:', memErr);
       }
@@ -365,11 +410,21 @@ export async function POST(req: NextRequest) {
         ? (rawVisitorMeta as Record<string, any>)
         : {};
 
-    const effectiveCentre = detectedCentre?.name || requestCentre || visitorMeta.centre || visitorMeta.centreName;
-    const effectiveCity = detectedCity || requestCity || existingVisitor?.city || visitorMeta.city;
-    const visitorName = (body.name as string | undefined) || existingVisitor?.name || null;
-    const visitorEmail = (body.email as string | undefined) || existingVisitor?.email || null;
-    const visitorCompany = (body.company as string | undefined) || visitorMeta?.company || null;
+    const effectiveCentre =
+      detectedCentre?.name ||
+      requestCentre ||
+      findCentre(requestWorkspace)?.name ||
+      visitorMeta.centre ||
+      visitorMeta.centreName;
+    const effectiveCity =
+      detectedCity ||
+      requestCity ||
+      existingVisitor?.city ||
+      visitorMeta.city ||
+      (effectiveCentre ? findCentre(effectiveCentre)?.city : null);
+    const finalVisitorName = visitorName || existingVisitor?.name || null;
+    const finalVisitorEmail = visitorEmail || existingVisitor?.email || null;
+    const finalVisitorCompany = visitorCompany || visitorMeta?.company || null;
 
     // Phase 3: Layer 2 - NLP Extraction (Fire and forget, wrap in try/catch to be non-blocking)
     if (visitorConfig.enabled && visitorConfig.layer2_nlp && resolvedContactId) {
@@ -464,33 +519,48 @@ export async function POST(req: NextRequest) {
 
       if (ruleCheck.intent === 'handoff_requested') {
         const isHandoffEnabled = tenant.humanHandoffEnabled ?? true;
+        const resolvedCentre = findCentre(effectiveCentre);
+        const effectiveHandoffEmail = emailCenter || resolvedCentre?.email || tenant.fallbackEmail;
 
         if (!isHandoffEnabled) {
-          const effectiveEmail = emailCenter || tenant.fallbackEmail;
-          const noAgentMsg = effectiveEmail
-            ? (isEn
-                ? `For further assistance, our team would be pleased to assist you directly via email at ${effectiveEmail}.`
-                : `Untuk bantuan lebih lanjut, tim kami siap membantu Anda secara langsung melalui email di ${effectiveEmail}.`)
-            : (isEn
-                ? 'For further assistance, our team would be pleased to assist you directly via email. Please leave a message with your contact details.'
-                : 'Untuk bantuan lebih lanjut, tim kami siap membantu Anda secara langsung via email. Silakan tinggalkan pesan beserta kontak Anda.');
+          const dynamicResult = resolveDynamicHandoff({
+            baseResponse: isEn
+              ? (effectiveHandoffEmail
+                  ? `For personal assistance, our on-duty front desk team would be pleased to assist you directly via email at ${effectiveHandoffEmail} or phone.`
+                  : 'For personal assistance, our team would be pleased to assist you directly. Please leave a message with your contact details.')
+              : (effectiveHandoffEmail
+                  ? `Untuk bantuan personal, tim front desk kami siap membantu Anda via email di ${effectiveHandoffEmail} atau telepon.`
+                  : 'Untuk bantuan personal, tim kami siap membantu Anda. Silakan tinggalkan pesan beserta kontak Anda.'),
+            centre: effectiveCentre,
+            city: effectiveCity,
+            emailCenter: effectiveHandoffEmail,
+            isEn,
+            humanHandoffEnabled: false,
+          });
+
+          const replyMsg = dynamicResult.reply;
 
           await prisma.message.create({
             data: {
               sessionId: currentSessionId,
               senderType: 'bot',
-              content: noAgentMsg,
+              content: replyMsg,
             },
           });
+
+          const dynamicQuickOptions = dynamicResult.options ? parseOptions(dynamicResult.options) : [];
 
           return corsResponse({
             sessionId: currentSessionId,
             status: 'bot',
-            reply: noAgentMsg,
+            reply: replyMsg,
+            options: channel !== 'widget' ? dynamicQuickOptions : undefined,
             handoffOccurred: false,
             humanHandoffEnabled: false,
-            fallbackEmail: effectiveEmail || null,
-            emailCenter: emailCenter || null,
+            fallbackEmail: effectiveHandoffEmail || null,
+            emailCenter: effectiveHandoffEmail || null,
+            centre: effectiveCentre || null,
+            city: effectiveCity || null,
           });
         }
 
@@ -507,27 +577,45 @@ export async function POST(req: NextRequest) {
           ? `Sure, I will connect you with our customer support team${agentName} right away. Please wait a moment! 😊`
           : `Baik, saya akan segera menghubungkan Anda dengan agen kami${agentName}. Mohon tunggu sebentar ya! 😊`;
 
+        const dynamicResult = resolveDynamicHandoff({
+          baseResponse: handoffMessage,
+          centre: effectiveCentre,
+          city: effectiveCity,
+          emailCenter: effectiveHandoffEmail,
+          isEn,
+          humanHandoffEnabled: true,
+        });
+
+        const finalHandoffReply = dynamicResult.reply;
+
         const savedHandoffMsg = await prisma.message.create({
           data: {
             sessionId: currentSessionId,
             senderType: 'bot',
-            content: handoffMessage,
+            content: finalHandoffReply,
           },
         });
+
+        const dynamicQuickOptions = dynamicResult.options ? parseOptions(dynamicResult.options) : [];
 
         return corsResponse({
           sessionId: currentSessionId,
           messageId: savedHandoffMsg.id,
           status: 'queue',
-          reply: handoffMessage,
+          reply: finalHandoffReply,
+          options: channel !== 'widget' ? dynamicQuickOptions : undefined,
           handoffOccurred: true,
           handoffReason: ruleCheck.reason,
+          emailCenter: effectiveHandoffEmail || null,
+          centre: effectiveCentre || null,
+          city: effectiveCity || null,
         });
       }
     }
 
-    if (qnaMatch?.metadata?.centre && resolvedContactId) {
-      const intentCentre = findCentre(qnaMatch.metadata.centre as string);
+    const qnaMeta = qnaMatch?.metadata as Record<string, any> | null | undefined;
+    if (qnaMeta?.centre && resolvedContactId) {
+      const intentCentre = findCentre(qnaMeta.centre as string);
       if (intentCentre) {
         prisma.visitorProfile.update({
           where: { tenantId_contactId: { tenantId, contactId: resolvedContactId } },
@@ -558,13 +646,14 @@ export async function POST(req: NextRequest) {
 
     // Inject User Profile & Memorized Centre Context so the AI Agent Proxy can answer dynamically
     const resolvedCentreInfo = findCentre(effectiveCentre);
-    if (effectiveCentre || effectiveCity || visitorName || visitorCompany) {
+    if (effectiveCentre || effectiveCity || finalVisitorName || finalVisitorCompany || requestWorkspace) {
       finalCustomInstructions += `\n\n[USER PROFILE & MEMORIZED CENTRE CONTEXT]\n` +
-        (visitorName ? `• Visitor Name: ${visitorName}\n` : '') +
-        (visitorCompany ? `• Company: ${visitorCompany}\n` : '') +
-        (visitorEmail ? `• Email: ${visitorEmail}\n` : '') +
+        (finalVisitorName ? `• Visitor Name: ${finalVisitorName}\n` : '') +
+        (finalVisitorCompany ? `• Company: ${finalVisitorCompany}\n` : '') +
+        (finalVisitorEmail ? `• Email: ${finalVisitorEmail}\n` : '') +
         (effectiveCity ? `• City / Location: ${effectiveCity}\n` : '') +
-        (effectiveCentre ? `• Workspace Centre: ${effectiveCentre}\n` : '');
+        (effectiveCentre ? `• Workspace Centre: ${effectiveCentre}\n` : '') +
+        (requestWorkspace ? `• Active Workspace: ${requestWorkspace}\n` : '');
 
       if (resolvedCentreInfo) {
         finalCustomInstructions +=
@@ -757,6 +846,7 @@ export async function POST(req: NextRequest) {
         emailCenter,
         isEn,
         baseOptions: qnaMatch?.options || '',
+        humanHandoffEnabled: tenant.humanHandoffEnabled ?? true,
       });
 
       if (dynamicResult.dynamicallyResolved) {

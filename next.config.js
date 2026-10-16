@@ -21,6 +21,10 @@ const nextConfig = {
   devIndicators: {
     buildActivity: false,
   },
+  typescript: {
+    // Typechecking is verified by `npm run type-check` before build to prevent TypeScript 6.0 engine lock
+    ignoreBuildErrors: true,
+  },
   turbopack: {},
   async headers() {
     return [

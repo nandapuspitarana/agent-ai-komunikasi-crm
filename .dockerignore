@@ -13,3 +13,12 @@ yarn-error.log*
 
 # Legacy per-centre copies, not registered anywhere (superseded by L2-centre-*.md and KB - List of Centres.json)
 userjourney/knowledge base/md_locations
+
+# Development & test artifacts
+.agent
+tests
+playwright-report
+test-results
+wp-plugin
+docs
+specs
