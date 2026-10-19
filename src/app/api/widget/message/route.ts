@@ -702,16 +702,7 @@ export async function POST(req: NextRequest) {
     let handoffOccurred = false;
 
     if (tenant.aiEnabled) {
-      // Fetch document IDs associated with the active flow for RAG isolation
-      let documentIds: string[] = [];
       const effectiveFlowId = tenant.activeFlowId || effectiveFlow?.id;
-      if (effectiveFlowId) {
-        const docs = await prisma.knowledgeDocument.findMany({
-          where: { flowId: effectiveFlowId, status: 'ready' },
-          select: { proxyDocId: true }
-        });
-        documentIds = docs.map(d => d.proxyDocId).filter((id): id is string => id !== null);
-      }
 
       let dynamicSystemPrompt = systemPrompt;
       let bypassLLM = false;
@@ -804,7 +795,6 @@ export async function POST(req: NextRequest) {
             tenant_id: tenantId,
             flow_id: effectiveFlowId || undefined,  // RAG isolation: scope to active AI Bot
             system_prompt: dynamicSystemPrompt,
-            document_ids: documentIds,
             history: conversationHistory,
           });
 
