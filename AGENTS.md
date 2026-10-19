@@ -256,25 +256,17 @@ Pada [socket.ts](file:///c:/Users/nanda/Documents/aiagent/agent-ai-komunikasi-cr
 - NVIDIA GPU dengan driver terbaru & CUDA Toolkit (disarankan CUDA 12.1)
 
 ### 2. Konfigurasi Environment (`.env`)
-Pastikan variabel berikut ada di file `.env` root proyek Anda:
+Pastikan variabel `DATABASE_URL` mengarah ke database PostgreSQL aktif (misal port default 5432):
 ```env
-# Database PostgreSQL (Docker Container Port 5444 untuk menghindari konflik port 5432 Windows)
-POSTGRES_USER="postgres"
-POSTGRES_PASSWORD="postgres123"
-POSTGRES_DB="postgres"
-POSTGRES_PORT="5444"
-DATABASE_URL="postgresql://postgres:postgres123@localhost:5444/postgres?schema=crm"
+DATABASE_URL="postgresql://postgres:password@192.168.20.242:5432/postgres?schema=crm"
 
 # Local AI Engine Proxy (Opsional jika menggunakan fast-path intent matching)
 LOCAL_LLM_URL="http://localhost:8000/generate"
 ```
 
-### 3. Menjalankan Database PostgreSQL (Docker Compose)
-Proyek menyediakan service PostgreSQL terisolasi di `docker-compose.yml` dengan variabel dinamis:
+### 3. Sinkronisasi Skema Database & Knowledge Base
+Setelah koneksi database PostgreSQL aktif dan dapat dijangkau:
 ```powershell
-# Jalankan container database PostgreSQL di latar belakang
-docker compose up -d postgres
-
 # Terapkan skema database Prisma
 npx prisma db push
 

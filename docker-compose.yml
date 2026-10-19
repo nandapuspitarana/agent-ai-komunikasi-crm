@@ -6,24 +6,6 @@ networks:
     external: true
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: crm-postgres
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "${POSTGRES_PORT:-5444}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   web:
     build:
       context: .
@@ -39,18 +21,11 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: ${DOCKER_DATABASE_URL:-$DATABASE_URL}
       # Flow + knowledge base baked into the image are loaded into the database on every start
       # (scripts/docker/sync-knowledge.js). Only changed content is rewritten.
       KB_SYNC: ${KB_SYNC:-true}                    # "false" to skip
       KB_TENANT_ID: ${KB_TENANT_ID:-}              # tenant id(s), comma separated, or "all". Required when several tenants exist
       KB_ACTIVATE_FLOW: ${KB_ACTIVATE_FLOW:-true}  # true = on first creation, force = every start, false = never
       KB_ALIGN_LANGUAGE: ${KB_ALIGN_LANGUAGE:-true}  # tenant language follows the active flow's language (en)
-    depends_on:
-      postgres:
-        condition: service_healthy
     restart: always
     command: ["sh", "-c", "npx prisma db push --accept-data-loss && { node scripts/docker/sync-knowledge.js || echo '[sync-knowledge] failed, continuing without knowledge sync'; } && npm run start"]
-
-volumes:
-  postgres_data:
