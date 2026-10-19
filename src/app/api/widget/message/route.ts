@@ -147,8 +147,16 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { sessionId, tenantId, message, contactId, channel = 'widget' } = body;
+    let body: any;
+    try {
+      body = await req.json();
+    } catch {
+      return corsResponse(
+        { error: 'Invalid JSON payload' },
+        { status: 400 }
+      );
+    }
+    const { sessionId, tenantId, message, contactId, channel = 'widget' } = body || {};
     const rawEmailCenter =
       body.email_center ?? body.emailCenter ?? body.centre_email ?? body.centreEmail;
     const emailCenter = typeof rawEmailCenter === 'string' ? rawEmailCenter.trim() : '';
