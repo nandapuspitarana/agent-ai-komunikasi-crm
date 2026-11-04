@@ -25,6 +25,7 @@
     "tabRating": "Rating & CSAT",
     "tabAiAgent": "AI Agent",
     "tabInsight": "Insight",
+    "tabAiCost": "AI Cost & Tokens",
     "loadingStats": "Loading statistic data...",
     "totalChats": "Total Chats",
     "resolvedChats": "Resolved Chats",
