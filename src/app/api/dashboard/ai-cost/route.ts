@@ -13,26 +13,44 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Default to a specific tenant for Super Admin if they want to view stats,
-    // or just use their tenantId (which might be system). For this CRM, 
-    // we use the logged in user's tenantId.
-    const activeTenantId = tenantId || 'system';
-    
-    // Get query params
     const { searchParams } = new URL(req.url);
-    const days = searchParams.get('days') || '7';
+    const requestedTenantId = searchParams.get('tenant_id');
+
+    // Only SUPER_ADMIN can query arbitrary tenants; regular users are pinned to their tenantId
+    let activeTenantId = tenantId;
+    if (session.user.role === 'SUPER_ADMIN' && requestedTenantId) {
+      activeTenantId = requestedTenantId;
+    }
+
+    if (!activeTenantId) {
+      activeTenantId = 'system';
+    }
+
+    // Validate and clamp days (1 - 28)
+    const rawDays = parseInt(searchParams.get('days') || '7', 10);
+    const days = Math.min(Math.max(isNaN(rawDays) ? 7 : rawDays, 1), 28);
 
     const proxyUrl = process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8200';
-    const response = await fetch(`${proxyUrl}/api/v1/observability/dashboard?tenant_id=${activeTenantId}&days=${days}`, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      next: { revalidate: 0 }
-    });
+    const serviceToken = process.env.OBSERVABILITY_SERVICE_TOKEN;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (serviceToken) {
+      headers['Authorization'] = `Bearer ${serviceToken}`;
+    }
+
+    const response = await fetch(
+      `${proxyUrl}/api/v1/observability/dashboard?tenant_id=${encodeURIComponent(activeTenantId)}&days=${days}`,
+      {
+        headers,
+        next: { revalidate: 0 },
+      }
+    );
 
     if (!response.ok) {
       const err = await response.text();
-      console.error('FastAPI error:', err);
+      console.error('FastAPI observability error:', err);
       return NextResponse.json({ error: 'Failed to fetch AI stats from proxy' }, { status: response.status });
     }
 
