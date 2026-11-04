@@ -16,14 +16,14 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const requestedTenantId = searchParams.get('tenant_id');
 
-    // Only SUPER_ADMIN can query arbitrary tenants; regular users are pinned to their tenantId
+    // Only SUPER_ADMIN can query arbitrary tenants or 'all' for global view; regular users are pinned to their tenantId
     let activeTenantId = tenantId;
-    if (session.user.role === 'SUPER_ADMIN' && requestedTenantId) {
-      activeTenantId = requestedTenantId;
+    if (session.user.role === 'SUPER_ADMIN') {
+      activeTenantId = requestedTenantId || 'all';
     }
 
     if (!activeTenantId) {
-      activeTenantId = 'system';
+      activeTenantId = 'all';
     }
 
     // Validate and clamp days (1 - 28)
