@@ -30,6 +30,11 @@ yarn-error.log*
 !.env.example
 !.env.*.example
 
+# Sensitive credentials & account integration documents (never push secrets to git)
+docs/INTEGRATED_ACCOUNTS.md
+*INTEGRATED_ACCOUNTS*.md
+!*INTEGRATED_ACCOUNTS*.example.md
+
 # vercel
 .vercel
 
