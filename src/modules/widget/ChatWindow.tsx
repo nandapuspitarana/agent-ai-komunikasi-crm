@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase-client';
+import { supabase, setRealtimeTokenSource, fetchRealtimeToken } from '@/lib/supabase-client';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 import { ChatUI, ChatMessageData, SessionStatus } from '@/components/chat/ChatUI';
 
@@ -176,9 +176,9 @@ export function ChatWindow({
           event: 'INSERT',
           schema: 'crm',
           table: 'crm_agent_Message',
+          filter: `sessionId=eq.${serverSessionId}`,
         },
         (payload) => {
-          console.log('[Widget] RECEIVED postgres_changes EVENT!', payload);
           const newMsg = payload.new as any;
           if (newMsg.sessionId !== serverSessionId) return;
           if (newMsg.senderType === 'user') return;
@@ -193,30 +193,15 @@ export function ChatWindow({
           }
         }
       )
-      .on(
-        'broadcast',
-        { event: 'new_message' },
-        (payload) => {
-          console.log('[Widget] RECEIVED broadcast EVENT!', payload);
-          const newMsg = payload.payload as any;
-          if (newMsg.senderType === 'user') return;
-          
-          if (newMsg.senderType === 'bot') {
-            addMessage(newMsg.content, 'bot', undefined, undefined, newMsg.createdAt);
-            setIsSending(false);
-          } else if (newMsg.senderType === 'agent') {
-            addMessage(newMsg.content, 'agent', undefined, undefined, newMsg.createdAt);
-          } else if (newMsg.senderType === 'system') {
-            addMessage(newMsg.content, 'system', undefined, undefined, newMsg.createdAt);
-          }
-        }
-      )
+      // (Public 'broadcast' listener removed: the server never sends broadcasts,
+      // and anyone who knew the channel name could inject fake replies.)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'crm',
           table: 'crm_agent_ChatSession',
+          filter: `id=eq.${serverSessionId}`,
         },
         (payload) => {
           const updatedSession = payload.new as any;
@@ -231,15 +216,31 @@ export function ChatWindow({
             setSessionStatus('queue');
           }
         }
-      )
-      .subscribe((status, err) => {
-        console.log('[Widget] Channel status changed:', status, err);
-      });
+      );
+
+    // The realtime token only covers this chat session (RLS), so subscribe
+    // after it has been applied.
+    let cancelled = false;
+    setRealtimeTokenSource(`widget:${serverSessionId}`, () =>
+      fetchRealtimeToken(`${apiBase}/api/widget/realtime-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId, sessionId: serverSessionId }),
+      })
+    )
+      .then(() => {
+        if (cancelled) return;
+        channel.subscribe((status, err) => {
+          console.log('[Widget] Channel status changed:', status, err);
+        });
+      })
+      .catch((err) => console.error('[Widget] Realtime auth failed:', err));
 
     return () => {
+      cancelled = true;
       supabase.removeChannel(channel);
     };
-  }, [serverSessionId, addMessage, t]);
+  }, [serverSessionId, addMessage, t, apiBase, tenantId]);
 
   const isSendingRef = useRef(false);
 

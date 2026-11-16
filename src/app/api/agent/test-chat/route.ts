@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { chatWithAgent } from '@/lib/ai-agent';
 
 import { prisma } from '@/lib/prisma';
+import { requireUser, canAccessTenant } from '@/lib/api-guard';
 
 export async function POST(req: NextRequest) {
   try {
+    const guard = await requireUser();
+    if (!guard.ok) return guard.response;
+
     let { flowId, message, sessionId, matchedIntent } = await req.json();
 
     if (!flowId || !message) {
@@ -16,7 +20,7 @@ export async function POST(req: NextRequest) {
       include: { intents: true }
     });
 
-    if (!flow) {
+    if (!flow || !canAccessTenant(guard.user, flow.tenantId)) {
       return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
     }
 
@@ -102,6 +106,7 @@ export async function POST(req: NextRequest) {
           message: formattedMessage,
           session_id: sessionId || crypto.randomUUID(),
           tenant_id: flow.tenantId,
+          flow_id: flow.id,             // RAG isolation: scope to the agent under test
           system_prompt: systemPrompt,
         });
         aiReplyRaw = aiResponse.reply;

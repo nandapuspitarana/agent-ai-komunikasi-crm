@@ -3,6 +3,11 @@ import { prisma } from '@/lib/prisma';
 import { upsertVisitorProfile, updateVisitorClassification } from '@/lib/visitor-service';
 import { getVisitorConfig } from '@/lib/visitor-config';
 import { sendInquiryNotificationToTenant } from '@/lib/email-service';
+import {
+  verifyVisitorToken,
+  newAnonymousContactId,
+  legacyContactLookupEnabled,
+} from '@/lib/visitor-token';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -63,14 +68,25 @@ export async function POST(req: NextRequest) {
       return corsResponse({ error: 'Tenant not found' }, { status: 404 });
     }
 
-    const resolvedContactId = contactId || (sessionId ? undefined : `widget_${Date.now()}`);
+    const resolvedContactId = contactId || (sessionId ? undefined : newAnonymousContactId());
 
     // 2. Resolve or Create ChatSession
     let currentSession = sessionId
       ? await prisma.chatSession.findUnique({ where: { id: sessionId } })
       : null;
 
-    if (!currentSession && resolvedContactId) {
+    // Never write into another tenant's session.
+    if (currentSession && currentSession.tenantId !== tenantId) {
+      currentSession = null;
+    }
+
+    // Looking up a session by contactId returns its sessionId to the caller,
+    // so it needs the same proof as reading history (visitor token).
+    const mayLookupByContact =
+      !!resolvedContactId &&
+      (verifyVisitorToken(tenantId, resolvedContactId, body.visitorToken) || legacyContactLookupEnabled());
+
+    if (!currentSession && mayLookupByContact) {
       currentSession = await prisma.chatSession.findFirst({
         where: { tenantId, contactId: resolvedContactId },
         orderBy: { updatedAt: 'desc' },
@@ -81,7 +97,7 @@ export async function POST(req: NextRequest) {
       currentSession = await prisma.chatSession.create({
         data: {
           tenantId,
-          contactId: resolvedContactId || `widget_${Date.now()}`,
+          contactId: resolvedContactId || newAnonymousContactId(),
           channel: 'widget',
           status: 'bot',
         },

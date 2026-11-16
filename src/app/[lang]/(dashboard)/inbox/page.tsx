@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, MessageSquare, PanelRight, MapPin, Monitor, Smartphone, Globe, Star, ChevronRight, X, Phone, Mail } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { supabase } from '@/lib/supabase-client';
+import { supabase, setRealtimeTokenSource, fetchRealtimeToken } from '@/lib/supabase-client';
 import { CannedResponses } from '@/components/inbox/CannedResponses';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
@@ -155,47 +155,26 @@ export default function InboxPage() {
             return [newChat, ...prev];
           });
         }
-      )
-      .on(
-        'broadcast',
-        { event: 'new_message' },
-        (payload) => {
-          const data = payload.payload as any;
-          setChats(prev => {
-            const existingChat = prev.find(chat => chat.id === data.sessionId);
-            if (!existingChat) return prev; 
-            
-            return prev.map(chat => {
-              if (chat.id === data.sessionId) {
-                const messages = chat.messages || [];
-                if (messages.some(m => m.id === data.id || (m.text === data.content && m.sender === data.senderType))) {
-                  return chat;
-                }
-                
-                return {
-                  ...chat,
-                  messages: [...messages, {
-                    id: data.id || (Date.now().toString() + Math.random()),
-                    text: data.content,
-                    sender: data.senderType,
-                    timestamp: new Date(data.createdAt || Date.now()).toISOString()
-                  }],
-                  preview: data.content,
-                  time: new Date(data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                };
-              }
-              return chat;
-            });
-          });
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('Agent connected to Inbox via Supabase Realtime');
-        }
-      });
+      );
+    // (The public 'broadcast' listener was removed: nothing on the server sends
+    // broadcasts, and anyone with the anon key could inject fake messages.)
+
+    // RLS only delivers rows this user's token allows, so subscribe after the
+    // server-minted realtime token is applied.
+    let cancelled = false;
+    setRealtimeTokenSource(`dashboard:${tenantId}`, () => fetchRealtimeToken('/api/realtime/token'))
+      .then(() => {
+        if (cancelled) return;
+        channel.subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('Agent connected to Inbox via Supabase Realtime');
+          }
+        });
+      })
+      .catch((err) => console.error('[Inbox] Realtime auth failed:', err));
 
     return () => {
+      cancelled = true;
       supabase.removeChannel(channel);
     };
   }, [session]);

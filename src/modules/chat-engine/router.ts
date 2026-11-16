@@ -260,10 +260,18 @@ export class MessageRouter {
         return await this.queueForLater(context);
       }
 
+      // The AI proxy scopes sessions and RAG by tenant + flow and returns no
+      // knowledge-base results without them, so always pass both.
+      const tenant = await prisma.tenant.findUnique({
+        where: { id: context.tenantId },
+        select: { activeFlowId: true },
+      });
       const response = await chatWithAgent({
         message: context.message,
         session_id: context.sessionId,
         user_id: context.sender,
+        tenant_id: context.tenantId,
+        flow_id: tenant?.activeFlowId || undefined,
       });
 
       // Save AI response to database

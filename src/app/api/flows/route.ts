@@ -4,6 +4,7 @@ import { canAccessAdminPanel } from '@/lib/auth-utils';
 import { logAIAgentCreated, logAIAgentUpdated, logAIAgentDeleted } from '@/lib/audit-logger';
 
 import { prisma } from '@/lib/prisma';
+import { canAccessTenant, ROLES_MANAGE, type AppRole } from '@/lib/api-guard';
 
 // GET /api/flows - Get all flows for tenant
 export async function GET(request: NextRequest) {
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
         include: { intents: true }
       });
 
-      if (!flow) {
+      if (!flow || !canAccessTenant(session.user, flow.tenantId)) {
         return NextResponse.json({ error: 'Flow not found' }, { status: 404 });
       }
 
@@ -61,6 +62,10 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!ROLES_MANAGE.includes(session.user.role as AppRole)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -101,6 +106,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (id) {
+      // Only the owning tenant (or SUPER_ADMIN) may overwrite a flow.
+      const existing = await prisma.flow.findUnique({ where: { id }, select: { tenantId: true } });
+      if (!existing || !canAccessTenant(session.user, existing.tenantId)) {
+        return NextResponse.json({ error: 'Flow not found' }, { status: 404 });
+      }
+
       // Update existing flow and its intents in a transaction
       const [updatedFlow] = await prisma.$transaction([
         prisma.flow.update({
@@ -204,6 +215,10 @@ export async function DELETE(request: NextRequest) {
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!ROLES_MANAGE.includes(session.user.role as AppRole)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

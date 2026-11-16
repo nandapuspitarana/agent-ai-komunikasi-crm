@@ -4,6 +4,7 @@ import { VariableManager } from '@/modules/flow-builder/variables';
 import { logChatMessageSent } from '@/lib/audit-logger';
 
 import { prisma } from '@/lib/prisma';
+import { canAccessTenant } from '@/lib/api-guard';
 
 /**
  * Endpoint to send agent response back to widget via Socket.io
@@ -15,11 +16,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { sessionId, tenantId, message, metadata } = await req.json();
+    const { sessionId, message, metadata } = await req.json();
 
-    if (!sessionId || !tenantId || !message) {
+    if (!sessionId || !message) {
       return NextResponse.json(
-        { error: 'Missing required fields: sessionId, tenantId, message' },
+        { error: 'Missing required fields: sessionId, message' },
         { status: 400 }
       );
     }
@@ -29,9 +30,11 @@ export async function POST(req: NextRequest) {
       where: { id: sessionId },
     });
 
-    if (!chatSession) {
+    if (!chatSession || !canAccessTenant(session.user, chatSession.tenantId)) {
       return NextResponse.json({ error: 'Chat session not found' }, { status: 404 });
     }
+    // Tenant always comes from the session row, never from the request body.
+    const tenantId = chatSession.tenantId;
 
     await prisma.message.create({
       data: {

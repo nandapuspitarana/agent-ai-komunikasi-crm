@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
 
 import { prisma } from '@/lib/prisma';
-
-// Force recompile
+import { requireUser, canAccessTenant, ROLES_MANAGE } from '@/lib/api-guard';
 
 // GET /api/flows/[flowId]
 export async function GET(
@@ -12,22 +10,18 @@ export async function GET(
 ) {
   const { flowId } = await params;
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const guard = await requireUser();
+    if (!guard.ok) return guard.response;
 
     const flow = await prisma.flow.findUnique({
       where: { id: flowId },
       include: { intents: true }
     });
 
-    if (!flow) {
+    if (!flow || !canAccessTenant(guard.user, flow.tenantId)) {
       return NextResponse.json({ error: 'Flow not found' }, { status: 404 });
     }
 
-    // Optional: Validate tenant ownership here if needed
-    
     return NextResponse.json(flow);
   } catch (error) {
     console.error('Error fetching flow:', error);
@@ -42,16 +36,14 @@ export async function DELETE(
 ) {
   const { flowId } = await params;
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const guard = await requireUser({ roles: ROLES_MANAGE });
+    if (!guard.ok) return guard.response;
 
     const flow = await prisma.flow.findUnique({
       where: { id: flowId }
     });
 
-    if (!flow) {
+    if (!flow || !canAccessTenant(guard.user, flow.tenantId)) {
       return NextResponse.json({ error: 'Flow not found' }, { status: 404 });
     }
 

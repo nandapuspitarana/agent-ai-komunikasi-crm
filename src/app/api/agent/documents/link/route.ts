@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 
 import { prisma } from '@/lib/prisma';
+import { isSuperAdmin } from '@/lib/api-guard';
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,6 +22,15 @@ export async function POST(req: NextRequest) {
 
     if (!tenantId) {
       return NextResponse.json({ error: 'Tenant ID missing' }, { status: 400 });
+    }
+
+    // The target agent must belong to the caller's tenant.
+    const targetFlow = await prisma.flow.findFirst({
+      where: { id: flowId, tenantId },
+      select: { id: true },
+    });
+    if (!targetFlow) {
+      return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
     }
 
     // Verify the source document belongs to the tenant or fallback to public.crm_documents
@@ -46,7 +56,8 @@ export async function POST(req: NextRequest) {
           SELECT id, filename, file_type, metadata, status, chunk_count
           FROM public.crm_documents
           WHERE id = $1::uuid AND status = 'ready'
-        `, sourceDocumentId);
+            AND ($2::boolean OR tenant_id = $3 OR tenant_id IS NULL)
+        `, sourceDocumentId, isSuperAdmin(session.user), tenantId);
 
         if (crmDocs.length > 0) {
           const cd = crmDocs[0];
