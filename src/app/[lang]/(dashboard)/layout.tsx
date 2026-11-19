@@ -6,19 +6,25 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
   MessageSquare, Settings, LayoutDashboard, Bot, Library,
-  ChevronRight, UserSearch
+  ChevronRight, UserSearch, ShieldCheck
 } from 'lucide-react';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
-const NAV_ITEMS = [
+const NAV_ITEMS: Array<{
+  href: string;
+  labelKey: string;
+  icon: typeof LayoutDashboard;
+  superAdminOnly?: boolean;
+}> = [
   { href: '/dashboard', labelKey: 'overview', icon: LayoutDashboard },
   { href: '/inbox', labelKey: 'inbox', icon: MessageSquare },
   { href: '/visitors', labelKey: 'visitors', icon: UserSearch },
   { href: '/agent', labelKey: 'agent', icon: Bot },
   { href: '/integration', labelKey: 'integration', icon: Library },
   { href: '/settings', labelKey: 'settings', icon: Settings },
+  { href: '/admin', labelKey: 'admin', icon: ShieldCheck, superAdminOnly: true },
 ];
 
 import GlobalNotification from '@/components/GlobalNotification';
@@ -70,6 +76,8 @@ export default function DashboardLayout({
 
   const tenant = (session?.user as any)?.tenant;
   const tenantId = (session?.user as any)?.tenantId;
+  const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
+  const visibleNavItems = NAV_ITEMS.filter((item) => !item.superAdminOnly || isSuperAdmin);
 
   return (
     <div className="flex h-screen bg-slate-50">
@@ -82,7 +90,7 @@ export default function DashboardLayout({
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
-          {NAV_ITEMS.map(({ href, labelKey, icon: Icon }) => {
+          {visibleNavItems.map(({ href, labelKey, icon: Icon }) => {
             const isActive = pathname === href || pathname?.startsWith(href + '/');
             return (
               <Link
