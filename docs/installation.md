@@ -396,14 +396,14 @@ frame-src 'none';
 
 ---
 
-## Dashboard Penagihan (Super Admin)
+## Billing Dashboard (Super Admin)
 
-Dashboard penagihan AI lintas tenant ada di `/<lang>/admin` dan hanya bisa diakses role **SUPER_ADMIN**. Setup-nya:
+The billing dashboard shows AI usage across all tenants. It is available at `/<lang>/admin` and is visible only to users with the **SUPER_ADMIN** role.
 
-1. **Env `BILLING_TIMEZONE`** di kedua repo (`agent-ai-komunikasi-crm` dan `ai-agent-proxy`). Default `Asia/Jakarta`. Zona ini menentukan batas periode tagihan (awal/akhir bulan).
-2. **Jalankan migration `ai-agent-proxy/migrations/006_ai_usage_billing.sql`** di Supabase SQL editor **sebelum purge berikutnya**. Tanpa migration ini, baris metrik yang lebih tua dari 28 hari akan terus terhapus, padahal retensi metrik seharusnya 400 hari.
+Setup:
 
-Setelah migration dan env terpasang, buka `/<lang>/admin` sebagai SUPER_ADMIN untuk melihat ringkasan pemakaian per tenant dan mengunduh CSV.
+1. **Set `BILLING_TIMEZONE`** in both repos (`agent-ai-komunikasi-crm` and `ai-agent-proxy`). Default: `Asia/Jakarta`. This timezone sets the billing period boundaries (start and end of month).
+2. **Run `ai-agent-proxy/migrations/006_ai_usage_billing.sql`** in the Supabase SQL editor **before the next purge run**. Without this migration, metric rows older than 28 days keep being deleted.
 
 ---
 

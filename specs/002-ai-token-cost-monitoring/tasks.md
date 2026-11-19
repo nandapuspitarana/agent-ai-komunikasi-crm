@@ -24,7 +24,7 @@
 | Anti-double-count tokens | ✅ **sudah** | Hanya akumulasi `llm_complete`, `embedding`, `eval` |
 | Rekonsiliasi dengan tagihan OpenAI asli | ⏳ fase 3 | — |
 | Budget / alert per tenant | ⏳ fase 4 | — |
-| Dashboard penagihan Super Admin (lintas tenant, CSV) | ✅ sudah | src/app/[lang]/(dashboard)/admin/page.tsx, /api/admin/overview, docs/superpowers/specs/2026-11-19-admin-billing-dashboard-design.md |
+| Dashboard penagihan Super Admin (lintas tenant, CSV) | ✅ sudah | `src/app/[lang]/(dashboard)/admin/page.tsx`, `/api/admin/overview`, `docs/superpowers/specs/2026-11-19-admin-billing-dashboard-design.md` |
 
 ---
 
@@ -60,7 +60,7 @@
 
 - [ ] **T020** Ganti loop Python + `limit(5000)` dengan Postgres RPC/view, mis. `ai_cost_summary(tenant_id, from, to, group_by)` yang mengembalikan SUM token & `cost_usd` per hari / model / `request_type`.
 - [ ] **T021** Tabel rollup harian `ai_usage_daily (date, tenant_id, model_name, request_type, input_tokens, cached_input_tokens, output_tokens, cost_usd, request_count)` diisi cron (pg_cron atau scheduled job) — supaya query bulanan/tahunan tetap cepat.
-- [ ] **T022** Endpoint baru / perluasan di `api/observability.py` — sebagian: `GET /observability/usage-by-tenant?from&to` sudah ada (lihat spec admin billing); month-to-date/proyeksi belum:
+- [ ] **T022** Endpoint baru / perluasan di `api/observability.py` — sebagian: `GET /observability/usage-by-tenant?from&to` sudah ada (lihat spec admin billing); month-to-date/proyeksi belum
   - `GET /observability/cost?tenant_id&from&to&group_by=day|model|type` (hilangkan batas `le=28`)
   - `GET /observability/cost/month-to-date?tenant_id` → `{spent_usd, projected_month_end_usd, budget_usd, pct}`
   - Proyeksi akhir bulan = `spent / hari_berjalan × jumlah_hari_bulan`.
