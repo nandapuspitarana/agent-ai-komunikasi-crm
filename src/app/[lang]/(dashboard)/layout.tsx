@@ -3,10 +3,10 @@
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   MessageSquare, Settings, LayoutDashboard, Bot, Library,
-  ChevronRight, UserSearch, ShieldCheck
+  ChevronRight, UserSearch, ShieldCheck, Menu, X
 } from 'lucide-react';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -39,6 +39,47 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { t } = useTranslation();
   const [hotLeadCount, setHotLeadCount] = useState<number>(0);
+
+  // Below `md` the sidebar is an off-canvas drawer; at `md` and up it is the static column it always was.
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const wasMenuOpen = useRef(false);
+
+  // Close on route change.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // Close on Escape while open.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen]);
+
+  // Growing past `md` while the drawer is open: the sidebar becomes the static column, so reset the state.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setMenuOpen(false);
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  // Focus moves into the drawer when it opens and back to the hamburger button when it closes.
+  useEffect(() => {
+    if (menuOpen) {
+      closeButtonRef.current?.focus();
+    } else if (wasMenuOpen.current) {
+      menuButtonRef.current?.focus();
+    }
+    wasMenuOpen.current = menuOpen;
+  }, [menuOpen]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -82,11 +123,34 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen bg-slate-50">
       {tenantId && <GlobalNotification tenantId={tenantId} />}
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
+      {/* Backdrop for the mobile drawer */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-slate-900/50 md:hidden"
+          aria-hidden="true"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar: off-canvas drawer below md (hidden from focus and AT while closed), unchanged column from md up */}
+      <div
+        id="dashboard-sidebar"
+        className={`w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-40 max-md:overflow-y-auto max-md:transition-transform max-md:duration-200 motion-reduce:transition-none ${
+          menuOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full max-md:invisible'
+        }`}
+      >
         <div className="p-4 bg-slate-950 flex items-center gap-2 text-white">
           <LayoutDashboard size={24} className="text-brand-light" />
           <span className="font-bold text-lg">{t('sidebar', 'saasCrm')}</span>
+          <button
+            type="button"
+            ref={closeButtonRef}
+            onClick={() => setMenuOpen(false)}
+            aria-label={t('sidebar', 'closeMenu', 'Close menu')}
+            className="ml-auto md:hidden p-1.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
@@ -126,13 +190,26 @@ export default function DashboardLayout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-6 justify-between shrink-0">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-4 md:px-6 justify-between shrink-0">
+          <button
+            type="button"
+            ref={menuButtonRef}
+            onClick={() => setMenuOpen(true)}
+            aria-label={t('sidebar', 'openMenu', 'Open menu')}
+            aria-expanded={menuOpen}
+            aria-controls="dashboard-sidebar"
+            className="md:hidden mr-3 p-2 -ml-2 rounded-lg text-slate-600 hover:bg-slate-100 shrink-0"
+          >
+            <Menu size={22} />
+          </button>
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-slate-500">
-            {t('sidebar', NAV_ITEMS.find(n => pathname === n.href || pathname?.startsWith(n.href + '/'))?.labelKey || 'overview')}
+          <div className="flex items-center gap-2 text-sm text-slate-500 min-w-0 mr-auto">
+            <span className="truncate">
+              {t('sidebar', NAV_ITEMS.find(n => pathname === n.href || pathname?.startsWith(n.href + '/'))?.labelKey || 'overview')}
+            </span>
           </div>
           {session?.user && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4 shrink-0">
               <LanguageSwitcher />
               <UserMenu
                 user={{

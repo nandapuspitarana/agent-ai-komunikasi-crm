@@ -4,7 +4,7 @@ import { Fragment, useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 import { tenantLabel } from '@/lib/admin-billing';
-import { NA, formatCost, formatInt, formatTokens, roleLabel, tenantLabelsFrom, type TenantRow } from './shared';
+import { NA, formatCost, formatInt, formatTokens, roleLabel, tenantLabelsFrom, unpricedHint, type TenantRow } from './shared';
 
 type SortKey = 'costUsd' | 'totalTokens' | 'activeInPeriod' | 'name';
 type SortDir = 'asc' | 'desc';
@@ -127,8 +127,7 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
 
   const colCount = 10;
   const unavailableTip = ta('tokensUnavailable', 'Token data unavailable');
-  const unpricedTip = (count: number) =>
-    ta('unpricedCellHint', '{count} calls without a price — cost not included').replace('{count}', formatInt(count, locale));
+  const unpricedTip = (count: number) => unpricedHint(ta, count, locale);
   const totalStaffTip = ta('totalStaffHint', 'Excludes accounts without a tenant');
 
   return (
@@ -198,14 +197,15 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
                     <td className="px-4 py-3 text-right tabular-nums">{formatInt(r.endUsers.activeInPeriod, locale)}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{formatInt(r.activity.sessions, locale)}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{formatInt(r.activity.messages, locale)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums" title={r.ai ? undefined : unavailableTip}>
+                    <td className="px-4 py-3 text-right tabular-nums" title={r.ai ? formatInt(r.ai.totalTokens, locale) : unavailableTip}>
                       {r.ai ? formatTokens(r.ai.totalTokens, locale) : NA}
                     </td>
                     <td
                       className="px-4 py-3 text-right tabular-nums"
                       title={r.ai ? (r.ai.unpricedCount > 0 ? unpricedTip(r.ai.unpricedCount) : undefined) : unavailableTip}
                     >
-                      {r.ai ? `${formatCost(r.ai.costUsd, locale)}${r.ai.unpricedCount > 0 ? ' *' : ''}` : NA}
+                      {r.ai ? formatCost(r.ai.costUsd, locale) : NA}
+                      {r.ai && r.ai.unpricedCount > 0 && <UnpricedMark hint={unpricedTip(r.ai.unpricedCount)} />}
                     </td>
                     <td className="px-4 py-3 text-right text-slate-500 whitespace-nowrap">
                       {r.lastActivityAt ? relativeTime(r.lastActivityAt, locale) : NA}
@@ -230,19 +230,21 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
               <td className="px-4 py-3" />
               <td className="px-4 py-3 text-right tabular-nums" title={totalStaffTip}>
                 {formatInt(total.staffActive, locale)}/{formatInt(total.staffTotal, locale)}
-                <span aria-label={totalStaffTip}> †</span>
+                <span aria-hidden="true"> †</span>
+                <span className="sr-only">{totalStaffTip}</span>
               </td>
               <td className="px-4 py-3 text-right tabular-nums">{formatInt(total.activeUsers, locale)}</td>
               <td className="px-4 py-3 text-right tabular-nums">{formatInt(total.sessions, locale)}</td>
               <td className="px-4 py-3 text-right tabular-nums">{formatInt(total.messages, locale)}</td>
-              <td className="px-4 py-3 text-right tabular-nums">
+              <td className="px-4 py-3 text-right tabular-nums" title={total.tokens === null ? undefined : formatInt(total.tokens, locale)}>
                 {total.tokens === null ? NA : formatTokens(total.tokens, locale)}
               </td>
               <td
                 className="px-4 py-3 text-right tabular-nums"
                 title={total.unpriced > 0 ? unpricedTip(total.unpriced) : undefined}
               >
-                {total.cost === null ? NA : `${formatCost(total.cost, locale)}${total.unpriced > 0 ? ' *' : ''}`}
+                {total.cost === null ? NA : formatCost(total.cost, locale)}
+                {total.cost !== null && total.unpriced > 0 && <UnpricedMark hint={unpricedTip(total.unpriced)} />}
               </td>
               <td />
             </tr>
@@ -251,6 +253,16 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
       </div>
       <p className="px-4 py-2 text-xs text-slate-400 border-t border-slate-100">† {totalStaffTip}</p>
     </div>
+  );
+}
+
+/** The `*` after a cost with unpriced calls; the explanation is also readable by screen readers. */
+function UnpricedMark({ hint }: { hint: string }) {
+  return (
+    <>
+      <span aria-hidden="true"> *</span>
+      <span className="sr-only">{hint}</span>
+    </>
   );
 }
 

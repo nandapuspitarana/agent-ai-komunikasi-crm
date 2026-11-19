@@ -17,7 +17,9 @@
     "settings": "Settings",
     "visitors": "Visitors",
     "saasCrm": "CeosuiteBOT",
-    "admin": "Admin"
+    "admin": "Admin",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -418,6 +420,7 @@
     "cardCost": "Estimated AI cost",
     "trendTitle": "Daily token & cost trend",
     "trendEmpty": "No AI usage in this period yet",
+    "trendWeekly": "Weekly totals",
     "searchPlaceholder": "Search tenant…",
     "colTenant": "Tenant",
     "colPlan": "Plan",

@@ -17,7 +17,9 @@
     "settings": "การตั้งค่า",
     "visitors": "Visitors",
     "saasCrm": "CeosuiteBOT",
-    "admin": "Admin"
+    "admin": "Admin",
+    "openMenu": "เปิดเมนู",
+    "closeMenu": "ปิดเมนู"
   },
   "dashboard": {
     "title": "แดชบอร์ด",
@@ -319,6 +321,7 @@
     "cardCost": "ค่าใช้จ่าย AI โดยประมาณ",
     "trendTitle": "แนวโน้มโทเคนและค่าใช้จ่ายรายวัน",
     "trendEmpty": "ยังไม่มีการใช้งาน AI ในช่วงเวลานี้",
+    "trendWeekly": "ยอดรวมรายสัปดาห์",
     "searchPlaceholder": "ค้นหาผู้เช่า…",
     "colTenant": "ผู้เช่า",
     "colPlan": "แพ็กเกจ",

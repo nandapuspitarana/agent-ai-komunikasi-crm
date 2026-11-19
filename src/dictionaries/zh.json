@@ -17,7 +17,9 @@
     "settings": "设置",
     "visitors": "Visitors",
     "saasCrm": "CeosuiteBOT",
-    "admin": "Admin"
+    "admin": "Admin",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单"
   },
   "dashboard": {
     "title": "仪表板",
@@ -319,6 +321,7 @@
     "cardCost": "预估 AI 费用",
     "trendTitle": "每日令牌与费用趋势",
     "trendEmpty": "此时间段内暂无 AI 使用记录",
+    "trendWeekly": "每周合计",
     "searchPlaceholder": "搜索租户…",
     "colTenant": "租户",
     "colPlan": "套餐",

@@ -17,7 +17,9 @@
     "settings": "Pengaturan",
     "visitors": "Prospek",
     "saasCrm": "CeosuiteBOT",
-    "admin": "Admin"
+    "admin": "Admin",
+    "openMenu": "Buka menu",
+    "closeMenu": "Tutup menu"
   },
   "dashboard": {
     "title": "Dasbor",
@@ -418,6 +420,7 @@
     "cardCost": "Estimasi biaya AI",
     "trendTitle": "Tren harian token & biaya",
     "trendEmpty": "Belum ada pemakaian AI di periode ini",
+    "trendWeekly": "Total mingguan",
     "searchPlaceholder": "Cari tenant…",
     "colTenant": "Tenant",
     "colPlan": "Plan",

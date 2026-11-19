@@ -58,7 +58,7 @@ export default function PeriodPicker({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="flex bg-slate-100 p-1 rounded-xl w-fit">
+      <div className="flex flex-wrap bg-slate-100 p-1 rounded-xl w-fit max-w-full">
         <button type="button" className={segment('this_month')} aria-pressed={active === 'this_month'} onClick={() => pick('this_month')}>
           {ta('periodThisMonth', 'This month')}
         </button>

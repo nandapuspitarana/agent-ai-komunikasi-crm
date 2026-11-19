@@ -17,7 +17,9 @@
     "settings": "설정",
     "visitors": "방문자",
     "saasCrm": "CeosuiteBOT",
-    "admin": "Admin"
+    "admin": "Admin",
+    "openMenu": "메뉴 열기",
+    "closeMenu": "메뉴 닫기"
   },
   "dashboard": {
     "title": "대시보드",
@@ -319,6 +321,7 @@
     "cardCost": "예상 AI 비용",
     "trendTitle": "일별 토큰 및 비용 추이",
     "trendEmpty": "이 기간에는 아직 AI 사용 내역이 없습니다",
+    "trendWeekly": "주간 합계",
     "searchPlaceholder": "테넌트 검색…",
     "colTenant": "테넌트",
     "colPlan": "요금제",

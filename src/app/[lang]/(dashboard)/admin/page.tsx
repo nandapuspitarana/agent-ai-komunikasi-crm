@@ -26,7 +26,7 @@ function Banner({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-2 px-4 py-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 text-sm">
       <AlertTriangle size={16} className="mt-0.5 shrink-0" />
-      <span>{children}</span>
+      <span className="min-w-0 break-words">{children}</span>
     </div>
   );
 }
@@ -153,7 +153,7 @@ export default function AdminPage() {
   const pickerValue: Period | null = query ?? (period ? { from: period.from, to: period.to } : null);
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">{ta('title', 'Admin · Billing')}</h1>
@@ -189,10 +189,11 @@ export default function AdminPage() {
         </div>
       )}
 
-      {loading && <Skeleton />}
+      {/* Initial load only: later refetches keep the previous data mounted (dimmed) so search, sort and expanded rows survive. */}
+      {loading && !data && <Skeleton />}
 
-      {!loading && data && (
-        <>
+      {data && (
+        <div className={`space-y-6 transition-opacity ${loading ? 'opacity-60' : ''}`} aria-busy={loading}>
           {retentionDate && (
             <Banner>{ta('warnRetention', 'Token data is available since {date}').replace('{date}', retentionDate)}</Banner>
           )}
@@ -211,7 +212,7 @@ export default function AdminPage() {
           <AdminSummaryCards platform={data.platform} ai={data.ai} />
           {data.ai.status === 'ok' && <UsageTrendChart byDay={data.ai.byDay ?? []} period={data.period} />}
           <TenantBillingTable tenants={data.tenants} />
-        </>
+        </div>
       )}
     </div>
   );

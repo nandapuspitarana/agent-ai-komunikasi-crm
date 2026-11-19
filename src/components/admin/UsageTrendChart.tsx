@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
-import { formatCost, formatInt, formatTokens, type AdminDayUsage } from './shared';
+import { bucketUsage, formatCost, formatInt, formatTokens, type AdminDayUsage } from './shared';
 
 /** Every calendar date `from..to` (inclusive, plain YYYY-MM-DD; no time-zone math needed). */
 function datesBetween(from: string, to: string): string[] {
@@ -37,21 +37,28 @@ export default function UsageTrendChart({
     );
   }, [sparseByDay, period.from, period.to]);
 
-  const max = byDay.reduce((m, d) => Math.max(m, d.total_tokens), 0);
+  // Long ranges are drawn as weekly totals (see bucketUsage): a bar per day would be sub-pixel on a phone.
+  const { weekly, buckets } = useMemo(() => bucketUsage(byDay), [byDay]);
+  const max = buckets.reduce((m, b) => Math.max(m, b.total_tokens), 0);
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5">
-      <h3 className="text-sm font-semibold text-slate-700 mb-4">{ta('trendTitle', 'Daily token & cost trend')}</h3>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 mb-4">
+        <h3 className="text-sm font-semibold text-slate-700">{ta('trendTitle', 'Daily token & cost trend')}</h3>
+        {weekly && <span className="text-xs text-slate-400">{ta('trendWeekly', 'Weekly totals')}</span>}
+      </div>
       {byDay.length === 0 || max === 0 ? (
         <p className="text-sm text-slate-400 py-10 text-center">{ta('trendEmpty', 'No AI usage in this period yet')}</p>
       ) : (
         <>
-          <div className="flex items-end gap-[2px] h-40" role="list">
-            {byDay.map((d) => {
-              const pct = d.total_tokens > 0 ? Math.max((d.total_tokens / max) * 100, 2) : 0;
-              const tip = `${d.date}\n${formatTokens(d.total_tokens, locale)} ${ta('colTokens', 'Tokens').toLowerCase()} · ${formatCost(d.cost_usd, locale)}\n${formatInt(d.request_count, locale)} ${ta('requests', 'requests')}`;
+          {/* No flex gap: each bar's wrapper pads 1px per side instead, so at most 62 bars (2px each) always fit. */}
+          <div className="flex items-end h-40 overflow-hidden" role="list">
+            {buckets.map((b) => {
+              const pct = b.total_tokens > 0 ? Math.max((b.total_tokens / max) * 100, 2) : 0;
+              const when = b.from === b.to ? b.from : `${b.from} – ${b.to}`;
+              const tip = `${when}\n${formatTokens(b.total_tokens, locale)} ${ta('colTokens', 'Tokens').toLowerCase()} · ${formatCost(b.cost_usd, locale)}\n${formatInt(b.request_count, locale)} ${ta('requests', 'requests')}`;
               return (
-                <div key={d.date} role="listitem" title={tip} aria-label={tip} className="flex-1 h-full flex items-end min-w-0">
+                <div key={b.from} role="listitem" title={tip} aria-label={tip} className="flex-1 h-full flex items-end min-w-0 px-px">
                   <div className="w-full rounded-t bg-brand/70 hover:bg-brand transition-colors" style={{ height: `${pct}%` }} />
                 </div>
               );

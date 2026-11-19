@@ -3,7 +3,7 @@
 import { Building2, UserCog, Users, Cpu, DollarSign } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
-import { NA, formatCost, formatInt, formatTokens, roleLabel, type AdminAi, type PlatformStats } from './shared';
+import { NA, formatCost, formatInt, formatTokens, roleLabel, unpricedHint, type AdminAi, type PlatformStats } from './shared';
 
 const joinCounts = (record: Record<string, number>, label?: (key: string) => string) =>
   Object.entries(record)
@@ -12,18 +12,38 @@ const joinCounts = (record: Record<string, number>, label?: (key: string) => str
     .map(([k, n]) => `${label ? label(k) : k} ${n}`)
     .join(' · ');
 
-function Card({ icon, label, value, lines }: { icon: ReactNode; label: string; value: string; lines: string[] }) {
+function Card({
+  icon,
+  label,
+  value,
+  lines,
+  hint,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  lines: string[];
+  /** Accessible explanation of the `*` marker appended to the value (unpriced calls). */
+  hint?: string;
+}) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col min-w-0">
       <div className="flex items-center gap-3 mb-3">
         <div className="w-9 h-9 rounded-lg bg-brand-bg text-brand flex items-center justify-center shrink-0">{icon}</div>
         <h3 className="text-sm font-medium text-slate-500">{label}</h3>
       </div>
-      <p className="text-2xl font-bold text-slate-900 truncate" title={value}>
+      {/* Values and lines wrap instead of truncating: long ko/th labels must stay readable on a phone. */}
+      <p className="text-xl sm:text-2xl font-bold text-slate-900 break-words" title={hint ? `${value} — ${hint}` : undefined}>
         {value}
+        {hint && (
+          <>
+            <span aria-hidden="true"> *</span>
+            <span className="sr-only">{hint}</span>
+          </>
+        )}
       </p>
       {lines.map((line, i) => (
-        <p key={i} className="text-xs text-slate-500 mt-1 truncate" title={line}>
+        <p key={i} className="text-xs text-slate-500 mt-1 break-words">
           {line || ' '}
         </p>
       ))}
@@ -72,6 +92,7 @@ export default function AdminSummaryCards({ platform, ai }: { platform: Platform
         icon={<DollarSign size={18} />}
         label={ta('cardCost', 'Estimated AI cost')}
         value={totals ? formatCost(totals.cost_usd, locale) : NA}
+        hint={totals && totals.unpriced_count > 0 ? unpricedHint(ta, totals.unpriced_count, locale) : undefined}
         lines={[
           totals
             ? `${formatInt(totals.request_count, locale)} ${ta('requests', 'requests')} · ${formatInt(totals.error_count, locale)} ${ta('errors', 'errors')}`
