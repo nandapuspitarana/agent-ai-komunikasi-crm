@@ -84,32 +84,33 @@ function seedPrisma() {
         ]
   );
   prismaMock.visitorProfile.count.mockResolvedValue(6);
-  prismaMock.chatSession.groupBy.mockImplementation(async (args: any) => {
-    if (args?._max) {
-      return [{ tenantId: 't1', _max: { updatedAt: new Date('2026-11-18T10:00:00Z') } }];
-    }
-    if (args?.where?.handoffRequested) return [{ tenantId: 't1', _count: 2 }];
-    return [
-      { tenantId: 't1', channel: 'widget', _count: 10 },
-      { tenantId: 't1', channel: 'whatsapp', _count: 5 },
-      { tenantId: 't2', channel: 'widget', _count: 3 },
-    ];
-  });
   prismaMock.$queryRaw.mockImplementation(async (strings: TemplateStringsArray) => {
     const sql = Array.from(strings).join(' ');
-    if (sql.includes('senderType')) {
+    if (sql.includes('AS "senderType"')) {
       return [
         { tenantId: 't1', senderType: 'user', n: 40 },
         { tenantId: 't1', senderType: 'bot', n: 38 },
         { tenantId: 't2', senderType: 'user', n: BigInt(9) },
       ];
     }
-    if (sql.includes('GROUP BY "tenantId"')) {
+    if (sql.includes('MAX(')) {
+      return [{ tenantId: 't1', lastAt: new Date('2026-11-18T10:00:00Z') }];
+    }
+    if (sql.includes('"handoffRequested"')) return [{ tenantId: 't1', n: 2 }];
+    if (sql.includes('s."channel"')) {
+      return [
+        { tenantId: 't1', channel: 'widget', n: 10 },
+        { tenantId: 't1', channel: 'whatsapp', n: 5 },
+        { tenantId: 't2', channel: 'widget', n: 3 },
+      ];
+    }
+    if (sql.includes('GROUP BY s."tenantId"')) {
       return [
         { tenantId: 't1', n: 12 },
         { tenantId: 't2', n: 3 },
       ];
     }
+    // platform-wide distinct (tenantId, contactId): <= the per-tenant sum (15)
     return [{ n: 14 }];
   });
 }
@@ -234,6 +235,46 @@ describe('GET /api/admin/overview — data', () => {
     const beta = body.tenants.find((t: any) => t.id === 't2');
     expect(beta.lastActivityAt).toBeNull();
     expect(beta.activity).toEqual({ sessions: 3, messages: 9, handoffs: 0 });
+  });
+
+  it('derives activity from messages in the period (reused sessions count), via tagged $queryRaw', async () => {
+    fetchMock.mockResolvedValue(okResponse(proxyBody([])));
+    await GET(req());
+
+    // ChatSession is never grouped by its own createdAt any more: a reused session must still count.
+    expect(prismaMock.chatSession.groupBy).not.toHaveBeenCalled();
+
+    const sqls = prismaMock.$queryRaw.mock.calls.map((c: any[]) => Array.from(c[0] as TemplateStringsArray).join(' '));
+    expect(sqls).toHaveLength(6);
+    for (const sql of sqls) {
+      expect(sql).toContain('"crm_agent_Message"');
+      expect(sql).toContain('JOIN "crm_agent_ChatSession"');
+    }
+    const find = (needle: string) => sqls.find((s) => s.includes(needle)) as string;
+    expect(find('s."channel"')).toContain('COUNT(DISTINCT m."sessionId")');
+    expect(find('"handoffRequested" = true')).toContain('COUNT(DISTINCT m."sessionId")');
+    expect(find('MAX(m."createdAt")')).not.toContain('>=');
+    const activeSqls = sqls.filter((s) => s.includes('"contactId"'));
+    expect(activeSqls).toHaveLength(2);
+    for (const sql of activeSqls) expect(sql).toContain(`m."senderType" = 'user'`);
+  });
+
+  it('passes the period start/end instants as $queryRaw values', async () => {
+    fetchMock.mockResolvedValue(okResponse(proxyBody([])));
+    await GET(req());
+
+    const start = new Date('2026-10-31T17:00:00.000Z');
+    const end = new Date('2026-11-30T17:00:00.000Z');
+    let periodQueries = 0;
+    for (const call of prismaMock.$queryRaw.mock.calls as any[][]) {
+      const sql = Array.from(call[0] as TemplateStringsArray).join(' ');
+      if (sql.includes('MAX(')) continue; // last activity is all-time
+      periodQueries += 1;
+      const values = call.slice(1);
+      expect(values.some((v) => v instanceof Date && v.getTime() === start.getTime())).toBe(true);
+      expect(values.some((v) => v instanceof Date && v.getTime() === end.getTime())).toBe(true);
+    }
+    expect(periodQueries).toBe(5);
   });
 
   it('does not return conversation content', async () => {

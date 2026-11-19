@@ -398,12 +398,12 @@ frame-src 'none';
 
 ## Billing Dashboard (Super Admin)
 
-The billing dashboard shows AI usage across all tenants. It is available at `/<lang>/admin` and is visible only to users with the **SUPER_ADMIN** role.
+The billing dashboard shows per-tenant usage (staff, active end users, chat activity, AI tokens and cost) across all tenants and exports it as CSV. It is available at `/<lang>/admin` and is visible only to users with the **SUPER_ADMIN** role.
 
 Setup:
 
 1. **Set `BILLING_TIMEZONE`** in both repos (`agent-ai-komunikasi-crm` and `ai-agent-proxy`). Default: `Asia/Jakarta`. This timezone sets the billing period boundaries (start and end of month).
-2. **Run `ai-agent-proxy/migrations/006_ai_usage_billing.sql`** in the Supabase SQL editor **before the next purge run**. Without this migration, metric rows older than 28 days keep being deleted.
+2. **Run `ai-agent-proxy/migrations/006_ai_usage_billing.sql`** in the Supabase SQL editor **before the next purge run**. Without this migration, metric rows older than 28 days keep being deleted. After it, metric rows are kept for 400 days; only conversation content is scrubbed after 28 days.
 
 ---
 

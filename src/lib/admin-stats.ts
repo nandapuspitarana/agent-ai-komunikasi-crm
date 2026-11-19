@@ -3,6 +3,14 @@ import type { BillingPeriod, TenantRow } from '@/lib/admin-billing';
 
 // Prisma-only aggregation for the super-admin billing dashboard.
 // Only count / groupBy / aggregate / $queryRaw aggregates: never loads ChatSession or Message rows.
+//
+// Conversation activity is derived from MESSAGES created in the period, not from ChatSession.createdAt:
+// WhatsApp keeps one permanent session per (tenant, contact) and the widget reuses open sessions, so
+// counting sessions by their creation date would miss returning users. Hence:
+//   - active users    = distinct contacts that sent a user message in the period
+//   - sessions        = distinct sessions that have any message in the period
+//   - handoffs        = those sessions that are flagged handoffRequested
+//   - last activity   = latest message of the tenant (all time)
 
 export type PlatformStats = {
   tenants: { total: number; byPlan: Record<string, number>; aiEnabled: number };
@@ -25,6 +33,8 @@ export type PlatformStats = {
 
 type TenantCountRow = { tenantId: string; n: number | bigint };
 type TenantSenderRow = { tenantId: string; senderType: string; n: number | bigint };
+type TenantChannelRow = { tenantId: string; channel: string; n: number | bigint };
+type TenantLastRow = { tenantId: string; lastAt: Date | null };
 
 const add = (record: Record<string, number>, key: string, n: number) => {
   record[key] = (record[key] ?? 0) + n;
@@ -44,11 +54,11 @@ export async function getAdminStats(
     profilesStored,
     profilesNew,
     hotLeads,
+    activeUsersByTenant,
+    activeUsersPlatform,
     sessionGroups,
     handoffGroups,
     lastActivity,
-    activeUsersByTenant,
-    activeUsersPlatform,
     messageGroups,
   ] = await Promise.all([
     prisma.tenant.findMany({
@@ -60,22 +70,34 @@ export async function getAdminStats(
     prisma.visitorProfile.groupBy({ by: ['tenantId'], _count: true }),
     prisma.visitorProfile.groupBy({ by: ['tenantId'], where: { createdAt: inPeriod }, _count: true }),
     prisma.visitorProfile.count({ where: { leadClassification: 'hot_lead' } }),
-    prisma.chatSession.groupBy({ by: ['tenantId', 'channel'], where: { createdAt: inPeriod }, _count: true }),
-    prisma.chatSession.groupBy({
-      by: ['tenantId'],
-      where: { createdAt: inPeriod, handoffRequested: true },
-      _count: true,
-    }),
-    prisma.chatSession.groupBy({ by: ['tenantId'], _max: { updatedAt: true } }),
     prisma.$queryRaw<TenantCountRow[]>`
-      SELECT "tenantId", COUNT(DISTINCT "contactId")::int AS n
-      FROM "crm_agent_ChatSession"
-      WHERE "createdAt" >= ${start} AND "createdAt" < ${end}
-      GROUP BY "tenantId"`,
+      SELECT s."tenantId" AS "tenantId", COUNT(DISTINCT s."contactId")::int AS n
+      FROM "crm_agent_Message" m
+      JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
+      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end} AND m."senderType" = 'user'
+      GROUP BY s."tenantId"`,
     prisma.$queryRaw<Array<{ n: number | bigint }>>`
-      SELECT COUNT(DISTINCT ("tenantId", "contactId"))::int AS n
-      FROM "crm_agent_ChatSession"
-      WHERE "createdAt" >= ${start} AND "createdAt" < ${end}`,
+      SELECT COUNT(DISTINCT (s."tenantId", s."contactId"))::int AS n
+      FROM "crm_agent_Message" m
+      JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
+      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end} AND m."senderType" = 'user'`,
+    prisma.$queryRaw<TenantChannelRow[]>`
+      SELECT s."tenantId" AS "tenantId", s."channel" AS "channel", COUNT(DISTINCT m."sessionId")::int AS n
+      FROM "crm_agent_Message" m
+      JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
+      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end}
+      GROUP BY s."tenantId", s."channel"`,
+    prisma.$queryRaw<TenantCountRow[]>`
+      SELECT s."tenantId" AS "tenantId", COUNT(DISTINCT m."sessionId")::int AS n
+      FROM "crm_agent_Message" m
+      JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
+      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end} AND s."handoffRequested" = true
+      GROUP BY s."tenantId"`,
+    prisma.$queryRaw<TenantLastRow[]>`
+      SELECT s."tenantId" AS "tenantId", MAX(m."createdAt") AS "lastAt"
+      FROM "crm_agent_Message" m
+      JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
+      GROUP BY s."tenantId"`,
     prisma.$queryRaw<TenantSenderRow[]>`
       SELECT s."tenantId" AS "tenantId", m."senderType" AS "senderType", COUNT(*)::int AS n
       FROM "crm_agent_Message" m
@@ -148,21 +170,21 @@ export async function getAdminStats(
   }
 
   for (const g of sessionGroups) {
-    const n = Number(g._count);
+    const n = Number(g.n);
     platform.activity.sessions += n;
     add(platform.activity.sessionsByChannel, g.channel, n);
     const row = rows.get(g.tenantId);
     if (row) row.activity.sessions += n;
   }
   for (const g of handoffGroups) {
-    const n = Number(g._count);
+    const n = Number(g.n);
     platform.activity.handoffs += n;
     const row = rows.get(g.tenantId);
     if (row) row.activity.handoffs = n;
   }
   for (const g of lastActivity) {
     const row = rows.get(g.tenantId);
-    if (row && g._max.updatedAt) row.lastActivityAt = g._max.updatedAt.toISOString();
+    if (row && g.lastAt) row.lastActivityAt = new Date(g.lastAt).toISOString();
   }
 
   for (const g of messageGroups) {

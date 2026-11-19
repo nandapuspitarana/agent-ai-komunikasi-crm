@@ -57,7 +57,8 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
     });
   }, [tenants, query, sortKey, sortDir, locale]);
 
-  // TOTAL covers every tenant (independent of the search box) so it matches the summary cards.
+  // TOTAL covers every tenant row (independent of the search box). Staff is the sum of tenant staff, so it
+  // excludes accounts without a tenant (SUPER_ADMIN): the summary card's platform count can be higher.
   const total = useMemo(() => {
     const acc = {
       staffTotal: 0,
@@ -67,6 +68,7 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
       messages: 0,
       tokens: null as number | null,
       cost: null as number | null,
+      unpriced: 0,
     };
     for (const r of tenants) {
       acc.staffTotal += r.staff.total;
@@ -77,6 +79,7 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
       if (r.ai) {
         acc.tokens = (acc.tokens ?? 0) + r.ai.totalTokens;
         acc.cost = (acc.cost ?? 0) + r.ai.costUsd;
+        acc.unpriced += r.ai.unpricedCount;
       }
     }
     return acc;
@@ -115,6 +118,9 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
 
   const colCount = 10;
   const unavailableTip = ta('tokensUnavailable', 'Token data unavailable');
+  const unpricedTip = (count: number) =>
+    ta('unpricedCellHint', '{count} calls without a price — cost not included').replace('{count}', formatInt(count, locale));
+  const totalStaffTip = ta('totalStaffHint', 'Excludes accounts without a tenant');
 
   return (
     <div className="bg-white rounded-xl border border-slate-200">
@@ -152,7 +158,7 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
             {rows.length === 0 && (
               <tr>
                 <td colSpan={colCount} className="px-4 py-8 text-center text-slate-400">
-                  {ta('noMatch', 'No tenant matches your search')}
+                  {tenants.length === 0 ? ta('noData', 'No data') : ta('noMatch', 'No tenant matches your search')}
                 </td>
               </tr>
             )}
@@ -194,8 +200,11 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
                     <td className="px-4 py-3 text-right tabular-nums" title={r.ai ? undefined : unavailableTip}>
                       {r.ai ? formatTokens(r.ai.totalTokens, locale) : NA}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums" title={r.ai ? undefined : unavailableTip}>
-                      {r.ai ? formatCost(r.ai.costUsd, locale) : NA}
+                    <td
+                      className="px-4 py-3 text-right tabular-nums"
+                      title={r.ai ? (r.ai.unpricedCount > 0 ? unpricedTip(r.ai.unpricedCount) : undefined) : unavailableTip}
+                    >
+                      {r.ai ? `${formatCost(r.ai.costUsd, locale)}${r.ai.unpricedCount > 0 ? ' *' : ''}` : NA}
                     </td>
                     <td className="px-4 py-3 text-right text-slate-500 whitespace-nowrap">
                       {r.lastActivityAt ? relativeTime(r.lastActivityAt, locale) : NA}
@@ -218,8 +227,9 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
               <td />
               <td className="px-4 py-3">{ta('total', 'TOTAL')}</td>
               <td className="px-4 py-3" />
-              <td className="px-4 py-3 text-right tabular-nums">
+              <td className="px-4 py-3 text-right tabular-nums" title={totalStaffTip}>
                 {formatInt(total.staffActive, locale)}/{formatInt(total.staffTotal, locale)}
+                <span aria-label={totalStaffTip}> †</span>
               </td>
               <td className="px-4 py-3 text-right tabular-nums">{formatInt(total.activeUsers, locale)}</td>
               <td className="px-4 py-3 text-right tabular-nums">{formatInt(total.sessions, locale)}</td>
@@ -227,14 +237,18 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
               <td className="px-4 py-3 text-right tabular-nums">
                 {total.tokens === null ? NA : formatTokens(total.tokens, locale)}
               </td>
-              <td className="px-4 py-3 text-right tabular-nums">
-                {total.cost === null ? NA : formatCost(total.cost, locale)}
+              <td
+                className="px-4 py-3 text-right tabular-nums"
+                title={total.unpriced > 0 ? unpricedTip(total.unpriced) : undefined}
+              >
+                {total.cost === null ? NA : `${formatCost(total.cost, locale)}${total.unpriced > 0 ? ' *' : ''}`}
               </td>
               <td />
             </tr>
           </tfoot>
         </table>
       </div>
+      <p className="px-4 py-2 text-xs text-slate-400 border-t border-slate-100">† {totalStaffTip}</p>
     </div>
   );
 }
@@ -247,8 +261,8 @@ function DetailList({ title, items }: { title: string; items: Array<[string, str
         <p className="text-xs text-slate-400">{NA}</p>
       ) : (
         <ul className="space-y-1">
-          {items.map(([k, v]) => (
-            <li key={k} className="flex justify-between gap-3 text-xs">
+          {items.map(([k, v], i) => (
+            <li key={`${i}-${k}`} className="flex justify-between gap-3 text-xs">
               <span className="text-slate-600 truncate" title={k}>
                 {k}
               </span>
@@ -275,7 +289,7 @@ function TenantDetails({
     `${formatTokens(x.total_tokens, locale)} · ${formatCost(x.cost_usd, locale)}`,
   ]);
   const byModel: Array<[string, string]> = (row.ai?.byModel ?? []).map((x) => [
-    x.model_name,
+    x.model_name ?? '(unknown)',
     `${formatTokens(x.total_tokens, locale)} · ${formatCost(x.cost_usd, locale)}`,
   ]);
   const byRole: Array<[string, string]> = Object.entries(row.staff.byRole).map(([role, n]) => [

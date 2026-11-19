@@ -119,7 +119,7 @@ describe('mergeTenantUsage', () => {
     const out = mergeTenantUsage([crmRow()], []);
     expect(out[0].ai).toEqual({
       totalTokens: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0,
-      costUsd: 0, requests: 0, errors: 0, byType: [], byModel: [],
+      costUsd: 0, requests: 0, errors: 0, unpricedCount: 0, byType: [], byModel: [],
     });
   });
 
@@ -129,7 +129,7 @@ describe('mergeTenantUsage', () => {
     expect(row.activity.messages).toBe(340);
     expect(row.ai).toEqual({
       totalTokens: 150, inputTokens: 100, cachedInputTokens: 20, outputTokens: 50,
-      costUsd: 0.1, requests: 5, errors: 1,
+      costUsd: 0.1, requests: 5, errors: 1, unpricedCount: 0,
       byType: [{ request_type: 'chat', total_tokens: 150, cost_usd: 0.1, request_count: 5 }],
       byModel: [{ model_name: 'm1', total_tokens: 150, cost_usd: 0.1 }],
     });
@@ -159,6 +159,11 @@ describe('mergeTenantUsage', () => {
     expect(out[3].id).toBeNull();
   });
 
+  it('maps unpriced_count to unpricedCount', () => {
+    const [row] = mergeTenantUsage([crmRow()], [usage({ unpriced_count: 3 })]);
+    expect(row.ai?.unpricedCount).toBe(3);
+  });
+
   it('total tokens across all rows equals the sum of usage total_tokens', () => {
     const list = [
       usage({ tenant_id: 'A', total_tokens: 11 }),
@@ -182,7 +187,7 @@ describe('needsRetentionWarning', () => {
 
 describe('buildBillingCsv', () => {
   const HEADER =
-    'tenant_id,tenant_name,plan,period_from,period_to,staff_total,staff_active,end_users_active,sessions,messages,input_tokens,cached_input_tokens,output_tokens,total_tokens,requests,cost_usd';
+    'tenant_id,tenant_name,plan,period_from,period_to,staff_total,staff_active,end_users_active,sessions,messages,input_tokens,cached_input_tokens,output_tokens,total_tokens,requests,cost_usd,unpriced_requests';
   const period = { from: '2026-11-01', to: '2026-11-30' };
 
   it('has the exact header and \\r\\n line endings', () => {
@@ -196,7 +201,7 @@ describe('buildBillingCsv', () => {
   it('emits a full row with cost_usd at 6 decimals', () => {
     const [row] = mergeTenantUsage([crmRow()], [usage()]);
     const csv = buildBillingCsv([row], period);
-    expect(csv.split('\r\n')[1]).toBe('A,Tenant A,pro,2026-11-01,2026-11-30,3,2,10,12,340,100,20,50,150,5,0.100000');
+    expect(csv.split('\r\n')[1]).toBe('A,Tenant A,pro,2026-11-01,2026-11-30,3,2,10,12,340,100,20,50,150,5,0.100000,0');
   });
 
   it('RFC 4180 quotes commas, quotes and newlines', () => {
@@ -206,7 +211,30 @@ describe('buildBillingCsv', () => {
 
   it('leaves token and cost cells empty (not 0) when ai is null', () => {
     const csv = buildBillingCsv([crmRow({ ai: null })], period);
-    expect(csv.split('\r\n')[1]).toBe('A,Tenant A,pro,2026-11-01,2026-11-30,3,2,10,12,340,,,,,,');
+    expect(csv.split('\r\n')[1]).toBe('A,Tenant A,pro,2026-11-01,2026-11-30,3,2,10,12,340,,,,,,,');
+  });
+
+  it('emits unpriced_requests as the trailing column', () => {
+    const [row] = mergeTenantUsage([crmRow()], [usage({ unpriced_count: 4 })]);
+    const cells = buildBillingCsv([row], period).split('\r\n')[1].split(',');
+    expect(cells[cells.length - 1]).toBe('4');
+  });
+
+  it('neutralises spreadsheet formulas in text cells (CSV injection)', () => {
+    const line = (name: string) => buildBillingCsv([crmRow({ name })], period).split('\r\n')[1];
+    expect(line('=HYPERLINK("x")')).toContain(`,"'=HYPERLINK(""x"")",`);
+    expect(line('@SUM(A1)')).toContain(`,'@SUM(A1),`);
+    expect(line('+1')).toContain(`,'+1,`);
+    expect(line('-1')).toContain(`,'-1,`);
+    expect(line('\tcmd')).toContain(`,'\tcmd,`);
+    expect(line('Normal Name')).toContain(',Normal Name,');
+  });
+
+  it('does not prefix numeric cells, even negative ones', () => {
+    const [row] = mergeTenantUsage([crmRow()], [usage({ cost_usd: -0.5 })]);
+    const csv = buildBillingCsv([row], period).split('\r\n')[1];
+    expect(csv).toContain(',-0.500000,');
+    expect(csv).not.toContain("'-0.5");
   });
 
   it('leaves tenant_id and plan empty when null', () => {

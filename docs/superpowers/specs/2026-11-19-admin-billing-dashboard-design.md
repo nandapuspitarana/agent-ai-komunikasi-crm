@@ -101,10 +101,10 @@ agregasi langsung di `ai_trace_logs` dengan index yang ada cukup untuk volume sa
   - Tenant: `id, name, subscription, aiEnabled, createdAt`.
   - Akun staf: `user.groupBy([tenantId, role, isActive])`; staf baru dalam periode (`createdAt`); staf login dalam periode (`lastLoginAt`).
   - Pengguna akhir:
-    - **Pengguna aktif dalam periode** = jumlah `contactId` unik dari `ChatSession` yang `createdAt` dalam periode, per tenant (metrik utama untuk tagihan; tidak terpengaruh pembersihan VisitorProfile). Pakai `groupBy([tenantId, contactId])` lalu hitung, atau `$queryRaw` `COUNT(DISTINCT …)` bila lebih efisien.
+    - **Pengguna aktif dalam periode** = kontak unik yang chat dalam periode: `COUNT(DISTINCT s."contactId")` dari `Message` (join `ChatSession`) dengan `m."createdAt"` dalam periode dan `m."senderType" = 'user'`, per tenant (platform: `COUNT(DISTINCT (tenantId, contactId))`). Berbasis pesan, bukan `ChatSession.createdAt`, karena WhatsApp memakai satu sesi permanen per kontak dan widget memakai ulang sesi terbuka; metrik utama untuk tagihan, tidak terpengaruh pembersihan VisitorProfile. Dihitung dengan `$queryRaw` agregat.
     - Profil pengunjung tersimpan = `visitorProfile.groupBy(tenantId)`; profil baru dalam periode; jumlah `hot_lead`.
-  - Aktivitas: sesi chat dalam periode per tenant & per `channel` (`widget`, `whatsapp`, …); pesan dalam periode per tenant per `senderType` (`user`, `bot`, `agent`) via relasi `session.tenantId`; sesi yang di-handoff ke agen.
-  - Aktivitas terakhir per tenant = `MAX(ChatSession.updatedAt)`.
+  - Aktivitas (semua berbasis pesan dalam periode, join `Message` → `ChatSession`): sesi = `COUNT(DISTINCT m."sessionId")` yang punya pesan dalam periode, per tenant & per `channel` (`widget`, `whatsapp`, …); pesan per tenant per `senderType` (`user`, `bot`, `agent`); handoff = sesi di atas dengan `handoffRequested = true`.
+  - Aktivitas terakhir per tenant = `MAX(Message.createdAt)` sepanjang waktu (tanpa filter periode).
 - Data token: panggil proxy `usage-by-tenant` dengan `agentProxyUrl()` + `agentProxyHeaders()` (sama seperti `/api/dashboard/ai-cost`), timeout 15 detik.
   - Gabungkan per `tenant_id`. Tenant CRM tanpa pemakaian → token 0 (itu nilai sebenarnya). `tenant_id` dari proxy yang tidak ada di CRM → baris "Tenant tidak dikenal (`id`)", NULL → "Tanpa tenant", supaya total per tenant = total platform.
   - Proxy gagal/timeout → `ai: { status: "unavailable", error }` dan semua field token tenant = `null` (bukan 0). Bagian Prisma tetap dikembalikan.
@@ -152,10 +152,10 @@ agregasi langsung di `ai_trace_logs` dengan index yang ada cukup untuk volume sa
 ```
 - Pemilih periode: Bulan ini (default), Bulan lalu, Rentang kustom (dua `input type="date"`).
 - Tabel bisa diurutkan (biaya, token, pengguna aktif, nama) dan dicari; baris bisa diperluas untuk rincian.
-- Peringatan `unpriced_models`: "N panggilan tanpa harga model (biaya belum termasuk): …".
+- Peringatan unpriced: dari `ai.totals.unpriced_count` (jumlah panggilan), disertai daftar `unpricedModels` bila ada (model tanpa nama tampil `(unknown)`). Sel biaya tenant dengan `unpricedCount > 0` diberi tanda `*` dan tooltip "N panggilan tanpa harga — biaya belum termasuk".
 - Token `null` ditampilkan "—" dengan tooltip, bukan 0.
 - **Export CSV** dibuat di browser dari data yang sama: satu baris per tenant, kolom
-  `tenant_id, tenant_name, plan, period_from, period_to, staff_total, staff_active, end_users_active, sessions, messages, input_tokens, cached_input_tokens, output_tokens, total_tokens, requests, cost_usd`;
+  `tenant_id, tenant_name, plan, period_from, period_to, staff_total, staff_active, end_users_active, sessions, messages, input_tokens, cached_input_tokens, output_tokens, total_tokens, requests, cost_usd, unpriced_requests` (kolom terakhir = jumlah panggilan sukses tanpa harga; kosong bila `ai` tidak tersedia; kolom tambahan di akhir agar parser lama tetap jalan). Sel teks yang diawali `=`, `+`, `-`, `@`, tab atau CR diberi awalan `'` (anti formula injection);
   nama file `billing_<from>_<to>.csv`; `cost_usd` 6 desimal; tombol nonaktif bila `ai.status = unavailable`.
 - i18n: namespace baru `admin` di `src/dictionaries/{en,id,ko,th,zh}.json`; `en` & `id` diterjemahkan penuh, `ko/th/zh` diisi teks Inggris (bisa diterjemahkan belakangan). Setiap pemanggilan `t('admin', key, fallback)` memakai fallback Inggris.
 

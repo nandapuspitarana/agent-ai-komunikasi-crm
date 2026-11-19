@@ -9,7 +9,7 @@ import AdminSummaryCards from '@/components/admin/AdminSummaryCards';
 import UsageTrendChart from '@/components/admin/UsageTrendChart';
 import TenantBillingTable from '@/components/admin/TenantBillingTable';
 import PeriodPicker from '@/components/admin/PeriodPicker';
-import type { AdminOverview } from '@/components/admin/shared';
+import { formatInt, type AdminOverview } from '@/components/admin/shared';
 
 type Period = { from: string; to: string };
 
@@ -39,7 +39,7 @@ function Skeleton() {
 export default function AdminPage() {
   const { t, locale } = useTranslation();
   const ta = useCallback((key: string, fallback: string) => t('admin', key, fallback), [t]);
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
 
   // `query` null = no from/to yet: the server picks the current month in its billing time zone.
@@ -65,6 +65,7 @@ export default function AdminPage() {
           throw new Error(body?.error ? `${body.error} (HTTP ${res.status})` : `HTTP ${res.status}`);
         }
         const json = (await res.json()) as AdminOverview;
+        if (controller.signal.aborted) return;
         setData(json);
         setTz(json.period.tz);
       } catch (err) {
@@ -96,7 +97,7 @@ export default function AdminPage() {
 
   const exportCsv = () => {
     if (!data || data.ai.status !== 'ok') return;
-    const csv = '﻿' + buildBillingCsv(data.tenants, data.period);
+    const csv = '\uFEFF' + buildBillingCsv(data.tenants, data.period);
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a');
     a.href = url;
@@ -104,8 +105,16 @@ export default function AdminPage() {
     document.body.appendChild(a);
     a.click();
     a.remove();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   };
+
+  if (sessionStatus === 'loading') {
+    return (
+      <div className="p-8">
+        <Skeleton />
+      </div>
+    );
+  }
 
   if (!isSuperAdmin) {
     return (
@@ -119,7 +128,8 @@ export default function AdminPage() {
   }
 
   const aiUnavailable = ai?.status === 'unavailable';
-  const unpriced = ai?.status === 'ok' ? (ai.unpricedModels ?? []) : [];
+  const unpricedCount = ai?.status === 'ok' ? ai.totals.unpriced_count : 0;
+  const unpricedModels = ai?.status === 'ok' ? (ai.unpricedModels ?? []) : [];
   const pickerValue: Period | null = query ?? (period ? { from: period.from, to: period.to } : null);
 
   return (
@@ -134,7 +144,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={exportCsv}
-            disabled={!data || aiUnavailable}
+            disabled={loading || !data || aiUnavailable}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-brand text-white disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Download size={16} />
@@ -167,16 +177,19 @@ export default function AdminPage() {
             <Banner>{ta('warnRetention', 'Token data is available since {date}').replace('{date}', retentionDate)}</Banner>
           )}
           {aiUnavailable && <Banner>{ta('warnAiUnavailable', 'AI service unreachable — token figures are unavailable')}</Banner>}
-          {unpriced.length > 0 && (
+          {unpricedCount > 0 && (
             <Banner>
-              {ta('warnUnpriced', '{count} models without a price (cost not included): {models}')
-                .replace('{count}', String(unpriced.length))
-                .replace('{models}', unpriced.join(', '))}
+              {ta('warnUnpriced', '{count} calls without a price — cost not included in the totals.').replace(
+                '{count}',
+                formatInt(unpricedCount, locale)
+              )}
+              {unpricedModels.length > 0 &&
+                ` ${ta('warnUnpricedModels', 'Models: {models}').replace('{models}', unpricedModels.join(', '))}`}
             </Banner>
           )}
 
           <AdminSummaryCards platform={data.platform} ai={data.ai} />
-          {data.ai.status === 'ok' && <UsageTrendChart byDay={data.ai.byDay ?? []} />}
+          {data.ai.status === 'ok' && <UsageTrendChart byDay={data.ai.byDay ?? []} period={data.period} />}
           <TenantBillingTable tenants={data.tenants} />
         </>
       )}

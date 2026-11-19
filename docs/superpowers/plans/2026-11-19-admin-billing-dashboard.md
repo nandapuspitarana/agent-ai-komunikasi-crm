@@ -20,7 +20,7 @@
 - Tidak ada isi percakapan di endpoint/route/halaman baru.
 - Tanpa dependency npm baru; tanpa library chart.
 - Prisma: hanya `count` / `groupBy` / `aggregate` / `$queryRaw` agregat — tidak memuat seluruh baris `ChatSession`/`Message`.
-- CSV kolom persis: `tenant_id,tenant_name,plan,period_from,period_to,staff_total,staff_active,end_users_active,sessions,messages,input_tokens,cached_input_tokens,output_tokens,total_tokens,requests,cost_usd`; nama file `billing_<from>_<to>.csv`; `cost_usd` 6 desimal.
+- CSV kolom persis: `tenant_id,tenant_name,plan,period_from,period_to,staff_total,staff_active,end_users_active,sessions,messages,input_tokens,cached_input_tokens,output_tokens,total_tokens,requests,cost_usd,unpriced_requests` (16 kolom spesifikasi + `unpriced_requests` di akhir; sel teks diberi awalan `'` bila diawali `=`,`+`,`-`,`@`,tab,CR); nama file `billing_<from>_<to>.csv`; `cost_usd` 6 desimal.
 - i18n namespace `admin` di kelima `src/dictionaries/*.json`; `en` & `id` diterjemahkan, `ko/th/zh` berisi teks Inggris; setiap `t('admin', key, fallback)` memberi fallback Inggris.
 - Branch kerja: `feature/admin-billing-dashboard` di **kedua** repo. Repo CRM punya perubahan user yang belum di-commit (`Dockerfile`, `docker-compose.yml`, `package.json`, `userjourney/*`, `scripts/docker/bootstrap.js`, …) — **jangan** di-stage; selalu `git add <path spesifik>`.
 
@@ -224,7 +224,7 @@
 - Consumes: Task 4 (`resolvePeriod`, `billingTimezone`, `mergeTenantUsage`, `BillingPeriodError`, types); `requireUser` (`src/lib/api-guard.ts`); `agentProxyFetch` (`src/lib/agent-proxy-client.ts`); proxy endpoint Task 3.
 - Produces:
   - `getAdminStats(period: BillingPeriod): Promise<{ platform: PlatformStats; tenants: TenantRow[] }>` di `src/lib/admin-stats.ts`, `PlatformStats` = bentuk `platform` di spec §5.2 (`tenants{total,byPlan,aiEnabled}`, `staff{total,active,byRole,newInPeriod,loggedInPeriod}`, `endUsers{activeInPeriod,storedProfiles,newProfilesInPeriod,hotLeads}`, `activity{sessions,sessionsByChannel,handoffs,messages,messagesBySender}`). Semua `TenantRow.ai = null` (diisi di route).
-    - Pengguna aktif per tenant: `$queryRaw` `SELECT "tenantId", COUNT(DISTINCT "contactId")::int AS n FROM "crm_agent_ChatSession" WHERE "createdAt" >= ${start} AND "createdAt" < ${end} GROUP BY "tenantId"`; total platform = `COUNT(DISTINCT ("tenantId","contactId"))`.
+    - Pengguna aktif per tenant (berbasis pesan, bukan `ChatSession.createdAt`): `$queryRaw` `SELECT s."tenantId", COUNT(DISTINCT s."contactId")::int AS n FROM "crm_agent_Message" m JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId" WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end} AND m."senderType" = 'user' GROUP BY s."tenantId"`; total platform = `COUNT(DISTINCT (s."tenantId", s."contactId"))`. Sesi/handoff = `COUNT(DISTINCT m."sessionId")` pada join yang sama; aktivitas terakhir = `MAX(m."createdAt")` sepanjang waktu.
     - Pesan per tenant & sender: `$queryRaw` join `crm_agent_Message` m → `crm_agent_ChatSession` s, `GROUP BY s."tenantId", m."senderType"`, filter `m."createdAt"` dalam periode.
     - Handoff = sesi dalam periode dengan `handoffRequested = true`. `lastActivityAt` = `chatSession.groupBy({ by:['tenantId'], _max:{ updatedAt:true } })` (tanpa filter periode).
     - Hot leads = `visitorProfile.count({ where: { leadClassification: 'hot_lead' } })`.

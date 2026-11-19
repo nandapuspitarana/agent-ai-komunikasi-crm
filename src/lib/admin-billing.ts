@@ -26,7 +26,7 @@ export type ProxyTenantUsage = {
   error_count: number;
   unpriced_count: number;
   by_type: Array<{ request_type: string; total_tokens: number; cost_usd: number; request_count: number }>;
-  by_model: Array<{ model_name: string; total_tokens: number; cost_usd: number }>;
+  by_model: Array<{ model_name: string | null; total_tokens: number; cost_usd: number }>;
 };
 
 export type TenantAi = {
@@ -37,6 +37,8 @@ export type TenantAi = {
   costUsd: number;
   requests: number;
   errors: number;
+  /** Successful calls with no price snapshot: costUsd does not include them. */
+  unpricedCount: number;
   byType: ProxyTenantUsage['by_type'];
   byModel: ProxyTenantUsage['by_model'];
 };
@@ -186,6 +188,7 @@ const zeroAi = (): TenantAi => ({
   costUsd: 0,
   requests: 0,
   errors: 0,
+  unpricedCount: 0,
   byType: [],
   byModel: [],
 });
@@ -198,6 +201,7 @@ const toAi = (u: ProxyTenantUsage): TenantAi => ({
   costUsd: u.cost_usd,
   requests: u.request_count,
   errors: u.error_count,
+  unpricedCount: u.unpriced_count,
   byType: u.by_type,
   byModel: u.by_model,
 });
@@ -262,6 +266,7 @@ export const CSV_COLUMNS = [
   'total_tokens',
   'requests',
   'cost_usd',
+  'unpriced_requests',
 ] as const;
 
 const csvCell = (value: string | number | null): string => {
@@ -270,31 +275,37 @@ const csvCell = (value: string | number | null): string => {
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 
+// Spreadsheet formula injection (OWASP): a text cell starting with one of these is evaluated as a formula.
+const FORMULA_START = /^[=+\-@\t\r]/;
+
+/** Text cells (tenant id/name/plan): neutralise formula triggers, then RFC 4180 quote. Never use for numbers. */
+const csvText = (value: string | null): string =>
+  csvCell(value !== null && FORMULA_START.test(value) ? `'${value}` : value);
+
 export function buildBillingCsv(rows: TenantRow[], period: Pick<BillingPeriod, 'from' | 'to'>): string {
   const lines = [CSV_COLUMNS.join(',')];
   for (const r of rows) {
     const ai = r.ai;
     lines.push(
       [
-        r.id,
-        r.name,
-        r.plan,
-        period.from,
-        period.to,
-        r.staff.total,
-        r.staff.active,
-        r.endUsers.activeInPeriod,
-        r.activity.sessions,
-        r.activity.messages,
-        ai ? ai.inputTokens : null,
-        ai ? ai.cachedInputTokens : null,
-        ai ? ai.outputTokens : null,
-        ai ? ai.totalTokens : null,
-        ai ? ai.requests : null,
-        ai ? ai.costUsd.toFixed(6) : null,
-      ]
-        .map(csvCell)
-        .join(',')
+        csvText(r.id),
+        csvText(r.name),
+        csvText(r.plan),
+        csvCell(period.from),
+        csvCell(period.to),
+        csvCell(r.staff.total),
+        csvCell(r.staff.active),
+        csvCell(r.endUsers.activeInPeriod),
+        csvCell(r.activity.sessions),
+        csvCell(r.activity.messages),
+        csvCell(ai ? ai.inputTokens : null),
+        csvCell(ai ? ai.cachedInputTokens : null),
+        csvCell(ai ? ai.outputTokens : null),
+        csvCell(ai ? ai.totalTokens : null),
+        csvCell(ai ? ai.requests : null),
+        csvCell(ai ? ai.costUsd.toFixed(6) : null),
+        csvCell(ai ? ai.unpricedCount : null),
+      ].join(',')
     );
   }
   return lines.join('\r\n');
