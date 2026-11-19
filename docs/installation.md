@@ -400,10 +400,10 @@ frame-src 'none';
 
 The billing dashboard shows per-tenant usage (staff, active end users, chat activity, AI tokens and cost) across all tenants and exports it as CSV. It is available at `/<lang>/admin` and is visible only to users with the **SUPER_ADMIN** role.
 
-Setup:
+Setup consists of two required settings, `BILLING_TIMEZONE` in both repos and proxy migration `006_ai_usage_billing.sql`. Apply them in the order given under **Deployment order** below; the order matters because of the purge job.
 
-1. **Set `BILLING_TIMEZONE`** in both repos (`agent-ai-komunikasi-crm` and `ai-agent-proxy`). Default: `Asia/Jakarta`. This timezone sets the billing period boundaries (start and end of month).
-2. **Run `ai-agent-proxy/migrations/006_ai_usage_billing.sql`** in the Supabase SQL editor **before the next purge run**. Without this migration, metric rows older than 28 days keep being deleted. After it, metric rows are kept for 400 days; only conversation content is scrubbed after 28 days.
+- **`BILLING_TIMEZONE`**: set it in the production env of both repos (`agent-ai-komunikasi-crm` and `ai-agent-proxy`). Default: `Asia/Jakarta`. It sets the billing period boundaries (start and end of month). The two values must match.
+- **`ai-agent-proxy/migrations/006_ai_usage_billing.sql`**: run it in the Supabase SQL editor **before the next purge run**. Without this migration, metric rows older than 28 days keep being deleted. After it, metric rows are kept for 400 days; only conversation content is scrubbed after 28 days.
 
 ### Deployment order
 
@@ -420,7 +420,6 @@ Follow these steps in this order. The order matters because of the purge job.
 
 - The first invoice periods may be incomplete. Earlier purge runs already deleted metric data older than 28 days, and that data cannot be recovered. When the selected period starts before the oldest data still available, the dashboard shows the `retention.oldest_available` banner ("Token data is available since ..."). Treat token and cost figures for periods before that date as partial.
 - The CRM activity counts (sessions, messages, active users, handoffs) come from the CRM database, not the proxy, so they are not affected by the purge. "Handoffs" counts sessions in which a human agent sent at least one message during the period.
-
 
 ---
 

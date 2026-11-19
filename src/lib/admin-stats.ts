@@ -15,11 +15,15 @@ import type { BillingPeriod, TenantRow } from '@/lib/admin-billing';
 //   - last activity   = latest message of the tenant (all time)
 //
 // Time zone: Message."createdAt" is `timestamp(3)` WITHOUT time zone and holds UTC wall-clock time.
-// A tagged $queryRaw binds a JS Date as timestamptz, which Postgres would convert with the DB session
-// TimeZone. Every window bound is therefore cast `(${bound}::timestamptz AT TIME ZONE 'UTC')`, so the
-// comparison happens in UTC wall time whatever the server setting. The typed Prisma calls (count/groupBy)
-// bind with the column's own type and need no cast. The lastActivity MAX("createdAt") has no bound; Prisma
-// reads a naive timestamp back as UTC, so `new Date(lastAt).toISOString()` is correct.
+// Passing a JS Date to a tagged $queryRaw makes Prisma pick the parameter type (it currently declares
+// timestamptz, so Postgres converts with the DB session TimeZone and the window shifts on a non-UTC server;
+// a different Prisma version or a driver adapter could type it differently again). To not depend on that,
+// the bounds are passed as ISO-8601 strings with an explicit `Z` and cast `(${iso}::timestamptz AT TIME ZONE 'UTC')`:
+// Postgres parses a Z-suffixed literal as that exact instant whatever the session TimeZone, and AT TIME ZONE 'UTC'
+// turns it into UTC wall time, which compares correctly with the naive column. They stay bound parameters.
+// The typed Prisma calls (count/groupBy) bind with the column's own type and need no cast. The lastActivity
+// MAX("createdAt") has no bound; Prisma reads a naive timestamp back as UTC, so `new Date(lastAt).toISOString()`
+// is correct.
 
 export type PlatformStats = {
   tenants: { total: number; byPlan: Record<string, number>; aiEnabled: number };
@@ -54,6 +58,9 @@ export async function getAdminStats(
 ): Promise<{ platform: PlatformStats; tenants: TenantRow[] }> {
   const { start, end } = period;
   const inPeriod = { gte: start, lt: end };
+  // Explicit-offset text bounds for $queryRaw: see the time zone note at the top of this file.
+  const startIso = start.toISOString();
+  const endIso = end.toISOString();
 
   const [
     tenantRows,
@@ -83,24 +90,24 @@ export async function getAdminStats(
       SELECT s."tenantId" AS "tenantId", COUNT(DISTINCT s."contactId")::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'user'
+      WHERE m."createdAt" >= (${startIso}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${endIso}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'user'
       GROUP BY s."tenantId"`,
     prisma.$queryRaw<Array<{ n: number | bigint }>>`
       SELECT COUNT(DISTINCT (s."tenantId", s."contactId"))::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'user'`,
+      WHERE m."createdAt" >= (${startIso}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${endIso}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'user'`,
     prisma.$queryRaw<TenantChannelRow[]>`
       SELECT s."tenantId" AS "tenantId", s."channel" AS "channel", COUNT(DISTINCT m."sessionId")::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC')
+      WHERE m."createdAt" >= (${startIso}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${endIso}::timestamptz AT TIME ZONE 'UTC')
       GROUP BY s."tenantId", s."channel"`,
     prisma.$queryRaw<TenantCountRow[]>`
       SELECT s."tenantId" AS "tenantId", COUNT(DISTINCT m."sessionId")::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'agent'
+      WHERE m."createdAt" >= (${startIso}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${endIso}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'agent'
       GROUP BY s."tenantId"`,
     prisma.$queryRaw<TenantLastRow[]>`
       SELECT s."tenantId" AS "tenantId", MAX(m."createdAt") AS "lastAt"
@@ -111,7 +118,7 @@ export async function getAdminStats(
       SELECT s."tenantId" AS "tenantId", m."senderType" AS "senderType", COUNT(*)::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC')
+      WHERE m."createdAt" >= (${startIso}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${endIso}::timestamptz AT TIME ZONE 'UTC')
       GROUP BY s."tenantId", m."senderType"`,
   ]);
 

@@ -269,7 +269,6 @@ describe('GET /api/admin/overview — data', () => {
     fetchMock.mockResolvedValue(okResponse(proxyBody([])));
     await GET(req());
 
-    const sqls = prismaMock.$queryRaw.mock.calls.map((c: any[]) => Array.from(c[0] as TemplateStringsArray).join(' '));
     // Join with '?' so the parameter placeholders are visible in the assertions.
     const windowed = prismaMock.$queryRaw.mock.calls
       .map((c: any[]) => Array.from(c[0] as TemplateStringsArray).join('?'))
@@ -282,20 +281,26 @@ describe('GET /api/admin/overview — data', () => {
     }
   });
 
-  it('passes the period start/end instants as $queryRaw values', async () => {
+  it('binds the period start/end as ISO-8601 UTC strings (explicit Z), not Date objects, as $queryRaw values', async () => {
     fetchMock.mockResolvedValue(okResponse(proxyBody([])));
     await GET(req());
 
-    const start = new Date('2026-10-31T17:00:00.000Z');
-    const end = new Date('2026-11-30T17:00:00.000Z');
+    // An explicit-offset text literal is parsed by Postgres as that exact instant whatever the session
+    // TimeZone, and does not depend on how Prisma types a JS Date in raw queries.
+    const startIso = '2026-10-31T17:00:00.000Z';
+    const endIso = '2026-11-30T17:00:00.000Z';
     let periodQueries = 0;
     for (const call of prismaMock.$queryRaw.mock.calls as any[][]) {
       const sql = Array.from(call[0] as TemplateStringsArray).join(' ');
       if (sql.includes('MAX(')) continue; // last activity is all-time
       periodQueries += 1;
       const values = call.slice(1);
-      expect(values.some((v) => v instanceof Date && v.getTime() === start.getTime())).toBe(true);
-      expect(values.some((v) => v instanceof Date && v.getTime() === end.getTime())).toBe(true);
+      expect(values).toEqual([startIso, endIso, ...values.slice(2)]);
+      for (const v of values.slice(0, 2)) {
+        expect(typeof v).toBe('string');
+        expect(v).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      }
+      expect(values.some((v) => v instanceof Date)).toBe(false);
     }
     expect(periodQueries).toBe(5);
   });
