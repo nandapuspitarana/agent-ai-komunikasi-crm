@@ -96,7 +96,7 @@ function seedPrisma() {
     if (sql.includes('MAX(')) {
       return [{ tenantId: 't1', lastAt: new Date('2026-11-18T10:00:00Z') }];
     }
-    if (sql.includes('"handoffRequested"')) return [{ tenantId: 't1', n: 2 }];
+    if (sql.includes(`m."senderType" = 'agent'`)) return [{ tenantId: 't1', n: 2 }];
     if (sql.includes('s."channel"')) {
       return [
         { tenantId: 't1', channel: 'widget', n: 10 },
@@ -252,11 +252,34 @@ describe('GET /api/admin/overview — data', () => {
     }
     const find = (needle: string) => sqls.find((s) => s.includes(needle)) as string;
     expect(find('s."channel"')).toContain('COUNT(DISTINCT m."sessionId")');
-    expect(find('"handoffRequested" = true')).toContain('COUNT(DISTINCT m."sessionId")');
+    // Handoff = sessions a human agent actually handled (agent messages) in the period.
+    // Nothing ever writes ChatSession.handoffRequested, so the query must not reference it.
+    const handoffSql = find(`m."senderType" = 'agent'`);
+    expect(handoffSql).toContain('COUNT(DISTINCT m."sessionId")');
+    expect(handoffSql).toContain('GROUP BY s."tenantId"');
+    expect(handoffSql).not.toContain('handoffRequested');
+    for (const sql of sqls) expect(sql).not.toContain('handoffRequested');
     expect(find('MAX(m."createdAt")')).not.toContain('>=');
     const activeSqls = sqls.filter((s) => s.includes('"contactId"'));
     expect(activeSqls).toHaveLength(2);
     for (const sql of activeSqls) expect(sql).toContain(`m."senderType" = 'user'`);
+  });
+
+  it(`binds every windowed bound as timestamptz AT TIME ZONE 'UTC' (independent of the DB session TimeZone)`, async () => {
+    fetchMock.mockResolvedValue(okResponse(proxyBody([])));
+    await GET(req());
+
+    const sqls = prismaMock.$queryRaw.mock.calls.map((c: any[]) => Array.from(c[0] as TemplateStringsArray).join(' '));
+    // Join with '?' so the parameter placeholders are visible in the assertions.
+    const windowed = prismaMock.$queryRaw.mock.calls
+      .map((c: any[]) => Array.from(c[0] as TemplateStringsArray).join('?'))
+      .filter((s: string) => !s.includes('MAX('));
+    expect(windowed).toHaveLength(5);
+    for (const sql of windowed) {
+      expect(sql).toContain(`m."createdAt" >= (?::timestamptz AT TIME ZONE 'UTC')`);
+      expect(sql).toContain(`m."createdAt" < (?::timestamptz AT TIME ZONE 'UTC')`);
+      expect(sql.split(`AT TIME ZONE 'UTC'`).length - 1).toBe(2);
+    }
   });
 
   it('passes the period start/end instants as $queryRaw values', async () => {

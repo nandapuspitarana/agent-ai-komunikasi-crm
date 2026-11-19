@@ -405,6 +405,23 @@ Setup:
 1. **Set `BILLING_TIMEZONE`** in both repos (`agent-ai-komunikasi-crm` and `ai-agent-proxy`). Default: `Asia/Jakarta`. This timezone sets the billing period boundaries (start and end of month).
 2. **Run `ai-agent-proxy/migrations/006_ai_usage_billing.sql`** in the Supabase SQL editor **before the next purge run**. Without this migration, metric rows older than 28 days keep being deleted. After it, metric rows are kept for 400 days; only conversation content is scrubbed after 28 days.
 
+### Deployment order
+
+Follow these steps in this order. The order matters because of the purge job.
+
+1. **Migration 004 must already be applied** on the proxy database.
+2. **Apply proxy migration `006_ai_usage_billing.sql` BEFORE the next pg_cron purge run.** Until then the old purge still deletes metric rows older than 28 days. Rows that are 28 to 400 days old are lost permanently if the purge runs first.
+3. **Do NOT re-run migration 003 afterwards.** It would restore the 28-day delete of metric rows.
+4. **Rebuild the proxy image.** The proxy has a new `tzdata` dependency, and the slim image has no system zoneinfo.
+5. **Set `BILLING_TIMEZONE` in the production env of both the CRM and the proxy** (default `Asia/Jakarta`). The two values must match, otherwise the CRM and the proxy compute different period boundaries.
+6. **Deploy the CRM.**
+
+### Notes on the first invoice periods
+
+- The first invoice periods may be incomplete. Earlier purge runs already deleted metric data older than 28 days, and that data cannot be recovered. When the selected period starts before the oldest data still available, the dashboard shows the `retention.oldest_available` banner ("Token data is available since ..."). Treat token and cost figures for periods before that date as partial.
+- The CRM activity counts (sessions, messages, active users, handoffs) come from the CRM database, not the proxy, so they are not affected by the purge. "Handoffs" counts sessions in which a human agent sent at least one message during the period.
+
+
 ---
 
 ## Support & Resources

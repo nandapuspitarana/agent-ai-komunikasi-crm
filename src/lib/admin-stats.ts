@@ -9,8 +9,17 @@ import type { BillingPeriod, TenantRow } from '@/lib/admin-billing';
 // counting sessions by their creation date would miss returning users. Hence:
 //   - active users    = distinct contacts that sent a user message in the period
 //   - sessions        = distinct sessions that have any message in the period
-//   - handoffs        = those sessions that are flagged handoffRequested
+//   - handoffs        = distinct sessions in which a human agent sent a message in the period
+//                       (senderType = 'agent'), i.e. sessions a human actually handled. Nothing writes
+//                       ChatSession.handoffRequested (a handoff only sets status = 'queue'), so it is not used.
 //   - last activity   = latest message of the tenant (all time)
+//
+// Time zone: Message."createdAt" is `timestamp(3)` WITHOUT time zone and holds UTC wall-clock time.
+// A tagged $queryRaw binds a JS Date as timestamptz, which Postgres would convert with the DB session
+// TimeZone. Every window bound is therefore cast `(${bound}::timestamptz AT TIME ZONE 'UTC')`, so the
+// comparison happens in UTC wall time whatever the server setting. The typed Prisma calls (count/groupBy)
+// bind with the column's own type and need no cast. The lastActivity MAX("createdAt") has no bound; Prisma
+// reads a naive timestamp back as UTC, so `new Date(lastAt).toISOString()` is correct.
 
 export type PlatformStats = {
   tenants: { total: number; byPlan: Record<string, number>; aiEnabled: number };
@@ -74,24 +83,24 @@ export async function getAdminStats(
       SELECT s."tenantId" AS "tenantId", COUNT(DISTINCT s."contactId")::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end} AND m."senderType" = 'user'
+      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'user'
       GROUP BY s."tenantId"`,
     prisma.$queryRaw<Array<{ n: number | bigint }>>`
       SELECT COUNT(DISTINCT (s."tenantId", s."contactId"))::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end} AND m."senderType" = 'user'`,
+      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'user'`,
     prisma.$queryRaw<TenantChannelRow[]>`
       SELECT s."tenantId" AS "tenantId", s."channel" AS "channel", COUNT(DISTINCT m."sessionId")::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end}
+      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC')
       GROUP BY s."tenantId", s."channel"`,
     prisma.$queryRaw<TenantCountRow[]>`
       SELECT s."tenantId" AS "tenantId", COUNT(DISTINCT m."sessionId")::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end} AND s."handoffRequested" = true
+      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC') AND m."senderType" = 'agent'
       GROUP BY s."tenantId"`,
     prisma.$queryRaw<TenantLastRow[]>`
       SELECT s."tenantId" AS "tenantId", MAX(m."createdAt") AS "lastAt"
@@ -102,7 +111,7 @@ export async function getAdminStats(
       SELECT s."tenantId" AS "tenantId", m."senderType" AS "senderType", COUNT(*)::int AS n
       FROM "crm_agent_Message" m
       JOIN "crm_agent_ChatSession" s ON s."id" = m."sessionId"
-      WHERE m."createdAt" >= ${start} AND m."createdAt" < ${end}
+      WHERE m."createdAt" >= (${start}::timestamptz AT TIME ZONE 'UTC') AND m."createdAt" < (${end}::timestamptz AT TIME ZONE 'UTC')
       GROUP BY s."tenantId", m."senderType"`,
   ]);
 

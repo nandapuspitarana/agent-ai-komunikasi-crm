@@ -64,7 +64,7 @@
   - `GET /observability/cost?tenant_id&from&to&group_by=day|model|type` (hilangkan batas `le=28`)
   - `GET /observability/cost/month-to-date?tenant_id` → `{spent_usd, projected_month_end_usd, budget_usd, pct}`
   - Proyeksi akhir bulan = `spent / hari_berjalan × jumlah_hari_bulan`.
-- [x] **T023** Mode super-admin: agregat lintas tenant (`tenant_id` opsional) + ranking tenant termahal.
+- [x] **T023** Mode super-admin: agregat lintas tenant (`tenant_id` opsional) + ranking tenant termahal. — cakupan tepat: `GET /observability/dashboard` (`tenant_id` opsional, `all` = lintas tenant) mengembalikan daftar tenant yang diurutkan berdasarkan biaya; dashboard billing super-admin memakai `GET /observability/usage-by-tenant`, yang selalu lintas semua tenant dan TIDAK punya filter `tenant_id` ("ranking" = pengurutan tabel di UI, bukan endpoint ranking terpisah). Endpoint `/dashboard` masih terkena batas 28 hari / 5000 baris (lihat T020).
 
 ## Fase 3 — Integrasi OpenAI (rekonsiliasi tagihan asli) (~1 hari)
 
