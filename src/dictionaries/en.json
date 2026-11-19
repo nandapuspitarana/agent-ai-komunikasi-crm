@@ -19,7 +19,8 @@
     "saasCrm": "CeosuiteBOT",
     "admin": "Admin",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "language": "Language"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -421,6 +422,7 @@
     "trendTitle": "Daily token & cost trend",
     "trendEmpty": "No AI usage in this period yet",
     "trendWeekly": "Weekly totals",
+    "trendDays": "{count} days",
     "searchPlaceholder": "Search tenant…",
     "colTenant": "Tenant",
     "colPlan": "Plan",

@@ -57,13 +57,13 @@ describe('bucketUsage', () => {
     const { weekly, buckets } = bucketUsage(dayList(TREND_WEEKLY_ABOVE_DAYS));
     expect(weekly).toBe(false);
     expect(buckets).toHaveLength(TREND_WEEKLY_ABOVE_DAYS);
-    expect(buckets[0]).toEqual({ from: '2026-01-01', to: '2026-01-01', total_tokens: 10, cost_usd: 0.5, request_count: 2 });
+    expect(buckets[0]).toEqual({ from: '2026-01-01', to: '2026-01-01', days: 1, total_tokens: 10, cost_usd: 0.5, request_count: 2 });
   });
 
   it('switches to weekly totals above the threshold, counted from the first day', () => {
     const { weekly, buckets } = bucketUsage(dayList(TREND_WEEKLY_ABOVE_DAYS + 1));
     expect(weekly).toBe(true);
-    expect(buckets[0]).toEqual({ from: '2026-01-01', to: '2026-01-07', total_tokens: 70, cost_usd: 3.5, request_count: 14 });
+    expect(buckets[0]).toEqual({ from: '2026-01-01', to: '2026-01-07', days: 7, total_tokens: 70, cost_usd: 3.5, request_count: 14 });
     expect(buckets[1].from).toBe('2026-01-08');
   });
 
@@ -76,6 +76,8 @@ describe('bucketUsage', () => {
     expect(buckets.reduce((s, b) => s + b.total_tokens, 0)).toBe(4000);
     expect(buckets[buckets.length - 1].to).toBe(days[399].date);
     expect(buckets[buckets.length - 1].total_tokens).toBe(10 * (400 % 7));
+    expect(buckets[buckets.length - 1].days).toBe(400 % 7);
+    expect(buckets[0].days).toBe(7);
   });
 
   it('handles an empty range', () => {
@@ -88,7 +90,8 @@ describe('sidebar menu dictionary keys', () => {
   const sidebar = (l: string): Record<string, string> =>
     JSON.parse(readFileSync(path.resolve(__dirname, '../../src/dictionaries', `${l}.json`), 'utf-8')).sidebar;
 
-  it.each(LOCALES)('%s has non-empty openMenu/closeMenu and the same sidebar keys as en', (l) => {
+  it.each(LOCALES)('%s has non-empty openMenu/closeMenu/language and the same sidebar keys as en', (l) => {
+    expect(sidebar(l).language?.trim()).toBeTruthy();
     expect(sidebar(l).openMenu?.trim()).toBeTruthy();
     expect(sidebar(l).closeMenu?.trim()).toBeTruthy();
     expect(Object.keys(sidebar(l)).sort()).toEqual(Object.keys(sidebar('en')).sort());
@@ -97,5 +100,6 @@ describe('sidebar menu dictionary keys', () => {
   it.each(['id', 'ko', 'th', 'zh'] as const)('%s translates the menu labels', (l) => {
     expect(sidebar(l).openMenu).not.toBe(sidebar('en').openMenu);
     expect(sidebar(l).closeMenu).not.toBe(sidebar('en').closeMenu);
+    expect(sidebar(l).language).not.toBe(sidebar('en').language);
   });
 });

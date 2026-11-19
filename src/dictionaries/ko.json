@@ -19,7 +19,8 @@
     "saasCrm": "CeosuiteBOT",
     "admin": "Admin",
     "openMenu": "메뉴 열기",
-    "closeMenu": "메뉴 닫기"
+    "closeMenu": "메뉴 닫기",
+    "language": "언어"
   },
   "dashboard": {
     "title": "대시보드",
@@ -322,6 +323,7 @@
     "trendTitle": "일별 토큰 및 비용 추이",
     "trendEmpty": "이 기간에는 아직 AI 사용 내역이 없습니다",
     "trendWeekly": "주간 합계",
+    "trendDays": "{count}일",
     "searchPlaceholder": "테넌트 검색…",
     "colTenant": "테넌트",
     "colPlan": "요금제",

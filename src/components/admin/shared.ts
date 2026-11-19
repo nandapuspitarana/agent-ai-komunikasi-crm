@@ -65,7 +65,7 @@ export const unpricedHint = (ta: (key: string, fallback: string) => string, coun
 /** Above this many days the trend chart draws one bar per week instead of per day (bars stay legible on a phone). */
 export const TREND_WEEKLY_ABOVE_DAYS = 62;
 
-export type UsageBucket = { from: string; to: string; total_tokens: number; cost_usd: number; request_count: number };
+export type UsageBucket = { from: string; to: string; days: number; total_tokens: number; cost_usd: number; request_count: number };
 
 /**
  * Chart bars: one per day up to TREND_WEEKLY_ABOVE_DAYS days, otherwise one per 7 consecutive days counted from
@@ -80,6 +80,7 @@ export const bucketUsage = (days: AdminDayUsage[]): { weekly: boolean; buckets: 
     buckets.push({
       from: chunk[0].date,
       to: chunk[chunk.length - 1].date,
+      days: chunk.length,
       total_tokens: chunk.reduce((s, d) => s + d.total_tokens, 0),
       cost_usd: chunk.reduce((s, d) => s + d.cost_usd, 0),
       request_count: chunk.reduce((s, d) => s + d.request_count, 0),

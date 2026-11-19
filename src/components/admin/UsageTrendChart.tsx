@@ -55,7 +55,9 @@ export default function UsageTrendChart({
           <div className="flex items-end h-40 overflow-hidden" role="list">
             {buckets.map((b) => {
               const pct = b.total_tokens > 0 ? Math.max((b.total_tokens / max) * 100, 2) : 0;
-              const when = b.from === b.to ? b.from : `${b.from} – ${b.to}`;
+              const range = b.from === b.to ? b.from : `${b.from} – ${b.to}`;
+              // A short (partial) weekly bucket says how many days it covers, so it is not read as a usage drop.
+              const when = weekly && b.days < 7 ? `${range} (${ta('trendDays', '{count} days').replace('{count}', String(b.days))})` : range;
               const tip = `${when}\n${formatTokens(b.total_tokens, locale)} ${ta('colTokens', 'Tokens').toLowerCase()} · ${formatCost(b.cost_usd, locale)}\n${formatInt(b.request_count, locale)} ${ta('requests', 'requests')}`;
               return (
                 <div key={b.from} role="listitem" title={tip} aria-label={tip} className="flex-1 h-full flex items-end min-w-0 px-px">

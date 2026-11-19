@@ -261,7 +261,7 @@ function UnpricedMark({ hint }: { hint: string }) {
   return (
     <>
       <span aria-hidden="true"> *</span>
-      <span className="sr-only">{hint}</span>
+      <span className="sr-only">{`, ${hint}`}</span>
     </>
   );
 }

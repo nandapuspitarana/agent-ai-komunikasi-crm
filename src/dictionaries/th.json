@@ -19,7 +19,8 @@
     "saasCrm": "CeosuiteBOT",
     "admin": "Admin",
     "openMenu": "เปิดเมนู",
-    "closeMenu": "ปิดเมนู"
+    "closeMenu": "ปิดเมนู",
+    "language": "ภาษา"
   },
   "dashboard": {
     "title": "แดชบอร์ด",
@@ -322,6 +323,7 @@
     "trendTitle": "แนวโน้มโทเคนและค่าใช้จ่ายรายวัน",
     "trendEmpty": "ยังไม่มีการใช้งาน AI ในช่วงเวลานี้",
     "trendWeekly": "ยอดรวมรายสัปดาห์",
+    "trendDays": "{count} วัน",
     "searchPlaceholder": "ค้นหาผู้เช่า…",
     "colTenant": "ผู้เช่า",
     "colPlan": "แพ็กเกจ",

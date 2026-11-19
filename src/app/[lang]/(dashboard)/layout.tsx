@@ -71,12 +71,17 @@ export default function DashboardLayout({
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
-  // Focus moves into the drawer when it opens and back to the hamburger button when it closes.
+  // Focus moves into the drawer when it opens and back to the hamburger button when it closes. If it closed
+  // because the viewport grew to md+ (hamburger hidden), focus goes to the first nav link of the static sidebar.
   useEffect(() => {
     if (menuOpen) {
       closeButtonRef.current?.focus();
     } else if (wasMenuOpen.current) {
-      menuButtonRef.current?.focus();
+      if (window.matchMedia('(min-width: 768px)').matches) {
+        document.querySelector<HTMLElement>('#dashboard-sidebar nav a')?.focus();
+      } else {
+        menuButtonRef.current?.focus();
+      }
     }
     wasMenuOpen.current = menuOpen;
   }, [menuOpen]);
@@ -135,6 +140,9 @@ export default function DashboardLayout({
       {/* Sidebar: off-canvas drawer below md (hidden from focus and AT while closed), unchanged column from md up */}
       <div
         id="dashboard-sidebar"
+        role={menuOpen ? 'dialog' : undefined}
+        aria-modal={menuOpen ? true : undefined}
+        aria-label={menuOpen ? t('sidebar', 'saasCrm') : undefined}
         className={`w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-40 max-md:overflow-y-auto max-md:transition-transform max-md:duration-200 motion-reduce:transition-none ${
           menuOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full max-md:invisible'
         }`}
@@ -160,6 +168,7 @@ export default function DashboardLayout({
               <Link
                 key={href}
                 href={href}
+                onClick={() => setMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group relative ${
                   isActive
                     ? 'bg-brand text-white shadow-sm'
@@ -188,7 +197,8 @@ export default function DashboardLayout({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+      {/* inert while the mobile drawer is open: no focus, clicks or AT reading behind it (menuOpen is never true at md+) */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0" inert={menuOpen}>
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center px-4 md:px-6 justify-between shrink-0">
           <button

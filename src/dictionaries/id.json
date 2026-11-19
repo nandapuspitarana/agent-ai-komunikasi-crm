@@ -19,7 +19,8 @@
     "saasCrm": "CeosuiteBOT",
     "admin": "Admin",
     "openMenu": "Buka menu",
-    "closeMenu": "Tutup menu"
+    "closeMenu": "Tutup menu",
+    "language": "Bahasa"
   },
   "dashboard": {
     "title": "Dasbor",
@@ -421,6 +422,7 @@
     "trendTitle": "Tren harian token & biaya",
     "trendEmpty": "Belum ada pemakaian AI di periode ini",
     "trendWeekly": "Total mingguan",
+    "trendDays": "{count} hari",
     "searchPlaceholder": "Cari tenant…",
     "colTenant": "Tenant",
     "colPlan": "Plan",
