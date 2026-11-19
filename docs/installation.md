@@ -396,6 +396,17 @@ frame-src 'none';
 
 ---
 
+## Dashboard Penagihan (Super Admin)
+
+Dashboard penagihan AI lintas tenant ada di `/<lang>/admin` dan hanya bisa diakses role **SUPER_ADMIN**. Setup-nya:
+
+1. **Env `BILLING_TIMEZONE`** di kedua repo (`agent-ai-komunikasi-crm` dan `ai-agent-proxy`). Default `Asia/Jakarta`. Zona ini menentukan batas periode tagihan (awal/akhir bulan).
+2. **Jalankan migration `ai-agent-proxy/migrations/006_ai_usage_billing.sql`** di Supabase SQL editor **sebelum purge berikutnya**. Tanpa migration ini, baris metrik yang lebih tua dari 28 hari akan terus terhapus, padahal retensi metrik seharusnya 400 hari.
+
+Setelah migration dan env terpasang, buka `/<lang>/admin` sebagai SUPER_ADMIN untuk melihat ringkasan pemakaian per tenant dan mengunduh CSV.
+
+---
+
 ## Support & Resources
 
 - **Documentation**: https://your-crm-domain.com/docs/widget
