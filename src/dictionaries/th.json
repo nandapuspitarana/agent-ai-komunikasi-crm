@@ -356,6 +356,12 @@
     "tokensIn": "in",
     "tokensOut": "out",
     "sortBy": "Sort by",
-    "never": "Never"
+    "errPeriodIncomplete": "เลือกทั้งวันที่เริ่มต้นและวันที่สิ้นสุด",
+    "errPeriodInvalid": "กรอกวันที่ให้ถูกต้อง",
+    "errPeriodOrder": "วันที่เริ่มต้นต้องไม่อยู่หลังวันที่สิ้นสุด",
+    "errPeriodTooLong": "ช่วงเวลาสูงสุดได้ {max} วัน",
+    "errServerTimezone": "เขตเวลาสำหรับการเรียกเก็บเงินบนเซิร์ฟเวอร์ตั้งค่าไม่ถูกต้อง โปรดติดต่อผู้ดูแลระบบ",
+    "errGeneric": "เกิดข้อผิดพลาด โปรดลองอีกครั้ง",
+    "unknownModel": "(ไม่ทราบ)"
   }
 }

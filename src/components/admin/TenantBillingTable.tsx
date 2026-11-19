@@ -3,7 +3,8 @@
 import { Fragment, useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
-import { NA, formatCost, formatInt, formatTokens, type TenantRow } from './shared';
+import { tenantLabel } from '@/lib/admin-billing';
+import { NA, formatCost, formatInt, formatTokens, tenantLabelsFrom, type TenantRow } from './shared';
 
 type SortKey = 'costUsd' | 'totalTokens' | 'activeInPeriod' | 'name';
 type SortDir = 'asc' | 'desc';
@@ -42,20 +43,28 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
+  // Primitive deps: `t` changes identity on every provider render, the label strings do not.
+  const { unknown: unknownLabel, none: noneLabel } = tenantLabelsFrom(ta);
+  const labels = useMemo(() => ({ unknown: unknownLabel, none: noneLabel }), [unknownLabel, noneLabel]);
+
+  // One displayed name per row (CRM name, or the localized orphan label): shown, searched and sorted by.
+  const named = useMemo(() => tenants.map((row) => ({ row, label: tenantLabel(row, labels) })), [tenants, labels]);
+
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const filtered = q ? tenants.filter((r) => r.name.toLowerCase().includes(q)) : tenants;
+    const filtered = q ? named.filter((r) => r.label.toLowerCase().includes(q)) : named;
     const sign = sortDir === 'asc' ? 1 : -1;
+    const byLabel = (a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label, locale);
     return [...filtered].sort((a, b) => {
-      if (sortKey === 'name') return sign * a.name.localeCompare(b.name, locale);
-      const av = sortValue(a, sortKey);
-      const bv = sortValue(b, sortKey);
-      if (av === null && bv === null) return a.name.localeCompare(b.name, locale);
+      if (sortKey === 'name') return sign * byLabel(a, b);
+      const av = sortValue(a.row, sortKey);
+      const bv = sortValue(b.row, sortKey);
+      if (av === null && bv === null) return byLabel(a, b);
       if (av === null) return 1; // unknown (null) always sorts last
       if (bv === null) return -1;
-      return sign * (av - bv) || a.name.localeCompare(b.name, locale);
+      return sign * (av - bv) || byLabel(a, b);
     });
-  }, [tenants, query, sortKey, sortDir, locale]);
+  }, [named, query, sortKey, sortDir, locale]);
 
   // TOTAL covers every tenant row (independent of the search box). Staff is the sum of tenant staff, so it
   // excludes accounts without a tenant (SUPER_ADMIN): the summary card's platform count can be higher.
@@ -162,10 +171,9 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
                 </td>
               </tr>
             )}
-            {rows.map((r) => {
+            {rows.map(({ row: r, label }) => {
               const key = rowKey(r);
               const open = expanded.has(key);
-              const label = r.known ? r.name : r.id ? `${r.id.slice(0, 8)}…` : NA;
               return (
                 <Fragment key={key}>
                   <tr className="border-b border-slate-100 hover:bg-slate-50">
@@ -181,14 +189,7 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
                       </button>
                     </td>
                     <td className="px-4 py-3 font-medium text-slate-900">
-                      <span className="inline-flex items-center gap-2">
-                        {label}
-                        {!r.known && (
-                          <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-semibold uppercase tracking-wide">
-                            {r.id ? ta('unknownTenant', 'Unknown tenant') : ta('noTenant', 'No tenant')}
-                          </span>
-                        )}
-                      </span>
+                      <span className={r.known ? undefined : 'italic text-slate-600'}>{label}</span>
                     </td>
                     <td className="px-4 py-3">{r.plan ?? NA}</td>
                     <td className="px-4 py-3 text-right tabular-nums">
@@ -289,7 +290,7 @@ function TenantDetails({
     `${formatTokens(x.total_tokens, locale)} · ${formatCost(x.cost_usd, locale)}`,
   ]);
   const byModel: Array<[string, string]> = (row.ai?.byModel ?? []).map((x) => [
-    x.model_name ?? '(unknown)',
+    x.model_name ?? ta('unknownModel', '(unknown)'),
     `${formatTokens(x.total_tokens, locale)} · ${formatCost(x.cost_usd, locale)}`,
   ]);
   const byRole: Array<[string, string]> = Object.entries(row.staff.byRole).map(([role, n]) => [

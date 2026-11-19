@@ -455,6 +455,12 @@
     "tokensIn": "masuk",
     "tokensOut": "keluar",
     "sortBy": "Urutkan",
-    "never": "Belum pernah"
+    "errPeriodIncomplete": "Pilih tanggal mulai dan tanggal akhir",
+    "errPeriodInvalid": "Masukkan tanggal yang valid",
+    "errPeriodOrder": "Tanggal mulai tidak boleh setelah tanggal akhir",
+    "errPeriodTooLong": "Periode maksimal {max} hari",
+    "errServerTimezone": "Zona waktu penagihan di server salah dikonfigurasi. Hubungi administrator.",
+    "errGeneric": "Terjadi kesalahan. Silakan coba lagi.",
+    "unknownModel": "(tidak diketahui)"
   }
 }

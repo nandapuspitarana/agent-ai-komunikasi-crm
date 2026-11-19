@@ -3,6 +3,9 @@ import {
   MAX_BILLING_DAYS,
   BillingPeriodError,
   resolvePeriod,
+  validatePeriodRange,
+  tenantLabel,
+  DEFAULT_TENANT_LABELS,
   presetPeriod,
   zonedMidnightToUtc,
   mergeTenantUsage,
@@ -83,6 +86,79 @@ describe('resolvePeriod', () => {
     expect(() => resolvePeriod('2025-10-16', '2026-11-19', JKT)).not.toThrow();
     expect(() => resolvePeriod('2025-10-15', '2026-11-19', JKT)).toThrow(BillingPeriodError);
   });
+
+  const codeOf = (fn: () => unknown) => {
+    try {
+      fn();
+    } catch (err) {
+      return err instanceof BillingPeriodError ? err.code : 'not-a-BillingPeriodError';
+    }
+    return null;
+  };
+
+  it('throws a stable machine code per failure, with an English message (no Indonesian)', () => {
+    expect(codeOf(() => resolvePeriod('2026-11-30', '2026-11-01', JKT))).toBe('period_order');
+    expect(codeOf(() => resolvePeriod('2025-01-01', '2026-02-05', JKT))).toBe('period_too_long');
+    expect(codeOf(() => resolvePeriod('2026-11-01', null, JKT))).toBe('period_incomplete');
+    expect(codeOf(() => resolvePeriod(null, '2026-11-01', JKT))).toBe('period_incomplete');
+    expect(codeOf(() => resolvePeriod('', '', JKT))).toBe('period_incomplete');
+    expect(codeOf(() => resolvePeriod('2026/11/01', '2026-11-30', JKT))).toBe('period_invalid');
+    expect(codeOf(() => resolvePeriod('2026-02-30', '2026-03-05', JKT))).toBe('period_invalid');
+    // A bad time zone comes from the server env, so it is its own (server-side) code.
+    expect(codeOf(() => resolvePeriod('2026-11-01', '2026-11-30', 'Mars/Base'))).toBe('server_timezone');
+    expect(codeOf(() => resolvePeriod(null, null, 'Mars/Base'))).toBe('server_timezone');
+
+    for (const [f, t] of [['2026-11-30', '2026-11-01'], ['2025-01-01', '2026-02-05'], ['x', 'y']]) {
+      try {
+        resolvePeriod(f, t, JKT);
+        throw new Error('expected a BillingPeriodError');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BillingPeriodError);
+        expect((err as Error).message).not.toMatch(/Periode|Tanggal|tidak|Zona|harus/);
+      }
+    }
+  });
+
+  it('the too-long message carries the shared MAX_BILLING_DAYS', () => {
+    expect(() => resolvePeriod('2025-01-01', '2026-02-05', JKT)).toThrow(String(MAX_BILLING_DAYS));
+  });
+});
+
+describe('validatePeriodRange (shared by the API and the period picker)', () => {
+  it('accepts a valid range, including a single day and exactly MAX_BILLING_DAYS', () => {
+    expect(validatePeriodRange('2026-11-05', '2026-11-05')).toBeNull();
+    expect(validatePeriodRange('2025-10-16', '2026-11-19')).toBeNull();
+  });
+
+  it('flags empty dates as incomplete, before parsing', () => {
+    expect(validatePeriodRange('', '2026-11-05')).toBe('period_incomplete');
+    expect(validatePeriodRange('2026-11-05', '')).toBe('period_incomplete');
+    expect(validatePeriodRange(null, null)).toBe('period_incomplete');
+  });
+
+  it('flags from after to, and non-dates', () => {
+    expect(validatePeriodRange('2026-11-06', '2026-11-05')).toBe('period_order');
+    expect(validatePeriodRange('2026-13-01', '2026-11-05')).toBe('period_invalid');
+  });
+
+  it('counts the 400-day cap inclusively: 400 days pass, 401 do not', () => {
+    expect(validatePeriodRange('2025-10-16', '2026-11-19')).toBeNull(); // 400 days
+    expect(validatePeriodRange('2025-10-15', '2026-11-19')).toBe('period_too_long'); // 401 days
+  });
+
+  it('agrees with resolvePeriod for every case', () => {
+    const cases: Array<[string, string]> = [
+      ['2026-11-05', '2026-11-05'],
+      ['2026-11-06', '2026-11-05'],
+      ['2025-10-16', '2026-11-19'],
+      ['2025-10-15', '2026-11-19'],
+      ['2026-02-30', '2026-03-05'],
+    ];
+    for (const [f, t] of cases) {
+      if (validatePeriodRange(f, t) === null) expect(() => resolvePeriod(f, t, JKT)).not.toThrow();
+      else expect(() => resolvePeriod(f, t, JKT)).toThrow(BillingPeriodError);
+    }
+  });
 });
 
 describe('presetPeriod', () => {
@@ -146,7 +222,8 @@ describe('mergeTenantUsage', () => {
 
     const unknown = out[2];
     expect(unknown.known).toBe(false);
-    expect(unknown.name).toBe('Tenant tidak dikenal (zzzzzzzz)');
+    expect(unknown.name).toBeNull(); // no server-side (Indonesian) label: the client localizes
+    expect(unknown.orphanKind).toBe('unknown');
     expect(unknown).toMatchObject({
       plan: null, aiEnabled: null, createdAt: null, lastActivityAt: null,
       staff: { total: 0, active: 0, byRole: {} },
@@ -155,8 +232,11 @@ describe('mergeTenantUsage', () => {
     });
 
     expect(out[3].known).toBe(false);
-    expect(out[3].name).toBe('Tanpa tenant');
+    expect(out[3].name).toBeNull();
+    expect(out[3].orphanKind).toBe('none');
     expect(out[3].id).toBeNull();
+    // CRM-known rows carry no orphan kind
+    expect(out[0].orphanKind).toBeUndefined();
   });
 
   it('maps unpriced_count to unpricedCount', () => {
@@ -173,6 +253,32 @@ describe('mergeTenantUsage', () => {
     const out = mergeTenantUsage([crmRow(), crmRow({ id: 'B' })], list);
     const sum = out.reduce((s, r) => s + (r.ai?.totalTokens ?? 0), 0);
     expect(sum).toBe(list.reduce((s, u) => s + u.total_tokens, 0));
+  });
+});
+
+describe('tenantLabel', () => {
+  const labels = { unknown: 'Tenant tak dikenal', none: 'Tanpa tenant' };
+  const orphan = (id: string | null, orphanKind: 'unknown' | 'none') =>
+    crmRow({ id, name: null, known: false, orphanKind });
+
+  it('uses the CRM name for known rows', () => {
+    expect(tenantLabel(crmRow(), labels)).toBe('Tenant A');
+  });
+
+  it('localized label plus the first 8 characters of the id for unknown tenants', () => {
+    expect(tenantLabel(orphan('zzzzzzzz-1111-2222', 'unknown'), labels)).toBe('Tenant tak dikenal (zzzzzzzz)');
+  });
+
+  it('localized label alone when there is no tenant', () => {
+    expect(tenantLabel(orphan(null, 'none'), labels)).toBe('Tanpa tenant');
+  });
+
+  it('falls back to the no-tenant label for a null id even without a kind', () => {
+    expect(tenantLabel(crmRow({ id: null, name: null, known: false }), labels)).toBe('Tanpa tenant');
+  });
+
+  it('ships English defaults', () => {
+    expect(DEFAULT_TENANT_LABELS).toEqual({ unknown: 'Unknown tenant', none: 'No tenant' });
   });
 });
 
@@ -238,8 +344,37 @@ describe('buildBillingCsv', () => {
   });
 
   it('leaves tenant_id and plan empty when null', () => {
-    const csv = buildBillingCsv([crmRow({ id: null, plan: null, name: 'Tanpa tenant' })], period);
-    expect(csv.split('\r\n')[1].startsWith(',Tanpa tenant,,2026-11-01')).toBe(true);
+    const csv = buildBillingCsv([crmRow({ id: null, plan: null, name: 'Acme' })], period);
+    expect(csv.split('\r\n')[1].startsWith(',Acme,,2026-11-01')).toBe(true);
+  });
+
+  describe('orphan rows and the label resolver', () => {
+    const merged = () =>
+      mergeTenantUsage([crmRow()], [usage({ tenant_id: 'zzzzzzzz-1111' }), usage({ tenant_id: null })]).slice(1);
+    const nameCells = (csv: string) => csv.split('\r\n').slice(1).map((l) => l.split(',')[1]);
+
+    it('exports the English default label when no resolver is given (never Indonesian)', () => {
+      expect(nameCells(buildBillingCsv(merged(), period))).toEqual(['Unknown tenant (zzzzzzzz)', 'No tenant']);
+    });
+
+    it('exports whatever the resolver returns, the same text the table displays', () => {
+      const labels = { unknown: 'Locataire inconnu', none: 'Sans locataire' };
+      const csv = buildBillingCsv(merged(), period, (r) => tenantLabel(r, labels));
+      expect(nameCells(csv)).toEqual(['Locataire inconnu (zzzzzzzz)', 'Sans locataire']);
+    });
+
+    it('applies the formula-injection guard and quoting to the resolved label', () => {
+      const labels = { unknown: '=cmd|x', none: '@none, "q"' };
+      const csv = buildBillingCsv(merged(), period, (r) => tenantLabel(r, labels));
+      const lines = csv.split('\r\n');
+      expect(lines[1]).toContain(",'=cmd|x (zzzzzzzz),");
+      expect(lines[2]).toContain(`,"'@none, ""q""",`);
+    });
+
+    it('applies the guard to a CRM name returned by the resolver too', () => {
+      const csv = buildBillingCsv([crmRow({ name: 'Plain' })], period, () => '=1+1');
+      expect(csv.split('\r\n')[1]).toContain(",'=1+1,");
+    });
   });
 });
 

@@ -6,6 +6,7 @@ import {
   billingTimezone,
   mergeTenantUsage,
   resolvePeriod,
+  type BillingApiError,
   type ProxyTenantUsage,
 } from '@/lib/admin-billing';
 import { getAdminStats } from '@/lib/admin-stats';
@@ -13,7 +14,11 @@ import { getAdminStats } from '@/lib/admin-stats';
 export const dynamic = 'force-dynamic';
 
 const PROXY_TIMEOUT_MS = 15_000;
-const PROXY_ERROR = 'Layanan AI tidak dapat dihubungi';
+const PROXY_ERROR: BillingApiError = { code: 'ai_unavailable', message: 'AI service unreachable' };
+
+/** Error body: a stable `code` the UI localizes, plus an English `message` for logs and API clients. */
+const apiError = (code: BillingApiError['code'], message: string, status: number) =>
+  NextResponse.json({ error: { code, message } satisfies BillingApiError }, { status });
 
 type ProxyUsageResponse = {
   totals: Record<string, number>;
@@ -56,7 +61,12 @@ export async function GET(request: NextRequest) {
     period = resolvePeriod(sp.get('from'), sp.get('to'), billingTimezone());
   } catch (err) {
     if (err instanceof BillingPeriodError) {
-      return NextResponse.json({ error: err.message }, { status: 400 });
+      // A bad BILLING_TIMEZONE is the operator's misconfiguration, not the caller's mistake.
+      if (err.code === 'server_timezone') {
+        console.error('[admin/overview] invalid BILLING_TIMEZONE', err.message);
+        return apiError(err.code, err.message, 500);
+      }
+      return apiError(err.code, err.message, 400);
     }
     throw err;
   }
@@ -71,7 +81,7 @@ export async function GET(request: NextRequest) {
       if (a.ai === null && b.ai !== null) return 1;
       if (a.ai !== null && b.ai === null) return -1;
       if (a.ai && b.ai && a.ai.costUsd !== b.ai.costUsd) return b.ai.costUsd - a.ai.costUsd;
-      return a.name.localeCompare(b.name);
+      return (a.name ?? a.id ?? '').localeCompare(b.name ?? b.id ?? '');
     });
 
     const ai = usage
@@ -92,6 +102,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     console.error('[admin/overview] failed', err);
-    return NextResponse.json({ error: 'Failed to load admin overview' }, { status: 500 });
+    return apiError('overview_failed', 'Failed to load admin overview', 500);
   }
 }

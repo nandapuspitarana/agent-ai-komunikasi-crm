@@ -152,9 +152,43 @@ describe('GET /api/admin/overview — access control', () => {
     asRole('SUPER_ADMIN');
     const res = await GET(req('?from=2026-11-30&to=2026-11-01'));
     expect(res.status).toBe(400);
-    expect(typeof (await res.json()).error).toBe('string');
+    expect((await res.json()).error.code).toBe('period_order');
     expect(prismaMock.tenant.findMany).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['?from=2026-11-30&to=2026-11-01', 'period_order'],
+    ['?from=2025-01-01&to=2026-02-05', 'period_too_long'],
+    ['?from=2026-11-01', 'period_incomplete'],
+    ['?to=2026-11-01', 'period_incomplete'],
+    ['?from=2026/11/01&to=2026-11-30', 'period_invalid'],
+    ['?from=2026-02-30&to=2026-03-05', 'period_invalid'],
+  ])('returns a machine code and an English message for %s', async (qs, code) => {
+    asRole('SUPER_ADMIN');
+    const res = await GET(req(qs));
+    expect(res.status).toBe(400);
+    const { error } = await res.json();
+    expect(error.code).toBe(code);
+    expect(typeof error.message).toBe('string');
+    expect(error.message).not.toMatch(/Periode|Tanggal|tidak|Zona|harus/);
+  });
+
+  it('answers an invalid BILLING_TIMEZONE with 500 server_timezone and logs it, not 400', async () => {
+    asRole('SUPER_ADMIN');
+    vi.stubEnv('BILLING_TIMEZONE', 'Asia/Jakart');
+    try {
+      for (const qs of ['?from=2026-11-01&to=2026-11-30', '']) {
+        const res = await GET(req(qs));
+        expect(res.status).toBe(500);
+        expect((await res.json()).error.code).toBe('server_timezone');
+      }
+      expect(console.error).toHaveBeenCalled();
+      expect(prismaMock.tenant.findMany).not.toHaveBeenCalled();
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });
 
@@ -185,6 +219,9 @@ describe('GET /api/admin/overview — data', () => {
     // sorted by cost desc: PT Alpha (0.25), unknown (0.05), PT Beta (0)
     expect(body.tenants.map((t: any) => t.id)).toEqual(['t1', 'ghost-tenant-id', 't2']);
     expect(body.tenants[1].known).toBe(false);
+    // orphan rows carry a machine kind and no server-side name; the client localizes the label
+    expect(body.tenants[1].name).toBeNull();
+    expect(body.tenants[1].orphanKind).toBe('unknown');
 
     const url = String(fetchMock.mock.calls[0][0]);
     expect(url).toContain('/api/v1/observability/usage-by-tenant');
@@ -305,6 +342,14 @@ describe('GET /api/admin/overview — data', () => {
     expect(periodQueries).toBe(5);
   });
 
+  it('answers an unexpected failure with 500 and the overview_failed code', async () => {
+    prismaMock.tenant.findMany.mockRejectedValue(new Error('db down'));
+    fetchMock.mockResolvedValue(okResponse(proxyBody([])));
+    const res = await GET(req());
+    expect(res.status).toBe(500);
+    expect((await res.json()).error.code).toBe('overview_failed');
+  });
+
   it('does not return conversation content', async () => {
     fetchMock.mockResolvedValue(okResponse(proxyBody([])));
     const text = JSON.stringify(await (await GET(req())).json());
@@ -315,7 +360,8 @@ describe('GET /api/admin/overview — data', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.ai.status).toBe('unavailable');
-    expect(typeof body.ai.error).toBe('string');
+    expect(body.ai.error.code).toBe('ai_unavailable');
+    expect(typeof body.ai.error.message).toBe('string');
     expect(body.ai.totals).toBeUndefined();
     expect(body.tenants).toHaveLength(2);
     for (const t of body.tenants) expect(t.ai).toBeNull();

@@ -356,6 +356,12 @@
     "tokensIn": "in",
     "tokensOut": "out",
     "sortBy": "Sort by",
-    "never": "Never"
+    "errPeriodIncomplete": "请选择开始日期和结束日期",
+    "errPeriodInvalid": "请输入有效日期",
+    "errPeriodOrder": "开始日期不能晚于结束日期",
+    "errPeriodTooLong": "时间范围最长为 {max} 天",
+    "errServerTimezone": "服务器的计费时区配置有误，请联系管理员。",
+    "errGeneric": "出现错误，请重试。",
+    "unknownModel": "（未知）"
   }
 }

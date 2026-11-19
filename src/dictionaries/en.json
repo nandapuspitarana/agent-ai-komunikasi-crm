@@ -455,6 +455,12 @@
     "tokensIn": "in",
     "tokensOut": "out",
     "sortBy": "Sort by",
-    "never": "Never"
+    "errPeriodIncomplete": "Select both a start and an end date",
+    "errPeriodInvalid": "Enter valid dates",
+    "errPeriodOrder": "The start date must not be after the end date",
+    "errPeriodTooLong": "The period can be at most {max} days",
+    "errServerTimezone": "The server billing time zone is misconfigured. Contact an administrator.",
+    "errGeneric": "Something went wrong. Please try again.",
+    "unknownModel": "(unknown)"
   }
 }

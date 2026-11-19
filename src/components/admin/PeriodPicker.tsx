@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { presetPeriod } from '@/lib/admin-billing';
+import { useEffect, useState } from 'react';
+import { MAX_BILLING_DAYS, presetPeriod, validatePeriodRange } from '@/lib/admin-billing';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { errorMessageFor } from './shared';
 
 type Period = { from: string; to: string };
 type Mode = 'this_month' | 'last_month' | 'custom';
@@ -21,10 +22,8 @@ export default function PeriodPicker({
   const { t } = useTranslation();
   const ta = (key: string, fallback: string) => t('admin', key, fallback);
 
-  const presets = useMemo(
-    () => ({ this_month: presetPeriod('this_month', tz), last_month: presetPeriod('last_month', tz) }),
-    [tz]
-  );
+  // Not memoised: the presets must follow the clock (a tab left open across a month boundary).
+  const presets = { this_month: presetPeriod('this_month', tz), last_month: presetPeriod('last_month', tz) };
 
   const [customOpen, setCustomOpen] = useState(false);
   const [draftFrom, setDraftFrom] = useState(value.from);
@@ -41,11 +40,15 @@ export default function PeriodPicker({
       ? 'last_month'
       : 'custom';
   const active: Mode = customOpen ? 'custom' : matched;
-  const invalid = !draftFrom || !draftTo || draftFrom > draftTo;
+  // Same rule as the API (resolvePeriod): both dates set, from <= to, at most MAX_BILLING_DAYS inclusive.
+  const rangeError = validatePeriodRange(draftFrom, draftTo);
+  const invalid = rangeError !== null;
+  const errorMeta = rangeError ? errorMessageFor(rangeError) : null;
+  const errorText = errorMeta ? ta(errorMeta.key, errorMeta.fallback).replace('{max}', String(MAX_BILLING_DAYS)) : '';
 
   const pick = (mode: 'this_month' | 'last_month') => {
     setCustomOpen(false);
-    onChange(presets[mode]);
+    onChange(presetPeriod(mode, tz)); // fresh at click time, not the render-time snapshot
   };
 
   const segment = (mode: Mode) =>
@@ -56,13 +59,13 @@ export default function PeriodPicker({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex bg-slate-100 p-1 rounded-xl w-fit">
-        <button type="button" className={segment('this_month')} onClick={() => pick('this_month')}>
+        <button type="button" className={segment('this_month')} aria-pressed={active === 'this_month'} onClick={() => pick('this_month')}>
           {ta('periodThisMonth', 'This month')}
         </button>
-        <button type="button" className={segment('last_month')} onClick={() => pick('last_month')}>
+        <button type="button" className={segment('last_month')} aria-pressed={active === 'last_month'} onClick={() => pick('last_month')}>
           {ta('periodLastMonth', 'Last month')}
         </button>
-        <button type="button" className={segment('custom')} onClick={() => setCustomOpen(true)}>
+        <button type="button" className={segment('custom')} aria-pressed={active === 'custom'} onClick={() => setCustomOpen(true)}>
           {ta('periodCustom', 'Custom')}
         </button>
       </div>
@@ -77,6 +80,8 @@ export default function PeriodPicker({
             type="date"
             value={draftFrom}
             max={draftTo || undefined}
+            aria-invalid={invalid}
+            aria-describedby={invalid ? 'admin-period-error' : undefined}
             onChange={(e) => setDraftFrom(e.target.value)}
             className="px-2 py-1.5 border border-slate-200 rounded-lg text-sm text-slate-700 bg-white"
           />
@@ -89,17 +94,24 @@ export default function PeriodPicker({
             type="date"
             value={draftTo}
             min={draftFrom || undefined}
+            aria-invalid={invalid}
+            aria-describedby={invalid ? 'admin-period-error' : undefined}
             onChange={(e) => setDraftTo(e.target.value)}
             className="px-2 py-1.5 border border-slate-200 rounded-lg text-sm text-slate-700 bg-white"
           />
           <button
             type="button"
             disabled={invalid}
-            onClick={() => onChange({ from: draftFrom, to: draftTo })}
+            onClick={() => !invalid && onChange({ from: draftFrom, to: draftTo })}
             className="px-3 py-1.5 rounded-lg text-sm font-medium bg-brand text-white disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {ta('apply', 'Apply')}
           </button>
+          {invalid && (
+            <p id="admin-period-error" role="alert" className="basis-full text-xs text-red-600">
+              {errorText}
+            </p>
+          )}
         </div>
       )}
     </div>

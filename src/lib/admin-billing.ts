@@ -8,12 +8,35 @@ export const billingTimezone = (): string => process.env.BILLING_TIMEZONE || 'As
 /** Inclusive calendar dates `from..to` in `tz`, as the UTC instants [start, end). */
 export type BillingPeriod = { from: string; to: string; tz: string; start: Date; end: Date };
 
+/**
+ * Stable, language-neutral error codes of the billing dashboard API. The UI maps each code to a
+ * dictionary message; `message` next to it is English and meant for logs and API clients only.
+ */
+export type BillingErrorCode =
+  | 'period_incomplete' // from / to missing or empty (both are required together)
+  | 'period_invalid' // not a real calendar date in YYYY-MM-DD
+  | 'period_order' // from is after to
+  | 'period_too_long' // more than MAX_BILLING_DAYS inclusive
+  | 'server_timezone' // BILLING_TIMEZONE on the server is not a valid IANA zone (misconfiguration)
+  | 'overview_failed' // unexpected failure while loading the overview
+  | 'ai_unavailable'; // the AI usage service could not be reached
+
+export type BillingApiError = { code: BillingErrorCode; message: string };
+
 export class BillingPeriodError extends Error {
-  constructor(message: string) {
+  readonly code: BillingErrorCode;
+
+  constructor(code: BillingErrorCode, message: string) {
     super(message);
     this.name = 'BillingPeriodError';
+    this.code = code;
   }
 }
+
+export type PeriodErrorCode = Extract<BillingErrorCode, 'period_incomplete' | 'period_invalid' | 'period_order' | 'period_too_long'>;
+
+/** Why an orphan row (usage without a CRM tenant) is orphaned; `null` on rows the CRM knows. */
+export type OrphanKind = 'unknown' | 'none';
 
 export type ProxyTenantUsage = {
   tenant_id: string | null;
@@ -45,7 +68,10 @@ export type TenantAi = {
 
 export type TenantRow = {
   id: string | null;
-  name: string;
+  /** CRM tenant name. `null` for rows the CRM does not know: the client renders a localized label (see tenantLabel). */
+  name: string | null;
+  /** Set only on `known: false` rows: 'unknown' = proxy usage for a tenant_id the CRM lacks, 'none' = tenant_id null. */
+  orphanKind?: OrphanKind;
   plan: string | null;
   aiEnabled: boolean | null;
   createdAt: string | null;
@@ -88,7 +114,7 @@ function formatter(tz: string): Intl.DateTimeFormat {
       second: '2-digit',
     });
   } catch {
-    throw new BillingPeriodError(`Zona waktu tidak valid: ${tz}`);
+    throw new BillingPeriodError('server_timezone', `Invalid time zone: ${tz}`);
   }
 }
 
@@ -111,7 +137,7 @@ function offsetMs(fmt: Intl.DateTimeFormat, instant: Date): number {
 /** 00:00 local time of `date` (`YYYY-MM-DD`) in `tz`, as a UTC instant. */
 export function zonedMidnightToUtc(date: string, tz: string): Date {
   const parsed = parseDate(date);
-  if (!parsed) throw new BillingPeriodError(`Tanggal tidak valid: ${date}`);
+  if (!parsed) throw new BillingPeriodError('period_invalid', `Invalid date: ${date}`);
   const fmt = formatter(tz);
   const guess = Date.UTC(parsed.y, parsed.m - 1, parsed.d);
   // Second pass resolves zones whose offset differs between the guess and the real instant (DST).
@@ -144,6 +170,29 @@ export function presetPeriod(
   return { from: isoDate(y, m, 1), to: isoDate(y, m, lastDayOfMonth(y, m)) };
 }
 
+/**
+ * The one range rule of the dashboard, shared by the API (resolvePeriod) and the period picker.
+ * Dates are `YYYY-MM-DD`; `to` is inclusive and at most MAX_BILLING_DAYS days after `from`.
+ * Returns the first violated rule, or null when the range is acceptable.
+ */
+export function validatePeriodRange(from: string | null, to: string | null): PeriodErrorCode | null {
+  if (!from || !to) return 'period_incomplete';
+  const pf = parseDate(from);
+  const pt = parseDate(to);
+  if (!pf || !pt) return 'period_invalid';
+  const days = (Date.UTC(pt.y, pt.m - 1, pt.d) - Date.UTC(pf.y, pf.m - 1, pf.d)) / DAY_MS + 1;
+  if (days < 1) return 'period_order';
+  if (days > MAX_BILLING_DAYS) return 'period_too_long';
+  return null;
+}
+
+const PERIOD_ERROR_MESSAGES: Record<PeriodErrorCode, string> = {
+  period_incomplete: 'Both from and to are required',
+  period_invalid: 'Dates must be real calendar dates in YYYY-MM-DD format',
+  period_order: 'from must not be after to',
+  period_too_long: `The period can be at most ${MAX_BILLING_DAYS} days`,
+};
+
 export function resolvePeriod(
   from: string | null,
   to: string | null,
@@ -151,7 +200,7 @@ export function resolvePeriod(
   now: Date = new Date()
 ): BillingPeriod {
   if ((from === null) !== (to === null)) {
-    throw new BillingPeriodError('Parameter from dan to harus diisi bersamaan');
+    throw new BillingPeriodError('period_incomplete', PERIOD_ERROR_MESSAGES.period_incomplete);
   }
   let f: string;
   let t: string;
@@ -162,14 +211,10 @@ export function resolvePeriod(
     t = to;
   }
 
-  const pf = parseDate(f);
-  const pt = parseDate(t);
-  if (!pf || !pt) throw new BillingPeriodError('Format tanggal harus YYYY-MM-DD');
+  const violation = validatePeriodRange(f, t);
+  if (violation) throw new BillingPeriodError(violation, PERIOD_ERROR_MESSAGES[violation]);
 
-  const days = (Date.UTC(pt.y, pt.m - 1, pt.d) - Date.UTC(pf.y, pf.m - 1, pf.d)) / DAY_MS + 1;
-  if (days < 1) throw new BillingPeriodError('Tanggal from tidak boleh setelah to');
-  if (days > MAX_BILLING_DAYS) throw new BillingPeriodError(`Periode maksimal ${MAX_BILLING_DAYS} hari`);
-
+  const pt = parseDate(t)!;
   const start = zonedMidnightToUtc(f, tz);
   const end = zonedMidnightToUtc(isoDate(...nextDay(pt)), tz);
   return { from: f, to: t, tz, start, end };
@@ -229,7 +274,8 @@ export function mergeTenantUsage(crmRows: TenantRow[], usage: ProxyTenantUsage[]
   for (const u of orphans) {
     merged.push({
       id: u.tenant_id,
-      name: u.tenant_id === null ? 'Tanpa tenant' : `Tenant tidak dikenal (${u.tenant_id.slice(0, 8)})`,
+      name: null,
+      orphanKind: u.tenant_id === null ? 'none' : 'unknown',
       plan: null,
       aiEnabled: null,
       createdAt: null,
@@ -242,6 +288,22 @@ export function mergeTenantUsage(crmRows: TenantRow[], usage: ProxyTenantUsage[]
     });
   }
   return merged;
+}
+
+export type TenantLabels = { unknown: string; none: string };
+
+/** English fallback labels, used only when the caller passes no localized ones. */
+export const DEFAULT_TENANT_LABELS: TenantLabels = { unknown: 'Unknown tenant', none: 'No tenant' };
+
+/**
+ * The one human-readable name of a tenant row: what the table shows, searches and sorts by, and what the CSV
+ * exports as tenant_name. Rows the CRM knows use their name; orphan rows get the localized label
+ * ('unknown' also gets the first 8 characters of the tenant id).
+ */
+export function tenantLabel(row: Pick<TenantRow, 'id' | 'name' | 'known' | 'orphanKind'>, labels: TenantLabels): string {
+  if (row.known) return row.name ?? '';
+  if (row.orphanKind === 'none' || row.id === null) return labels.none;
+  return `${labels.unknown} (${row.id.slice(0, 8)})`;
 }
 
 /** True when the proxy's retained data starts after the requested period start (totals may be partial). */
@@ -282,14 +344,22 @@ const FORMULA_START = /^[=+\-@\t\r]/;
 const csvText = (value: string | null): string =>
   csvCell(value !== null && FORMULA_START.test(value) ? `'${value}` : value);
 
-export function buildBillingCsv(rows: TenantRow[], period: Pick<BillingPeriod, 'from' | 'to'>): string {
+/**
+ * `labelOf` resolves the tenant_name cell (pass the same resolver the table displays, so the CSV matches the
+ * screen); the formula-injection guard is applied to whatever it returns.
+ */
+export function buildBillingCsv(
+  rows: TenantRow[],
+  period: Pick<BillingPeriod, 'from' | 'to'>,
+  labelOf: (row: TenantRow) => string = (row) => tenantLabel(row, DEFAULT_TENANT_LABELS)
+): string {
   const lines = [CSV_COLUMNS.join(',')];
   for (const r of rows) {
     const ai = r.ai;
     lines.push(
       [
         csvText(r.id),
-        csvText(r.name),
+        csvText(labelOf(r)),
         csvText(r.plan),
         csvCell(period.from),
         csvCell(period.to),

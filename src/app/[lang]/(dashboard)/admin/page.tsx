@@ -4,14 +4,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { AlertCircle, AlertTriangle, Download, ShieldAlert } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
-import { billingCsvFilename, buildBillingCsv, needsRetentionWarning, zonedMidnightToUtc } from '@/lib/admin-billing';
+import {
+  MAX_BILLING_DAYS,
+  billingCsvFilename,
+  buildBillingCsv,
+  needsRetentionWarning,
+  tenantLabel,
+  zonedMidnightToUtc,
+} from '@/lib/admin-billing';
 import AdminSummaryCards from '@/components/admin/AdminSummaryCards';
 import UsageTrendChart from '@/components/admin/UsageTrendChart';
 import TenantBillingTable from '@/components/admin/TenantBillingTable';
 import PeriodPicker from '@/components/admin/PeriodPicker';
-import { formatInt, type AdminOverview } from '@/components/admin/shared';
+import { errorCodeOf, errorMessageFor, formatInt, tenantLabelsFrom, type AdminOverview } from '@/components/admin/shared';
 
 type Period = { from: string; to: string };
+// `code` is the API's machine error code (localized on render); `status` is the HTTP status when there was a response.
+type LoadError = { code: string | null; status: number | null };
 
 function Banner({ children }: { children: React.ReactNode }) {
   return (
@@ -47,7 +56,7 @@ export default function AdminPage() {
   const [tz, setTz] = useState<string | null>(null);
   const [data, setData] = useState<AdminOverview | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<LoadError | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -62,7 +71,7 @@ export default function AdminPage() {
         const res = await fetch(`/api/admin/overview${qs}`, { signal: controller.signal, cache: 'no-store' });
         if (!res.ok) {
           const body = await res.json().catch(() => null);
-          throw new Error(body?.error ? `${body.error} (HTTP ${res.status})` : `HTTP ${res.status}`);
+          throw Object.assign(new Error(`HTTP ${res.status}`), { code: errorCodeOf(body), status: res.status });
         }
         const json = (await res.json()) as AdminOverview;
         if (controller.signal.aborted) return;
@@ -71,7 +80,8 @@ export default function AdminPage() {
       } catch (err) {
         if (controller.signal.aborted) return;
         setData(null);
-        setError(err instanceof Error ? err.message : String(err));
+        const { code = null, status = null } = err as { code?: string | null; status?: number | null };
+        setError({ code, status });
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -130,6 +140,12 @@ export default function AdminPage() {
   const aiUnavailable = ai?.status === 'unavailable';
   const unpricedCount = ai?.status === 'ok' ? ai.totals.unpriced_count : 0;
   const unpricedModels = ai?.status === 'ok' ? (ai.unpricedModels ?? []) : [];
+  const errorMessage = (() => {
+    if (!error) return '';
+    const { key, fallback } = errorMessageFor(error.code);
+    const text = ta(key, fallback).replace('{max}', String(MAX_BILLING_DAYS));
+    return key === 'errGeneric' && error.status ? `${text} (HTTP ${error.status})` : text;
+  })();
   const pickerValue: Period | null = query ?? (period ? { from: period.from, to: period.to } : null);
 
   return (
@@ -157,7 +173,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-red-200 bg-red-50 text-red-700 text-sm" role="alert">
           <AlertCircle size={16} className="shrink-0" />
           <span className="flex-1">
-            {ta('loadError', 'Failed to load admin data')}: {error}
+            {ta('loadError', 'Failed to load admin data')}: {errorMessage}
           </span>
           <button
             type="button"
