@@ -461,6 +461,13 @@
     "errPeriodTooLong": "Periode maksimal {max} hari",
     "errServerTimezone": "Zona waktu penagihan di server salah dikonfigurasi. Hubungi administrator.",
     "errGeneric": "Terjadi kesalahan. Silakan coba lagi.",
-    "unknownModel": "(tidak diketahui)"
+    "unknownModel": "(tidak diketahui)",
+    "roleShortSuperAdmin": "SA",
+    "roleShortBusinessPartner": "BP",
+    "roleShortAgent": "AG",
+    "roleSuperAdmin": "Super Admin",
+    "roleBusinessPartner": "Mitra Bisnis",
+    "roleAgent": "Agen",
+    "httpErrorSuffix": "(HTTP {status})"
   }
 }

@@ -107,7 +107,9 @@ export default function AdminPage() {
 
   const exportCsv = () => {
     if (!data || data.ai.status !== 'ok') return;
-    const csv = '\uFEFF' + buildBillingCsv(data.tenants, data.period);
+    // tenant_name uses the same localized label as the table, so the CSV follows the UI language.
+    const labels = tenantLabelsFrom(ta);
+    const csv = '\uFEFF' + buildBillingCsv(data.tenants, data.period, (r) => tenantLabel(r, labels));
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a');
     a.href = url;
@@ -144,7 +146,9 @@ export default function AdminPage() {
     if (!error) return '';
     const { key, fallback } = errorMessageFor(error.code);
     const text = ta(key, fallback).replace('{max}', String(MAX_BILLING_DAYS));
-    return key === 'errGeneric' && error.status ? `${text} (HTTP ${error.status})` : text;
+    return key === 'errGeneric' && error.status
+      ? `${text} ${ta('httpErrorSuffix', '(HTTP {status})').replace('{status}', String(error.status))}`
+      : text;
   })();
   const pickerValue: Period | null = query ?? (period ? { from: period.from, to: period.to } : null);
 

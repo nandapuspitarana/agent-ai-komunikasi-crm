@@ -4,7 +4,7 @@ import { Fragment, useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 import { tenantLabel } from '@/lib/admin-billing';
-import { NA, formatCost, formatInt, formatTokens, tenantLabelsFrom, type TenantRow } from './shared';
+import { NA, formatCost, formatInt, formatTokens, roleLabel, tenantLabelsFrom, type TenantRow } from './shared';
 
 type SortKey = 'costUsd' | 'totalTokens' | 'activeInPeriod' | 'name';
 type SortDir = 'asc' | 'desc';
@@ -294,7 +294,7 @@ function TenantDetails({
     `${formatTokens(x.total_tokens, locale)} · ${formatCost(x.cost_usd, locale)}`,
   ]);
   const byRole: Array<[string, string]> = Object.entries(row.staff.byRole).map(([role, n]) => [
-    role,
+    roleLabel(ta, role, 'name'),
     formatInt(n, locale),
   ]);
   const extra: Array<[string, string]> = [

@@ -461,6 +461,13 @@
     "errPeriodTooLong": "The period can be at most {max} days",
     "errServerTimezone": "The server billing time zone is misconfigured. Contact an administrator.",
     "errGeneric": "Something went wrong. Please try again.",
-    "unknownModel": "(unknown)"
+    "unknownModel": "(unknown)",
+    "roleShortSuperAdmin": "SA",
+    "roleShortBusinessPartner": "BP",
+    "roleShortAgent": "AG",
+    "roleSuperAdmin": "Super Admin",
+    "roleBusinessPartner": "Business Partner",
+    "roleAgent": "Agent",
+    "httpErrorSuffix": "(HTTP {status})"
   }
 }

@@ -3,15 +3,13 @@
 import { Building2, UserCog, Users, Cpu, DollarSign } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
-import { NA, formatCost, formatInt, formatTokens, type AdminAi, type PlatformStats } from './shared';
+import { NA, formatCost, formatInt, formatTokens, roleLabel, type AdminAi, type PlatformStats } from './shared';
 
-const ROLE_ABBR: Record<string, string> = { SUPER_ADMIN: 'SA', BUSINESS_PARTNER: 'BP', AGENT: 'AG' };
-
-const joinCounts = (record: Record<string, number>, abbr?: Record<string, string>) =>
+const joinCounts = (record: Record<string, number>, label?: (key: string) => string) =>
   Object.entries(record)
     .filter(([, n]) => n > 0)
     .sort((a, b) => b[1] - a[1])
-    .map(([k, n]) => `${abbr?.[k] ?? k} ${n}`)
+    .map(([k, n]) => `${label ? label(k) : k} ${n}`)
     .join(' · ');
 
 function Card({ icon, label, value, lines }: { icon: ReactNode; label: string; value: string; lines: string[] }) {
@@ -52,7 +50,7 @@ export default function AdminSummaryCards({ platform, ai }: { platform: Platform
         icon={<UserCog size={18} />}
         label={ta('cardStaff', 'Staff accounts')}
         value={`${formatInt(staff.total, locale)} (${formatInt(staff.active, locale)} ${ta('active', 'active')})`}
-        lines={[joinCounts(staff.byRole, ROLE_ABBR)]}
+        lines={[joinCounts(staff.byRole, (role) => roleLabel(ta, role, 'short'))]}
       />
       <Card
         icon={<Users size={18} />}

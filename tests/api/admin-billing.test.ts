@@ -371,6 +371,17 @@ describe('buildBillingCsv', () => {
       expect(lines[2]).toContain(`,"'@none, ""q""",`);
     });
 
+    it("a resolver returning '=X' for orphan rows comes out as '=X (formula guard on the localized label)", () => {
+      const csv = buildBillingCsv(merged(), period, () => '=X');
+      expect(nameCells(csv)).toEqual(["'=X", "'=X"]);
+    });
+
+    it('emits the localized label for both the unknown and the none row', () => {
+      const labels = { unknown: 'Tenant tidak dikenal', none: 'Tanpa tenant' };
+      const csv = buildBillingCsv(merged(), period, (r) => tenantLabel(r, labels));
+      expect(nameCells(csv)).toEqual(['Tenant tidak dikenal (zzzzzzzz)', 'Tanpa tenant']);
+    });
+
     it('applies the guard to a CRM name returned by the resolver too', () => {
       const csv = buildBillingCsv([crmRow({ name: 'Plain' })], period, () => '=1+1');
       expect(csv.split('\r\n')[1]).toContain(",'=1+1,");

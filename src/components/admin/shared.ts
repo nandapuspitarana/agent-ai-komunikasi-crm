@@ -56,11 +56,14 @@ const ERROR_MESSAGES: Record<string, { key: string; fallback: string }> = {
   period_too_long: { key: 'errPeriodTooLong', fallback: 'The period can be at most {max} days' },
   server_timezone: { key: 'errServerTimezone', fallback: 'The server billing time zone is misconfigured. Contact an administrator.' },
 };
+// Own-property check: a server-sent code like 'constructor' or '__proto__' must not hit Object.prototype.
+const hasOwn = (obj: object, key: string): boolean => Object.prototype.hasOwnProperty.call(obj, key);
+
 const GENERIC_ERROR = { key: 'errGeneric', fallback: 'Something went wrong. Please try again.' };
 
 /** Dictionary key and English fallback for an API/validation error code. */
 export const errorMessageFor = (code: string | null | undefined) =>
-  (code ? ERROR_MESSAGES[code] : undefined) ?? GENERIC_ERROR;
+  (code && hasOwn(ERROR_MESSAGES, code) ? ERROR_MESSAGES[code] : undefined) ?? GENERIC_ERROR;
 
 /** The machine code of an API error body (`{ error: { code } }`), or null when it carries none. */
 export const errorCodeOf = (body: unknown): string | null => {
@@ -74,3 +77,16 @@ export const tenantLabelsFrom = (ta: (key: string, fallback: string) => string):
   unknown: ta('unknownTenant', 'Unknown tenant'),
   none: ta('noTenant', 'No tenant'),
 });
+
+const ROLES: Record<string, { short: [string, string]; name: [string, string] }> = {
+  SUPER_ADMIN: { short: ['roleShortSuperAdmin', 'SA'], name: ['roleSuperAdmin', 'Super Admin'] },
+  BUSINESS_PARTNER: { short: ['roleShortBusinessPartner', 'BP'], name: ['roleBusinessPartner', 'Business Partner'] },
+  AGENT: { short: ['roleShortAgent', 'AG'], name: ['roleAgent', 'Agent'] },
+};
+
+/** Localized staff role: short form for the summary card, full name for the row details. Unknown roles stay raw. */
+export const roleLabel = (ta: (key: string, fallback: string) => string, role: string, form: 'short' | 'name'): string => {
+  if (!hasOwn(ROLES, role)) return role;
+  const [key, fallback] = ROLES[role][form];
+  return ta(key, fallback);
+};
