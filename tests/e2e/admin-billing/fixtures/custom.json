@@ -1,0 +1,177 @@
+{
+  "period": {
+    "from": "2026-11-10",
+    "to": "2026-11-14",
+    "tz": "Asia/Jakarta"
+  },
+  "totals": {
+    "input_tokens": 95367,
+    "cached_input_tokens": 2880,
+    "output_tokens": 14433,
+    "total_tokens": 109800,
+    "cost_usd": 0.324858,
+    "request_count": 401,
+    "error_count": 3,
+    "unpriced_count": 0
+  },
+  "tenants": [
+    {
+      "tenant_id": "cccccccc-0000-4000-8000-000000000003",
+      "input_tokens": 44000,
+      "cached_input_tokens": 0,
+      "output_tokens": 6600,
+      "total_tokens": 50600,
+      "cost_usd": 0.22,
+      "request_count": 60,
+      "error_count": 0,
+      "unpriced_count": 0,
+      "by_type": [
+        {
+          "request_type": "eval",
+          "total_tokens": 36800,
+          "cost_usd": 0.16,
+          "request_count": 40
+        },
+        {
+          "request_type": "llm_complete",
+          "total_tokens": 13800,
+          "cost_usd": 0.06,
+          "request_count": 20
+        }
+      ],
+      "by_model": [
+        {
+          "model_name": "gpt-4o",
+          "total_tokens": 50600,
+          "cost_usd": 0.22
+        }
+      ]
+    },
+    {
+      "tenant_id": "aaaaaaaa-0000-4000-8000-000000000001",
+      "input_tokens": 45317,
+      "cached_input_tokens": 2880,
+      "output_tokens": 6623,
+      "total_tokens": 51940,
+      "cost_usd": 0.092358,
+      "request_count": 307,
+      "error_count": 3,
+      "unpriced_count": 0,
+      "by_type": [
+        {
+          "request_type": "embedding",
+          "total_tokens": 9329,
+          "cost_usd": 0.007258,
+          "request_count": 19
+        },
+        {
+          "request_type": "llm_complete",
+          "total_tokens": 42611,
+          "cost_usd": 0.0851,
+          "request_count": 288
+        }
+      ],
+      "by_model": [
+        {
+          "model_name": "text-embedding-3-small",
+          "total_tokens": 9329,
+          "cost_usd": 0.007258
+        },
+        {
+          "model_name": "gpt-4o-mini",
+          "total_tokens": 42611,
+          "cost_usd": 0.0851
+        }
+      ]
+    },
+    {
+      "tenant_id": "bbbbbbbb-0000-4000-8000-000000000002",
+      "input_tokens": 3800,
+      "cached_input_tokens": 0,
+      "output_tokens": 760,
+      "total_tokens": 4560,
+      "cost_usd": 0.0095,
+      "request_count": 19,
+      "error_count": 0,
+      "unpriced_count": 0,
+      "by_type": [
+        {
+          "request_type": "llm_complete",
+          "total_tokens": 4560,
+          "cost_usd": 0.0095,
+          "request_count": 19
+        }
+      ],
+      "by_model": [
+        {
+          "model_name": "gpt-4o-mini",
+          "total_tokens": 4560,
+          "cost_usd": 0.0095
+        }
+      ]
+    },
+    {
+      "tenant_id": "eeeeeeee-0000-4000-8000-000000000005",
+      "input_tokens": 2250,
+      "cached_input_tokens": 0,
+      "output_tokens": 450,
+      "total_tokens": 2700,
+      "cost_usd": 0.003,
+      "request_count": 15,
+      "error_count": 0,
+      "unpriced_count": 0,
+      "by_type": [
+        {
+          "request_type": "llm_complete",
+          "total_tokens": 2700,
+          "cost_usd": 0.003,
+          "request_count": 15
+        }
+      ],
+      "by_model": [
+        {
+          "model_name": "gpt-4o-mini",
+          "total_tokens": 2700,
+          "cost_usd": 0.003
+        }
+      ]
+    }
+  ],
+  "by_day": [
+    {
+      "date": "2026-11-10",
+      "total_tokens": 48165,
+      "cost_usd": 0.152058,
+      "request_count": 115
+    },
+    {
+      "date": "2026-11-11",
+      "total_tokens": 18804,
+      "cost_usd": 0.0574,
+      "request_count": 75
+    },
+    {
+      "date": "2026-11-12",
+      "total_tokens": 23192,
+      "cost_usd": 0.0781,
+      "request_count": 81
+    },
+    {
+      "date": "2026-11-13",
+      "total_tokens": 8555,
+      "cost_usd": 0.0174,
+      "request_count": 57
+    },
+    {
+      "date": "2026-11-14",
+      "total_tokens": 11084,
+      "cost_usd": 0.0199,
+      "request_count": 73
+    }
+  ],
+  "unpriced_models": [],
+  "retention": {
+    "metrics_days": 400,
+    "oldest_available": "2025-10-16T10:07:12.11321+00:00"
+  }
+}

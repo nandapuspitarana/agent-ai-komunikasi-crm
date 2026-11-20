@@ -1,0 +1,58 @@
+{
+  "period": {
+    "from": "2026-11-25",
+    "to": "2026-11-25",
+    "tz": "Asia/Jakarta"
+  },
+  "totals": {
+    "input_tokens": 400,
+    "cached_input_tokens": 0,
+    "output_tokens": 40,
+    "total_tokens": 440,
+    "cost_usd": 0.004,
+    "request_count": 4,
+    "error_count": 0,
+    "unpriced_count": 0
+  },
+  "tenants": [
+    {
+      "tenant_id": "bbbbbbbb-0000-4000-8000-000000000002",
+      "input_tokens": 400,
+      "cached_input_tokens": 0,
+      "output_tokens": 40,
+      "total_tokens": 440,
+      "cost_usd": 0.004,
+      "request_count": 4,
+      "error_count": 0,
+      "unpriced_count": 0,
+      "by_type": [
+        {
+          "request_type": "llm_complete",
+          "total_tokens": 440,
+          "cost_usd": 0.004,
+          "request_count": 4
+        }
+      ],
+      "by_model": [
+        {
+          "model_name": "gpt-4o-mini",
+          "total_tokens": 440,
+          "cost_usd": 0.004
+        }
+      ]
+    }
+  ],
+  "by_day": [
+    {
+      "date": "2026-11-25",
+      "total_tokens": 440,
+      "cost_usd": 0.004,
+      "request_count": 4
+    }
+  ],
+  "unpriced_models": [],
+  "retention": {
+    "metrics_days": 400,
+    "oldest_available": "2025-10-16T10:07:12.11321+00:00"
+  }
+}
