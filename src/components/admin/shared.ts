@@ -121,6 +121,13 @@ export const tenantLabelsFrom = (ta: (key: string, fallback: string) => string):
   none: ta('noTenant', 'No tenant'),
 });
 
+/** What the proxy puts in `unpriced_models` for calls that carry no model name (observability/billing.py). */
+export const UNKNOWN_MODEL_SENTINEL = '(unknown)';
+
+/** Localized model name: a missing name, or the proxy's "(unknown)" sentinel, shows the translated "unknown" label. */
+export const modelLabel = (ta: (key: string, fallback: string) => string, name: string | null | undefined): string =>
+  !name || name === UNKNOWN_MODEL_SENTINEL ? ta('unknownModel', '(unknown)') : name;
+
 const ROLES: Record<string, { short: [string, string]; name: [string, string] }> = {
   SUPER_ADMIN: { short: ['roleShortSuperAdmin', 'SA'], name: ['roleSuperAdmin', 'Super Admin'] },
   BUSINESS_PARTNER: { short: ['roleShortBusinessPartner', 'BP'], name: ['roleBusinessPartner', 'Business Partner'] },

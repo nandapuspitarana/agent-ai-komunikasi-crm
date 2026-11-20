@@ -402,7 +402,7 @@ The billing dashboard shows per-tenant usage (staff, active end users, chat acti
 
 Setup consists of two required settings, `BILLING_TIMEZONE` in both repos and proxy migration `006_ai_usage_billing.sql`. Apply them in the order given under **Deployment order** below; the order matters because of the purge job.
 
-- **`BILLING_TIMEZONE`**: set it in the production env of both repos (`agent-ai-komunikasi-crm` and `ai-agent-proxy`). Default: `Asia/Jakarta`. It sets the billing period boundaries (start and end of month). The two values must match.
+- **`BILLING_TIMEZONE`**: set it in the production env of both repos (`agent-ai-komunikasi-crm` and `ai-agent-proxy`). Default: `Asia/Jakarta`. It sets the billing period boundaries (start and end of month). The CRM value decides the dashboard's periods (the CRM always sends `tz` to the proxy); the proxy value is only the default for callers that omit `tz`. Keep the two values the same.
 - **`ai-agent-proxy/migrations/006_ai_usage_billing.sql`**: run it in the Supabase SQL editor **before the next purge run**. Without this migration, metric rows older than 28 days keep being deleted. After it, metric rows are kept for 400 days; only conversation content is scrubbed after 28 days.
 
 ### Deployment order
@@ -413,7 +413,7 @@ Follow these steps in this order. The order matters because of the purge job.
 2. **Apply proxy migration `006_ai_usage_billing.sql` BEFORE the next pg_cron purge run.** Until then the old purge still deletes metric rows older than 28 days. Rows that are 28 to 400 days old are lost permanently if the purge runs first.
 3. **Do NOT re-run migration 003 afterwards.** It would restore the 28-day delete of metric rows.
 4. **Rebuild the proxy image.** The proxy has a new `tzdata` dependency, and the slim image has no system zoneinfo.
-5. **Set `BILLING_TIMEZONE` in the production env of both the CRM and the proxy** (default `Asia/Jakarta`). The two values must match, otherwise the CRM and the proxy compute different period boundaries.
+5. **Set `BILLING_TIMEZONE` in the production env of both the CRM and the proxy** (default `Asia/Jakarta`). The CRM always sends `tz` to the proxy, so the CRM value alone decides the period boundaries of the dashboard; the proxy value is only the default for callers that omit `tz`, and a mismatch does not shift CRM periods. Keep the two values the same anyway, so every caller sees the same boundaries.
 6. **Deploy the CRM.**
 
 ### Notes on the first invoice periods

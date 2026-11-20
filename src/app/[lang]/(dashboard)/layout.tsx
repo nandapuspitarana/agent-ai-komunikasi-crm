@@ -11,6 +11,7 @@ import {
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { findActiveNavItem, isNavActive, localizedHref } from '@/lib/dashboard-nav';
 
 const NAV_ITEMS: Array<{
   href: string;
@@ -37,7 +38,7 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [hotLeadCount, setHotLeadCount] = useState<number>(0);
 
   // Below `md` the sidebar is an off-canvas drawer; at `md` and up it is the static column it always was.
@@ -163,11 +164,11 @@ export default function DashboardLayout({
 
         <nav className="flex-1 p-4 space-y-1">
           {visibleNavItems.map(({ href, labelKey, icon: Icon }) => {
-            const isActive = pathname === href || pathname?.startsWith(href + '/');
+            const isActive = isNavActive(pathname, locale, href);
             return (
               <Link
                 key={href}
-                href={href}
+                href={localizedHref(locale, href)}
                 onClick={() => setMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group relative ${
                   isActive
@@ -215,7 +216,7 @@ export default function DashboardLayout({
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-slate-500 min-w-0 mr-auto">
             <span className="truncate">
-              {t('sidebar', NAV_ITEMS.find(n => pathname === n.href || pathname?.startsWith(n.href + '/'))?.labelKey || 'overview')}
+              {t('sidebar', findActiveNavItem(NAV_ITEMS, pathname, locale)?.labelKey || 'overview')}
             </span>
           </div>
           {session?.user && (

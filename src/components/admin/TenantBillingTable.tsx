@@ -4,7 +4,7 @@ import { Fragment, useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 import { tenantLabel } from '@/lib/admin-billing';
-import { NA, formatCost, formatInt, formatTokens, roleLabel, tenantLabelsFrom, unpricedHint, type TenantRow } from './shared';
+import { NA, formatCost, formatInt, formatTokens, modelLabel, roleLabel, tenantLabelsFrom, unpricedHint, type TenantRow } from './shared';
 
 type SortKey = 'costUsd' | 'totalTokens' | 'activeInPeriod' | 'name';
 type SortDir = 'asc' | 'desc';
@@ -146,7 +146,8 @@ export default function TenantBillingTable({ tenants }: { tenants: TenantRow[] }
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* `relative` makes this the containing block of the absolutely positioned sr-only spans in the cells; without it they escape the scroll clip and widen the page. */}
+      <div className="relative overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs uppercase tracking-wide text-slate-500 bg-slate-50 border-b border-slate-200">
@@ -302,7 +303,7 @@ function TenantDetails({
     `${formatTokens(x.total_tokens, locale)} · ${formatCost(x.cost_usd, locale)}`,
   ]);
   const byModel: Array<[string, string]> = (row.ai?.byModel ?? []).map((x) => [
-    x.model_name ?? ta('unknownModel', '(unknown)'),
+    modelLabel(ta, x.model_name),
     `${formatTokens(x.total_tokens, locale)} · ${formatCost(x.cost_usd, locale)}`,
   ]);
   const byRole: Array<[string, string]> = Object.entries(row.staff.byRole).map(([role, n]) => [

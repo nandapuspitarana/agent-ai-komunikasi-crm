@@ -95,8 +95,20 @@ agregasi langsung di `ai_trace_logs` dengan index yang ada cukup untuk volume sa
 ### 5.2 CRM (`agent-ai-komunikasi-crm`)
 
 **API `GET /api/admin/overview?from=YYYY-MM-DD&to=YYYY-MM-DD`** — `src/app/api/admin/overview/route.ts`
-- `requireUser({ roles: ['SUPER_ADMIN'], requireTenant: false })`; selain itu 401/403.
-- Default periode: bulan berjalan di `BILLING_TIMEZONE`. Validasi sama dengan proxy (pesan error 400).
+- `requireUser({ roles: ['SUPER_ADMIN'], requireTenant: false })`; selain itu 401/403. Kedua respons ini berasal dari guard bersama dan berbentuk `{ error: "Unauthorized" | "Forbidden" }` (string, tanpa `code`).
+- Default periode: bulan berjalan di `BILLING_TIMEZONE`. Validasi sama dengan proxy.
+- **Bentuk error:** `{ error: { code, message } }`. `code` adalah kode mesin yang stabil dan dilokalkan oleh UI (kamus `admin`, kunci `err*`); `message` berbahasa Inggris, hanya untuk log dan klien API.
+
+  | Status | `code` | Penyebab |
+  |---|---|---|
+  | 400 | `period_incomplete` | `from` / `to` kosong atau hanya salah satu |
+  | 400 | `period_invalid` | bukan tanggal kalender nyata `YYYY-MM-DD` |
+  | 400 | `period_order` | `from` setelah `to` |
+  | 400 | `period_too_long` | lebih dari 400 hari (inklusif) |
+  | 500 | `server_timezone` | `BILLING_TIMEZONE` di server bukan zona IANA yang valid (salah konfigurasi operator, bukan kesalahan pemanggil); dicatat di log server |
+  | 500 | `overview_failed` | kegagalan tak terduga saat memuat overview |
+
+  `ai_unavailable` bukan status HTTP: itu `ai.error.code` di dalam respons 200 saat proxy gagal. UI memetakan kode yang tidak dikenal (termasuk string error dari guard) ke pesan umum `errGeneric`, ditambah `(HTTP <status>)` bila ada respons.
 - Data dari Prisma, **pakai `count`/`groupBy`, tidak memuat seluruh baris**:
   - Tenant: `id, name, subscription, aiEnabled, createdAt`.
   - Akun staf: `user.groupBy([tenantId, role, isActive])`; staf baru dalam periode (`createdAt`); staf login dalam periode (`lastLoginAt`).
@@ -106,8 +118,10 @@ agregasi langsung di `ai_trace_logs` dengan index yang ada cukup untuk volume sa
   - Aktivitas (semua berbasis pesan dalam periode, join `Message` → `ChatSession`): sesi = `COUNT(DISTINCT m."sessionId")` yang punya pesan dalam periode, per tenant & per `channel` (`widget`, `whatsapp`, …); pesan per tenant per `senderType` (`user`, `bot`, `agent`); handoff = `COUNT(DISTINCT m."sessionId")` pada pesan dalam periode dengan `m."senderType" = 'agent'`, yaitu sesi yang benar-benar ditangani agen manusia pada periode itu (per tenant; total platform = jumlah semua tenant). `ChatSession.handoffRequested` tidak dipakai karena tidak pernah ditulis oleh kode mana pun (handoff hanya mengubah `status` menjadi `queue`). Semua batas periode pada `$queryRaw` di-cast `(${start}::timestamptz AT TIME ZONE 'UTC')` (idem `end`), karena `Message."createdAt"` adalah `timestamp(3)` tanpa zona waktu berisi waktu UTC; tanpa cast, Postgres mengonversi parameter `timestamptz` memakai TimeZone sesi database dan jendela periode bergeser. `lastActivityAt` = `MAX(m."createdAt")` per tenant (semua waktu), dibaca sebagai UTC.
   - Aktivitas terakhir per tenant = `MAX(Message.createdAt)` sepanjang waktu (tanpa filter periode).
 - Data token: panggil proxy `usage-by-tenant` dengan `agentProxyUrl()` + `agentProxyHeaders()` (sama seperti `/api/dashboard/ai-cost`), timeout 15 detik.
-  - Gabungkan per `tenant_id`. Tenant CRM tanpa pemakaian → token 0 (itu nilai sebenarnya). `tenant_id` dari proxy yang tidak ada di CRM → baris "Tenant tidak dikenal (`id`)", NULL → "Tanpa tenant", supaya total per tenant = total platform.
-  - Proxy gagal/timeout → `ai: { status: "unavailable", error }` dan semua field token tenant = `null` (bukan 0). Bagian Prisma tetap dikembalikan.
+  - CRM selalu mengirim `tz` (= `BILLING_TIMEZONE` CRM) ke proxy, sehingga nilai `BILLING_TIMEZONE` di proxy tidak memengaruhi permintaan CRM.
+  - Gabungkan per `tenant_id`. Tenant CRM tanpa pemakaian → token 0 (itu nilai sebenarnya). Pemakaian yang tidak punya tenant di CRM ditambahkan sebagai baris `known: false` agar total per tenant = total platform. Baris ini tidak membawa teks tampilan dari server: `name` bernilai `null` dan `orphanKind` menjelaskan sebabnya: `'unknown'` = `tenant_id` dari proxy yang tidak ada di CRM, `'none'` = `tenant_id` NULL (pada baris yang dikenal CRM, `orphanKind` tidak ada).
+  - Label baris yatim dibuat di klien dari kamus `admin` (`unknownTenant`, `noTenant`) oleh `tenantLabel()` di `src/lib/admin-billing.ts`: baris dikenal memakai namanya, `'none'` → "Tanpa tenant" / "No tenant" dst., `'unknown'` → "Tenant tidak dikenal (8 karakter pertama `id`)". Label yang sama dipakai untuk tampilan, pencarian, pengurutan, dan kolom `tenant_name` di CSV, sehingga mengikuti bahasa UI.
+  - Proxy gagal/timeout (15 detik) → `ai: { status: "unavailable", error: { code: "ai_unavailable", message } }` dan semua field token tenant = `null` (bukan 0). Bagian Prisma tetap dikembalikan.
 - Bentuk response:
   ```ts
   {
@@ -116,11 +130,14 @@ agregasi langsung di `ai_trace_logs` dengan index yang ada cukup untuk volume sa
                 staff: { total, active, byRole, newInPeriod, loggedInPeriod },
                 endUsers: { activeInPeriod, storedProfiles, newProfilesInPeriod, hotLeads },
                 activity: { sessions, sessionsByChannel, handoffs, messages, messagesBySender } },
-    ai: { status: "ok" | "unavailable", error?, totals?, byDay?, unpricedModels?, oldestAvailable? },
-    tenants: Array<{ id, name, plan, aiEnabled, createdAt, lastActivityAt,
+    ai: { status: "ok", totals /* termasuk unpriced_count */, byDay?, unpricedModels?, oldestAvailable? }
+       | { status: "unavailable", error: { code: "ai_unavailable", message } },
+    tenants: Array<{ id: string | null, name: string | null, orphanKind?: 'unknown' | 'none',   // name null + orphanKind hanya pada baris known: false
+                     plan, aiEnabled, createdAt, lastActivityAt,
                      staff: { total, active, byRole }, endUsers: { activeInPeriod, storedProfiles, newProfilesInPeriod },
                      activity: { sessions, messages, handoffs },
                      ai: { totalTokens, inputTokens, cachedInputTokens, outputTokens, costUsd, requests, errors,
+                           unpricedCount,   // panggilan sukses tanpa harga: tidak termasuk dalam costUsd
                            byType, byModel } | null,
                      known: boolean }>
   }
@@ -139,7 +156,7 @@ agregasi langsung di `ai_trace_logs` dengan index yang ada cukup untuk volume sa
 │ 12 (8 AI on)  │ 47 (41 aktif) │ 3.210         │ 18,4 jt       │ $41,27               │
 │ free 5 · pro 7│ SA1·BP12·AG34 │ +540 profil   │ in 15,1·out 3,3│ 1.204 req · 3 error │
 ├───────────────┴───────────────┴───────────────┴───────────────┴──────────────────────┤
-│ Tren harian token & biaya (bar per hari, SVG/CSS)                                    │
+│ Tren token & biaya (bar per hari; per minggu bila periode > 62 hari, HTML/CSS)       │
 ├──────────────────────────────────────────────────────────────────────────────────────┤
 │ [Cari tenant…]                                         urut: Biaya ▾                 │
 │ Tenant      Plan  Staf  Pengguna aktif  Sesi   Pesan   Token     Biaya   Terakhir aktif│
@@ -150,14 +167,15 @@ agregasi langsung di `ai_trace_logs` dengan index yang ada cukup untuk volume sa
 │ TOTAL             …                                                                   │
 └──────────────────────────────────────────────────────────────────────────────────────┘
 ```
+- Grafik tren: satu bar per hari untuk periode sampai 62 hari; di atas itu satu bar per minggu (7 hari berurutan dihitung dari hari pertama, bucket terakhir bisa lebih pendek dan menyebut jumlah harinya) supaya bar tetap terbaca di ponsel. Total tiap bucket = jumlah nilai harian di dalamnya (`bucketUsage` di `src/components/admin/shared.ts`).
 - Pemilih periode: Bulan ini (default), Bulan lalu, Rentang kustom (dua `input type="date"`).
 - Tabel bisa diurutkan (biaya, token, pengguna aktif, nama) dan dicari; baris bisa diperluas untuk rincian.
-- Peringatan unpriced: dari `ai.totals.unpriced_count` (jumlah panggilan), disertai daftar `unpricedModels` bila ada (model tanpa nama tampil `(unknown)`). Sel biaya tenant dengan `unpricedCount > 0` diberi tanda `*` dan tooltip "N panggilan tanpa harga — biaya belum termasuk".
+- Peringatan unpriced: dari `ai.totals.unpriced_count` (jumlah panggilan), disertai daftar `unpricedModels` bila ada (proxy mengirim model tanpa nama sebagai `(unknown)`; UI menampilkannya dengan label terjemahan `unknownModel`, sama seperti rincian baris). Sel biaya tenant dengan `unpricedCount > 0` diberi tanda `*` dan tooltip "N panggilan tanpa harga — biaya belum termasuk".
 - Token `null` ditampilkan "—" dengan tooltip, bukan 0.
 - **Export CSV** dibuat di browser dari data yang sama: satu baris per tenant, kolom
   `tenant_id, tenant_name, plan, period_from, period_to, staff_total, staff_active, end_users_active, sessions, messages, input_tokens, cached_input_tokens, output_tokens, total_tokens, requests, cost_usd, unpriced_requests` (kolom terakhir = jumlah panggilan sukses tanpa harga; kosong bila `ai` tidak tersedia; kolom tambahan di akhir agar parser lama tetap jalan). Sel teks yang diawali `=`, `+`, `-`, `@`, tab atau CR diberi awalan `'` (anti formula injection);
   nama file `billing_<from>_<to>.csv`; `cost_usd` 6 desimal; tombol nonaktif bila `ai.status = unavailable`.
-- i18n: namespace baru `admin` di `src/dictionaries/{en,id,ko,th,zh}.json`; `en` & `id` diterjemahkan penuh, `ko/th/zh` diisi teks Inggris (bisa diterjemahkan belakangan). Setiap pemanggilan `t('admin', key, fallback)` memakai fallback Inggris.
+- i18n: namespace baru `admin` di `src/dictionaries/{en,id,ko,th,zh}.json`; kelima bahasa diterjemahkan penuh. `tests/api/admin-i18n.test.ts` memaksa kunci dan placeholder `{...}` identik dengan `en` di semua bahasa, dan nilai `ko/th/zh` tidak boleh sama dengan teks Inggris kecuali kunci dalam allowlist eksplisit (`httpErrorSuffix`). Setiap pemanggilan `t('admin', key, fallback)` memakai fallback Inggris.
 
 **Test CRM**
 - `tests/api/admin-overview.test.ts` (vitest, pola mock Prisma/auth seperti `tenant-isolation.test.ts`): 401 tanpa sesi, 403 untuk `BUSINESS_PARTNER`/`AGENT`, validasi periode, penggabungan token proxy + tenant tidak dikenal + total konsisten, proxy gagal → `ai.status = unavailable` & token `null` sambil data Prisma tetap ada.

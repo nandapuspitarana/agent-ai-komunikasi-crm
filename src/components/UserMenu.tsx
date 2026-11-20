@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
 import { ChevronDown, LogOut, Settings as SettingsIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslation } from '@/lib/i18n/I18nContext';
+import { localizedHref } from '@/lib/dashboard-nav';
 
 interface UserMenuProps {
   user: {
@@ -16,6 +18,7 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ user, tenant }: UserMenuProps) {
+  const { locale } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +73,7 @@ export default function UserMenu({ user, tenant }: UserMenuProps) {
           </div>
 
           <Link
-            href="/settings"
+            href={localizedHref(locale, '/settings')}
             className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             onClick={() => setIsOpen(false)}
           >

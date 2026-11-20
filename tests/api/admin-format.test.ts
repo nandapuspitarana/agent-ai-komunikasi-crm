@@ -5,6 +5,7 @@ import {
   TREND_WEEKLY_ABOVE_DAYS,
   bucketUsage,
   formatCost,
+  modelLabel,
   unpricedHint,
   type AdminDayUsage,
 } from '@/components/admin/shared';
@@ -101,5 +102,19 @@ describe('sidebar menu dictionary keys', () => {
     expect(sidebar(l).openMenu).not.toBe(sidebar('en').openMenu);
     expect(sidebar(l).closeMenu).not.toBe(sidebar('en').closeMenu);
     expect(sidebar(l).language).not.toBe(sidebar('en').language);
+  });
+});
+
+describe('modelLabel', () => {
+  const ta = (key: string, fallback: string) => (key === 'unknownModel' ? '(tidak diketahui)' : fallback);
+
+  it('localizes a missing model name and the proxy "(unknown)" sentinel', () => {
+    expect(modelLabel(ta, null)).toBe('(tidak diketahui)');
+    expect(modelLabel(ta, undefined)).toBe('(tidak diketahui)');
+    expect(modelLabel(ta, '(unknown)')).toBe('(tidak diketahui)');
+  });
+
+  it('leaves real model names untouched', () => {
+    expect(modelLabel(ta, 'gpt-4o-mini')).toBe('gpt-4o-mini');
   });
 });

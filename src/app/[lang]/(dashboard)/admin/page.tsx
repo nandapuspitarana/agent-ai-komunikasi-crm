@@ -16,7 +16,7 @@ import AdminSummaryCards from '@/components/admin/AdminSummaryCards';
 import UsageTrendChart from '@/components/admin/UsageTrendChart';
 import TenantBillingTable from '@/components/admin/TenantBillingTable';
 import PeriodPicker from '@/components/admin/PeriodPicker';
-import { errorCodeOf, errorMessageFor, formatInt, tenantLabelsFrom, type AdminOverview } from '@/components/admin/shared';
+import { errorCodeOf, errorMessageFor, formatInt, modelLabel, tenantLabelsFrom, type AdminOverview } from '@/components/admin/shared';
 
 type Period = { from: string; to: string };
 // `code` is the API's machine error code (localized on render); `status` is the HTTP status when there was a response.
@@ -79,7 +79,7 @@ export default function AdminPage() {
         setTz(json.period.tz);
       } catch (err) {
         if (controller.signal.aborted) return;
-        setData(null);
+        // Keep the last good data mounted (search, sort and expanded rows survive); the banner shows the error.
         const { code = null, status = null } = err as { code?: string | null; status?: number | null };
         setError({ code, status });
       } finally {
@@ -164,7 +164,8 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={exportCsv}
-            disabled={loading || !data || aiUnavailable}
+            // A failed refetch leaves the previous period's data on screen: exporting it would not match the picker.
+            disabled={loading || !data || aiUnavailable || !!error}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-brand text-white disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Download size={16} />
@@ -205,7 +206,7 @@ export default function AdminPage() {
                 formatInt(unpricedCount, locale)
               )}
               {unpricedModels.length > 0 &&
-                ` ${ta('warnUnpricedModels', 'Models: {models}').replace('{models}', unpricedModels.join(', '))}`}
+                ` ${ta('warnUnpricedModels', 'Models: {models}').replace('{models}', unpricedModels.map((m) => modelLabel(ta, m)).join(', '))}`}
             </Banner>
           )}
 

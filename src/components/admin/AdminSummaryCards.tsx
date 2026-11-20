@@ -27,7 +27,7 @@ function Card({
   hint?: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col min-w-0">
+    <div className="relative bg-white rounded-xl border border-slate-200 p-5 flex flex-col min-w-0">
       <div className="flex items-center gap-3 mb-3">
         <div className="w-9 h-9 rounded-lg bg-brand-bg text-brand flex items-center justify-center shrink-0">{icon}</div>
         <h3 className="text-sm font-medium text-slate-500">{label}</h3>
