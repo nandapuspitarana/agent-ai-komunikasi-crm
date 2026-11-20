@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
+import { agentProxyUrl, agentProxyHeaders } from '@/lib/agent-proxy-client';
 
 export async function GET(req: NextRequest) {
   try {
@@ -30,12 +31,12 @@ export async function GET(req: NextRequest) {
     const rawDays = parseInt(searchParams.get('days') || '7', 10);
     const days = Math.min(Math.max(isNaN(rawDays) ? 7 : rawDays, 1), 28);
 
-    const proxyUrl = process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8200';
+    const proxyUrl = agentProxyUrl();
     const serviceToken = process.env.OBSERVABILITY_SERVICE_TOKEN;
 
-    const headers: Record<string, string> = {
+    const headers: Record<string, string> = agentProxyHeaders({
       'Content-Type': 'application/json',
-    };
+    });
     if (serviceToken) {
       headers['Authorization'] = `Bearer ${serviceToken}`;
     }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
 
 import { prisma } from '@/lib/prisma';
+import { requireUser, canAccessTenant, ROLES_MANAGE } from '@/lib/api-guard';
+import { agentProxyFetch } from '@/lib/agent-proxy-client';
 
 // GET /api/flows/[flowId]/knowledge - list docs for this agent
 export async function GET(
@@ -10,8 +11,13 @@ export async function GET(
 ) {
   const { flowId } = await params;
   try {
-    const session = await auth();
-    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireUser();
+    if (!guard.ok) return guard.response;
+
+    const flow = await prisma.flow.findUnique({ where: { id: flowId }, select: { tenantId: true } });
+    if (!flow || !canAccessTenant(guard.user, flow.tenantId)) {
+      return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
+    }
 
     const docs = await prisma.knowledgeDocument.findMany({
       where: { flowId },
@@ -32,8 +38,8 @@ export async function POST(
 ) {
   const { flowId } = await params;
   try {
-    const session = await auth();
-    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireUser({ roles: ROLES_MANAGE });
+    if (!guard.ok) return guard.response;
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
@@ -49,7 +55,9 @@ export async function POST(
     const fileType = file.name.split('.').pop()?.toLowerCase() || 'unknown';
 
     const flow = await prisma.flow.findUnique({ where: { id: flowId } });
-    if (!flow) return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
+    if (!flow || !canAccessTenant(guard.user, flow.tenantId)) {
+      return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
+    }
 
     // 1. Create record in DB as pending
     const doc = await prisma.knowledgeDocument.create({
@@ -67,8 +75,6 @@ export async function POST(
     });
 
     // 2. Forward to Python AI proxy for vector ingestion
-    let proxyUrl = process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8200';
-    proxyUrl = proxyUrl.replace('localhost', '127.0.0.1');
     try {
       const proxyFormData = new FormData();
       const fileBuffer = await file.arrayBuffer();
@@ -86,7 +92,7 @@ export async function POST(
       if (description) proxyFormData.append('description', description);
       if (category) proxyFormData.append('category', category);
 
-      const proxyRes = await fetch(`${proxyUrl}/api/v1/documents/ingest`, {
+      const proxyRes = await agentProxyFetch('/api/v1/documents/ingest', {
         method: 'POST',
         body: proxyFormData,
         signal: AbortSignal.timeout(60000),

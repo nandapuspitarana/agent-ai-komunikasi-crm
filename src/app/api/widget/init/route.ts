@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma';
 import { getVisitorConfig } from '@/lib/visitor-config';
 import { resolveEffectiveFlow, readWelcomeConfig } from '@/lib/flow-resolver';
 import { getVersionInfo } from '@/lib/version';
+import { signVisitorToken, verifyVisitorToken } from '@/lib/visitor-token';
 
 export async function POST(request: Request) {
   try {
-    const { websiteUrl, tenantId, sdkVersion } = await request.json();
+    const { websiteUrl, tenantId, sdkVersion, contactId, visitorToken: presentedToken } = await request.json();
 
     if (!tenantId) {
       return NextResponse.json({ error: 'tenantId is required' }, { status: 400 });
@@ -43,8 +44,22 @@ export async function POST(request: Request) {
 
     const vConfig = getVisitorConfig(tenant.visitorConfig, effectiveLang);
 
+    // Lets the client restore this contact's history via GET /api/widget/message.
+    // Issued only on first use of a contactId (no chat yet) or to a caller that
+    // already holds a valid token; otherwise anyone could claim a victim's id.
+    let visitorToken: string | undefined;
+    if (typeof contactId === 'string' && contactId) {
+      if (verifyVisitorToken(tenant.id, contactId, presentedToken)) {
+        visitorToken = presentedToken;
+      } else {
+        const existing = await prisma.chatSession.count({ where: { tenantId: tenant.id, contactId } });
+        if (existing === 0) visitorToken = signVisitorToken(tenant.id, contactId);
+      }
+    }
+
     return NextResponse.json({
       status: 'success',
+      ...(visitorToken ? { visitorToken } : {}),
       // server/API/SDK versions; `sdk.status` tells the caller if its SDK is current
       version: getVersionInfo(sdkVersion ?? request.headers.get('x-sdk-version')),
       config: {

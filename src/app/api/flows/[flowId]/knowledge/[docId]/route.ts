@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
 
 import { prisma } from '@/lib/prisma';
+import { requireUser, canAccessTenant, ROLES_MANAGE } from '@/lib/api-guard';
+import { agentProxyFetch } from '@/lib/agent-proxy-client';
 
 // DELETE /api/flows/[flowId]/knowledge/[docId]
 export async function DELETE(
@@ -10,19 +11,22 @@ export async function DELETE(
 ) {
   const { flowId, docId } = await params;
   try {
-    const session = await auth();
-    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireUser({ roles: ROLES_MANAGE });
+    if (!guard.ok) return guard.response;
 
     const doc = await prisma.knowledgeDocument.findFirst({
       where: { id: docId, flowId },
     });
-    if (!doc) return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+    if (!doc || !canAccessTenant(guard.user, doc.tenantId)) return NextResponse.json({ error: 'Document not found' }, { status: 404 });
 
-    // Try to also delete from Python proxy
-    if (doc.proxyDocId) {
-      const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8200';
+    // Try to also delete from Python proxy — but only when no other agent still links
+    // the same proxy document (documents/link duplicates the record per flow).
+    const otherLinks = doc.proxyDocId
+      ? await prisma.knowledgeDocument.count({ where: { proxyDocId: doc.proxyDocId, id: { not: docId } } })
+      : 0;
+    if (doc.proxyDocId && otherLinks === 0) {
       try {
-        await fetch(`${proxyUrl}/api/v1/documents/${doc.proxyDocId}`, {
+        await agentProxyFetch(`/api/v1/documents/${encodeURIComponent(doc.proxyDocId)}`, {
           method: 'DELETE',
           signal: AbortSignal.timeout(5000),
         });

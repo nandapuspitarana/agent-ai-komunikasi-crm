@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { supabase } from '@/lib/supabase-client';
+import { supabase, setRealtimeTokenSource, fetchRealtimeToken } from '@/lib/supabase-client';
 import { Bell, BellOff } from 'lucide-react';
 
 export default function GlobalNotification({ tenantId }: { tenantId: string }) {
@@ -125,36 +125,22 @@ export default function GlobalNotification({ tenantId }: { tenantId: string }) {
             showNotification('Chat Baru', 'Pengunjung memulai percakapan.');
           }
         }
-      )
-      .on(
-        'broadcast',
-        { event: 'new_message' },
-        (payload) => {
-          const data = payload.payload as any;
-          // Guard against duplicate notifications if both replication and broadcast fire
-          if (data.senderType === 'user') {
-            if (processedMessageIds.current.has(data.id)) return;
-            processedMessageIds.current.add(data.id);
-            if (activeSessionsRef.current.has(data.sessionId)) {
-              showNotification('Pesan Baru', data.content);
-            } else {
-              import('@/app/actions/notification').then(({ checkSessionTenant }) => {
-                checkSessionTenant(data.sessionId).then(sessionTenantId => {
-                  if (sessionTenantId === tenantId) {
-                    setActiveSessions(prev => new Set(prev).add(data.sessionId));
-                    showNotification('Pesan Baru', data.content);
-                  }
-                });
-              });
-            }
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log('GlobalNotification subscription status:', status);
-      });
+      );
+    // (Public 'broadcast' listener removed: the server never sends broadcasts,
+    // and anyone with the anon key could push fake notifications.)
+
+    let cancelled = false;
+    setRealtimeTokenSource(`dashboard:${tenantId}`, () => fetchRealtimeToken('/api/realtime/token'))
+      .then(() => {
+        if (cancelled) return;
+        channel.subscribe((status) => {
+          console.log('GlobalNotification subscription status:', status);
+        });
+      })
+      .catch((err) => console.error('[GlobalNotification] Realtime auth failed:', err));
 
     return () => {
+      cancelled = true;
       supabase.removeChannel(channel);
       document.title = originalTitle;
     };

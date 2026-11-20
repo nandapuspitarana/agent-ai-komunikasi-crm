@@ -4,7 +4,9 @@
  * The local endpoint must accept a JSON payload and return a JSON `{ reply: string, ... }`.
  */
 
-const AGENT_PROXY_URL = (process.env.AGENT_PROXY_URL || 'http://127.0.0.1:8200').replace('localhost', '127.0.0.1');
+import { agentProxyUrl, agentProxyHeaders } from '@/lib/agent-proxy-client';
+
+const AGENT_PROXY_URL = agentProxyUrl();
 const LOCAL_LLM_URL = (process.env.LOCAL_LLM_URL || '').replace('localhost', '127.0.0.1');
 const LOCAL_LLM_TYPE = process.env.LOCAL_LLM_TYPE || 'generic';
 
@@ -101,9 +103,7 @@ export async function chatWithAgent(request: AgentChatRequest): Promise<AgentCha
       try {
         response = await fetch(`${AGENT_PROXY_URL}/api/v1/chat`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: agentProxyHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify(request),
           signal: AbortSignal.timeout(75000), // Increased to 75s for slow local LLMs
         });

@@ -11,5 +11,6 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/api/**/*.test.ts'],
+    env: { AUTH_SECRET: 'test-auth-secret' },
   },
 });

@@ -1,12 +1,19 @@
 import { NextResponse } from 'next/server';
+import { requireUser, isSuperAdmin } from '@/lib/api-guard';
+import { agentProxyFetch } from '@/lib/agent-proxy-client';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const proxyUrl = process.env.AGENT_PROXY_URL || 'http://localhost:8200';
-  
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+  const { user } = guard;
+
+  // Non-admins only ever see their own tenant's documents.
+  const query = isSuperAdmin(user) ? '' : `?tenant_id=${encodeURIComponent(user.tenantId as string)}`;
+
   try {
-    const response = await fetch(`${proxyUrl}/api/v1/documents`, {
+    const response = await agentProxyFetch(`/api/v1/documents${query}`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' },
       signal: AbortSignal.timeout(8000),

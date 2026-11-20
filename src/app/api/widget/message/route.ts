@@ -20,6 +20,12 @@ import {
 } from '@/lib/centres-directory';
 
 import { prisma } from '@/lib/prisma';
+import {
+  signVisitorToken,
+  verifyVisitorToken,
+  newAnonymousContactId,
+  legacyContactLookupEnabled,
+} from '@/lib/visitor-token';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -51,6 +57,7 @@ export async function GET(req: NextRequest) {
     const contactId = searchParams.get('contactId');
     const tenantId = searchParams.get('tenantId');
     const after = searchParams.get('after');
+    const visitorToken = searchParams.get('visitorToken');
 
     if (!sessionId && !(contactId && tenantId)) {
       return corsResponse(
@@ -63,7 +70,18 @@ export async function GET(req: NextRequest) {
       ? await prisma.chatSession.findUnique({ where: { id: sessionId } })
       : null;
 
-    if (!session && contactId && tenantId) {
+    // A session id from another tenant is treated as unknown.
+    if (session && tenantId && session.tenantId !== tenantId) {
+      session = null;
+    }
+
+    // tenantId is public and contactId may be guessable, so looking a session up
+    // by contact requires the visitor token issued for that contact.
+    const contactLookupAllowed =
+      !!(contactId && tenantId) &&
+      (verifyVisitorToken(tenantId, contactId, visitorToken) || legacyContactLookupEnabled());
+
+    if (!session && contactId && tenantId && contactLookupAllowed) {
       session = await prisma.chatSession.findFirst({
         where: {
           tenantId,
@@ -217,11 +235,17 @@ export async function POST(req: NextRequest) {
       ? await prisma.chatSession.findUnique({ where: { id: sessionId } })
       : null;
 
+    // Never write into another tenant's session.
+    if (chatSession && chatSession.tenantId !== tenantId) {
+      chatSession = null;
+    }
+
+    const sessionCreatedNow = !chatSession;
     if (!chatSession) {
       chatSession = await prisma.chatSession.create({
         data: {
           tenantId,
-          contactId: contactId || `widget_${Date.now()}`,
+          contactId: contactId || newAnonymousContactId(),
           channel,
           status: 'bot',
         },
@@ -230,6 +254,26 @@ export async function POST(req: NextRequest) {
 
     const currentSessionId = chatSession.id;
     const resolvedContactId = contactId || chatSession.contactId;
+
+    // Returned with replies so the client can later restore history by contact.
+    // Only hand it out to a caller who already owns this contact; otherwise
+    // anyone could POST a victim's contactId and get the token for it.
+    let mayIssueVisitorToken = false;
+    if (verifyVisitorToken(tenantId, resolvedContactId, body.visitorToken)) {
+      mayIssueVisitorToken = true;                       // already proven
+    } else if (!sessionCreatedNow) {
+      // Caller presented this session's id (the session capability).
+      mayIssueVisitorToken = chatSession.contactId === resolvedContactId;
+    } else if (!contactId) {
+      mayIssueVisitorToken = true;                       // server-generated id
+    } else if (typeof prisma.chatSession.count === 'function') {
+      // Client-chosen id: first use only (no earlier sessions for it).
+      const earlier = await prisma.chatSession.count({
+        where: { tenantId, contactId, id: { not: currentSessionId } },
+      });
+      mayIssueVisitorToken = earlier === 0;
+    }
+    const visitorToken = mayIssueVisitorToken ? signVisitorToken(tenantId, resolvedContactId) : undefined;
 
     // Deduplication check: ignore rapid duplicate messages sent within 2 seconds
     if (typeof prisma.message?.findFirst === 'function') {
@@ -262,6 +306,7 @@ export async function POST(req: NextRequest) {
 
         if (recentBotReply) {
           return corsResponse({
+        visitorToken,
             sessionId: currentSessionId,
             messageId: recentBotReply.id,
             status: chatSession.status,
@@ -273,6 +318,7 @@ export async function POST(req: NextRequest) {
         }
 
         return corsResponse({
+        visitorToken,
           sessionId: currentSessionId,
           status: chatSession.status,
           reply: '',
@@ -468,6 +514,7 @@ export async function POST(req: NextRequest) {
       // Forward ke dashboard agent via Socket.io
       // Supabase Realtime handles this automatically.
       return corsResponse({
+        visitorToken,
         sessionId: currentSessionId,
         status: 'agent',
         reply: null, // Agent akan membalas sendiri dari dashboard
@@ -559,6 +606,7 @@ export async function POST(req: NextRequest) {
           const dynamicQuickOptions = dynamicResult.options ? parseOptions(dynamicResult.options) : [];
 
           return corsResponse({
+        visitorToken,
             sessionId: currentSessionId,
             status: 'bot',
             reply: replyMsg,
@@ -607,6 +655,7 @@ export async function POST(req: NextRequest) {
         const dynamicQuickOptions = dynamicResult.options ? parseOptions(dynamicResult.options) : [];
 
         return corsResponse({
+        visitorToken,
           sessionId: currentSessionId,
           messageId: savedHandoffMsg.id,
           status: 'queue',
@@ -953,6 +1002,7 @@ export async function POST(req: NextRequest) {
     const dynamicBotName = flowConfig?.name || tenant.activeFlow?.name || 'Claire';
 
     return corsResponse({
+        visitorToken,
       sessionId: currentSessionId,
       messageId: savedBotMessage.id,
       status: handoffOccurred ? 'queue' : 'bot',
