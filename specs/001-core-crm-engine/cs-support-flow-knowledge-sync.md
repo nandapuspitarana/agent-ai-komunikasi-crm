@@ -158,6 +158,12 @@ docker exec ai-agent-proxy python /tmp/embed_missing_chunks.py --flow-id <flow i
 node scripts/e2e/cs-flow-all-branches.mjs https://cb242.ceosuite.com <tenant id>
 ```
 
+`cs-flow-ui-all-branches.cjs` (`node scripts/e2e/cs-flow-ui-all-branches.cjs . <base url> <tenant id> <screenshot dir>`)
+clicks the same paths in the real widget page with Playwright and fails when a visitor bubble shows anything but
+the clicked button's label. Buttons are `Label|Intent name`: the intent name is what the server receives, the label
+is what the visitor sees (`src/lib/quick-replies.ts` posts both; `ChatWindow.sendMessage(text, displayText)`).
+Before 2026-11-24 the bubble showed the intent name ("City Directory: Jakarta").
+
 `cs-flow-all-branches.mjs` opens one widget session per path from Start to each card (44 paths: 25 city ->
 centre, 19 FAQ -> topic -> answer), compares every reply's text and buttons with the flow JSON, and fails when an
 intent is unreachable. It exits non-zero on any difference.
