@@ -97,6 +97,54 @@ describe('Docker knowledge sync (scripts/docker/sync-knowledge.js)', () => {
     expect(leaks).toEqual([]);
   });
 
+  describe('Markdown chunking (RAG search quality)', () => {
+    const HEADER = /^\[Document: [^\]]*\]\n\n/;
+    const body = (chunk: string) => chunk.replace(HEADER, '');
+    // Text that is not markdown syntax and not a heading line
+    const meaningful = (t: string) => t.split('\n').filter((l) => !/^\s*#{1,6}\s/.test(l)).join('\n').replace(/[\s\-#*|`>_=:]/g, '').length;
+    const kbFiles = fs.readdirSync(kbDir).filter((f) => /\.md$/i.test(f));
+
+    it('TEST-KB-06 No chunk is empty, a separator or a heading alone (they outranked real answers)', () => {
+      // On 242 89 of 1167 chunks were "[Document: ...]\n\n---" or a bare heading; for "meeting rooms with a
+      // projector" they took all 5 RAG slots and the bot answered "I don't have enough information".
+      const bad: string[] = [];
+      for (const f of kbFiles) {
+        const chunks: string[] = lib.chunkMarkdown(fs.readFileSync(path.join(kbDir, f), 'utf8'), 'X', 'Y');
+        expect(chunks.length, f).toBeGreaterThan(0);
+        chunks.forEach((c, i) => { if (meaningful(body(c)) < 20) bad.push(`${f} #${i}: ${JSON.stringify(body(c).slice(0, 60))}`); });
+      }
+      expect(bad).toEqual([]);
+    });
+
+    it('TEST-KB-07 Chunking keeps every line of text and carries the section heading into continuation chunks', () => {
+      const lost: string[] = [];
+      for (const f of kbFiles) {
+        const md = fs.readFileSync(path.join(kbDir, f), 'utf8').replace(/\r\n/g, '\n');
+        const all = lib.chunkMarkdown(md, 'X', 'Y').map(body).join('\n');
+        for (const line of md.split('\n').map((l) => l.trim())) {
+          if (!line || /^(-{3,}|\*{3,}|_{3,})$/.test(line) || line.length > 1000) continue;
+          if (!all.includes(line)) lost.push(`${f}: ${line.slice(0, 60)}`);
+        }
+      }
+      expect(lost).toEqual([]);
+
+      const para = (n: number) => `Paragraph ${n} ` + 'lorem ipsum dolor sit amet '.repeat(20);
+      const md = `# Title\n\n## Long section\n\n${[1, 2, 3, 4, 5, 6].map(para).join('\n\n')}\n\n---\n\n## Next\n\nShort text about the next topic here.`;
+      const chunks: string[] = lib.chunkMarkdown(md, 'Doc', 'Cat').map(body);
+      const long = chunks.filter((c) => c.includes('Paragraph '));
+      expect(long.length).toBeGreaterThan(1);
+      for (const c of long) expect(c.startsWith('# Title\n## Long section') || c.startsWith('## Long section'), c.slice(0, 40)).toBe(true);
+      expect(chunks.some((c) => c.trim() === '# Title')).toBe(false);
+      for (const c of chunks) expect(c.length, 'maxChars').toBeLessThanOrEqual(1200);
+    });
+
+    it('TEST-KB-08 A chunking change reloads the knowledge base (CHUNKER_VERSION is part of the KB hash)', () => {
+      expect(typeof lib.CHUNKER_VERSION).toBe('number');
+      const sync = fs.readFileSync(path.join(root, 'scripts', 'docker', 'sync-knowledge.js'), 'utf8');
+      expect(sync).toMatch(/kbHasher\.update\(`chunker \$\{lib\.CHUNKER_VERSION\}`\)/);
+    });
+  });
+
   it('TEST-KB-04 Dry run plans the flow and all knowledge documents without a database', () => {
     const out = execFileSync('node', ['scripts/docker/sync-knowledge.js', '--dry-run'], {
       cwd: root,

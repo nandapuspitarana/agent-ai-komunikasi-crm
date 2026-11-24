@@ -73,36 +73,76 @@ function getDescription(content, file, metaName) {
   return `Comprehensive reference document for ${metaName}.`;
 }
 
-function chunkMarkdown(content, metaName, category, maxChars = 1200) {
-  const sections = content.split(/\n(?=##?#?\s)/);
-  const rawChunks = [];
+// Bump when chunkMarkdown / chunksFromCentresJson change what they produce: sync-knowledge.js mixes it into the
+// knowledge base hash, so the next start-up reloads (and the proxy re-embeds) the chunks.
+const CHUNKER_VERSION = 2;
 
+const HEADING = /^#{1,6}\s/;
+// Characters of real text: heading lines and markdown punctuation do not count
+const textLength = t => t.split('\n').filter(l => !HEADING.test(l.trim())).join('\n').replace(/[\s\-#*|`>_=:]/g, '').length;
+const MIN_TEXT = 20;
+
+// Splits a markdown document at its #, ## and ### headings, then long sections at paragraphs.
+// - Horizontal rules (---) only separate sections; they are dropped (they used to become chunks of their own).
+// - A section with (almost) no text of its own, e.g. a bare "## 1. Serviced Office" heading, is joined to the next
+//   section instead of becoming a chunk that has nothing to answer with.
+// - Every continuation chunk of a long section starts with the section's heading, so it still says what it is about.
+// Empty or heading-only chunks scored highest for short queries and pushed real answers out of the RAG top 5.
+function chunkMarkdown(content, metaName, category, maxChars = 1200) {
+  const text = content.replace(/\r\n/g, '\n').replace(/^[ \t]*(?:-{3,}|\*{3,}|_{3,})[ \t]*$/gm, '').replace(/\n{3,}/g, '\n\n');
+  const sections = text.split(/\n(?=##?#?\s)/).map(s => s.trim()).filter(Boolean);
+
+  // Join sections that have too little text to the next one
+  const merged = [];
+  let carry = '';
   for (const sec of sections) {
-    const trimmed = sec.trim();
-    if (!trimmed) continue;
-    if (trimmed.length <= maxChars) {
-      rawChunks.push(trimmed);
-      continue;
-    }
-    const paras = trimmed.split(/\n\n+/);
-    let cur = '';
-    for (const p of paras) {
-      if ((cur + '\n\n' + p).length <= maxChars) {
-        cur = cur ? cur + '\n\n' + p : p;
-      } else {
-        if (cur) rawChunks.push(cur);
-        if (p.length > maxChars) {
-          for (let i = 0; i < p.length; i += maxChars - 100) rawChunks.push(p.slice(i, i + maxChars));
-          cur = '';
-        } else {
-          cur = p;
-        }
-      }
-    }
-    if (cur) rawChunks.push(cur);
+    if (textLength(sec) < MIN_TEXT) { carry = carry ? `${carry}\n\n${sec}` : sec; continue; }
+    merged.push({ carry, sec });
+    carry = '';
+  }
+  if (carry) {
+    if (merged.length) merged[merged.length - 1].sec += `\n\n${carry}`;
+    else merged.push({ carry: '', sec: carry });
   }
 
-  const finalChunks = rawChunks.length > 0 ? rawChunks : [content.trim()];
+  const rawChunks = [];
+  for (const { carry: before, sec } of merged) {
+    const whole = before ? `${before}\n\n${sec}` : sec;
+    if (whole.length <= maxChars) { rawChunks.push(whole); continue; }
+
+    // The section's own heading (and the headings carried in front of it) lead every continuation chunk
+    const secLines = sec.split('\n');
+    const ownHeading = HEADING.test(secLines[0]) ? secLines[0] : '';
+    const carriedHeadings = before.split('\n').filter(l => HEADING.test(l.trim()));
+    const head = [...carriedHeadings, ownHeading].filter(Boolean).join('\n').slice(0, Math.floor(maxChars / 4));
+    const budget = maxChars - (head ? head.length + 2 : 0);
+
+    const paras = whole.split(/\n\n+/).filter(p => !(HEADING.test(p) && head.split('\n').includes(p.trim())));
+    let cur = '';
+    const flush = () => { if (cur) rawChunks.push(head ? `${head}\n\n${cur}` : cur); cur = ''; };
+    for (const p of paras) {
+      if (cur && (cur + '\n\n' + p).length > budget) flush();
+      if (p.length > budget) {
+        flush();
+        // A paragraph longer than a chunk (usually a table): cut at line ends where possible
+        let rest = p;
+        while (rest.length > budget) {
+          let cut = rest.lastIndexOf('\n', budget);
+          if (cut < budget / 2) cut = budget;
+          cur = rest.slice(0, cut).trim();
+          flush();
+          rest = rest.slice(cut).trim();
+        }
+        cur = rest;
+      } else {
+        cur = cur ? `${cur}\n\n${p}` : p;
+      }
+    }
+    flush();
+  }
+
+  const finalChunks = rawChunks.filter(c => textLength(c) >= MIN_TEXT);
+  if (!finalChunks.length && textLength(text) > 0) finalChunks.push(text.trim().slice(0, maxChars));
   return finalChunks.map(chunk => `[Document: ${metaName} | Category: ${category}]\n\n${chunk}`);
 }
 
@@ -218,6 +258,7 @@ module.exports = {
   getTags,
   getDescription,
   chunkMarkdown,
+  CHUNKER_VERSION,
   parseXmlLocations,
   centreSlugsFromCentresJson,
   LEGACY_XML_SLUGS,
