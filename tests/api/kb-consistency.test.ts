@@ -42,12 +42,12 @@ describe('Knowledge base has one consistent version of every centre', () => {
       intents.find((i) => (i.trainingPhrases || []).some((p: string) => p.toLowerCase().trim() === q));
 
     for (const [q, name] of [
-      ['centennial tower', 'PO Centre: Centennial Tower'],
-      ['lotte center', 'PO Centre: Hanoi Lotte Center'],
-      ['athenee tower', 'PO Centre: Athenee Tower'],
-      ['lkg tower', 'PO Centre: Lkg Tower'],
-      ['ping an finance center', 'PO Centre: Ping An Finance Center'],
-      ['vietcombank tower', 'PO Centre: Vietcombank Tower'],
+      ['centennial tower', 'Centre: Centennial Tower'],
+      ['lotte center', 'Centre: Hanoi Lotte Center'],
+      ['athenee tower', 'Centre: Athenee Tower'],
+      ['lkg tower', 'Centre: Lkg Tower'],
+      ['ping an finance center', 'Centre: Ping An Finance Center'],
+      ['vietcombank tower', 'Centre: Vietcombank Tower'],
       ['jakarta', 'City Directory: Jakarta'],
       ['singapore', 'City Directory: Singapore'],
       ['hangzhou', 'City Directory: Hangzhou'],

@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   findCentre,
   findCentresByCity,
@@ -6,6 +8,7 @@ import {
   detectCentreInText,
   detectCityInText,
   resolveDynamicHandoff,
+  formatDefaultHandoff,
   CENTRES_DIRECTORY,
 } from '@/lib/centres-directory';
 import { POST } from '@/app/api/widget/message/route';
@@ -110,7 +113,8 @@ describe('Centres Directory & Dynamic Handoff Resolver', () => {
     expect(res.reply).toContain('+62 21 8063 1888');
     expect(res.reply).toContain('sales@ceosuite.com');
     expect(res.reply).not.toContain('Axiata Tower');
-    expect(res.options).toContain('Front Desk: Sahid Sudirman Center');
+    // The hotline is the answer: no buttons (they used to lead back into menus and loop).
+    expect(res.options).toBe('');
   });
 
   it('TEST-DH-07 resolveDynamicHandoff for city produces city centres list', () => {
@@ -130,6 +134,33 @@ describe('Centres Directory & Dynamic Handoff Resolver', () => {
     expect(res.reply).toContain('Indonesia Stock Exchange Tower 2');
     expect(res.reply).toContain('One Pacific Place');
     expect(res.reply).not.toContain('Centennial Tower');
+    // One button per centre, each opening that centre's card (the end of the CS flow)
+    expect(res.options).toBe(
+      'Sahid Sudirman Center|Centre: Sahid Sudirman Center, Axa Tower|Centre: Axa Tower, ' +
+        'Indonesia Stock Exchange Tower 2|Centre: Indonesia Stock Exchange Tower 2, One Pacific Place|Centre: One Pacific Place'
+    );
+  });
+
+  it('TEST-DH-17 Handoff without a known centre or city offers every city, and every button opens an intent of the CS flow', () => {
+    const flow = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'userjourney', 'UserJourney-CS-Support.json'), 'utf8')
+    );
+    const intentNames = new Set(flow.data.intents.map((i: any) => i.name));
+    const targets = (options: string) => (options ? options.split(', ').map((o) => o.split('|')[1]) : []);
+
+    const general = formatDefaultHandoff(true);
+    const cities = [...new Set(CENTRES_DIRECTORY.map((c) => c.city))];
+    expect(targets(general.options).sort()).toEqual(cities.map((c) => `City Directory: ${c}`).sort());
+
+    const perCity = cities.map((city) => resolveDynamicHandoff({ baseResponse: '[HANDOFF_REQUESTED]', city, isEn: true }));
+    const perCentre = CENTRES_DIRECTORY.map((c) =>
+      resolveDynamicHandoff({ baseResponse: '[HANDOFF_REQUESTED]', centre: c.name, isEn: true })
+    );
+    for (const res of [general, ...perCity, ...perCentre]) {
+      for (const target of targets(res.options || '')) {
+        expect(intentNames.has(target), `button target "${target}" is not an intent of the CS flow`).toBe(true);
+      }
+    }
   });
 
   it('TEST-DH-08 resolveDynamicHandoff in Indonesian generates Indonesian copy', () => {
@@ -225,8 +256,7 @@ describe('POST /api/widget/message — Dynamic Handoff & Memorization Integratio
     expect(json.reply).toContain('Sahid Sudirman Center (Jakarta)');
     expect(json.reply).toContain('+62 21 8063 1888');
     expect(json.reply).not.toContain('Axiata Tower');
-    expect(json.options).toBeDefined();
-    expect(json.options.some((o: any) => o.label === 'Contact Front Desk')).toBe(true);
+    expect(json.options).toBeUndefined();
   });
 
   it('TEST-DH-10 Request with email_center (Centennial Tower) returns Singapore handoff hotline', async () => {
@@ -292,8 +322,8 @@ describe('POST /api/widget/message — Dynamic Handoff & Memorization Integratio
     expect(res.reply).toContain('Sahid Sudirman Center (Jakarta)');
     expect(res.reply).toContain('+62 21 8063 1888');
     expect(res.reply).toContain('56th Floor Jl. Jenderal Sudirman No. 86');
-    // Appends the structured options
-    expect(res.options).toContain('Front Desk: Sahid Sudirman Center');
+    // No buttons after a centre hotline
+    expect(res.options).toBe('');
   });
 
   it('TEST-DH-13 resolveDynamicHandoff with English AI response preserves empathy and appends centre hotline', () => {
@@ -349,8 +379,8 @@ describe('POST /api/widget/message — Dynamic Handoff & Memorization Integratio
     expect(json.reply).toContain('3 Temasek Avenue');
     expect(json.reply).not.toContain('nanda@ceosuite.com');
     expect(json.emailCenter).toBe('sales@sg.ceosuite.com');
-    expect(json.options).toBeDefined();
-    expect(json.options.some((o: any) => o.label === 'Contact Front Desk')).toBe(true);
+    // The centre hotline is the answer: no buttons
+    expect(json.options ?? []).toEqual([]);
   });
 
   it('TEST-DH-15 Step 2 keyword handoff ("want to talk human agent") when humanHandoffEnabled is true queues and attaches Centennial Tower hotline', async () => {

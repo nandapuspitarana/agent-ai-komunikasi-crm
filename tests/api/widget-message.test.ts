@@ -172,6 +172,52 @@ describe('POST /api/widget/message — quick reply options', () => {
   });
 });
 
+describe('POST /api/widget/message — fixed replies and fallback language', () => {
+  const cityIntent = (metadata: any) =>
+    intent({
+      name: 'City Directory: Ho Chi Minh City',
+      trainingPhrases: ['saigon'],
+      response: 'Our centre in Ho Chi Minh City is below.',
+      options: 'Vietcombank Tower|Centre: Vietcombank Tower',
+      metadata,
+    });
+
+  it('TEST-AI-F05 typed phrase of a fixedReply intent skips the LLM even with AI on', async () => {
+    const { chatWithAgent } = await import('@/lib/ai-agent');
+    (chatWithAgent as any).mockClear();
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant({ aiEnabled: true }, [cityIntent({ fixedReply: true })]));
+    const json = await (await send('saigon', 'mobile_app')).json();
+    expect(chatWithAgent).not.toHaveBeenCalled();
+    expect(json.reply).toBe('Our centre in Ho Chi Minh City is below.');
+    expect(json.options).toEqual([{ label: 'Vietcombank Tower', value: 'Centre: Vietcombank Tower' }]);
+  });
+
+  it('TEST-AI-F05b typed phrase of an ordinary intent still goes to the LLM with AI on', async () => {
+    const { chatWithAgent } = await import('@/lib/ai-agent');
+    (chatWithAgent as any).mockClear();
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant({ aiEnabled: true }, [cityIntent({})]));
+    await send('saigon', 'mobile_app');
+    expect(chatWithAgent).toHaveBeenCalledTimes(1);
+  });
+
+  it('TEST-AI-F06 AI off, no match: the fallback follows the flow language (English)', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(
+      tenant({ activeFlow: { id: 'f1', name: 'Claire', config: { language: 'en' }, intents: [intent()] } })
+    );
+    const json = await (await send('what is the wifi password?', 'mobile_app')).json();
+    expect(json.reply).toMatch(/^Sorry, I didn’t understand your message/);
+    expect(json.reply).not.toMatch(/Maaf/);
+  });
+
+  it('TEST-AI-F06b AI off, no match: Indonesian flow keeps the Indonesian fallback', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(
+      tenant({ activeFlow: { id: 'f1', name: 'Claire', config: { language: 'id' }, intents: [intent()] } })
+    );
+    const json = await (await send('apa password wifi?', 'mobile_app')).json();
+    expect(json.reply).toMatch(/^Maaf, saya belum mengerti pesan Anda/);
+  });
+});
+
 describe('GET /api/widget/message — polling and sync', () => {
   it('returns 400 when sessionId is missing', async () => {
     const res = await GET(new NextRequest('http://localhost/api/widget/message'));
