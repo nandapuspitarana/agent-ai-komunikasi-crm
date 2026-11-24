@@ -561,7 +561,8 @@ export function formatSingleCentreHandoff(
     }
   }
 
-  const options = `Contact Front Desk|Front Desk: ${centre.name}, Facilities & Amenities|CS: Facilities & Amenities Menu, Other Centres in ${centre.city}|City Directory: ${centre.city}, Main Menu|Start / Main Menu`;
+  // The hotline above is the answer: no buttons. (They used to lead back into menus, which looped.)
+  const options = '';
 
   return { message: intro, options };
 }
@@ -611,8 +612,8 @@ export function formatCityCentresHandoff(
     }
   }
 
-  const centreOptions = centres.map((c) => `${c.name}|Front Desk: ${c.name}`).join(', ');
-  const options = `${centreOptions}, Other Cities|Locations: Select City, Main Menu|Start / Main Menu`;
+  // One button per centre, opening that centre's card in the CS flow (userjourney/UserJourney-CS-Support.json)
+  const options = centres.map((c) => `${c.name}|Centre: ${c.name}`).join(', ');
 
   return { message: intro, options };
 }
@@ -632,7 +633,9 @@ export function formatDefaultHandoff(isEn: boolean = true, humanHandoffEnabled: 
       : `[HANDOFF_REQUESTED]\n\nTim Layanan Pelanggan kami telah diberi tahu dan sedang bersiap untuk membantu Anda secara langsung. Tim kami akan segera bergabung ke ruang obrolan ini.\n\nUntuk bantuan mendesak, silakan pilih kota atau centre Anda di bawah ini untuk menghubungi front desk setempat:`;
   }
 
-  const options = `Jakarta|City Directory: Jakarta, Kuala Lumpur|City Directory: Kuala Lumpur, Singapore|City Directory: Singapore, Hong Kong|City Directory: Hong Kong, Shanghai|City Directory: Shanghai, Beijing|City Directory: Beijing, All Centres Directory|CS: Contact Directory All Locations, Main Menu|Start / Main Menu`;
+  // Every city, each opening its centre list in the CS flow
+  const cities = Array.from(new Set(CENTRES_DIRECTORY.map((c) => c.city)));
+  const options = cities.map((city) => `${city}|City Directory: ${city}`).join(', ');
 
   return { message: intro, options };
 }

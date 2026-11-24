@@ -760,8 +760,11 @@ export async function POST(req: NextRequest) {
         const userMsgLower = message.toLowerCase().trim();
         const lowerIntentName = (qnaMatch.name || '').toLowerCase().trim();
 
-        // Check if this is an explicit menu button click or fixed form/card UI
+        // Check if this is an explicit menu button click or fixed form/card UI.
+        // metadata.fixedReply: the flow marks answers the AI must not rewrite (menus, city lists, cards), so a
+        // typed match ("saigon") gets the same reply as the button instead of an AI paraphrase.
         const isMenuClick =
+          (qnaMatch.metadata as any)?.fixedReply === true ||
           userMsgLower === lowerIntentName ||
           userMsgLower.startsWith('cs:') ||
           userMsgLower.startsWith('faq:') ||
@@ -879,7 +882,9 @@ export async function POST(req: NextRequest) {
           aiReplyRaw += ' [HANDOFF_REQUESTED]';
         }
       } else {
-        aiReplyRaw = flowConfig?.defaultResponse || 'Maaf, saya belum mengerti pesan Anda. Apakah Anda ingin berbicara dengan agen kami? [HANDOFF_REQUESTED]';
+        aiReplyRaw = flowConfig?.defaultResponse || (isEn
+          ? 'Sorry, I didn’t understand your message. Would you like to speak with our team? [HANDOFF_REQUESTED]'
+          : 'Maaf, saya belum mengerti pesan Anda. Apakah Anda ingin berbicara dengan agen kami? [HANDOFF_REQUESTED]');
       }
     }
 

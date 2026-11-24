@@ -24,6 +24,7 @@
 | Anti-double-count tokens | ✅ **sudah** | Hanya akumulasi `llm_complete`, `embedding`, `eval` |
 | Rekonsiliasi dengan tagihan OpenAI asli | ⏳ fase 3 | — |
 | Budget / alert per tenant | ⏳ fase 4 | — |
+| Dashboard penagihan Super Admin (lintas tenant, CSV) | ✅ sudah | `src/app/[lang]/(dashboard)/admin/page.tsx`, `/api/admin/overview`, `docs/superpowers/specs/2026-11-19-admin-billing-dashboard-design.md` |
 
 ---
 
@@ -59,11 +60,11 @@
 
 - [ ] **T020** Ganti loop Python + `limit(5000)` dengan Postgres RPC/view, mis. `ai_cost_summary(tenant_id, from, to, group_by)` yang mengembalikan SUM token & `cost_usd` per hari / model / `request_type`.
 - [ ] **T021** Tabel rollup harian `ai_usage_daily (date, tenant_id, model_name, request_type, input_tokens, cached_input_tokens, output_tokens, cost_usd, request_count)` diisi cron (pg_cron atau scheduled job) — supaya query bulanan/tahunan tetap cepat.
-- [ ] **T022** Endpoint baru / perluasan di `api/observability.py`:
+- [ ] **T022** Endpoint baru / perluasan di `api/observability.py` — sebagian: `GET /observability/usage-by-tenant?from&to` sudah ada (lihat spec admin billing); month-to-date/proyeksi belum
   - `GET /observability/cost?tenant_id&from&to&group_by=day|model|type` (hilangkan batas `le=28`)
   - `GET /observability/cost/month-to-date?tenant_id` → `{spent_usd, projected_month_end_usd, budget_usd, pct}`
   - Proyeksi akhir bulan = `spent / hari_berjalan × jumlah_hari_bulan`.
-- [ ] **T023** Mode super-admin: agregat lintas tenant (`tenant_id` opsional) + ranking tenant termahal.
+- [x] **T023** Mode super-admin: agregat lintas tenant (`tenant_id` opsional) + ranking tenant termahal. — cakupan tepat: `GET /observability/dashboard` (`tenant_id` opsional, `all` = lintas tenant) mengembalikan daftar tenant yang diurutkan berdasarkan biaya; dashboard billing super-admin memakai `GET /observability/usage-by-tenant`, yang selalu lintas semua tenant dan TIDAK punya filter `tenant_id` ("ranking" = pengurutan tabel di UI, bukan endpoint ranking terpisah). Endpoint `/dashboard` masih terkena batas 28 hari / 5000 baris (lihat T020).
 
 ## Fase 3 — Integrasi OpenAI (rekonsiliasi tagihan asli) (~1 hari)
 
@@ -94,7 +95,7 @@ Tujuan: angka internal adalah **estimasi**; angka dari OpenAI adalah **tagihan s
   - Grafik biaya harian (data `by_day` sudah tersedia), breakdown per model & per `request_type` (chat / embedding / eval).
   - Pemilih periode: 7 hari / 30 hari / bulan ini / bulan lalu / custom.
   - Tampilkan baris "unpriced models" bila ada (T012).
-- [ ] **T051** Export CSV per periode (untuk invoicing ke tenant).
+- [x] **T051** Export CSV per periode (untuk invoicing ke tenant).
 - [ ] **T052** Konversi IDR opsional (kurs dari env `USD_IDR_RATE` atau API kurs), tampilkan sebagai sekunder — USD tetap sumber kebenaran.
 
 ## Fase 6 — Keamanan & bersih-bersih
@@ -103,7 +104,7 @@ Tujuan: angka internal adalah **estimasi**; angka dari OpenAI adalah **tagihan s
 - [ ] **T061** `src/app/api/dashboard/ai-cost/route.ts`: `encodeURIComponent(tenantId)`; validasi `days`; super-admin bisa pilih tenant.
 - [ ] **T062** `src/modules/ai/agent-proxy.ts` masih **mock** (usage = panjang string, bukan token) dan dipakai `src/app/api/agent/route.ts` → hapus atau arahkan ke `chatWithAgent()`.
 - [ ] **T063** Jalur `LOCAL_LLM_URL` di `src/lib/ai-agent.ts` melewati proxy → tidak tercatat. Bila dipakai, catat sebagai model `local/*` dengan biaya 0 agar volume tetap terlihat.
-- [ ] **T064** Retensi: `llm_prompt`/`llm_response` di `ai_trace_logs` dipangkas/dihapus setelah N hari (privasi + ukuran DB); kolom token & biaya tetap disimpan (atau cukup di rollup T021).
+- [x] **T064** Retensi: `llm_prompt`/`llm_response` di `ai_trace_logs` dipangkas/dihapus setelah N hari (privasi + ukuran DB); kolom token & biaya tetap disimpan (atau cukup di rollup T021). — purge kini mengosongkan isi percakapan > 28 hari, metrik disimpan 400 hari (migration 006).
 
 ## Fase 7 — Testing
 
@@ -130,3 +131,4 @@ Tujuan: angka internal adalah **estimasi**; angka dari OpenAI adalah **tagihan s
 | `AI_DAILY_COST_ALERT_USD` | ai-agent-proxy | Ambang alert global harian |
 | `OBSERVABILITY_SERVICE_TOKEN` | keduanya | Auth CRM → proxy (T060) |
 | `USD_IDR_RATE` | crm (opsional) | Tampilan kurs |
+| `BILLING_TIMEZONE` | keduanya | Zona batas periode tagihan, default `Asia/Jakarta` |

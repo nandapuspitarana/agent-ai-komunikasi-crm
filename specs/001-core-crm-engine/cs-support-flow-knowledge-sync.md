@@ -11,7 +11,6 @@ database on `docker compose up --build`, and how the widget/SDK language is reso
 | Centre details (address, phone, fax, email, website, map link, hours, convenience, amenities, description) | `userjourney/knowledge base/KB - List of Centres.json` | Single source of truth. Edit this file, nothing else, to change a centre. |
 | Per-centre guardrail documents | `userjourney/knowledge base/L2-centre-*.md` | Must quote the same phone and email as the JSON (enforced by test). |
 | Other KB documents (FAQ, playbooks, policies, regions, ...) | `userjourney/knowledge base/*.md` | Registered as RAG documents. |
-| Base journey (menus, city lists, service cards) | `userjourney/UserJourney-Agent.json` | Input of the build script. |
 | CS flow | `userjourney/UserJourney-CS-Support.json` | **Generated** by `userjourney/build_cs_support.js`; do not edit by hand. |
 
 Not used: `KB - List of Centres.xlsx` (superseded by the JSON), `md_locations/` (legacy copies, excluded from the
@@ -21,6 +20,12 @@ WhatsApp numbers are not part of any bot answer or indexed document.
 
 ## 2. Flow generation (`userjourney/build_cs_support.js`)
 
+The flow is deliberately small (since 2026-11-24): **Start -> city -> centre card**, and the centre card is the end of
+the journey. Earlier versions had 230 intents (FAQ, facilities, billing, one card per product per centre, front
+desk cards); 129 of them were unreachable, 176 buttons pointed at intents that did not exist, and "Start again" /
+menu buttons sent visitors in circles. Questions outside centre locations are now answered by the AI from the
+knowledge base.
+
 1. Loads `KB - List of Centres.json` and maps each centre to its bot name through a brand code
    (`AXA`, `OPP`, `IDX`, ...).
 2. Fills each centre's address, phone, fax, email, website, map link, hours, convenience, amenities and
@@ -28,47 +33,52 @@ WhatsApp numbers are not part of any bot answer or indexed document.
    - Markdown links inside KB addresses are reduced to their text.
    - A map link that is empty or truncated (`...`) is **not** shown.
    - Hours are shown as `Monday - Friday, 8:30 AM – 5:30 PM` from `opening_time` / `closing_time`.
-3. Builds, per centre, one card per product (`PO/MR/VO/DW Centre: <name>`) and a `Front Desk: <name>` card.
-4. Builds the city lists (`City Directory: <city>`) with each centre's address and hours.
-5. Builds the phone directory and the human-handoff reply per centre, grouped by city (not one number per country).
-6. Adds training phrases (English and Indonesian) so free text reaches the right intent (section 3).
-7. De-duplicates training phrases (section 4).
+3. Builds 38 intents: the start menu (12 city buttons), one list per city (one button per centre) and one card per
+   centre (`responseType: card`, no buttons).
+4. Adds training phrases (English and Indonesian) so free text reaches the right intent (section 3).
+5. Stops with an error when a phrase belongs to two intents or a button points at an intent that does not exist.
 
 ### Intent naming
 
-| Prefix | Meaning |
+| Name | Meaning |
 |---|---|
-| `PO Centre: <centre>` / `MR` / `VO` / `DW` | Centre card for Private office / Meeting room / Virtual office / Dedicated workstation |
-| `Front Desk: <centre>` | Front desk contact for that centre |
-| `City Directory: <city>` | Centres of a city with address and hours |
-| `Locations: Select City` | City picker |
-| `CS: Contact Directory All Locations` | Phone/email per centre |
-| `Facilities: Building Access & Access Cards` | Hours per city and access rules |
+| `Start / Main Menu` | Greeting and the 12 city buttons |
+| `City Directory: <city>` | Short sentence and one button per centre of that city |
+| `Centre: <centre>` | Centre card with every KB field; end of the journey |
+
+Centre names are the ones `src/lib/centres-directory.ts` uses (`Manara Maxis 36` is labelled `Menara Maxis 36` on
+buttons and cards), so the visitor's centre is remembered from `metadata.centre` and the handoff buttons line up.
+
+Every intent carries `metadata.fixedReply: true`. The widget (`src/app/api/widget/message/route.ts`) then answers
+with the intent text exactly as written, also when the visitor types the phrase instead of tapping the button,
+and never sends it to the AI. Before this, a typed city ("saigon") went to the AI for a paraphrase, and the AI
+replaced the city text with "I could not find that in my documents" while the buttons were right.
 
 ## 3. Question coverage
 
 | User asks | Reaches |
 |---|---|
-| "address / alamat / link lokasi / google maps / email / phone / jam buka / convenience / amenities / fasilitas" + centre name or brand code | that centre's card (`PO Centre: ...`) |
-| "centre jakarta", "kantor di jakarta", "lokasi jakarta", "email jakarta", ... | `City Directory: <city>` |
-| bare centre name (e.g. "centennial tower") | that centre's card |
-| bare city name (e.g. "jakarta") | `City Directory: <city>` |
-| "link lokasi", "email", "alamat", "google maps", "nomor telepon" without a centre | `Locations: Select City` |
-| "jam buka", "jam tutup", "opening hours", "jam operasional" without a centre | `Facilities: Building Access & Access Cards` (hours listed per city) |
+| "address / alamat / link lokasi / google maps / email / phone / jam buka / convenience / amenities / fasilitas / front desk / resepsionis" + centre name, nickname or brand code | that centre's card (`Centre: ...`) |
+| bare centre name, centre/center spelling, nicknames ("menara maxis 36", "indonesia stock exchange", "lotte center", "k11 atelier") | that centre's card |
+| "centre jakarta", "kantor di jakarta", "lokasi jakarta", "email jakarta", bare city name, aliases ("hcmc", "saigon", "makati", "korea") | `City Directory: <city>` |
+| greetings, "start again", "our centres", "locations", and "link lokasi", "email", "alamat", "nomor telepon", "jam buka" without a centre | `Start / Main Menu` (city buttons) |
+| anything else (services, prices, Wi-Fi, billing, ...) | the AI, using the knowledge base; with the tenant's AI off, the default reply in the flow language ("Sorry, I didn’t understand your message…" for `en`) and a handoff |
 
-The widget matches the first intent whose name or training phrase equals the message, so a phrase must have one owner.
+Brand codes are only used inside a question ("email AXA"), never alone: with the AI off the widget also matches
+phrases contained in a message, and "sun" or "opp" would hit ordinary words. For the same reason there are no
+2-letter aliases ("kl", "hk").
 
 ## 4. De-duplication rules
 
-- Intent names are unique (case-insensitive).
-- A training phrase belongs to exactly one intent: the intent **named** exactly like the phrase, otherwise the first
-  intent that lists it.
-- City Directory intents do not keep phrases that are centre names, so a centre name opens the card.
+- Every centre and every city exists exactly once; names, phrases and answers are unique (enforced by the build
+  script and by `TEST-CS-05` / `TEST-KB-10`).
+- Every intent except the start menu is reached by exactly one button, so the flow is a tree and cannot loop
+  (`TEST-CS-03`).
+- Handoff replies (`src/lib/centres-directory.ts`) only offer buttons that open intents of this flow: none after a
+  centre hotline, one per centre after a city hotline, one per city otherwise (`TEST-DH-17`).
 - The WordPress export (`ceosuite.WordPress.*-location.xml`) is indexed with: drafts dropped, one chunk per
   published slug, and every centre covered by the centres JSON skipped (including legacy slugs listed in
   `LEGACY_XML_SLUGS` in `scripts/lib/kb-lib.js`).
-- Product cards (PO/MR/VO/DW) intentionally repeat the same centre data; they are generated from the same
-  source, so they cannot drift.
 
 ## 5. Container start-up sync
 
@@ -142,20 +152,21 @@ If an Indonesian summary (`[Laporan Masalah ke Perusahaan]`) still appears, the 
 
 | File | Covers |
 |---|---|
-| `tests/api/flow-cs-support.test.ts` (`TEST-CS-01`..`20`) | Flow integrity, option transitions, centre cards against the KB (address, phone, hours, map link, email, convenience, amenities, description), free-text questions per centre and per city, centre-less questions, no WhatsApp, FAQ questions |
+| `tests/api/flow-cs-support.test.ts` (`TEST-CS-01`..`20`) | Flow shape (start -> city -> card, no loops, no back buttons, no duplicates, no dead buttons), centre cards against the KB (address, phone, hours, map link, email, convenience, amenities, description), free-text questions per centre and per city (AI on and off), centre-less questions, no WhatsApp |
+| `tests/api/dynamic-handoff.test.ts` (`TEST-DH-01`..`17`) | Centre lookup, handoff replies per centre / city, handoff buttons open intents of the CS flow |
 | `tests/api/kb-consistency.test.ts` (`TEST-KB-10`..`15`) | No duplicated names/phrases, centre vs city routing, WordPress export de-duplication, L2 documents match the JSON, no WhatsApp in documents |
 | `tests/api/sync-knowledge.test.ts` (`TEST-KB-01`..`05`) | Centres JSON chunks, superseded sources, dry-run plan, Dockerfile/compose wiring |
 | `tests/api/widget-contact-submit.test.ts` | Report summary language resolution |
+| `tests/api/widget-message.test.ts` (`TEST-AI-F05`, `F06`) | `fixedReply` intents skip the AI when typed; the AI-off default reply follows the flow language |
 
-Run everything with `npx vitest run`.
+Run everything with `npx vitest run`. On Windows, run it from a path with an upper-case drive letter (`C:\...`):
+from `c:\...` vitest loads itself twice and every file fails with "Vitest failed to find the current suite".
 
 ## Open items
 
 - `docker compose build` and the database part of `sync-knowledge.js` have not been run end to end. The Docker
   engine stopped responding during the first image build, and the sync was not pointed at the shared database.
   Run it against staging first.
-- Singapore Land Tower (`SLT`) and Nan Fung Tower (`WNF`) exist in the KB JSON but have no city menu entry or
-  centre card, so they are not answered by the flow.
 - Vietcombank Tower's `location_url` is truncated in the KB, and Ping An and Sunshine Financial Center have no
   `location_url`; their cards show no map link until the KB is completed.
 - Chunks are stored without embeddings (same as the previous registration script); retrieval quality depends on
