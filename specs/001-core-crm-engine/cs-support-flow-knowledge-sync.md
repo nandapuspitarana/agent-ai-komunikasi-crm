@@ -162,7 +162,10 @@ node scripts/e2e/cs-flow-all-branches.mjs https://cb242.ceosuite.com <tenant id>
 clicks the same paths in the real widget page with Playwright and fails when a visitor bubble shows anything but
 the clicked button's label. Buttons are `Label|Intent name`: the intent name is what the server receives, the label
 is what the visitor sees (`src/lib/quick-replies.ts` posts both; `ChatWindow.sendMessage(text, displayText)`).
-Before 2026-11-24 the bubble showed the intent name ("City Directory: Jakarta").
+The widget sends the label as `displayText` to `POST /api/widget/message`, which matches intents on `message` but
+stores the label (at most 200 characters, else `message`), so the agent inbox and restored history show what the
+visitor clicked. The walker also reads the stored messages back at the end of each path. Before 2026-11-24 the
+bubble and the inbox showed the intent name ("City Directory: Jakarta").
 
 `cs-flow-all-branches.mjs` opens one widget session per path from Start to each card (44 paths: 25 city ->
 centre, 19 FAQ -> topic -> answer), compares every reply's text and buttons with the flow JSON, and fails when an

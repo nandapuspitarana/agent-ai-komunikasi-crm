@@ -218,6 +218,37 @@ describe('POST /api/widget/message — fixed replies and fallback language', () 
   });
 });
 
+describe('POST /api/widget/message — quick-reply label in the inbox', () => {
+  const sendWithLabel = (message: string, displayText: unknown) =>
+    POST(
+      new NextRequest('http://localhost/api/widget/message', {
+        method: 'POST',
+        body: JSON.stringify({ tenantId: 't1', message, displayText, contactId: 'c1' }),
+      })
+    );
+  const savedUser = () =>
+    prismaMock.message.create.mock.calls.map((c: any) => c[0].data).find((d: any) => d.senderType === 'user');
+
+  it('TEST-AI-R17 a button click stores the label the visitor saw, but still matches the intent by its value', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant({}, [intent({ name: 'City Directory: Jakarta', response: 'Jakarta centres' })]));
+    const json = await (await sendWithLabel('City Directory: Jakarta', 'Jakarta')).json();
+
+    expect(savedUser().content).toBe('Jakarta'); // the agent inbox shows what the visitor clicked
+    expect(json.reply).toContain('Jakarta centres'); // the intent was still matched by its name
+    // the duplicate check compares against what is stored
+    expect(prismaMock.message.findFirst.mock.calls[0][0].where.content).toBe('Jakarta');
+  });
+
+  it('TEST-AI-R17b typed messages, and empty / non-string / oversized labels, store the message itself', async () => {
+    prismaMock.tenant.findUnique.mockResolvedValue(tenant());
+    for (const label of [undefined, '   ', 42, 'x'.repeat(201)]) {
+      prismaMock.message.create.mockClear();
+      await sendWithLabel('rooms', label);
+      expect(savedUser().content).toBe('rooms');
+    }
+  });
+});
+
 describe('GET /api/widget/message — polling and sync', () => {
   it('returns 400 when sessionId is missing', async () => {
     const res = await GET(new NextRequest('http://localhost/api/widget/message'));

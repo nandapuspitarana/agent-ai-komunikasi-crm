@@ -202,6 +202,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // A quick-reply button sends its value (often an intent name such as "City Directory: Jakarta") as `message`
+    // and the label the visitor clicked ("Jakarta") as `displayText`. Matching uses `message`; the stored message,
+    // which the agent inbox and the restored chat history show, is the label.
+    const displayText = typeof body.displayText === 'string' ? body.displayText.trim() : '';
+    const storedContent = displayText && displayText.length <= 200 ? displayText : message;
+
     // Verify tenant exists
     const tenant = await prisma.tenant.findUnique({
       where: { id: tenantId },
@@ -282,7 +288,7 @@ export async function POST(req: NextRequest) {
         where: {
           sessionId: currentSessionId,
           senderType: 'user',
-          content: message,
+          content: storedContent,
           createdAt: { gte: twoSecondsAgo },
         },
         orderBy: { createdAt: 'desc' },
@@ -332,7 +338,7 @@ export async function POST(req: NextRequest) {
       data: {
         sessionId: currentSessionId,
         senderType: 'user',
-        content: message,
+        content: storedContent,
       },
     });
 

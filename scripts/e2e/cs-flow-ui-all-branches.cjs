@@ -1,6 +1,7 @@
 // Clicks EVERY button path of the CS flow in the real widget UI (one fresh browser context per path).
 // After each click: the visitor bubble must equal the button label (never an intent name), and the bot's reply
-// must show the next buttons or, at the end, the card title.
+// must show the next buttons or, at the end, the card title. At the end of each path the messages stored on the
+// server (what the agent inbox shows) must be the clicked labels too.
 // Usage (from the repo root, on the deployed commit):
 //   node scripts/e2e/cs-flow-ui-all-branches.cjs . https://cb242.ceosuite.com <tenant id> <screenshot dir>
 const fs = require('fs');
@@ -30,6 +31,12 @@ walk('Start / Main Menu', []);
       const ctx = await browser.newContext({ viewport: { width: 420, height: 820 } });
       const page = await ctx.newPage();
       const where = path.map((p) => p.label).join(' > ');
+      let sessionId = null;
+      page.on('response', (r) => {
+        if (r.request().method() === 'POST' && r.url().includes('/api/widget/message')) {
+          r.json().then((j) => { if (j && j.sessionId) sessionId = j.sessionId; }).catch(() => {});
+        }
+      });
       try {
         await page.goto(`${base}/widget-ui?tenantId=${tenantId}`, { waitUntil: 'domcontentloaded' });
         const first = page.getByRole('button', { name: path[0].label, exact: true }).last();
@@ -54,6 +61,13 @@ walk('Start / Main Menu', []);
         const all = (await page.locator('.rounded-br-sm p').allInnerTexts()).map((t) => t.trim());
         const leaked = all.filter((t) => INTENT_NAME.test(t));
         if (leaked.length) failures.push(`${where}: intent names in bubbles: ${leaked.join(' | ')}`);
+        if (!sessionId) failures.push(`${where}: no sessionId seen`);
+        else {
+          const res = await ctx.request.get(`${base}/api/widget/message?sessionId=${sessionId}&tenantId=${tenantId}`);
+          const stored = ((await res.json()).messages || []).filter((m) => m.senderType === 'user').map((m) => m.content);
+          const want = path.map((p) => p.label);
+          if (JSON.stringify(stored) !== JSON.stringify(want)) failures.push(`${where}: stored ${JSON.stringify(stored)}, want ${JSON.stringify(want)}`);
+        }
         if (done < 2 || /Jakarta > Axa|Meeting Rooms & Events > How can I book/.test(where)) await page.screenshot({ path: `${outDir}/ui-branch-${done}.png` });
       } catch (e) {
         failures.push(`${where}: ${e.message.split('\n')[0]}`);
@@ -66,7 +80,7 @@ walk('Start / Main Menu', []);
   const t0 = Date.now();
   await Promise.all([1, 2, 3, 4].map(worker));
   console.log(`UI paths: ${paths.length}, clicks: ${clicks}, time: ${((Date.now() - t0) / 1000).toFixed(0)}s`);
-  console.log(failures.length ? `FAILURES (${failures.length}):\n` + failures.join('\n') : 'ALL UI BRANCHES PASS (every bubble shows the clicked label)');
+  console.log(failures.length ? `FAILURES (${failures.length}):\n` + failures.join('\n') : 'ALL UI BRANCHES PASS (every bubble and every stored message is the clicked label)');
   await browser.close();
   process.exit(failures.length ? 1 : 0);
 })();
