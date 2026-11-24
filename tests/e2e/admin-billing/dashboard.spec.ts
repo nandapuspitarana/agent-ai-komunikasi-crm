@@ -427,7 +427,7 @@ test.describe('SUPER_ADMIN billing dashboard (proxy OK)', () => {
       fs.mkdirSync(path.dirname(saved), { recursive: true });
       await dl.saveAs(saved);
       const buf = fs.readFileSync(saved);
-      expect([...buf.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
+      expect(Array.from(buf.subarray(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
       const text = buf.subarray(3).toString('utf8');
       expect(text).toContain('\r\n');
       expect(text.replace(/\r\n/g, '')).not.toMatch(/\n/);
