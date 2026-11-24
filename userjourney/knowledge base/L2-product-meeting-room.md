@@ -1,7 +1,5 @@
-# Product & Location Master Guide: CEO SUITE Meeting Rooms (All-in-One AI Agent Knowledge Base)
+# CEO SUITE Meeting Rooms: Product & Location Guide
 
-> **Document Layer:** Layer 1 (FAQ & Playbook) + Layer 2 (Product, All Centres, Room Inventory, Pricing Reference & Portal SOP)  
-> **Target Audience:** AI Concierge / RAG Knowledge Base / Customer Support & Sales Automation  
 > **Coverage:** 9 Countries • 11 Cities • 25 Centres • 78+ Meeting Rooms & Boardrooms  
 > **Last Updated:** November 2026  
 
@@ -63,9 +61,9 @@ Tersedia berdasarkan permintaan (*upon request*) dan dapat dikenakan biaya tamba
 
 Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam operasional, kontak, tarif referensi (*starting rate*), dan inventaris lengkap setiap ruangan meeting di sistem booking CEO SUITE.
 
-> **Catatan Penting untuk AI Agent terkait Harga & Jam:**
+> **Tentang Harga & Jam Operasional:**
 > - Harga yang tercantum di bawah adalah **Tarif Referensi Awal (*Starting Reference Rate*)** dari *Knowledge Base* resmi CEO SUITE. Tarif aktual bervariasi tergantung ukuran ruangan (Small Meeting Room vs Boardroom vs Theatre), durasi, pajak setempat, serta diskon member.
-> - Jika kolom *Jam Booking Ruangan* tertulis `Mengikuti Jam Centre` (atau `00:00–00:00` di database), maka jam operasional ruangan mengikuti jam buka–tutup centre tersebut.
+> - Jika kolom *Jam Booking Ruangan* tertulis `Mengikuti Jam Centre`, maka jam operasional ruangan mengikuti jam buka–tutup centre tersebut.
 
 ---
 
@@ -562,7 +560,7 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 
 ## 5. Tabel Ringkasan Cepat Tarif & Kontak Seluruh Centre (Quick Lookup Table)
 
-Tabel ini memudahkan AI Agent menjawab perbandingan harga awal dan kontak di seluruh Asia:
+Tabel ini membandingkan tarif awal, jumlah ruangan, kapasitas, dan kontak resmi di seluruh Asia:
 
 | Negara | Kota | Nama Centre | Kode | Jumlah Ruangan | Kapasitas (Pax) | Tarif Referensi Mulai Dari | Telepon Resmi | Email Resmi |
 | :--- | :--- | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
@@ -650,9 +648,9 @@ Berdasarkan kebijakan resmi di **CS Booking Portal**:
 
 ---
 
-## 7. Pertanyaan yang Sering Diajukan (Comprehensive FAQ for AI Agent)
+## 7. Pertanyaan yang Sering Diajukan
 
-| Pertanyaan User | Jawaban Standar AI Agent yang Tepat & Aman |
+| Pertanyaan | Jawaban |
 | :--- | :--- |
 | **"Apakah saya bisa sewa meeting room per jam?"** | "Ya, tentu bisa. Meeting room CEO SUITE dapat disewa per jam (*hourly*), setengah hari (*half-day*), maupun sehari penuh (*full-day*). Khusus untuk lokasi kami di Tiongkok (Shanghai, Beijing, Hangzhou), perhitungan sewa tersedia mulai per 30 menit." |
 | **"Apakah non-member bisa menyewa meeting room di CEO SUITE?"** | "Bisa. Meskipun Anda belum menjadi member CEO SUITE, Anda dapat memesan meeting room melalui formulir *Open Access Booking* di [https://booking.ceosuite.com](https://booking.ceosuite.com) atau menghubungi tim centre kami secara langsung." |
@@ -660,45 +658,37 @@ Berdasarkan kebijakan resmi di **CS Booking Portal**:
 | **"Ada meeting room kapasitas besar (30–50 orang) di Jakarta?"** | "Ya, untuk kapasitas besar di Jakarta tersedia di **CEO SUITE AXA Tower (Lantai 45, Kuningan)**: terdapat `AXA Classroom` (30 pax), `AXA Seminar Room` (30 pax), dan `AXA Theatre` (hingga 50 pax), selain `AXA Boardroom` (20 pax)." |
 | **"Apakah boleh masuk lebih awal untuk persiapan (setup)?"** | "Kami memberikan waktu toleransi (*leeway*) gratis selama **30 menit** sebelum jadwal booking Anda untuk persiapan. Jika memerlukan waktu lebih dari 30 menit, akan dikenakan biaya admin satu kali sesuai ketentuan centre." |
 | **"Bagaimana aturan pembatalan (cancellation policy) meeting room?"** | "Pembatalan **lebih dari 7 hari kerja** sebelum jadwal tidak dikenakan biaya (gratis). Pembatalan dalam **3–7 hari kerja** dikenakan biaya 50%. Sedangkan pembatalan **dalam 3 hari kerja** dikenakan biaya 100% dan harus menghubungi tim centre secara langsung." |
-| **"Kenapa jumlah ruangan di Profile dan Available Rooms di aplikasi sama?"** | "Di aplikasi CS Portal Mobile, indikator `ROOMS` pada halaman Profile dan daftar `Available Rooms` pada halaman Booking telah disinkronkan menggunakan filter lokasi klien aktif yang sama, sehingga menampilkan jumlah ruangan meeting yang tersedia di centre Anda secara akurat." |
 | **"Apakah tersedia Wi-Fi, TV, dan Video Conference?"** | "Ya, seluruh fasilitas kami dilengkapi Wi-Fi bisnis berkecepatan tinggi dan koneksi kabel, layar TV/monitor presentasi, serta *whiteboard*. Fasilitas *Video Conferencing* dan proyektor juga tersedia (beberapa ruangan sudah terpasang bawaan seperti di `Boardroom - Oxley` Singapura, `Chinachem Tower` Hong Kong, `K11 Training Boardroom` Hong Kong, dan `AXA Meeting Room 1` Jakarta, atau dapat disewa sebagai tambahan)." |
 | **"Bisakah pesan katering atau bawa makanan sendiri?"** | "Bisa keduanya. Tim centre kami dapat membantu menyediakan paket katering atau memesankan makanan dari restoran pilihan Anda (dengan *service charge*). Anda juga diperbolehkan membawa makanan/minuman sendiri dengan biaya layanan (*service/corkage fee*) yang berlaku." |
 
 ---
 
-## 8. Panduan Perilaku AI Agent (AI Behaviour Rules, Qualification & Escalation)
+## 8. Cara Memesan Meeting Room, Memilih Ruang yang Tepat & Permintaan Khusus
 
-### A. Alur Kualifikasi Saat User Ingin Memesan (Booking Qualification Flow)
-Ketika pengguna menyatakan minat untuk menyewa atau mengecek ketersediaan Meeting Room, AI Agent harus mengumpulkan 5 informasi kunci secara bertahap dan sopan:
-1. **Lokasi / Centre:** Kota dan gedung mana yang diinginkan? (Jika user hanya menyebut kota seperti "Jakarta" atau "Kuala Lumpur", bantu rekomendasikan centre terdekat berdasarkan area: misal SCBD → `IDX` / `OPP`, Sudirman → `SSC`, Kuningan → `AXA`).
-2. **Kapasitas (Jumlah Peserta):** Berapa orang (*pax*) yang akan hadir? (Gunakan ini untuk mencocokkan nama ruangan dari tabel di Bab 4).
-3. **Waktu Pelaksanaan:** Tanggal berapa, jam mulai, dan jam selesai (durasi)?
-4. **Kebutuhan Khusus:** Apakah memerlukan *video conferencing*, proyektor, katering, atau tata letak khusus (*classroom/theatre*)?
-5. **Data Kontak Pemesan:** Nama lengkap, nama perusahaan, alamat email, dan nomor telepon/WhatsApp.
+### A. Cara Memesan Meeting Room
+Pesan langsung di [https://booking.ceosuite.com](https://booking.ceosuite.com), atau kirimkan 5 informasi berikut kepada tim kami dan kami bantu cek ketersediaannya:
+1. **Kota & centre yang diinginkan.** Belum tahu centre mana? Sebutkan areanya: di Jakarta, area SCBD dilayani IDX Tower 2 dan One Pacific Place, Sudirman oleh Sahid Sudirman Center, dan Kuningan oleh AXA Tower.
+2. **Jumlah peserta.** Kami sesuaikan dengan kapasitas ruangan (lihat Bab 4 untuk kapasitas setiap ruangan).
+3. **Tanggal, jam mulai, dan jam selesai.**
+4. **Kebutuhan peralatan, katering, dan tata letak.** Misalnya *video conferencing*, proyektor, katering, atau tata letak *boardroom*, *classroom*, seminar, atau *theatre*.
+5. **Data kontak Anda.** Nama lengkap, nama perusahaan, alamat email, dan nomor telepon.
 
-### B. Aturan Tagging Sistem CRM (System Tags)
-Jika fitur klasifikasi dan ekstraksi diaktifkan pada *system prompt*:
-- Gunakan `[CLASS:warm]` jika user baru bertanya informasi umum tentang fasilitas/lokasi meeting room.
-- Gunakan `[CLASS:hot_lead]` jika user menanyakan harga spesifik, diskon, atau prosedur pembayaran.
-- Gunakan `[CLASS:booking]` jika user ingin memesan ruangan pada tanggal/jam tertentu sekarang.
-- Gunakan `[CLASS:support]` jika member menanyakan kendala portal, konversi paket, atau pembatalan.
-- Ekstrak data kontak di akhir pesan dengan format: `[DATA: name="Nama Lengkap", email="email@domain.com", phone="08123..."]`.
+### B. Apakah Meeting Room Pilihan yang Tepat?
+Meeting room cocok jika Anda membutuhkan:
+- Ruang rapat jangka pendek (per 30 menit, per jam, setengah hari, atau sehari penuh) tanpa menyewa kantor bulanan.
+- Ruang untuk wawancara, rapat direksi (*board meeting*), presentasi klien, pelatihan, atau *video conference*.
+- Ruang privat untuk menerima tamu atau rapat tim bagi klien Virtual Office atau Coworking.
 
-### C. Kapan AI Agent WAJIB Merekomendasikan Meeting Room
-- User membutuhkan ruang rapat jangka pendek (per jam / harian) tanpa harus menyewa kantor bulanan/tahunan.
-- User membutuhkan ruang wawancara kandidat, rapat direksi (*board meeting*), presentasi klien, pelatihan (*training*), atau *video conference*.
-- User adalah klien Virtual Office atau Coworking yang membutuhkan ruang privat sementara untuk bertemu tamu.
+Produk CEO SUITE lain mungkin lebih sesuai:
+- Ruang kerja permanen untuk tim setiap hari: **Serviced Office** atau **Dedicated Workstation**.
+- Meja kerja fleksibel untuk 1 orang di area bersama: **Coworking Day Pass / Monthly Pass**.
+- Alamat domisili perusahaan untuk legalitas tanpa memakai ruang rapat: **Virtual Office**.
 
-### D. Kapan AI Agent TIDAK Boleh Merekomendasikan Meeting Room
-- User mencari ruang kerja permanen setiap hari (rekomendasikan **Serviced Office** atau **Dedicated Workstation**).
-- User hanya mencari meja kerja fleksibel untuk 1 orang tanpa rapat tertutup (rekomendasikan **Coworking Day Pass / Monthly Pass**).
-- User hanya membutuhkan alamat domisili perusahaan untuk legalitas tanpa ruang rapat fisik (rekomendasikan **Virtual Office**).
-
-### E. Guardrails & Kapan Harus Eskalasi ke Agen Manusia (`[HANDOFF_REQUESTED]`)
-1. **Jangan Pernah Menjamin Ketersediaan Instan:** Selalu nyatakan bahwa ketersediaan slot ruangan bersifat dinamis (*real-time*) dan memerlukan pengecekan di [https://booking.ceosuite.com](https://booking.ceosuite.com) atau konfirmasi tim centre.
-2. **Jangan Mengarang Harga Final:** Selalu sebutkan harga sebagai *"mulai dari"* (*starting rate*) sesuai mata uang lokal di dokumen ini, dan informasikan bahwa tarif spesifik mengikuti ukuran ruangan serta durasi sewa.
-3. **Eskalasi ke Tim Manusia / CS jika:**
-   - Permintaan acara berskala besar (> 30–50 peserta) atau membutuhkan kustomisasi tata letak khusus.
-   - Permintaan pengecualian biaya pembatalan (*waiver cancellation fee* dalam H-3 hari kerja).
-   - Negosiasi paket harga korporat / *bulk booking*.
-   - Keluhan pelanggan atau kendala teknis pada akun portal yang terblokir (*Suspended*).
+### C. Ketersediaan, Harga & Permintaan Khusus
+- **Ketersediaan bersifat *real-time*.** Slot ruangan selalu berubah; cek di [https://booking.ceosuite.com](https://booking.ceosuite.com) atau minta konfirmasi tim centre.
+- **Harga adalah tarif referensi "mulai dari"** dalam mata uang lokal. Tarif akhir mengikuti ruangan, durasi sewa, pajak setempat, dan diskon member.
+- **Tim kami mengatur langsung bersama Anda untuk:**
+  - Acara berskala besar atau publik (lebih dari 30–50 peserta) dan tata letak khusus.
+  - Permintaan pembebasan biaya pembatalan (terutama dalam 3 hari kerja sebelum jadwal).
+  - Paket harga korporat / *bulk booking* dan paket lintas centre.
+  - Kendala akun portal (misalnya akun *Suspended*) dan pertanyaan tagihan.

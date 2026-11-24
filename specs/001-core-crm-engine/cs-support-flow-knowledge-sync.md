@@ -179,6 +179,9 @@ from `c:\...` vitest loads itself twice and every file fails with "Vitest failed
   `location_url`; their cards show no map link until the KB is completed.
 - The sync stores chunks without embeddings; `embed_missing_chunks.py` fills them in by hand afterwards. Doing
   it in the sync itself needs the proxy (it holds the embedding key), e.g. an ingest call per document.
-- The AI proxy searches chunks of every tenant ("DB not migrated yet — falling back to UNSCOPED search") until
-  its isolation migration (`match_document_chunks_scoped`) is applied.
+- RAG isolation: without the AI proxy's migration `002_rag_isolation.sql` the proxy searches the chunks of every
+  flow and tenant ("DB not migrated yet — falling back to UNSCOPED search"), so documents of deleted flows leak
+  into answers. After the migration it searches only rows whose `flow_id`/`tenant_id` columns match; run
+  `scripts/database/sql/004_rag_isolation_backfill.sql` once to fill those columns for older rows. The sync
+  writes them itself when the columns exist (`TEST-KB-03b`). Applied on server 242 on 2026-11-24.
 - The centre manager is in the KB but intentionally not shown to visitors.

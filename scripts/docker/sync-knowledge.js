@@ -242,6 +242,18 @@ async function syncKnowledge(prisma, plan, tenant, flow) {
     return;
   }
 
+  // RAG isolation columns (AI proxy migration 002): the proxy only searches chunks whose columns match the bot.
+  const isoRows = await prisma.$queryRawUnsafe(`
+    SELECT table_name::text AS table_name, column_name::text AS column_name FROM information_schema.columns
+     WHERE table_schema = 'public' AND table_name IN ('crm_documents', 'crm_document_chunks')
+       AND column_name IN ('flow_id', 'tenant_id', 'bot_name')`);
+  const isoKeys = { flowId: flow.id, tenantId: tenant.id, botName: BOT_NAME };
+  const docIso = lib.isolationColumns(isoRows, 'crm_documents', isoKeys);
+  const chunkIso = lib.isolationColumns(isoRows, 'crm_document_chunks', isoKeys);
+  if (!chunkIso.names.length) log('note: no RAG isolation columns yet; the AI proxy searches every flow\'s chunks');
+  const extraCols = iso => iso.names.map(n => `, ${n}`).join('');
+  const extraArgs = (iso, first) => iso.names.map((_, k) => `, $${first + k}`).join('');
+
   // Pre-parsed spreadsheet chunks already in the vector store (taken before this flow's rows are cleared).
   const reused = {};
   for (const d of plan.docs.filter(x => x.reuseFromDb)) {
@@ -274,9 +286,9 @@ async function syncKnowledge(prisma, plan, tenant, flow) {
       category: d.category, tags: d.tags, description: d.description,
     };
     await prisma.$executeRawUnsafe(`
-      INSERT INTO public.crm_documents (id, filename, file_type, source_url, metadata, status, chunk_count, error_message, created_at, updated_at)
-      VALUES ($1::uuid, $2, $3, NULL, $4::jsonb, 'ready', $5, NULL, NOW(), NOW())`,
-      docUuid, d.file, d.ext, JSON.stringify(docMeta), chunks.length);
+      INSERT INTO public.crm_documents (id, filename, file_type, source_url, metadata, status, chunk_count, error_message, created_at, updated_at${extraCols(docIso)})
+      VALUES ($1::uuid, $2, $3, NULL, $4::jsonb, 'ready', $5, NULL, NOW(), NOW()${extraArgs(docIso, 6)})`,
+      docUuid, d.file, d.ext, JSON.stringify(docMeta), chunks.length, ...docIso.values);
 
     for (let i = 0; i < chunks.length; i++) {
       const chunkMeta = JSON.stringify({
@@ -284,9 +296,9 @@ async function syncKnowledge(prisma, plan, tenant, flow) {
         chunk_index: i, category: d.category, tags: d.tags,
       });
       await prisma.$executeRawUnsafe(`
-        INSERT INTO public.crm_document_chunks (id, document_id, chunk_index, content, embedding, metadata, created_at)
-        VALUES ($1::uuid, $2::uuid, $3, $4, NULL, $5::jsonb, NOW())`,
-        crypto.randomUUID(), docUuid, i, chunks[i], chunkMeta);
+        INSERT INTO public.crm_document_chunks (id, document_id, chunk_index, content, embedding, metadata, created_at${extraCols(chunkIso)})
+        VALUES ($1::uuid, $2::uuid, $3, $4, NULL, $5::jsonb, NOW()${extraArgs(chunkIso, 6)})`,
+        crypto.randomUUID(), docUuid, i, chunks[i], chunkMeta, ...chunkIso.values);
       await prisma.$executeRawUnsafe(
         `INSERT INTO public.documents (content, metadata, embedding) VALUES ($1, $2::jsonb, NULL)`, chunks[i], chunkMeta);
     }
