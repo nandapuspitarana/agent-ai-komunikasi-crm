@@ -51,6 +51,8 @@ function buildPlan() {
   const docs = [];
   const skipped = [];
   const kbHasher = crypto.createHash('sha256');
+  // A new chunker reloads the knowledge base even when no file changed
+  kbHasher.update(`chunker ${lib.CHUNKER_VERSION}`);
 
   for (const file of files) {
     const filePath = path.join(KB_DIR, file);

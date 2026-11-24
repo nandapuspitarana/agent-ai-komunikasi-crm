@@ -121,6 +121,13 @@ Admin workflow: update `KB - List of Centres.json` (and documents), run `docker 
    `scripts/database/register_all_knowledge_base.js` does). **Run `scripts/maintenance/embed_missing_chunks.py`
    after every sync that reloads the knowledge base** (see Operations): RAG search skips chunks without an
    embedding, so until then the AI answers "I don't have enough information" to every knowledge base question.
+   - Markdown documents are split by `chunkMarkdown` (`scripts/lib/kb-lib.js`) at `#`/`##`/`###` headings, long
+     sections at paragraphs (max 1200 characters). Horizontal rules are dropped, a section with under 20
+     characters of text (a bare heading) is joined to the next one, and continuation chunks repeat the section
+     heading. Before 2026-11-24, 89 of 1167 chunks on 242 were only `[Document: ...]` plus `---` or a heading; for
+     short queries they took all five RAG slots and pushed the real answer out.
+   - `CHUNKER_VERSION` is part of the knowledge base hash: bump it when chunking changes, so the next start
+     reloads the chunks (then embed them).
    - The centres JSON becomes one chunk per centre with every field.
    - `KB - Pricing Table.xlsx` cannot be parsed here; its existing chunks are reused from the database.
    - A warning is logged when a second flow with the same name exists for the tenant.
@@ -147,7 +154,13 @@ docker compose logs web | grep sync-knowledge
 docker cp scripts/maintenance/embed_missing_chunks.py ai-agent-proxy:/tmp/
 docker exec ai-agent-proxy python /tmp/embed_missing_chunks.py --flow-id <flow id> --dry-run
 docker exec ai-agent-proxy python /tmp/embed_missing_chunks.py --flow-id <flow id>
+# after a deploy: walk EVERY button branch of the live widget (from the repo root, on the deployed commit)
+node scripts/e2e/cs-flow-all-branches.mjs https://cb242.ceosuite.com <tenant id>
 ```
+
+`cs-flow-all-branches.mjs` opens one widget session per path from Start to each card (44 paths: 25 city ->
+centre, 19 FAQ -> topic -> answer), compares every reply's text and buttons with the flow JSON, and fails when an
+intent is unreachable. It exits non-zero on any difference.
 
 A healthy start logs the flow action, `knowledge base synced: N documents, M chunks` and
 `result: activeFlow="..." language=en` per tenant. The flow id is in the `updated with N intents (<flow id>)`
@@ -177,7 +190,7 @@ If an Indonesian summary (`[Laporan Masalah ke Perusahaan]`) still appears, the 
 | `tests/api/flow-cs-support.test.ts` (`TEST-CS-01`..`23`) | Flow shape (start -> city -> card and start -> FAQ -> topic -> answer, FAQ button first, no loops, no back buttons, no duplicates, no dead buttons, no `,` or `|` in buttons), centre cards against the KB (address, phone, hours, map link, email, convenience, amenities, description), FAQ topics and answers against the official FAQ file word for word, typed FAQ questions, free-text questions per centre and per city (AI on and off), centre-less questions, no WhatsApp |
 | `tests/api/dynamic-handoff.test.ts` (`TEST-DH-01`..`17`) | Centre lookup, handoff replies per centre / city, handoff buttons open intents of the CS flow |
 | `tests/api/kb-consistency.test.ts` (`TEST-KB-10`..`15`) | No duplicated names/phrases, centre vs city routing, WordPress export de-duplication, L2 documents match the JSON, no WhatsApp in documents |
-| `tests/api/sync-knowledge.test.ts` (`TEST-KB-01`..`05`) | Centres JSON chunks, superseded sources, dry-run plan, Dockerfile/compose wiring |
+| `tests/api/sync-knowledge.test.ts` (`TEST-KB-01`..`08`) | Centres JSON chunks, superseded sources, RAG isolation columns, no centre manager names, no empty or heading-only chunks, no lost text, headings on continuation chunks, `CHUNKER_VERSION` in the KB hash, dry-run plan, Dockerfile/compose wiring |
 | `tests/api/widget-contact-submit.test.ts` | Report summary language resolution |
 | `tests/api/widget-message.test.ts` (`TEST-AI-F05`, `F06`) | `fixedReply` intents skip the AI when typed; the AI-off default reply follows the flow language |
 
