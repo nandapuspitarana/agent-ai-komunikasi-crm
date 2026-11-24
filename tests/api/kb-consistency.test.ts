@@ -139,4 +139,35 @@ describe('Knowledge base has one consistent version of every centre', () => {
     // legacy per-centre copies (md_locations/) are not registered anywhere; keep them out of the image
     expect(ignore).toContain('userjourney/knowledge base/md_locations');
   });
+
+  it('TEST-KB-16 Meeting room guides name a room as having a projector or video conferencing only when its table row lists it', () => {
+    // The FAQ row "projectors are built into select rooms (such as `Boardroom - Oxley` ...)" made the bot say the
+    // Oxley boardroom has a projector; its room table lists Screen Mirroring, WiFi and Video Conference only.
+    const failures: string[] = [];
+    for (const file of ['L2-product-meeting-room-en.md', 'L2-product-meeting-room.md']) {
+      const lines = fs.readFileSync(path.join(kbDir, file), 'utf8').split('\n');
+      // Room table rows: | n | **`Room name`** | capacity | hours | type | facilities |
+      const facilities = new Map<string, string>();
+      for (const l of lines) {
+        const m = l.match(/^\|\s*\d+\s*\|\s*\*\*`([^`]+)`\*\*\s*\|.*\|([^|]*)\|\s*$/);
+        if (m) facilities.set(m[1], (facilities.get(m[1]) || '') + m[2]);
+      }
+      expect(facilities.size, file).toBeGreaterThan(50);
+      for (const [n, l] of lines.entries()) {
+        if (/^\|\s*\d+\s*\|/.test(l)) continue; // the tables themselves
+        const rooms = Array.from(l.matchAll(/`([^`]+)`/g), (m) => m[1]).filter((r) => facilities.has(r));
+        for (const [word, facility] of [[/projector|proyektor/i, 'Projector'], [/video conferenc/i, 'Video Conference']] as const) {
+          if (!word.test(l)) continue;
+          // Rooms named in the same sentence as the feature must have it
+          for (const sentence of l.split(/(?<=[.;])\s+/)) {
+            if (!word.test(sentence)) continue;
+            for (const r of rooms.filter((x) => sentence.includes(`\`${x}\``))) {
+              if (!facilities.get(r)!.includes(facility)) failures.push(`${file}:${n + 1} ${r} named with ${facility}`);
+            }
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([]);
+  });
 });
