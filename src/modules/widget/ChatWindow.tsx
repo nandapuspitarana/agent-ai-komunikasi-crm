@@ -262,6 +262,7 @@ export function ChatWindow({
           sessionId: serverSessionId,
           tenantId,
           message: messageText,
+          displayText: displayText?.trim() || undefined,
           contactId: localSessionId.current,
           channel: 'widget',
           email_center: userProfile.emailCenter || undefined,

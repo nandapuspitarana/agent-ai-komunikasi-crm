@@ -78,6 +78,8 @@ describe('toLegacyHtml', () => {
     expect(win).toMatch(/addMessage\(displayText\?\.trim\(\) \|\| messageText, 'user'\)/);
     // the request still carries the value (intent name)
     expect(win).toMatch(/message: messageText,/);
+    // ...and the label, which the server stores so the agent inbox shows what the visitor clicked
+    expect(win).toMatch(/displayText: displayText\?\.trim\(\) \|\| undefined,/);
     // welcome buttons rendered by ChatUI pass the label too
     const ui = read('src/components/chat/ChatUI.tsx');
     expect(ui).toContain('onClick={() => onSendMessage(value, label)}');
