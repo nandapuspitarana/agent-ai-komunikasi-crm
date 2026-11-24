@@ -79,7 +79,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Jakarta
 - **Alamat:** 45th Floor, AXA Tower, Jl. Prof. Dr. Satrio Kav. 18, Kuningan City, Setiabudi, Jakarta 12940, Indonesia
 - **Telepon:** `+62 21 3005 3500` | **Fax:** `+62 21 3005 3600`
-- **Centre Manager:** Mirna Pulungan
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Jakarta`)
 - **Tarif Referensi:** Mulai `IDR 200,000 / jam`
 - **Keunggulan Lokasi:** Terintegrasi langsung dengan mal Kuningan City, Denpasar Residence, berada di jantung Segitiga Emas Kuningan & kawasan kedutaan besar.
@@ -99,7 +98,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Jakarta
 - **Alamat:** 56th Floor, Sahid Sudirman Center, Jl. Jenderal Sudirman No. 86, Jakarta 10220, Indonesia
 - **Telepon:** `+62 21 8063 1888` | **Fax:** `+62 21 8063 1999`
-- **Centre Manager:** Camelia Pratiwi
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Jakarta`)
 - **Tarif Referensi:** Mulai `IDR 200,000 / jam`
 - **Keunggulan Lokasi:** Lantai 56 di salah satu gedung tertinggi di Jakarta, dekat stasiun MRT Setiabudi Astra, terhubung dengan Grand Sahid Jaya Hotel & Sahid Sudirman Residence.
@@ -117,7 +115,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Jakarta
 - **Alamat:** 15th Floor, One Pacific Place, Jl. Jend. Sudirman Kav. 52-53 (SCBD), Jakarta 12190, Indonesia
 - **Telepon:** `+62 21 2550 2550` | **Fax:** `+62 21 2550 2555`
-- **Centre Manager:** Shinta Permatasari
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Jakarta`)
 - **Tarif Referensi:** Mulai `IDR 200,000 / jam`
 - **Keunggulan Lokasi:** Satu kompleks dengan hotel bintang 5 The Ritz-Carlton Pacific Place dan mal premium Pacific Place di jantung SCBD, dekat MRT Istora Mandiri.
@@ -134,7 +131,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Jakarta
 - **Alamat:** 17th Floor, Indonesia Stock Exchange (IDX) Tower 2, Jl. Jend. Sudirman Kav. 52-53, Jakarta 12190, Indonesia
 - **Telepon:** `+62 21 515 7777` | **Fax:** `+62 21 515 7799`
-- **Centre Manager:** Camelia Pratiwi
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Jakarta`)
 - **Tarif Referensi:** Mulai `IDR 200,000 / jam`
 - **Keunggulan Lokasi:** Gedung paling ikonik di pusat keuangan Indonesia (Bursa Efek Indonesia), berseberangan dengan Pacific Place dan akses langsung ke MRT Istora Mandiri.
@@ -172,7 +168,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Singapore
 - **Alamat:** 21st Floor, 3 Temasek Avenue, Singapore 039190
 - **Telepon:** `+65 6829 7000` | **Fax:** `+65 6829 7070`
-- **Centre Manager:** Shander Lim
 - **Jam Operasional:** `09:00 – 18:00` (`Asia/Singapore`)
 - **Tarif Referensi:** Mulai `SGD 100 / jam`
 - **Keunggulan Lokasi:** 2 menit jalan kaki ke Promenade MRT Station (Circle & Downtown Line), dekat Suntec Convention Centre, dengan pemandangan Marina Bay tanpa halangan dari *reception*, *lounge*, dan *boardroom*.
@@ -189,7 +184,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Singapore
 - **Alamat:** 37th Floor, 50 Raffles Place, Singapore 048623
 - **Telepon:** `+65 6829 7000` | **Fax:** `+65 6829 7070`
-- **Centre Manager:** Christina Lim
 - **Jam Operasional:** `09:00 – 18:00` (`Asia/Singapore`)
 - **Keunggulan Lokasi:** Tepat di sebelahnya Raffles Place MRT Station dan 100 meter dari Boat Quay di jantung distrik finansial Singapura.
 - **Daftar Ruangan di Singapore Land Tower (1 Ruangan):**
@@ -212,7 +206,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Kuala Lumpur
 - **Alamat:** Level 26, Menara Maxis, Kuala Lumpur City Centre (KLCC), 50088 Kuala Lumpur, Malaysia
 - **Telepon:** `+60 3 2615 2688` | **Fax:** `+60 3 2615 2699`
-- **Centre Manager:** Carrie Law
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Kuala_Lumpur`)
 - **Tarif Referensi:** Mulai `MYR 150 / jam`
 - **Keunggulan Lokasi:** Bersebelahan langsung dengan Menara Kembar Petronas (Petronas Twin Towers), Suria KLCC Mall, dan akses jalan kaki tertutup ke stasiun LRT KLCC.
@@ -227,7 +220,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Kuala Lumpur
 - **Alamat:** Level 36, Menara Maxis, Kuala Lumpur City Centre (KLCC), 50088 Kuala Lumpur, Malaysia
 - **Telepon:** `+60 3 2615 0000` | **Fax:** `+60 3 2615 0088`
-- **Centre Manager:** Carrie Law
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Kuala_Lumpur`)
 - **Tarif Referensi:** Mulai `MYR 150 / jam`
 - **Daftar Ruangan di Menara Maxis Level 36 (4 Ruangan):**
@@ -243,7 +235,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Kuala Lumpur
 - **Alamat:** Level 35-02 (East Wing), Q Sentral, 2A Jalan Stesen Sentral 2, KL Sentral, 50470 Kuala Lumpur, Malaysia
 - **Telepon:** `+60 3 2731 9388` | **Fax:** `+60 3 2731 9399`
-- **Centre Manager:** Sy Chiann Pan
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Kuala_Lumpur`)
 - **Tarif Referensi:** Mulai `MYR 150 / jam`
 - **Keunggulan Lokasi:** Gedung Green Building berstatus MSC di pusat transportasi terbesar KL Sentral (terhubung langsung ke kereta ekspres KLIA, MRT, LRT, Monorail, KTM).
@@ -257,7 +248,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Kuala Lumpur
 - **Alamat:** 27th Floor, Axiata Tower, 9 Jalan Stesen Sentral 5, KL Sentral, 50470 Kuala Lumpur, Malaysia
 - **Telepon:** `+60 3 2776 6888` | **Fax:** `+60 3 2776 6999`
-- **Centre Manager:** Jessy Woo
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Kuala_Lumpur`)
 - **Tarif Referensi:** Mulai `MYR 150 / jam`
 - **Daftar Ruangan di Axiata Tower (4 Ruangan):**
@@ -283,7 +273,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Bangkok
 - **Alamat:** 23rd Floor, Athenee Tower, 63 Wireless Road, Lumpini, Pathumwan, Bangkok 10330, Thailand
 - **Telepon:** `+66 2 126 8000` | **Fax:** `+66 2 126 8080`
-- **Centre Manager:** Pim Kamonchanok
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Bangkok`)
 - **Tarif Referensi:** Mulai `THB 1,050 / jam`
 - **Keunggulan Lokasi:** Terletak strategis di antara Sukhumvit dan Silom di kawasan diplomatik Wireless Road, terhubung langsung ke Ploenchit BTS Skytrain Station dan hotel bintang lima The Athenee Hotel.
@@ -309,7 +298,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Manila
 - **Alamat:** 37th Floor, LKG Tower, 6801 Ayala Avenue, Makati City, Manila 1226, Philippines
 - **Telepon:** `+63 2 8859 2888` | **Fax:** `+63 2 8859 2882`
-- **Centre Manager:** Patricia Cruz
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Manila`)
 - **Tarif Referensi:** Mulai `PHP 1,100 / jam`
 - **Keunggulan Lokasi:** Berada di lantai 37 gedung Grade-A di jantung distrik finansial Makati (Ayala Avenue), dekat Bursa Efek Filipina dan hotel bintang lima (Manila Peninsula, Shangri-La Makati).
@@ -334,7 +322,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Hanoi
 - **Alamat:** 29th Floor, East Tower, Lotte Center Hanoi, 54 Lieu Giai Street, Giang Vo Ward (Ba Dinh District), Hanoi 100000, Vietnam
 - **Telepon:** `+84 24 3267 3999` | **Fax:** `+84 24 3267 3799`
-- **Centre Manager:** Pham Thi Huyen Hau
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Ho_Chi_Minh`)
 - **Tarif Referensi:** Mulai **`VND 760,000 / jam`**
 - **Keunggulan Lokasi:** Gedung pencakar langit ikonik yang terintegrasi dengan Lotte Department Store dan Lotte Hotel bintang 5, dekat kawasan kedutaan besar di Hanoi.
@@ -349,7 +336,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Ho Chi Minh City
 - **Alamat:** Level 21, Vietcombank Tower, No. 5 Me Linh Square, District 1 (Sai Gon Ward), Ho Chi Minh City 70000, Vietnam
 - **Telepon:** `+84 28 3827 1988` | **Fax:** `+84 28 3827 1899`
-- **Centre Manager:** Hana Nguyen
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Ho_Chi_Minh`)
 - **Tarif Referensi:** Mulai **`VND 850,000 / jam`**
 - **Keunggulan Lokasi:** Dirancang oleh Pelli Clarke Pelli Architects (AS) di jantung District 1 dengan pemandangan memukau ke Sungai Saigon (*Saigon River View*).
@@ -375,7 +361,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Shanghai SWF
 - **Alamat:** 28th Floor, Shanghai World Financial Center, 100 Century Avenue, Pudong New Area, Shanghai 200120, China
 - **Telepon:** `+86 21 2052 0666` | **Fax:** `+86 21 2052 0777`
-- **Centre Manager:** Sherry Chen
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Shanghai`)
 - **Tarif Referensi:** Mulai **`RMB 210 / 30 menit`** (setara `RMB 420 / jam`)
 - **Keunggulan Lokasi:** Gedung 101 lantai yang sangat ikonik di Lujiazui Pudong, satu gedung dengan Park Hyatt Shanghai, dekat Lujiazui Metro Station.
@@ -392,7 +377,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Shanghai LJZ
 - **Alamat:** 18th Floor, Shanghai Lujiazui Finance Plaza, 826 Century Avenue, Pudong, Shanghai 200120, China
 - **Telepon:** `+86 21 5116 5116` | **Fax:** `+86 21 5116 7116`
-- **Centre Manager:** Sherry Chen
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Shanghai`)
 - **Tarif Referensi:** Mulai **`RMB 300 / 30 menit`** (setara `RMB 600 / jam`)
 - **Keunggulan Lokasi:** Berada di Lujiazui Free Trade Zone dengan balkon eksklusif di lantai 18 dan akses langsung ke 2 stasiun metro (Dongchang Road & Shangcheng Road).
@@ -408,7 +392,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Shanghai HKN
 - **Alamat:** 47th Floor, Hong Kong New World Tower (K11), 300 Huaihai Zhong Road, Puxi, Shanghai 200021, China
 - **Telepon:** `+86 21 5116 2888` | **Fax:** `+86 21 5116 2882`
-- **Centre Manager:** Lena Li
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Shanghai`)
 - **Tarif Referensi:** Mulai **`RMB 75 / 30 menit`** (setara `RMB 150 / jam`)
 - **Keunggulan Lokasi:** Lantai 47 gedung ikonik 61 lantai di Huaihai Zhong Road (Puxi), terhubung langsung dengan K11 Art Mall dan Huangpi Nan Lu Metro Station.
@@ -424,7 +407,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Beijing
 - **Alamat:** 31st Floor, Sunshine Financial Center, No. 33 Jinghui Avenue, Chaoyang District, Beijing 100020, China
 - **Telepon:** `+86 10 8660 8888` | **Fax:** `+86 10 8660 8999`
-- **Centre Manager:** Bella Ren
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Shanghai`)
 - **Tarif Referensi:** Mulai **`RMB 200 / 30 menit`** (setara `RMB 400 / jam`)
 - **Daftar Ruangan di Sunshine Financial Center Beijing (4 Ruangan):**
@@ -440,7 +422,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Beijing
 - **Alamat:** 10th Floor, East Tower, B-12 Jianguomenwai Avenue, Chaoyang District, Beijing 100022, China
 - **Telepon:** `+86 10 5909 2988` | **Fax:** `+86 10 5909 2999`
-- **Centre Manager:** Bella Ren
 - **Jam Operasional:** `08:30 – 17:30` (`Asia/Shanghai`)
 - **Tarif Referensi:** Mulai **`RMB 200 / 30 menit`** (setara `RMB 400 / jam`)
 - **Keunggulan Lokasi:** Terhubung langsung dengan stasiun subway Yong'anli di Jianguomenwai Avenue.
@@ -473,7 +454,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Hong Kong
 - **Alamat:** Level 7, K11 ATELIER Victoria Dockside, 18 Salisbury Road, Tsim Sha Tsui, Hong Kong
 - **Telepon:** `+852 3166 6166` | **Fax:** `+852 3166 6266`
-- **Centre Manager:** Esther Yee
 - **Jam Operasional:** `09:00 – 18:00` (`Asia/Hong_Kong`)
 - **Tarif Referensi:** Mulai **`HKD 550 / jam`**
 - **Keunggulan Lokasi:** Kompleks tepi laut (*waterfront*) ikonik dengan pemandangan langsung ke Victoria Harbour, satu kompleks dengan hotel bintang 6 Rosewood Hong Kong dan K11 MUSEA.
@@ -490,7 +470,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** Work Wise Hong Kong WCC (CEO SUITE Network)
 - **Alamat:** Level 5 to Level 7, No. 34–37 Connaught Road Central, Central, Hong Kong
 - **Telepon:** `+852 3166 6160` | **Fax:** `+852 3166 6266`
-- **Centre Manager:** Carman Chan
 - **Jam Operasional:** `09:00 – 18:00` (`Asia/Hong_Kong`)
 - **Tarif Referensi:** Mulai **`HKD 380 / jam`**
 - **Keunggulan Lokasi:** Hanya 3 menit jalan kaki dari Central MTR Station dan Airport Express Hong Kong Station.
@@ -529,7 +508,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Seoul
 - **Alamat:** 15th Floor, Kyobo Building, 1 Jongno, Jongno-gu, Seoul 03154, South Korea
 - **Telepon:** `+82 2 2010 8888` | **Fax:** `+82 2 2010 8899`
-- **Centre Manager:** Alice Lim
 - **Jam Operasional:** `09:00 – 18:00` (`Asia/Seoul`)
 - **Tarif Referensi:** Mulai `KRW 60,000 / jam`
 - **Keunggulan Lokasi:** Gedung paling ikonik di Gwanghwamun CBD Seoul, akses langsung ke Subway Line 1, 2, dan 5, dekat Istana Kepresidenan (Blue House) dan kedutaan besar.
@@ -545,7 +523,6 @@ Berikut adalah daftar menyeluruh seluruh lokasi CEO SUITE beserta alamat, jam op
 - **Perusahaan:** CEO SUITE Seoul
 - **Alamat:** 29th Floor, Parnas Tower, 521 Teheran-ro, Gangnam-gu, Seoul 06164, South Korea
 - **Telepon:** `+82 2 2097 8288` | **Fax:** `+82 2 2097 8299`
-- **Centre Manager:** Erica Kim
 - **Jam Operasional:** `09:00 – 18:00` (`Asia/Seoul`)
 - **Tarif Referensi:** Mulai `KRW 60,000 / jam`
 - **Keunggulan Lokasi:** Terhubung langsung dengan Grand InterContinental Seoul Parnas Hotel, Starfield COEX Mall, City Airport Terminal, serta Subway Line 2 (Samseong Station) & Line 9, dengan pemandangan Sungai Han (*Han-river View*).

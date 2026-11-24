@@ -184,4 +184,4 @@ from `c:\...` vitest loads itself twice and every file fails with "Vitest failed
   into answers. After the migration it searches only rows whose `flow_id`/`tenant_id` columns match; run
   `scripts/database/sql/004_rag_isolation_backfill.sql` once to fill those columns for older rows. The sync
   writes them itself when the columns exist (`TEST-KB-03b`). Applied on server 242 on 2026-11-24.
-- The centre manager is in the KB but intentionally not shown to visitors.
+- Centre manager names stay only in `KB - List of Centres.json` (`centre_manager`) and are never indexed: the centre cards and the centres chunks leave them out, and the meeting room guides no longer list them (2026-11-24). `TEST-KB-03c` fails if a document the sync loads names one.
