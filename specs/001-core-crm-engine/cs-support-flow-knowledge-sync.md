@@ -33,18 +33,30 @@ knowledge base.
    - Markdown links inside KB addresses are reduced to their text.
    - A map link that is empty or truncated (`...`) is **not** shown.
    - Hours are shown as `Monday - Friday, 8:30 AM – 5:30 PM` from `opening_time` / `closing_time`.
-3. Builds 38 intents: the start menu (12 city buttons), one list per city (one button per centre) and one card per
-   centre (`responseType: card`, no buttons).
-4. Adds training phrases (English and Indonesian) so free text reaches the right intent (section 3).
-5. Stops with an error when a phrase belongs to two intents or a button points at an intent that does not exist.
+3. Builds 38 location intents: the start menu (FAQ button first, then 12 city buttons), one list per city (one
+   button per centre) and one card per centre (`responseType: card`, no buttons).
+4. Builds the FAQ menu from `L1-faq-ceosuite-official-website.md` (the official ceosuite.com FAQ, 19 questions):
+   **Start -> FAQ -> topic -> answer card**. One topic per `## n.` section of the file (labels in
+   `faqTopicLabels`, in file order), one button per `### Qn:` question, and an answer card that shows the official
+   answer word for word (markdown lists and links rendered as HTML) and ends the journey. 26 intents, 64 in all.
+   `L1-faq-common-visitor-questions.md` is not used here: it is operator-neutral research that quotes other
+   operators, so it stays RAG-only.
+5. Adds training phrases (English and Indonesian) so free text reaches the right intent (section 3).
+6. Stops with an error when a phrase belongs to two intents, a button points at an intent that does not exist, or a
+   button label or target contains `,` or `|`: the widget splits options on `,` (`src/lib/quick-replies.ts`), so
+   commas are removed from FAQ question buttons ("What is a co-working space or shared office?"). The card title
+   keeps the original question.
 
 ### Intent naming
 
 | Name | Meaning |
 |---|---|
-| `Start / Main Menu` | Greeting and the 12 city buttons |
+| `Start / Main Menu` | Greeting, the FAQ button and the 12 city buttons |
 | `City Directory: <city>` | Short sentence and one button per centre of that city |
 | `Centre: <centre>` | Centre card with every KB field; end of the journey |
+| `FAQ` | One button per FAQ topic |
+| `FAQ: <topic>` | One button per question of that topic |
+| `FAQ: <question>` | Answer card (official text); end of the journey |
 
 Centre names are the ones `src/lib/centres-directory.ts` uses (`Manara Maxis 36` is labelled `Menara Maxis 36` on
 buttons and cards), so the visitor's centre is remembered from `metadata.centre` and the handoff buttons line up.
@@ -62,6 +74,8 @@ replaced the city text with "I could not find that in my documents" while the bu
 | bare centre name, centre/center spelling, nicknames ("menara maxis 36", "indonesia stock exchange", "lotte center", "k11 atelier") | that centre's card |
 | "centre jakarta", "kantor di jakarta", "lokasi jakarta", "email jakarta", bare city name, aliases ("hcmc", "saigon", "makati", "korea") | `City Directory: <city>` |
 | greetings, "start again", "our centres", "locations", and "link lokasi", "email", "alamat", "nomor telepon", "jam buka" without a centre | `Start / Main Menu` (city buttons) |
+| "faq", "faqs", "frequently asked questions", "pertanyaan umum", "tanya jawab" | `FAQ` (topic buttons) |
+| an FAQ question typed exactly as written (case and the final "?" do not matter) | that question's answer card |
 | anything else (services, prices, Wi-Fi, billing, ...) | the AI, using the knowledge base; with the tenant's AI off, the default reply in the flow language ("Sorry, I didn’t understand your message…" for `en`) and a handoff |
 
 Brand codes are only used inside a question ("email AXA"), never alone: with the AI off the widget also matches
@@ -160,7 +174,7 @@ If an Indonesian summary (`[Laporan Masalah ke Perusahaan]`) still appears, the 
 
 | File | Covers |
 |---|---|
-| `tests/api/flow-cs-support.test.ts` (`TEST-CS-01`..`20`) | Flow shape (start -> city -> card, no loops, no back buttons, no duplicates, no dead buttons), centre cards against the KB (address, phone, hours, map link, email, convenience, amenities, description), free-text questions per centre and per city (AI on and off), centre-less questions, no WhatsApp |
+| `tests/api/flow-cs-support.test.ts` (`TEST-CS-01`..`23`) | Flow shape (start -> city -> card and start -> FAQ -> topic -> answer, FAQ button first, no loops, no back buttons, no duplicates, no dead buttons, no `,` or `|` in buttons), centre cards against the KB (address, phone, hours, map link, email, convenience, amenities, description), FAQ topics and answers against the official FAQ file word for word, typed FAQ questions, free-text questions per centre and per city (AI on and off), centre-less questions, no WhatsApp |
 | `tests/api/dynamic-handoff.test.ts` (`TEST-DH-01`..`17`) | Centre lookup, handoff replies per centre / city, handoff buttons open intents of the CS flow |
 | `tests/api/kb-consistency.test.ts` (`TEST-KB-10`..`15`) | No duplicated names/phrases, centre vs city routing, WordPress export de-duplication, L2 documents match the JSON, no WhatsApp in documents |
 | `tests/api/sync-knowledge.test.ts` (`TEST-KB-01`..`05`) | Centres JSON chunks, superseded sources, dry-run plan, Dockerfile/compose wiring |

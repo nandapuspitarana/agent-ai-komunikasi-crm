@@ -95,8 +95,8 @@
           "jam operasional"
         ],
         "responseType": "options",
-        "response": "Hello, I’m Claire from CEO SUITE Customer Support. Choose a city to see our centres and their details, or type your question.",
-        "options": "Jakarta|City Directory: Jakarta, Kuala Lumpur|City Directory: Kuala Lumpur, Singapore|City Directory: Singapore, Hong Kong|City Directory: Hong Kong, Shanghai|City Directory: Shanghai, Beijing|City Directory: Beijing, Hangzhou|City Directory: Hangzhou, Seoul|City Directory: Seoul, Bangkok|City Directory: Bangkok, Manila|City Directory: Manila, Hanoi|City Directory: Hanoi, Ho Chi Minh City|City Directory: Ho Chi Minh City",
+        "response": "Hello, I’m Claire from CEO SUITE Customer Support. Open FAQ for common questions, choose a city to see our centres and their details, or type your question.",
+        "options": "FAQ|FAQ, Jakarta|City Directory: Jakarta, Kuala Lumpur|City Directory: Kuala Lumpur, Singapore|City Directory: Singapore, Hong Kong|City Directory: Hong Kong, Shanghai|City Directory: Shanghai, Beijing|City Directory: Beijing, Hangzhou|City Directory: Hangzhou, Seoul|City Directory: Seoul, Bangkok|City Directory: Bangkok, Manila|City Directory: Manila, Hanoi|City Directory: Hanoi, Ho Chi Minh City|City Directory: Ho Chi Minh City",
         "metadata": {
           "category": "Locations",
           "fixedReply": true
@@ -5223,6 +5223,434 @@
           "fixedReply": true,
           "centre": "Vietcombank Tower",
           "city": "Ho Chi Minh City"
+        }
+      },
+      {
+        "name": "FAQ",
+        "trainingPhrases": [
+          "FAQ",
+          "faqs",
+          "frequently asked questions",
+          "frequently asked question",
+          "common questions",
+          "pertanyaan umum",
+          "pertanyaan yang sering ditanyakan",
+          "tanya jawab"
+        ],
+        "responseType": "options",
+        "response": "Frequently asked questions. Choose a topic.",
+        "options": "Serviced Office|FAQ: Serviced Office, Coworking & Dedicated Desk|FAQ: Coworking & Dedicated Desk, Virtual Office|FAQ: Virtual Office, Meeting Rooms & Events|FAQ: Meeting Rooms & Events, Equipment & Catering|FAQ: Equipment & Catering, Internet & Wi-Fi|FAQ: Internet & Wi-Fi",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true
+        }
+      },
+      {
+        "name": "FAQ: Serviced Office",
+        "trainingPhrases": [
+          "FAQ: Serviced Office"
+        ],
+        "responseType": "options",
+        "response": "Frequently asked questions about Serviced Office. Choose a question to see the answer.",
+        "options": "What is a serviced office?|FAQ: What is a serviced office?, Why would I need a serviced office?|FAQ: Why would I need a serviced office?, Are serviced offices better value than traditional office space?|FAQ: Are serviced offices better value than traditional office space?, Why choose CEO SUITE?|FAQ: Why choose CEO SUITE?",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Serviced Office"
+        }
+      },
+      {
+        "name": "FAQ: Coworking & Dedicated Desk",
+        "trainingPhrases": [
+          "FAQ: Coworking & Dedicated Desk"
+        ],
+        "responseType": "options",
+        "response": "Frequently asked questions about Coworking & Dedicated Desk. Choose a question to see the answer.",
+        "options": "What is a co-working space or shared office?|FAQ: What is a co-working space or shared office?, Do I need a co-working space?|FAQ: Do I need a co-working space?, What are the differences between standard co-working space and a dedicated workstation?|FAQ: What are the differences between standard co-working space and a dedicated workstation?",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Coworking & Dedicated Desk"
+        }
+      },
+      {
+        "name": "FAQ: Virtual Office",
+        "trainingPhrases": [
+          "FAQ: Virtual Office"
+        ],
+        "responseType": "options",
+        "response": "Frequently asked questions about Virtual Office. Choose a question to see the answer.",
+        "options": "What is a virtual office?|FAQ: What is a virtual office?, Why would I need a virtual office?|FAQ: Why would I need a virtual office?, Can I upgrade my virtual office to a serviced office with CEO SUITE?|FAQ: Can I upgrade my virtual office to a serviced office with CEO SUITE?",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Virtual Office"
+        }
+      },
+      {
+        "name": "FAQ: Meeting Rooms & Events",
+        "trainingPhrases": [
+          "FAQ: Meeting Rooms & Events"
+        ],
+        "responseType": "options",
+        "response": "Frequently asked questions about Meeting Rooms & Events. Choose a question to see the answer.",
+        "options": "How can I book a venue?|FAQ: How can I book a venue?, Can I get access to the venue early to set-up?|FAQ: Can I get access to the venue early to set-up?, Can my event go beyond the business hours of your center?|FAQ: Can my event go beyond the business hours of your center?",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Meeting Rooms & Events"
+        }
+      },
+      {
+        "name": "FAQ: Equipment & Catering",
+        "trainingPhrases": [
+          "FAQ: Equipment & Catering"
+        ],
+        "responseType": "options",
+        "response": "Frequently asked questions about Equipment & Catering. Choose a question to see the answer.",
+        "options": "Does CEO SUITE rent out presentation equipment?|FAQ: Does CEO SUITE rent out presentation equipment?, Do you provide technical assistance?|FAQ: Do you provide technical assistance?, Does CEO SUITE provide catering services?|FAQ: Does CEO SUITE provide catering services?, Can we bring in our own food and beverages?|FAQ: Can we bring in our own food and beverages?, Are you able to provide staff for my event?|FAQ: Are you able to provide staff for my event?",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Equipment & Catering"
+        }
+      },
+      {
+        "name": "FAQ: Internet & Wi-Fi",
+        "trainingPhrases": [
+          "FAQ: Internet & Wi-Fi"
+        ],
+        "responseType": "options",
+        "response": "Frequently asked questions about Internet & Wi-Fi. Choose a question to see the answer.",
+        "options": "Is wired/wireless internet access available?|FAQ: Is wired/wireless internet access available?",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Internet & Wi-Fi"
+        }
+      },
+      {
+        "name": "FAQ: What is a serviced office?",
+        "trainingPhrases": [
+          "FAQ: What is a serviced office?",
+          "What is a serviced office?",
+          "What is a serviced office"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>What is a serviced office?</div><div class='small'>Also known as managed offices, business centers and executive suites, serviced offices provide fully-equipped facilities managed by a service facility management company. They empower businesses, from start-ups to small-, medium-sized enterprises and large-scale companies to rent office spaces that are suitable and customizable to their needs. Naturally, a serviced office room can cater to as few as one individual and as many as 20 persons.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Serviced Office",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Why would I need a serviced office?",
+        "trainingPhrases": [
+          "FAQ: Why would I need a serviced office?",
+          "Why would I need a serviced office?",
+          "Why would I need a serviced office"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Why would I need a serviced office?</div><div class='small'>With minimal to no capital investment needed in leasing a serviced office, you can enjoy immediate access to fully furnished and well-equipped office without losing time and focus on growing your business. This modern approach to office space provides a complete business solution, and is increasingly popular with small firms and start-ups. However, due to serviced offices’ complete and fully-equipped nature, even large-scale companies find that business support services have considerable appeal.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Serviced Office",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Are serviced offices better value than traditional office space?",
+        "trainingPhrases": [
+          "FAQ: Are serviced offices better value than traditional office space?",
+          "Are serviced offices better value than traditional office space?",
+          "Are serviced offices better value than traditional office space"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Are serviced offices better value than traditional office space?</div><div class='small'>This really depends on several varying factors, such as location, building facilities and the included amenities. On its own, traditional office space may be less expensive than serviced offices but you’d only be getting an empty space. Additional expenses with traditional office space usually include overheads such as building dues, electricity, office space set-up, IT set-up, office furniture, telephone lines and office space interiors. Serviced office spaces are offered at a higher price because they already include all of these costs. Most importantly, serviced office spaces buy you more time for your business so you can focus on the more important matters and keep your business running smoothly.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Serviced Office",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Why choose CEO SUITE?",
+        "trainingPhrases": [
+          "FAQ: Why choose CEO SUITE?",
+          "Why choose CEO SUITE?",
+          "Why choose CEO SUITE"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Why choose CEO SUITE?</div><div class='small'>We’re Asia’s only one-stop Serviced Office Provider, run by multi-cultural industry experts. For more than 29 years, our predominantly female team have provided premium workplace solutions at reasonable rates, helping businesses of all sizes to expand throughout Asia with a minimum of culture shock. Located in some of the most prestigious buildings in the Asia-Pacific region, we offer an unparalleled range of services, from sourcing the right local business partners to legal accounting, payroll and IT. We leverage our broad connections and experience to enable you to make an impact in a region where every city has its own regulations, culture and ways of conducting business. By joining one CEO SUITE location, you are supported at our premium locations across Asia.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Serviced Office",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: What is a co-working space or shared office?",
+        "trainingPhrases": [
+          "FAQ: What is a co-working space or shared office?",
+          "What is a co-working space, or shared office?",
+          "What is a co-working space, or shared office",
+          "What is a co-working space or shared office"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>What is a co-working space, or shared office?</div><div class='small'>In a nutshell, the term refers to a space that provides fully equipped and fully furnished workstations that are ready for use and perfect for entrepreneurs and freelancers who choose not to work from home, and/or branch office/s. Co-working spaces are offered at a much lower price than traditional working spaces and offer more flexibility with daily, weekly and monthly access. Facilities such as mail handling, telephone, internet and admin support can all be made available.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Coworking & Dedicated Desk",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Do I need a co-working space?",
+        "trainingPhrases": [
+          "FAQ: Do I need a co-working space?",
+          "Do I need a co-working space?",
+          "Do I need a co-working space"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Do I need a co-working space?</div><div class='small'>For many entrepreneurs, working from home can be a lonely experience. Co-working environments have risen in popularity because they provide opportunities for networking with other small business owners and professional freelancers. They also offer a wealth of resources and the chance to connect with potential partners, clients and even outsource tasks. Co-working spaces offer entrepreneurs the most cost-effective way to launch their business as it costs them less than renting their own office. It also allows them the flexibility of scaling up or down to suit their business needs.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Coworking & Dedicated Desk",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: What are the differences between standard co-working space and a dedicated workstation?",
+        "trainingPhrases": [
+          "FAQ: What are the differences between standard co-working space and a dedicated workstation?",
+          "What are the differences between standard co-working space and a dedicated workstation?",
+          "What are the differences between standard co-working space and a dedicated workstation"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>What are the differences between standard co-working space and a dedicated workstation?</div><div class='small'>Co-working space is available by the day, week and month during office hours. A co-working client has access to either an unassigned work desk or workspace in a common area such as a business lounge with high-speed internet access. A dedicated workstation offers greater exclusivity, with 24/7 access to their own assigned workspace.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Coworking & Dedicated Desk",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: What is a virtual office?",
+        "trainingPhrases": [
+          "FAQ: What is a virtual office?",
+          "What is a virtual office?",
+          "What is a virtual office"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>What is a virtual office?</div><div class='small'>A virtual office is a substitute for the traditional work environment, and delivers results through the web, telephone and other technologies. Virtual offices operate without any actual physical office space; all operations (whether internal or external business processes and communication) are performed via the Internet and phone lines. Employee(s) work remotely and perform daily office tasks with the use of software and application tools dependent on the Internet. Most virtual offices offer a business address for postal communication and secretarial support.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Virtual Office",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Why would I need a virtual office?",
+        "trainingPhrases": [
+          "FAQ: Why would I need a virtual office?",
+          "Why would I need a virtual office?",
+          "Why would I need a virtual office"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Why would I need a virtual office?</div><div class='small'>Although a virtual office is not a universal solution for every business, there are many good reasons why it makes sense to consider getting one. For lean start-ups that are still testing the waters: the less capital you spend, the better. Establishing a virtual office kick-starts your most important business operations and gives you the advantage of having a prestigious business address to present to your clients and business prospects. Even with SMEs, a virtual office helps lower overheads by eliminating the cost of a physical office for your small group of workers. When it comes to large-scale businesses, branching out internationally may be one of your goals. When exploring a totally different market, a virtual office can be the best solution.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Virtual Office",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Can I upgrade my virtual office to a serviced office with CEO SUITE?",
+        "trainingPhrases": [
+          "FAQ: Can I upgrade my virtual office to a serviced office with CEO SUITE?",
+          "Can I upgrade my virtual office to a serviced office with CEO SUITE?",
+          "Can I upgrade my virtual office to a serviced office with CEO SUITE"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Can I upgrade my virtual office to a serviced office with CEO SUITE?</div><div class='small'>Yes, you can. In fact, CEO SUITE welcomes upgrades and downgrades of your availed package. One of the things that separates us from our competitors is that our clients can customize their office solutions in accordance with their changing requirements.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Virtual Office",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: How can I book a venue?",
+        "trainingPhrases": [
+          "FAQ: How can I book a venue?",
+          "How can I book a venue?",
+          "How can I book a venue"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>How can I book a venue?</div><div class='small'>There are several different ways to book a venue with us:<br/>• Online, via our web form or booking portal: <a href='https://booking.ceosuite.com' target='_blank'>https://booking.ceosuite.com</a><br/>• Call or email our business center. Visit <a href='https://www.ceosuite.com/locations/' target='_blank'>https://www.ceosuite.com/locations/</a> for contact details.<br/>• WeChat (China Only)<br/><br/>When making your booking, please tell us:<br/>• Your name and business name<br/>• Date of event<br/>• Time of booking<br/>• Number of participants<br/>• Equipment needed<br/>• Set-up requirements<br/>• Any other pertinent information regarding your event</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Meeting Rooms & Events",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Can I get access to the venue early to set-up?",
+        "trainingPhrases": [
+          "FAQ: Can I get access to the venue early to set-up?",
+          "Can I get access to the venue early to set-up?",
+          "Can I get access to the venue early to set-up"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Can I get access to the venue early to set-up?</div><div class='small'>Yes, we extend a 30-minute leeway for all clients. Beyond that, we charge a small one-time admin fee that varies for each center.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Meeting Rooms & Events",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Can my event go beyond the business hours of your center?",
+        "trainingPhrases": [
+          "FAQ: Can my event go beyond the business hours of your center?",
+          "Can my event go beyond the business hours of your center?",
+          "Can my event go beyond the business hours of your center"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Can my event go beyond the business hours of your center?</div><div class='small'>Yes. Please note that some of our centers are in buildings with centralized AC systems that automatically turn off after business hours, and additionally charges may apply to turn on the AC.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Meeting Rooms & Events",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Does CEO SUITE rent out presentation equipment?",
+        "trainingPhrases": [
+          "FAQ: Does CEO SUITE rent out presentation equipment?",
+          "Does CEO SUITE rent out presentation equipment?",
+          "Does CEO SUITE rent out presentation equipment"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Does CEO SUITE rent out presentation equipment?</div><div class='small'>Yes, we have in-house presentation equipment available for rent (high-definition displays, projectors, conference speakerphones, video conferencing equipment, and whiteboards).</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Equipment & Catering",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Do you provide technical assistance?",
+        "trainingPhrases": [
+          "FAQ: Do you provide technical assistance?",
+          "Do you provide technical assistance?",
+          "Do you provide technical assistance"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Do you provide technical assistance?</div><div class='small'>Yes, we’ll help out in whatever way we can to make your event a success. Our IT specialists and/or office assistants can help in setting-up any presentation equipment.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Equipment & Catering",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Does CEO SUITE provide catering services?",
+        "trainingPhrases": [
+          "FAQ: Does CEO SUITE provide catering services?",
+          "Does CEO SUITE provide catering services?",
+          "Does CEO SUITE provide catering services"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Does CEO SUITE provide catering services?</div><div class='small'>Yes, we do. Once you get in touch with us, our manager can send you a list of food items and cuisines to choose from. If you would prefer food from a specific establishment, we can order it for you, a service charge on top of your food bill may be applicable.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Equipment & Catering",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Can we bring in our own food and beverages?",
+        "trainingPhrases": [
+          "FAQ: Can we bring in our own food and beverages?",
+          "Can we bring in our own food and beverages?",
+          "Can we bring in our own food and beverages"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Can we bring in our own food and beverages?</div><div class='small'>Yes, with applicable service and corkage fees depending on your food items and if you require assistance on food service or beverage refills.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Equipment & Catering",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Are you able to provide staff for my event?",
+        "trainingPhrases": [
+          "FAQ: Are you able to provide staff for my event?",
+          "Are you able to provide staff for my event?",
+          "Are you able to provide staff for my event"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Are you able to provide staff for my event?</div><div class='small'>You can request for waiters to be assigned to your event if you select a catering package. You can ask our office assistants for occasional tasks, but they can’t be assigned for the whole duration of the event as they need to attend to other clients within our business centers. You can also request for our secretaries to record minutes of the meeting on your behalf for a small fee.</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Equipment & Catering",
+          "source": "L1-faq-ceosuite-official-website.md"
+        }
+      },
+      {
+        "name": "FAQ: Is wired/wireless internet access available?",
+        "trainingPhrases": [
+          "FAQ: Is wired/wireless internet access available?",
+          "Is wired/wireless internet access available?",
+          "Is wired/wireless internet access available"
+        ],
+        "responseType": "card",
+        "response": "<div class='card'><div class='card-title'>Is wired/wireless internet access available?</div><div class='small'>Yes, all our facilities are equipped with both enterprise-grade wired and wireless internet access (high-speed Wi-Fi).</div></div>",
+        "options": "",
+        "metadata": {
+          "category": "FAQ",
+          "fixedReply": true,
+          "topic": "Internet & Wi-Fi",
+          "source": "L1-faq-ceosuite-official-website.md"
         }
       }
     ]
