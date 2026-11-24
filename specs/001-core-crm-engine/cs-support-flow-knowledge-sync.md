@@ -104,7 +104,9 @@ Admin workflow: update `KB - List of Centres.json` (and documents), run `docker 
 4. **Knowledge documents**: when the hash of the knowledge base folder differs from `flow.metadata.kbHash`,
    the flow's documents are replaced in `crm_agent_KnowledgeDocument`, `public.crm_documents`,
    `public.crm_document_chunks` and `public.documents` (chunks are stored without embeddings, as
-   `scripts/database/register_all_knowledge_base.js` does).
+   `scripts/database/register_all_knowledge_base.js` does). **Run `scripts/maintenance/embed_missing_chunks.py`
+   after every sync that reloads the knowledge base** (see Operations): RAG search skips chunks without an
+   embedding, so until then the AI answers "I don't have enough information" to every knowledge base question.
    - The centres JSON becomes one chunk per centre with every field.
    - `KB - Pricing Table.xlsx` cannot be parsed here; its existing chunks are reused from the database.
    - A warning is logged when a second flow with the same name exists for the tenant.
@@ -127,10 +129,16 @@ docker compose exec web node scripts/docker/sync-knowledge.js --list-tenants
 node scripts/docker/sync-knowledge.js --dry-run
 # what happened at start
 docker compose logs web | grep sync-knowledge
+# after "knowledge base synced": embed the new chunks, inside the AI proxy (its model, key and DB connection)
+docker cp scripts/maintenance/embed_missing_chunks.py ai-agent-proxy:/tmp/
+docker exec ai-agent-proxy python /tmp/embed_missing_chunks.py --flow-id <flow id> --dry-run
+docker exec ai-agent-proxy python /tmp/embed_missing_chunks.py --flow-id <flow id>
 ```
 
 A healthy start logs the flow action, `knowledge base synced: N documents, M chunks` and
-`result: activeFlow="..." language=en` per tenant.
+`result: activeFlow="..." language=en` per tenant. The flow id is in the `updated with N intents (<flow id>)`
+line. On server 242 (2026-11-24) the CS flow is `601a23c2-136a-4e8c-9c55-5560d4e36384`; its 1172 chunks
+took about a minute to embed.
 
 ## 6. Language resolution
 
@@ -169,6 +177,8 @@ from `c:\...` vitest loads itself twice and every file fails with "Vitest failed
   Run it against staging first.
 - Vietcombank Tower's `location_url` is truncated in the KB, and Ping An and Sunshine Financial Center have no
   `location_url`; their cards show no map link until the KB is completed.
-- Chunks are stored without embeddings (same as the previous registration script); retrieval quality depends on
-  the AI proxy.
+- The sync stores chunks without embeddings; `embed_missing_chunks.py` fills them in by hand afterwards. Doing
+  it in the sync itself needs the proxy (it holds the embedding key), e.g. an ingest call per document.
+- The AI proxy searches chunks of every tenant ("DB not migrated yet — falling back to UNSCOPED search") until
+  its isolation migration (`match_document_chunks_scoped`) is applied.
 - The centre manager is in the KB but intentionally not shown to visitors.
