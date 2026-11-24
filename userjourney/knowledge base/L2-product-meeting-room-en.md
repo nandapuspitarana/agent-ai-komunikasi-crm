@@ -1,7 +1,5 @@
-# Product & Location Master Guide: CEO SUITE Meeting Rooms (All-in-One AI Agent Knowledge Base)
+# CEO SUITE Meeting Rooms: Product & Location Guide
 
-> **Document Layer:** Layer 1 (FAQ & Playbook) + Layer 2 (Product, All Centres, Room Inventory, Pricing Reference & Portal SOP)  
-> **Target Audience:** AI Concierge / RAG Knowledge Base / Customer Support & Sales Automation  
 > **Coverage:** 9 Countries • 11 Cities • 25 Centres • 78+ Meeting Rooms & Boardrooms  
 > **Language:** English (EN)  
 > **Last Updated:** November 2026  
@@ -64,9 +62,9 @@ Available upon advance request (additional charges may apply):
 
 Below is the complete, authoritative directory of all CEO SUITE locations, including full addresses, operating hours, timezones, contact details, Centre Managers, starting reference rates, and the exact room-by-room inventory from the CEO SUITE Booking Portal.
 
-> **Important Notes for AI Agent Regarding Pricing & Operating Hours:**
+> **About Prices & Operating Hours:**
 > - Prices listed below are **Starting Reference Rates** from the official CEO SUITE Knowledge Base. Actual rates vary by room size (e.g., 4-pax Meeting Room vs 20-pax Boardroom vs 50-pax Theatre), booking duration, local taxes, and member discount tiers.
-> - Where a room's *Allowed Booking Hours* shows `Follows Centre Hours` (stored as `00:00–00:00` in the database), the room follows the centre's standard opening and closing hours.
+> - Where a room's *Allowed Booking Hours* shows `Follows Centre Hours`, the room follows the centre's standard opening and closing hours.
 
 ---
 
@@ -563,7 +561,7 @@ Below is the complete, authoritative directory of all CEO SUITE locations, inclu
 
 ## 5. Master Quick-Lookup Table: All 25 Centres, Capacities, Rates & Contacts
 
-This summary table enables the AI Agent to quickly compare starting rates, room counts, capacities, and official contacts across all markets:
+This table compares starting rates, room counts, capacities, and official contacts across all markets:
 
 | Country | City | Centre Name | Code | Rooms | Capacity Range | Starting Reference Rate | Official Phone | Official Email |
 | :--- | :--- | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
@@ -650,9 +648,9 @@ Per the official **CS Booking Portal** policy:
 
 ---
 
-## 7. Frequently Asked Questions (Comprehensive FAQ for AI Agent)
+## 7. Frequently Asked Questions
 
-| User Question | Approved AI Agent Response |
+| Question | Answer |
 | :--- | :--- |
 | **"Can I book a meeting room by the hour?"** | "Yes. Most CEO SUITE meeting rooms can be booked by the hour, half-day, or full-day. For our centres in Mainland China (Shanghai, Beijing, and Hangzhou), rooms are billed in 30-minute increments." |
 | **"Can non-members book a meeting room at CEO SUITE?"** | "Yes, external guests and non-members are welcome to book our meeting rooms via the Open Access Booking form at [https://booking.ceosuite.com](https://booking.ceosuite.com) or by contacting any of our business centres directly." |
@@ -660,47 +658,38 @@ Per the official **CS Booking Portal** policy:
 | **"Do you have large training or seminar rooms for 30–50 people in Jakarta?"** | "Yes. **CEO SUITE AXA Tower (45th Floor, Kuningan, Jakarta)** offers large-capacity venues including `AXA Classroom` (30 pax), `AXA Seminar Room` (30 pax), and `AXA Theatre` (up to 50 pax), in addition to our 20-pax `AXA Boardroom`." |
 | **"Can I access the room early to set up?"** | "Yes, we extend a complimentary **30-minute early setup leeway** for all clients. Beyond 30 minutes, a small one-time administrative fee applies depending on the centre." |
 | **"What is the cancellation policy for meeting rooms?"** | "Cancellations made **more than 7 working days** before the booking are free of charge. Cancellations made **3 to 7 working days** prior incur a **50% cancellation fee**. Cancellations **within 3 working days** incur a **100% cancellation fee** and must be handled by contacting your centre directly." |
-| **"Why do the Profile ROOMS metric and Available Rooms show the same count?"** | "In the CS Portal Mobile app, the `ROOMS` metric tile on the Profile page and the `Available Rooms` list on the Booking page use the same active client location filter (`VenueModel.filterVenuesForClient`), ensuring consistent room counts for your selected workspace." |
 | **"Are Wi-Fi, TV screens, and video conferencing available?"** | "Yes. Enterprise-grade wired and wireless internet (high-speed Wi-Fi), presentation displays, and whiteboards are standard. Video conferencing equipment and projectors are built into select rooms (such as `Boardroom - Oxley` in Singapore, `Chinachem Tower` in Hong Kong, `K11 Training Boardroom` in Hong Kong, and `AXA Meeting Room 1` in Jakarta) or available for rental with on-site IT support." |
 | **"Can you arrange catering or can we bring our own food?"** | "Both options are available. Our centre team can send you catering menus or order from a specific restaurant on your behalf (subject to a service charge). You may also bring your own food and beverages, subject to applicable service and corkage fees." |
 
 ---
 
-## 8. AI Agent Behaviour Rules, Qualification Flow & Escalation Playbook
+## 8. Booking a Meeting Room, Choosing the Right Space & Special Requests
 
-### A. Booking Qualification Flow (5 Key Details to Collect)
-Whenever a user expresses interest in booking or checking availability for a Meeting Room, the AI Agent should politely collect the following 5 items:
-1. **City & Preferred Centre:** Which city and building do they prefer? (If they only name a city like "Jakarta" or "Seoul", recommend the best-fit centre by district: e.g., SCBD → `IDX` / `OPP`, Sudirman → `SSC`, Kuningan → `AXA`; Gangnam → `Parnas Tower`, Gwanghwamun → `Kyobo Building`).
-2. **Party Size (Headcount):** How many participants (*pax*) will attend? (Match their headcount to the specific room names in Section 4).
-3. **Date & Time:** Preferred date, start time, and end time (duration).
-4. **Equipment & Catering Needs:** Any special requirements for video conferencing, projectors, catering, or seating layout (boardroom, classroom, seminar, theatre)?
-5. **Contact Information:** Full name, company name, email address, and phone/WhatsApp number.
+### A. How to Book a Meeting Room
+Book online at [https://booking.ceosuite.com](https://booking.ceosuite.com), or send these 5 details to our team and we will check availability for you:
+1. **City & preferred centre.** Not sure which centre? Tell us the area: in Jakarta, SCBD is served by IDX Tower 2 and One Pacific Place, Sudirman by Sahid Sudirman Center, and Kuningan by AXA Tower; in Seoul, Gangnam is served by Parnas Tower and Gwanghwamun by Kyobo Building.
+2. **Number of participants.** We match your headcount to the right room (see Section 4 for room capacities).
+3. **Date, start time and end time.**
+4. **Equipment, catering and layout.** For example video conferencing, a projector, catering, or a boardroom, classroom, seminar or theatre layout.
+5. **Your contact details.** Full name, company name, email address and phone number.
 
-### B. CRM System Classification & Data Extraction Tags
-When classification and data extraction rules are enabled in the system prompt:
-- Append `[CLASS:warm]` when the user asks general product, facility, or location questions about meeting rooms.
-- Append `[CLASS:hot_lead]` when the user asks about specific pricing, promotions, package credits, or payment procedures.
-- Append `[CLASS:booking]` when the user wants to book or reserve a specific room, date, and time right now.
-- Append `[CLASS:support]` when an existing member asks about portal issues, package conversion, rescheduling, or cancellation.
-- Extract visitor contact details at the end of the reply using: `[DATA: name="Full Name", email="email@domain.com", phone="+62812..."]`.
+### B. Is a Meeting Room the Right Choice?
+A meeting room suits you when you need:
+- Short-term meeting space (30 minutes, hourly, half-day or full-day) without a monthly office lease.
+- A room for interviews, board meetings, client presentations, training or workshops, or video conferences.
+- A private room to host clients or team sessions as a Virtual Office or Coworking client.
 
-### C. When AI SHOULD Recommend Meeting Rooms
-- User needs short-term meeting space (30-minute, hourly, half-day, or full-day) without committing to a monthly office lease.
-- User needs an interview room, boardroom, client presentation venue, training/workshop space, or video conferencing room.
-- User is a Virtual Office or Coworking client needing a private room to host clients or team sessions.
+Other CEO SUITE products may suit you better:
+- A permanent private workspace for your team every day: **Serviced Office**.
+- A full-time personal desk with 24/7 access: **Dedicated Workstation**.
+- Flexible individual desk access in a shared workspace: **Coworking Day Pass / Monthly Pass**.
+- A prestigious business address and mail handling for company registration, without using a room: **Virtual Office**.
 
-### D. When AI SHOULD NOT Recommend Meeting Rooms
-- User needs a permanent daily private workspace for their team (recommend **Serviced Office**).
-- User needs a full-time assigned personal desk with 24/7 access (recommend **Dedicated Workstation**).
-- User only needs flexible individual desk access in a shared workspace (recommend **Coworking Day Pass / Monthly Pass**).
-- User only needs a prestigious business address and mail handling for company registration without physical room usage (recommend **Virtual Office**).
-
-### E. Mandatory Guardrails & Human Escalation (`[HANDOFF_REQUESTED]`)
-1. **Never Guarantee Immediate Availability:** Always state that meeting room availability is dynamic and must be verified live via [https://booking.ceosuite.com](https://booking.ceosuite.com) or confirmed by the centre team.
-2. **Never Promise Exact Final Pricing Without Live Confirmation:** Always frame listed prices as *starting reference rates* in local currency, noting that exact rates depend on the selected room tier, duration, taxes, and membership discounts.
-3. **Escalate to a Human Agent (`[HANDOFF_REQUESTED]`) When:**
-   - The user requests a large-scale event (> 30–50 attendees), public event, or custom room reconfiguration.
-   - The user requests a cancellation fee waiver (especially within the 3-working-day window).
-   - The user requests bespoke corporate bulk-booking rates or complex multi-centre packages.
-   - An existing client reports a `Suspended` portal account status or billing dispute.
-
+### C. Availability, Prices & Special Requests
+- **Availability is live.** Room availability changes all the time; check it at [https://booking.ceosuite.com](https://booking.ceosuite.com) or ask the centre team to confirm.
+- **Prices are starting reference rates** in local currency. The final rate depends on the room, booking duration, local taxes and any membership discount.
+- **Our team arranges these directly with you:**
+  - Large or public events (more than 30–50 attendees) and custom room layouts.
+  - Requests to waive a cancellation fee (especially within 3 working days of the booking).
+  - Corporate bulk-booking rates and multi-centre packages.
+  - Portal account issues (for example a suspended account) and billing questions.

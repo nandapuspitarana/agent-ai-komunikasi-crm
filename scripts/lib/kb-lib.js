@@ -196,7 +196,19 @@ function chunksFromCentresJson(jsonText) {
   });
 }
 
+// The AI proxy's RAG isolation migration (ai-agent-proxy migrations/002_rag_isolation.sql) adds these columns.
+// Once they exist the proxy searches only chunks whose flow_id/tenant_id columns match the bot, so rows written
+// without them are never found. `rows` are information_schema.columns rows (table_name, column_name).
+const ISOLATION_KEYS = { flow_id: 'flowId', tenant_id: 'tenantId', bot_name: 'botName' };
+
+function isolationColumns(rows, table, keys) {
+  const present = new Set(rows.filter(r => r.table_name === table).map(r => r.column_name));
+  const names = Object.keys(ISOLATION_KEYS).filter(c => present.has(c));
+  return { names, values: names.map(c => keys[ISOLATION_KEYS[c]]) };
+}
+
 module.exports = {
+  isolationColumns,
   CENTRES_JSON,
   SUPERSEDED,
   REUSE_FROM_DB,

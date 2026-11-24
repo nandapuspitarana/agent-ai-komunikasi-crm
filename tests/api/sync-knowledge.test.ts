@@ -48,6 +48,31 @@ describe('Docker knowledge sync (scripts/docker/sync-knowledge.js)', () => {
     expect(lib.getCategory('KB - List of Centres.json')).toBe('Centres');
   });
 
+  it('TEST-KB-03b RAG isolation columns are written when the proxy migration added them, skipped otherwise', () => {
+    // information_schema rows as the sync reads them
+    const migrated = [
+      { table_name: 'crm_documents', column_name: 'flow_id' },
+      { table_name: 'crm_documents', column_name: 'tenant_id' },
+      { table_name: 'crm_documents', column_name: 'bot_name' },
+      { table_name: 'crm_document_chunks', column_name: 'flow_id' },
+      { table_name: 'crm_document_chunks', column_name: 'tenant_id' },
+    ];
+    const keys = { flowId: 'f1', tenantId: 't1', botName: 'Claire CEOSUITE' };
+
+    const docs = lib.isolationColumns(migrated, 'crm_documents', keys);
+    expect(docs).toEqual({ names: ['flow_id', 'tenant_id', 'bot_name'], values: ['f1', 't1', 'Claire CEOSUITE'] });
+    const chunks = lib.isolationColumns(migrated, 'crm_document_chunks', keys);
+    expect(chunks).toEqual({ names: ['flow_id', 'tenant_id'], values: ['f1', 't1'] });
+
+    // Before the migration: nothing extra, so the insert stays valid
+    expect(lib.isolationColumns([], 'crm_document_chunks', keys)).toEqual({ names: [], values: [] });
+
+    // The sync uses it for both tables
+    const sync = fs.readFileSync(path.join(root, 'scripts', 'docker', 'sync-knowledge.js'), 'utf8');
+    expect(sync).toContain("isolationColumns(isoRows, 'crm_documents'");
+    expect(sync).toContain("isolationColumns(isoRows, 'crm_document_chunks'");
+  });
+
   it('TEST-KB-04 Dry run plans the flow and all knowledge documents without a database', () => {
     const out = execFileSync('node', ['scripts/docker/sync-knowledge.js', '--dry-run'], {
       cwd: root,
