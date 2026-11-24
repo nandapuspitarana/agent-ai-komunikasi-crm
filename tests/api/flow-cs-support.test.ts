@@ -55,7 +55,22 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
   const buttons = (intent: any): Array<[string, string]> =>
     intent?.options ? intent.options.split(', ').map((o: string) => o.split('|') as [string, string]) : [];
 
-  it('TEST-CS-01 The flow has one start menu, one intent per city and one card per centre, nothing else', () => {
+  // The official FAQ (ceosuite.com) is the source of the FAQ menu: sections -> questions -> answers
+  const faqPath = path.join(process.cwd(), 'userjourney', 'knowledge base', 'L1-faq-ceosuite-official-website.md');
+  const faqSections = fs.readFileSync(faqPath, 'utf8').split(/\n## \d+\. /).slice(1).map((s) => {
+    const questions = s.split(/\n### Q\d+: /).slice(1).map((q) => {
+      const [title, ...rest] = q.split('\n');
+      const answer = rest.join('\n').replace(/\*\*Answer:\*\*/, '').replace(/\n---[\s\S]*$/, '').trim();
+      return { question: title.trim(), answer };
+    });
+    return { title: s.split('\n')[0].trim(), questions };
+  });
+  const faqQuestions = faqSections.flatMap((s) => s.questions);
+  const FAQ = 'FAQ';
+  const faqCategories = intents.filter((i) => i.metadata?.category === 'FAQ' && i.name !== FAQ && i.options);
+  const faqAnswers = intents.filter((i) => i.metadata?.category === 'FAQ' && i.responseType === 'card');
+
+  it('TEST-CS-01 The flow has one start menu, one intent per city, one card per centre and the FAQ menu, nothing else', () => {
     expect(flowData.type).toBe('agent_flow');
     expect(flowData.data.name).toBe('CEO SUITE Customer Service & Support Flow');
     const centreCards = intents.filter((i) => i.name.startsWith('Centre: '));
@@ -63,8 +78,21 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
     expect(byName.has(START)).toBe(true);
     expect(cityLists.map((i) => i.name.replace('City Directory: ', '')).sort()).toEqual([...cities].sort());
     expect(centreCards.map((i) => i.name.replace('Centre: ', '')).sort()).toEqual(Object.values(brandToCentre).sort());
-    expect(intents.length).toBe(1 + cities.length + Object.keys(brandToCentre).length);
+    expect(faqCategories.length).toBe(faqSections.length);
+    expect(faqAnswers.length).toBe(faqQuestions.length);
+    expect(faqQuestions.length).toBe(19);
+    expect(intents.length).toBe(1 + cities.length + Object.keys(brandToCentre).length + 1 + faqSections.length + faqQuestions.length);
     for (const card of centreCards) expect(card.responseType, card.name).toBe('card');
+  });
+
+  it('TEST-CS-01b No button label or target contains a comma or a pipe (the widget splits options on them)', () => {
+    // src/lib/quick-replies.ts parseOptions splits on "," and then on the first "|"
+    for (const intent of intents) {
+      for (const o of (intent.options ? intent.options.split(', ') : [])) {
+        expect(o.split('|').length, `${intent.name}: ${o}`).toBe(2);
+        expect(o, intent.name).not.toMatch(/,/);
+      }
+    }
   });
 
   it('TEST-CS-02 Every button opens an intent of this flow', () => {
@@ -78,7 +106,9 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
   });
 
   it('TEST-CS-03 The journey is Start -> city -> centre card and ends there (no loops)', () => {
-    expect(buttons(byName.get(START)).map(([, t]) => t).sort()).toEqual(cities.map((c) => `City Directory: ${c}`).sort());
+    const startTargets = buttons(byName.get(START)).map(([, t]) => t);
+    expect(startTargets[0], 'FAQ is the first button').toBe(FAQ);
+    expect(startTargets.slice(1).sort()).toEqual(cities.map((c) => `City Directory: ${c}`).sort());
     for (const city of cities) {
       const expected = Object.keys(brandToCity)
         .filter((b) => brandToCity[b] === city)
@@ -156,6 +186,55 @@ describe('CEO SUITE Customer Service & Support Flow Integrity', () => {
     expect(matchMessage('i need the address of one pacific place', false)?.name).toBe('Centre: One Pacific Place');
     expect(matchMessage('where is the axa tower office please', false)?.name).toBe('Centre: Axa Tower');
     expect(matchMessage('do you have an office in hanoi?', false)?.name).toBe('City Directory: Hanoi');
+  });
+
+  describe('FAQ menu: Start -> FAQ -> topic -> answer card, from L1-faq-ceosuite-official-website.md', () => {
+    const plainText = (html: string) => html
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"')
+      .replace(/•/g, ' ').replace(/\s+/g, ' ').trim();
+    const mdText = (md: string) => md
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/\*\*/g, '').replace(/^\s*- /gm, ' ')
+      .replace(/\s+/g, ' ').trim();
+    const answerFor = (question: string) => faqAnswers.find((a) => plainText(a.response).includes(question));
+
+    it('TEST-CS-21 FAQ lists one topic per FAQ section, each topic lists that section\'s questions', () => {
+      const topics = buttons(byName.get(FAQ));
+      expect(topics.length).toBe(faqSections.length);
+      faqSections.forEach((section, i) => {
+        const topic = byName.get(topics[i][1]);
+        expect(topic?.responseType, section.title).toBe('options');
+        const answers = buttons(topic).map(([, t]) => byName.get(t));
+        expect(answers.length, section.title).toBe(section.questions.length);
+        section.questions.forEach((q, j) => expect(plainText(answers[j]?.response ?? ''), q.question).toContain(q.question));
+      });
+    });
+
+    it('TEST-CS-22 Every FAQ answer card shows the official answer word for word and ends the journey', () => {
+      const failures: string[] = [];
+      for (const q of faqQuestions) {
+        const card = answerFor(q.question);
+        if (!card) { failures.push(`no card: ${q.question}`); continue; }
+        if (card.options !== '') failures.push(`has buttons: ${q.question}`);
+        if (!card.metadata?.fixedReply) failures.push(`not a fixed reply: ${q.question}`);
+        if (!plainText(card.response).includes(mdText(q.answer))) failures.push(`answer differs: ${q.question}`);
+      }
+      expect(failures).toEqual([]);
+      // Links in answers are clickable
+      expect(answerFor('How can I book a venue?')?.response).toContain("href='https://booking.ceosuite.com'");
+    });
+
+    it('TEST-CS-23 Typing an FAQ question exactly (with or without "?") opens its answer; "faq" opens the topics', () => {
+      const failures: string[] = [];
+      for (const q of faqQuestions) {
+        for (const typed of [q.question, q.question.replace(/\?$/, ''), q.question.toLowerCase()]) {
+          const hit = matchMessage(typed);
+          if (hit !== answerFor(q.question)) failures.push(`"${typed}" -> ${hit?.name ?? 'no match'}`);
+        }
+      }
+      expect(failures).toEqual([]);
+      for (const q of ['faq', 'FAQ', 'faqs', 'frequently asked questions', 'pertanyaan umum']) expect(matchMessage(q)?.name, q).toBe(FAQ);
+    });
   });
 
   describe('KB - List of Centres.json is the source of truth for centre details', () => {

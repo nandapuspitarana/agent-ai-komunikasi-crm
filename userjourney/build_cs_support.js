@@ -319,6 +319,69 @@ function centreCard(name, meta) {
   return `<div class='card'><div class='card-title'>${escHtml(labelOf(name))} (${meta.city})</div><div class='small'>${parts.join('<br/>')}</div></div>`;
 }
 
+// ---------------------------------------------------------------------------------------------------
+// FAQ menu: Start -> FAQ -> topic -> answer card, from the official FAQ (ceosuite.com). The answer card is
+// the end of the journey, like a centre card. Answers are shown word for word.
+// ---------------------------------------------------------------------------------------------------
+const FAQ = 'FAQ';
+const faqMd = fs.readFileSync(path.join(__dirname, 'knowledge base', 'L1-faq-ceosuite-official-website.md'), 'utf8')
+  .replace(/\r\n/g, NL);
+// Button label per FAQ section, in the file's order. No commas: the widget splits buttons on "," (src/lib/quick-replies.ts).
+const faqTopicLabels = ['Serviced Office', 'Coworking & Dedicated Desk', 'Virtual Office', 'Meeting Rooms & Events',
+  'Equipment & Catering', 'Internet & Wi-Fi'];
+const faqSections = faqMd.split(/\n## \d+\. /).slice(1).map((s, i) => ({
+  title: s.split(NL)[0].trim(),
+  label: faqTopicLabels[i],
+  questions: s.split(/\n### Q\d+: /).slice(1).map(q => {
+    const [title, ...rest] = q.split(NL);
+    const answer = rest.join(NL).replace(/\*\*Answer:\*\*/, '').replace(/\n---[\s\S]*$/, '').trim();
+    return { question: title.trim(), answer };
+  })
+}));
+if (faqSections.length !== faqTopicLabels.length) {
+  throw new Error(`FAQ has ${faqSections.length} sections, faqTopicLabels has ${faqTopicLabels.length}: update faqTopicLabels`);
+}
+for (const s of faqSections) if (!s.questions.length) throw new Error(`FAQ section "${s.title}" has no questions`);
+
+// FAQ answers are markdown: paragraphs, "- " lists, [text](url) links and **bold**
+function mdToHtml(md) {
+  const inline = t => escHtml(t)
+    .replace(/\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/g, (_, text, url) => `<a href='${url}' target='_blank'>${text}</a>`)
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  return md.split(/\n\s*\n/).map(block => block.split(NL).map(l => l.trim()).filter(Boolean)
+    .map(l => (l.startsWith('- ') ? '• ' + inline(l.slice(2)) : inline(l))).join('<br/>')).join('<br/><br/>');
+}
+const noComma = t => t.replace(/,/g, '');
+const faqTopicName = s => `FAQ: ${s.label}`;
+const faqAnswerName = q => `FAQ: ${noComma(q.question)}`;
+
+const faqIntent = {
+  name: FAQ,
+  trainingPhrases: ['faq', 'faqs', 'frequently asked questions', 'frequently asked question', 'common questions',
+    'pertanyaan umum', 'pertanyaan yang sering ditanyakan', 'tanya jawab'],
+  responseType: 'options',
+  response: 'Frequently asked questions. Choose a topic.',
+  options: toOptions(faqSections.map(s => [s.label, faqTopicName(s)])),
+  metadata: { category: 'FAQ', fixedReply: true }
+};
+const faqTopicIntents = faqSections.map(s => ({
+  name: faqTopicName(s),
+  trainingPhrases: [],
+  responseType: 'options',
+  response: `Frequently asked questions about ${s.label}. Choose a question to see the answer.`,
+  options: toOptions(s.questions.map(q => [noComma(q.question), faqAnswerName(q)])),
+  metadata: { category: 'FAQ', fixedReply: true, topic: s.label }
+}));
+const faqAnswerIntents = faqSections.flatMap(s => s.questions.map(q => ({
+  name: faqAnswerName(q),
+  // The question as written and without its question mark, so a visitor who types it gets the answer
+  trainingPhrases: [q.question, q.question.replace(/\?$/, ''), noComma(q.question).replace(/\?$/, '')],
+  responseType: 'card',
+  response: `<div class='card'><div class='card-title'>${escHtml(q.question)}</div><div class='small'>${mdToHtml(q.answer)}</div></div>`,
+  options: '',
+  metadata: { category: 'FAQ', fixedReply: true, topic: s.label, source: 'L1-faq-ceosuite-official-website.md' }
+})));
+
 const kbNameCount = {};
 kbCentres.forEach(c => { kbNameCount[c.centre_name] = (kbNameCount[c.centre_name] || 0) + 1; });
 
@@ -328,8 +391,8 @@ const startIntent = {
   name: START,
   trainingPhrases: [...greetingPhrases, ...locationListPhrases],
   responseType: 'options',
-  response: 'Hello, I’m Claire from CEO SUITE Customer Support. Choose a city to see our centres and their details, or type your question.',
-  options: toOptions(cityOrder.map(c => [c, cityIntentName(c)])),
+  response: 'Hello, I’m Claire from CEO SUITE Customer Support. Open FAQ for common questions, choose a city to see our centres and their details, or type your question.',
+  options: toOptions([[FAQ, FAQ], ...cityOrder.map(c => [c, cityIntentName(c)])]),
   metadata: { category: 'Locations', fixedReply: true }
 };
 
@@ -364,7 +427,12 @@ const centreIntents = cityOrder.flatMap(city => centresByCity.get(city).map(([na
   };
 }));
 
-const allIntents = [startIntent, ...cityIntents, ...centreIntents];
+const allIntents = [startIntent, ...cityIntents, ...centreIntents, faqIntent, ...faqTopicIntents, ...faqAnswerIntents];
+
+// The widget splits buttons on "," and then on the first "|" (src/lib/quick-replies.ts)
+const badButtons = allIntents.flatMap(i => (i.options ? i.options.split(', ') : [])
+  .filter(o => /,/.test(o) || o.split('|').length !== 2).map(o => `${i.name}: ${o}`));
+if (badButtons.length) throw new Error(`Button labels or targets with "," or "|":\n${badButtons.join('\n')}`);
 
 // Phrases: the intent's own name first, no repeats inside an intent, and never one phrase in two intents
 // (the widget answers the first intent that matches, so a shared phrase is a wrong answer waiting to happen).
@@ -437,4 +505,5 @@ const newFlow = {
 fs.writeFileSync(outputFilePath, JSON.stringify(newFlow, null, 2), 'utf8');
 
 console.log('Successfully generated:', outputFilePath);
-console.log(`Intents: ${allIntents.length} (1 start, ${cityIntents.length} cities, ${centreIntents.length} centres)`);
+console.log(`Intents: ${allIntents.length} (1 start, ${cityIntents.length} cities, ${centreIntents.length} centres, ` +
+  `1 FAQ menu, ${faqTopicIntents.length} FAQ topics, ${faqAnswerIntents.length} FAQ answers)`);
