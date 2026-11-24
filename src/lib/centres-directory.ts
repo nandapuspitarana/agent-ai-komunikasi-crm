@@ -634,7 +634,7 @@ export function formatDefaultHandoff(isEn: boolean = true, humanHandoffEnabled: 
   }
 
   // Every city, each opening its centre list in the CS flow
-  const cities = [...new Set(CENTRES_DIRECTORY.map((c) => c.city))];
+  const cities = Array.from(new Set(CENTRES_DIRECTORY.map((c) => c.city)));
   const options = cities.map((city) => `${city}|City Directory: ${city}`).join(', ');
 
   return { message: intro, options };

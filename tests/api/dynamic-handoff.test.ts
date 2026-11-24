@@ -149,7 +149,7 @@ describe('Centres Directory & Dynamic Handoff Resolver', () => {
     const targets = (options: string) => (options ? options.split(', ').map((o) => o.split('|')[1]) : []);
 
     const general = formatDefaultHandoff(true);
-    const cities = [...new Set(CENTRES_DIRECTORY.map((c) => c.city))];
+    const cities = Array.from(new Set(CENTRES_DIRECTORY.map((c) => c.city)));
     expect(targets(general.options).sort()).toEqual(cities.map((c) => `City Directory: ${c}`).sort());
 
     const perCity = cities.map((city) => resolveDynamicHandoff({ baseResponse: '[HANDOFF_REQUESTED]', city, isEn: true }));
