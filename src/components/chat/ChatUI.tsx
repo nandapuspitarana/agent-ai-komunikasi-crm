@@ -53,7 +53,8 @@ export interface ChatUIProps {
   config: ChatUIConfig;
   inputValue: string;
   onInputChange: (value: string) => void;
-  onSendMessage: (text: string) => void;
+  /** displayText: shown in the visitor's bubble instead of `text` (a quick-reply button's label) */
+  onSendMessage: (text: string, displayText?: string) => void;
   
   // Header Actions
   onRestartChat?: () => void;
@@ -476,7 +477,7 @@ export function ChatUI({
                     return (
                     <button
                       key={idx}
-                      onClick={() => onSendMessage(value)}
+                      onClick={() => onSendMessage(value, label)}
                       disabled={isTyping || status === 'closed'}
                       className="px-3 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-brand/30 transition-colors shadow-sm disabled:opacity-50"
                       style={{ borderColor: config.primaryColor + '40', color: config.primaryColor }}

@@ -244,12 +244,14 @@ export function ChatWindow({
 
   const isSendingRef = useRef(false);
 
-  const sendMessage = async (messageText: string) => {
+  // displayText: what the visitor's bubble shows when it differs from what is sent (a quick-reply button sends
+  // its value, e.g. "City Directory: Jakarta", but the visitor clicked "Jakarta")
+  const sendMessage = async (messageText: string, displayText?: string) => {
     if (!messageText.trim() || isSendingRef.current) return;
 
     isSendingRef.current = true;
     setIsSending(true);
-    addMessage(messageText, 'user');
+    addMessage(displayText?.trim() || messageText, 'user');
     setInputValue('');
 
     try {
@@ -382,7 +384,7 @@ export function ChatWindow({
   useEffect(() => {
     const handleWindowMessage = async (event: MessageEvent) => {
       if (event.data?.type === 'widget_quick_reply' && event.data?.text) {
-        sendMessageRef.current(event.data.text);
+        sendMessageRef.current(event.data.text, typeof event.data.label === 'string' ? event.data.label : undefined);
       } else if (event.data?.type === 'widget_form_submit' && event.data?.url && event.data?.payload) {
         try {
           const loadingMsg = event.data.loadingMessage || t('chatWidget', 'submittingForm', 'Submitting your details...');
