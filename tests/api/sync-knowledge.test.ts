@@ -73,6 +73,30 @@ describe('Docker knowledge sync (scripts/docker/sync-knowledge.js)', () => {
     expect(sync).toContain("isolationColumns(isoRows, 'crm_document_chunks'");
   });
 
+  it('TEST-KB-03c No document the sync loads names a centre manager (RAG answers are shown to visitors)', () => {
+    const kbDir = path.join(root, 'userjourney', 'knowledge base');
+    const centresJson = fs.readFileSync(path.join(kbDir, lib.CENTRES_JSON), 'utf8');
+    const names = new Set<string>();
+    const walk = (o: any) => {
+      if (!o || typeof o !== 'object') return;
+      for (const [k, v] of Object.entries(o)) {
+        if (k === 'centre_manager' && typeof v === 'string' && v.trim()) names.add(v.trim());
+        else walk(v);
+      }
+    };
+    walk(JSON.parse(centresJson));
+    expect(names.size).toBeGreaterThan(0); // the KB does hold them; they must stay out of what is indexed
+
+    const loaded: Array<[string, string]> = fs
+      .readdirSync(kbDir)
+      .filter((f) => /\.(md|txt)$/i.test(f))
+      .map((f) => [f, fs.readFileSync(path.join(kbDir, f), 'utf8')]);
+    lib.chunksFromCentresJson(centresJson).forEach((c: string, i: number) => loaded.push([`centres chunk ${i}`, c]));
+
+    const leaks = loaded.flatMap(([f, text]) => Array.from(names).filter((n) => text.includes(n)).map((n) => `${f}: ${n}`));
+    expect(leaks).toEqual([]);
+  });
+
   it('TEST-KB-04 Dry run plans the flow and all knowledge documents without a database', () => {
     const out = execFileSync('node', ['scripts/docker/sync-knowledge.js', '--dry-run'], {
       cwd: root,
