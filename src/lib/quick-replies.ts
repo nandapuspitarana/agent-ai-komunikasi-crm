@@ -57,7 +57,9 @@ export function toLegacyHtml(options: QuickReplyOption[]): string {
   if (options.length === 0) return '';
   const buttons = options
     .map((o) => {
-      const handler = `window.postMessage({type: 'widget_quick_reply', text: ${JSON.stringify(o.value)}}, '*')`;
+      // `text` (the value, often an intent name) goes to the server; `label` is what the visitor clicked and
+      // what their own chat bubble shows
+      const handler = `window.postMessage({type: 'widget_quick_reply', text: ${JSON.stringify(o.value)}, label: ${JSON.stringify(o.label)}}, '*')`;
       return (
         `<button class="px-3 py-1.5 text-xs font-medium text-brand bg-brand-bg hover:bg-brand-bg border border-brand/30 rounded-full transition-colors" ` +
         `onclick="${escapeHtml(handler)}">${escapeHtml(o.label)}</button>`

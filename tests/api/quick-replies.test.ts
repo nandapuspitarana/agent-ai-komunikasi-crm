@@ -43,8 +43,45 @@ describe('toLegacyHtml', () => {
     // browsers decode entities in attribute values before running the handler:
     const handler = /onclick="([^"]*)"/.exec(html)![1]
       .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-    expect(handler).toBe(`window.postMessage({type: 'widget_quick_reply', text: "Kids' room"}, '*')`);
+    expect(handler).toBe(`window.postMessage({type: 'widget_quick_reply', text: "Kids' room", label: "Kids' room"}, '*')`);
     expect(html).toContain('>Kids&#39; room</button>');
+    // the label is escaped the same way as the value
+    const second = /onclick="([^"]*)"/g;
+    second.exec(html);
+    const h2 = second.exec(html)![1];
+    expect(h2).not.toContain('<');
+    expect(h2).not.toContain('"');
+  });
+
+  it('TEST-AI-R15 a button sends its value and also its label, so the visitor bubble shows the label', () => {
+    // CS flow buttons are "Jakarta|City Directory: Jakarta": the intent name goes to the server, but the visitor
+    // clicked "Jakarta" and must see "Jakarta" in their own bubble, not "City Directory: Jakarta".
+    const html = toLegacyHtml(parseOptions('Jakarta|City Directory: Jakarta, Meeting Rooms & Events|FAQ: Meeting Rooms & Events'));
+    const decode = (s: string) => s.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+    const handlers: string[] = [];
+    const re = /onclick="([^"]*)"/g;
+    for (let m = re.exec(html); m; m = re.exec(html)) handlers.push(decode(m[1]));
+    expect(handlers).toEqual([
+      `window.postMessage({type: 'widget_quick_reply', text: "City Directory: Jakarta", label: "Jakarta"}, '*')`,
+      `window.postMessage({type: 'widget_quick_reply', text: "FAQ: Meeting Rooms & Events", label: "Meeting Rooms & Events"}, '*')`,
+    ]);
+  });
+
+  it('TEST-AI-R16 the widget shows the label in the visitor bubble for both kinds of buttons', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const read = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8');
+    const win = read('src/modules/widget/ChatWindow.tsx');
+    // reply buttons (postMessage) pass the label through to sendMessage, which shows it instead of the value
+    expect(win).toMatch(/sendMessageRef\.current\(event\.data\.text,\s*typeof event\.data\.label === 'string' \? event\.data\.label : undefined\)/);
+    expect(win).toMatch(/const sendMessage = async \(messageText: string, displayText\?: string\)/);
+    expect(win).toMatch(/addMessage\(displayText\?\.trim\(\) \|\| messageText, 'user'\)/);
+    // the request still carries the value (intent name)
+    expect(win).toMatch(/message: messageText,/);
+    // welcome buttons rendered by ChatUI pass the label too
+    const ui = read('src/components/chat/ChatUI.tsx');
+    expect(ui).toContain('onClick={() => onSendMessage(value, label)}');
+    expect(ui).toMatch(/onSendMessage: \(text: string, displayText\?: string\) => void;/);
   });
 
   it('returns empty string for no options', () => {
