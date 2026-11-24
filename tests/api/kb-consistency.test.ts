@@ -153,9 +153,11 @@ describe('Knowledge base has one consistent version of every centre', () => {
         if (m) facilities.set(m[1], (facilities.get(m[1]) || '') + m[2]);
       }
       expect(facilities.size, file).toBeGreaterThan(50);
-      for (const [n, l] of lines.entries()) {
-        if (/^\|\s*\d+\s*\|/.test(l)) continue; // the tables themselves
-        const rooms = Array.from(l.matchAll(/`([^`]+)`/g), (m) => m[1]).filter((r) => facilities.has(r));
+      lines.forEach((l, n) => {
+        if (/^\|\s*\d+\s*\|/.test(l)) return; // the tables themselves
+        const rooms: string[] = [];
+        const code = /`([^`]+)`/g;
+        for (let m = code.exec(l); m; m = code.exec(l)) if (facilities.has(m[1])) rooms.push(m[1]);
         for (const [word, facility] of [[/projector|proyektor/i, 'Projector'], [/video conferenc/i, 'Video Conference']] as const) {
           if (!word.test(l)) continue;
           // Rooms named in the same sentence as the feature must have it
@@ -166,7 +168,7 @@ describe('Knowledge base has one consistent version of every centre', () => {
             }
           }
         }
-      }
+      });
     }
     expect(failures).toEqual([]);
   });
