@@ -22,9 +22,9 @@ class MessageRun {
   String toString() => 'MessageRun($text${bold ? ', bold' : ''}${url != null ? ', $url' : ''})';
 }
 
-// **bold** | [label](https://url) | bare https://url
+// **bold** | [label](https://url or mailto:address) | bare https://url
 final RegExp _tokenRe = RegExp(
-  r'\*\*(.+?)\*\*|\[([^\]\n]+)\]\((https?://[^)\s]+)\)|(https?://[^\s<>()\[\]]+)',
+  r'\*\*(.+?)\*\*|\[([^\]\n]+)\]\(((?:https?://|mailto:)[^)\s]+)\)|(https?://[^\s<>()\[\]]+)',
 );
 
 // Punctuation that ends a sentence rather than a bare URL.

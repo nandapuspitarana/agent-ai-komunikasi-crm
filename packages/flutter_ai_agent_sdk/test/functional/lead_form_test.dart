@@ -86,6 +86,17 @@ void main() {
       ]);
     });
 
+    test('TEST-AI-F26c a mailto anchor (centre card e-mail) becomes a link, not raw markdown', () {
+      final runs = parseMessageRuns(
+          "<b>Email:</b> <a href='mailto:sales@ceosuite.com'>sales@ceosuite.com</a><br/>Phone: +62");
+      expect(runs, [
+        const MessageRun('Email:', bold: true),
+        const MessageRun(' '),
+        const MessageRun('sales@ceosuite.com', url: 'mailto:sales@ceosuite.com'),
+        const MessageRun('\nPhone: +62'),
+      ]);
+    });
+
     test('TEST-AI-F26b plain text stays a single run', () {
       expect(parseMessageRuns('Halo, apa kabar?'), [const MessageRun('Halo, apa kabar?')]);
     });
