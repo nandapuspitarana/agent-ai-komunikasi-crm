@@ -86,6 +86,17 @@ void main() {
       ]);
     });
 
+    test('TEST-AI-F26c a mailto anchor (centre card e-mail) becomes a link, not raw markdown', () {
+      final runs = parseMessageRuns(
+          "<b>Email:</b> <a href='mailto:sales@ceosuite.com'>sales@ceosuite.com</a><br/>Phone: +62");
+      expect(runs, [
+        const MessageRun('Email:', bold: true),
+        const MessageRun(' '),
+        const MessageRun('sales@ceosuite.com', url: 'mailto:sales@ceosuite.com'),
+        const MessageRun('\nPhone: +62'),
+      ]);
+    });
+
     test('TEST-AI-F26b plain text stays a single run', () {
       expect(parseMessageRuns('Halo, apa kabar?'), [const MessageRun('Halo, apa kabar?')]);
     });
@@ -211,6 +222,7 @@ void main() {
       when(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) async => ChatMessage(
             id: 'b2',
@@ -226,6 +238,7 @@ void main() {
       final captured = verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: captureAny(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).captured.single as String;
       expect(captured, contains('- name: Ann'));
@@ -472,6 +485,7 @@ void main() {
       when(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) async => ChatMessage(
             id: 'h1',
@@ -489,6 +503,7 @@ void main() {
       verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
             channel: any(named: 'channel'),
             emailCenter: any(named: 'emailCenter'),

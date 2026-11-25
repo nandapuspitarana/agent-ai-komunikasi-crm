@@ -43,6 +43,7 @@ void main() {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) async {
         // Simulating artificial server delay
@@ -72,10 +73,11 @@ void main() {
       expect(controller.isTyping, isFalse);
     });
 
-    test('TEST-AI-U13: selectOption should trigger sendMessage with option value', () async {
+    test('TEST-AI-U13: selectOption sends the option value, sends and shows its label', () async {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
-            message: any(named: 'message'),
+            message: 'Book Meeting Room',
+            displayText: 'Meeting Room',
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) async => ChatMessage(
             id: 'bot_2',
@@ -88,13 +90,14 @@ void main() {
       await controller.selectOption(option);
 
       expect(controller.messages.length, equals(2));
-      expect(controller.messages.first.text, equals('Book Meeting Room'));
+      expect(controller.messages.first.text, equals('Meeting Room'));
     });
 
     test('TEST-AI-U14: Should mark message with error status when API fails', () async {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenThrow(const AiAgentApiException('Server Unavailable'));
 
@@ -143,6 +146,7 @@ void main() {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) async => ChatMessage(
             id: 'agent_1',
@@ -167,6 +171,7 @@ void main() {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((invocation) async {
         final sid = invocation.namedArguments[#sessionId] as String;
@@ -313,6 +318,7 @@ void main() {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) => completer.future);
 

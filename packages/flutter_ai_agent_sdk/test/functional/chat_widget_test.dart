@@ -51,6 +51,7 @@ void main() {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer(
         (_) async => ChatMessage(
@@ -74,7 +75,7 @@ void main() {
       expect(find.text('Jawaban bot untuk pertanyaan Anda.'), findsOneWidget);
     });
 
-    testWidgets('TEST-AI-W03: Tapping Quick Reply chip sends option value', (tester) async {
+    testWidgets('TEST-AI-W03: Tapping Quick Reply chip sends option value and shows its label', (tester) async {
       when(() => mockApiClient.initWidget(contactId: any(named: 'contactId'))).thenAnswer(
         (_) async => {
           'config': {
@@ -86,6 +87,7 @@ void main() {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer(
         (_) async => ChatMessage(
@@ -105,7 +107,15 @@ void main() {
       await tester.tap(find.text('Booking Room'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Book Room Now'), findsOneWidget);
+      verify(() => mockApiClient.sendMessage(
+            sessionId: any(named: 'sessionId'),
+            message: 'Book Room Now',
+            displayText: 'Booking Room',
+            contactId: any(named: 'contactId'),
+          )).called(1);
+      // the chip and the visitor's bubble both say the label; the value is never shown
+      expect(find.text('Booking Room'), findsNWidgets(2));
+      expect(find.text('Book Room Now'), findsNothing);
       expect(find.text('Membuka formulir booking...'), findsOneWidget);
     });
 
@@ -116,6 +126,7 @@ void main() {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer(
         (_) async => ChatMessage(
@@ -176,6 +187,7 @@ void main() {
       when(() => mockApiClient.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer(
         (_) async => ChatMessage(

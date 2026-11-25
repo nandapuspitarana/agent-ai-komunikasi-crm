@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 
 import { prisma } from '@/lib/prisma';
+import { messagePreview } from '@/lib/message-preview';
 
 export async function GET(req: NextRequest) {
   try {
@@ -163,7 +164,7 @@ export async function GET(req: NextRequest) {
         id: m.id,
         agent: 'AI Bot',
         user: m.session.contactId,
-        message: m.content.substring(0, 100) + (m.content.length > 100 ? '...' : ''),
+        message: messagePreview(m.content),
         time: timeStr
       };
     });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 
 import { prisma } from '@/lib/prisma';
+import { messagePreview } from '@/lib/message-preview';
 
 export async function GET(req: NextRequest) {
   try {
@@ -61,7 +62,7 @@ export async function GET(req: NextRequest) {
           sender: msg.senderType === 'user' ? 'user' : 'agent',
           timestamp: msg.createdAt
         })),
-        preview: lastMessage ? lastMessage.content : 'No messages yet',
+        preview: lastMessage ? messagePreview(lastMessage.content) : 'No messages yet',
         time: session.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
     });

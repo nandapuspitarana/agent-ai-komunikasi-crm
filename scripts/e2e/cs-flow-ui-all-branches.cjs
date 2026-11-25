@@ -56,7 +56,8 @@ walk('Start / Main Menu', []);
           const target = byName.get(step.target);
           const next = opts(target);
           if (next.length) await page.getByRole('button', { name: next[0].label, exact: true }).last().waitFor({ timeout: 20000 });
-          else await page.getByText(cardTitle(target), { exact: true }).last().waitFor({ timeout: 20000 });
+          // FAQ card titles repeat the clicked button's label, so look for the title inside a card, not anywhere
+          else await page.locator('.card-title', { hasText: cardTitle(target) }).last().waitFor({ timeout: 20000 });
         }
         const all = (await page.locator('.rounded-br-sm p').allInnerTexts()).map((t) => t.trim());
         const leaked = all.filter((t) => INTENT_NAME.test(t));
