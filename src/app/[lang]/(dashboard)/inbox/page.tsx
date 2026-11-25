@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { supabase, setRealtimeTokenSource, fetchRealtimeToken } from '@/lib/supabase-client';
 import { CannedResponses } from '@/components/inbox/CannedResponses';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { messagePreview } from '@/lib/message-preview';
 
 interface Chat {
   id: string;
@@ -109,7 +110,7 @@ export default function InboxPage() {
                     sender: data.senderType,
                     timestamp: new Date(data.createdAt || Date.now()).toISOString()
                   }],
-                  preview: data.content,
+                  preview: messagePreview(data.content),
                   time: new Date(data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 };
               }
