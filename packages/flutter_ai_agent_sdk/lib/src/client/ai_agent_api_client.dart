@@ -106,6 +106,7 @@ class AiAgentApiClient {
   Future<ChatMessage> sendMessage({
     required String sessionId,
     required String message,
+    String? displayText,
     String? contactId,
     String channel = 'mobile_app',
     String? emailCenter,
@@ -128,6 +129,11 @@ class AiAgentApiClient {
       'tenantId': config.tenantId,
       'sessionId': sessionId,
       'message': sanitizedMessage,
+      // A Quick Reply sends its value (the intent) as `message` and the button
+      // label as `displayText`: the server matches on the first and stores the
+      // second, so the agent inbox shows what the visitor tapped.
+      if (displayText != null && displayText.trim().isNotEmpty)
+        'displayText': ContentSanitizer.sanitize(displayText.trim()),
       if (contactId != null) 'contactId': contactId,
       'channel': channel,
       if (emailCenter != null && emailCenter.trim().isNotEmpty)

@@ -41,6 +41,7 @@ void main() {
         when(() => mockApiClient.sendMessage(
               sessionId: any(named: 'sessionId'),
               message: any(named: 'message'),
+              displayText: any(named: 'displayText'),
               contactId: any(named: 'contactId'),
             )).thenAnswer(
           (_) async => ChatMessage(

@@ -31,6 +31,7 @@ void main() {
       when(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) => answer());
     }
@@ -72,7 +73,7 @@ void main() {
       expect(tester.widget<ActionChip>(chip('Pricing')).onPressed, isNotNull);
     });
 
-    testWidgets('TEST-AI-F11 tapping a welcome chip sends its value; that chip is marked chosen and disabled', (tester) async {
+    testWidgets('TEST-AI-F11 tapping a welcome chip sends its value, shows its label; that chip is marked chosen and disabled', (tester) async {
       stubInit();
       stubSend(() async => bot('Ini daftar harga.'));
       await pump(tester);
@@ -83,10 +84,12 @@ void main() {
       verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: 'price', // value, not label
+            displayText: 'Pricing', // the label, stored for the agent inbox
             contactId: any(named: 'contactId'),
           )).called(1);
 
-      expect(find.text('price'), findsOneWidget, reason: 'user bubble shows the sent value');
+      expect(find.text('price'), findsNothing, reason: 'the intent value is never shown');
+      expect(find.text('Pricing'), findsNWidgets(2), reason: 'the chip and the user bubble show the label');
       expect(find.text('Ini daftar harga.'), findsOneWidget);
       expect(tester.widget<ActionChip>(chip('Pricing')).onPressed, isNull);
       expect(tester.widget<ActionChip>(chip('Book a tour')).onPressed, isNull, reason: 'old options cannot be reused');
@@ -124,6 +127,7 @@ void main() {
       verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: 'Bangkok Private Office',
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).called(1);
     });

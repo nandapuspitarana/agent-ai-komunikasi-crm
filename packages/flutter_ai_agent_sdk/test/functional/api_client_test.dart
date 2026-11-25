@@ -103,6 +103,29 @@ void main() {
       expect(reply.text, contains('Sahid Sudirman Center'));
     });
 
+    test('TEST-AI-U07c: sendMessage sends a Quick Reply label as displayText, and omits it otherwise', () async {
+      final payloads = <Map<String, dynamic>>[];
+      when(() => mockClient.post(
+            any(),
+            headers: any(named: 'headers'),
+            body: any(named: 'body'),
+          )).thenAnswer((invocation) async {
+        payloads.add(jsonDecode(invocation.namedArguments[#body] as String) as Map<String, dynamic>);
+        return http.Response(jsonEncode({'reply': 'ok'}), 200);
+      });
+
+      await apiClient.sendMessage(
+        sessionId: 'session_abc',
+        message: 'City Directory: Jakarta',
+        displayText: 'Jakarta',
+      );
+      await apiClient.sendMessage(sessionId: 'session_abc', message: 'hello');
+
+      expect(payloads[0]['message'], equals('City Directory: Jakarta'));
+      expect(payloads[0]['displayText'], equals('Jakarta'));
+      expect(payloads[1].containsKey('displayText'), isFalse);
+    });
+
     test('TEST-AI-U08: Should retry once on network connection error and succeed', () async {
       int callCount = 0;
       when(() => mockClient.post(

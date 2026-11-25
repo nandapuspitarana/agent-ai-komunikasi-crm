@@ -31,6 +31,7 @@ void main() {
       when(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) async => ChatMessage(
             id: 'h1',
@@ -69,6 +70,7 @@ void main() {
       verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).called(1);
     });
@@ -119,6 +121,7 @@ void main() {
       verifyNever(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           ));
     });
@@ -166,6 +169,7 @@ void main() {
       verifyNever(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           ));
     });

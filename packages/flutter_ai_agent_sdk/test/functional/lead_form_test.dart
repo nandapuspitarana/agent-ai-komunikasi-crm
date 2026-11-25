@@ -211,6 +211,7 @@ void main() {
       when(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) async => ChatMessage(
             id: 'b2',
@@ -226,6 +227,7 @@ void main() {
       final captured = verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: captureAny(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).captured.single as String;
       expect(captured, contains('- name: Ann'));
@@ -472,6 +474,7 @@ void main() {
       when(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
           )).thenAnswer((_) async => ChatMessage(
             id: 'h1',
@@ -489,6 +492,7 @@ void main() {
       verify(() => api.sendMessage(
             sessionId: any(named: 'sessionId'),
             message: any(named: 'message'),
+            displayText: any(named: 'displayText'),
             contactId: any(named: 'contactId'),
             channel: any(named: 'channel'),
             emailCenter: any(named: 'emailCenter'),

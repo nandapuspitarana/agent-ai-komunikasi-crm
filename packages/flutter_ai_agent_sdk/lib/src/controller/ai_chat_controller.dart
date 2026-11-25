@@ -456,25 +456,36 @@ class AiChatController extends ChangeNotifier {
   }
 
   /// Sends a text message from the user.
-  Future<void> sendMessage(String text) async {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty || _isTyping || _isSending) return;
-    _isSending = true;
+  Future<void> sendMessage(String text) => _send(text, throttled: true);
 
-    // Rate limiter anti-flood check
-    if (!rateLimiter.allowAction()) {
+  /// [throttled] applies the anti-flood interval. A Quick Reply skips it: its
+  /// buttons are disabled while a reply is pending and only the latest bot
+  /// message's buttons are live, so a tap cannot flood, and a flow button's
+  /// reply often arrives inside the interval.
+  ///
+  /// [displayText] is what the visitor sees in their bubble (a button's label)
+  /// when it differs from the [text] sent for matching (the button's intent).
+  Future<void> _send(String text, {required bool throttled, String? displayText}) async {
+    final trimmed = text.trim();
+    final shown = displayText?.trim() ?? '';
+    if (trimmed.isEmpty || _isTyping || _isSending) return;
+
+    // Rate limiter anti-flood check, before taking the in-flight flag so a
+    // refused message does not leave the chat locked.
+    if (throttled && !rateLimiter.allowAction()) {
       _errorMessage = 'Please wait a moment before sending another message.';
       notifyListeners();
       return;
     }
 
+    _isSending = true;
     _errorMessage = null;
 
     final userMsgId = 'user_${DateTime.now().millisecondsSinceEpoch}';
     final userMsg = ChatMessage(
       id: userMsgId,
       sender: MessageSender.user,
-      text: trimmed,
+      text: shown.isNotEmpty ? shown : trimmed,
       timestamp: DateTime.now(),
       status: MessageStatus.sending,
     );
@@ -488,6 +499,7 @@ class AiChatController extends ChangeNotifier {
       final botReply = await apiClient.sendMessage(
         sessionId: _sessionId,
         message: trimmed,
+        displayText: shown.isNotEmpty && shown != trimmed ? shown : null,
         contactId: contactId,
         emailCenter: _emailCenter,
         centreName: _centreName,
@@ -552,7 +564,11 @@ class AiChatController extends ChangeNotifier {
 
   /// Sends a Quick Reply option selection.
   Future<void> selectOption(QuickReplyOption option) async {
-    await sendMessage(option.value.isNotEmpty ? option.value : option.label);
+    await _send(
+      option.value.isNotEmpty ? option.value : option.label,
+      throttled: false,
+      displayText: option.label,
+    );
   }
 
   /// Submits the lead form of message [messageId] with [values] (field name ->
